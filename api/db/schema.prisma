@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -11,8 +11,128 @@ generator client {
 // Define your own datamodels here and run `yarn redwood prisma migrate dev`
 // to create migrations for them and apply to your dev DB.
 // TODO: Please remove the following example:
-model UserExample {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
+// model UserExample {
+//   id    Int     @id @default(autoincrement())
+//   email String  @unique
+//   name  String?
+// }
+
+model Arrestee {
+  id       Int @id @default(autoincrement())
+  display_field String
+  search_field String
+  first_name        String?
+  last_name         String?
+  preferred_name    String?
+  pronoun    String?
+  dob               DateTime?
+  email String?
+  phone_1 String?
+  phone_2 String?
+  address String?
+  city String?
+  state String?
+  zip String?
+  notes String?
+  custom_fields Json?
+  createdAt         DateTime? @default(now())
+  createdBy     User? @relation("CreatedArrestee", fields: [createdby_id], references: [id])
+  createdby_id Int?
+  updatedAt         DateTime? @updatedAt
+  updatedBy     User? @relation("ModifiedArrestee", fields: [updatedby_id], references: [id])
+  updatedby_id Int?
+  arrests Arrest[]
+  arrestee_logs Log[]
+  @@index([search_field])
+}
+
+model CustomSchema {
+  id       Int @id @default(autoincrement())
+  table String
+  section String
+  schema Json
+  updatedAt         DateTime? @updatedAt
+  updatedBy     User? @relation(fields: [updatedby_id], references: [id])
+  updatedby_id Int?
+}
+
+model Log {
+  id       Int @id @default(autoincrement())
+  time  DateTime @default(now())
+  type  String?
+  notes String?
+  needs_followup  Boolean @default(false)
+  custom_fields Json?
+  arrestee Arrestee? @relation(fields: [arrestee_id], references: [id])
+  arrestee_id Int?
+  createdAt         DateTime? @default(now())
+  createdBy     User? @relation("CreatedLog", fields: [createdby_id], references: [id])
+  createdby_id Int?
+  updatedAt         DateTime? @updatedAt
+  updatedBy     User? @relation("ModifiedLog", fields: [updatedby_id], references: [id])
+  updatedby_id Int?
+}
+
+model HotlineLog {
+  id       Int @id @default(autoincrement())
+  time  DateTime @default(now())
+  type  String?
+  notes String?
+  custom_fields Json?
+  createdAt         DateTime? @default(now())
+  createdBy     User? @relation("CreatedHotlineLog", fields: [createdby_id], references: [id])
+  createdby_id Int?
+  updatedAt         DateTime? @updatedAt
+  updatedBy     User? @relation("ModifiedHotlineLog", fields: [updatedby_id], references: [id])
+  updatedby_id Int?
+}
+
+// model SupportContact {
+//     id       Int @id @default(autoincrement())
+//     name  String?
+
+// }
+
+model Arrest {
+  id  Int @id @default(autoincrement())
+  display_field String
+  search_field String
+  date DateTime?
+  location String?
+  charges String?
+  arrest_city String?
+  jurisdiction String?
+  citation_number String?
+
+  arrestee Arrestee? @relation(fields: [arrestee_id], references: [id])
+  arrestee_id Int?
+  custom_fields Json?
+  createdAt         DateTime? @default(now())
+  createdBy     User? @relation("CreatedArrest", fields: [createdby_id], references: [id])
+  createdby_id Int?
+  updatedAt         DateTime? @updatedAt
+  updatedBy     User? @relation("ModifiedArrest", fields: [updatedby_id], references: [id])
+  updatedby_id Int?
+  @@index([search_field])
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
   name  String?
+  custom_fields Json?
+  role                String? @default("User")
+  hashedPassword      String
+  salt                String
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+  created_arrests Arrest[] @relation("CreatedArrest")
+  updated_arrests Arrest[] @relation("ModifiedArrest")
+  created_arrestees Arrestee[] @relation("CreatedArrestee")
+  updated_arrestees Arrestee[] @relation("ModifiedArrestee")
+  created_arrestee_logs Log[] @relation("CreatedLog")
+  updated_arrestee_logs Log[] @relation("ModifiedLog")
+  created_hotline_logs HotlineLog[] @relation("CreatedHotlineLog")
+  updated_hotline_logs HotlineLog[] @relation("ModifiedHotlineLog")
+  updated_custom_schemas CustomSchema[] @relation()
 }

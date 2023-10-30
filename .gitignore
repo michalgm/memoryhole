@@ -1,6 +1,6 @@
 .idea
 .DS_Store
-.env
+.env.*
 .netlify
 .redwood/*
 !.redwood/README.md
@@ -20,3 +20,4 @@ api/src/lib/generateGraphiQLHeader.*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+tryouts/
