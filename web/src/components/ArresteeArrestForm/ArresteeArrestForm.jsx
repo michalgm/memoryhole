@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, Divider, TextField, Typography } from '@mui/material'
+import { Box, Card, CardContent, CardHeader, Divider, TextField, Tooltip, Typography } from '@mui/material'
 import {
   Form,
   Submit,
@@ -6,7 +6,7 @@ import {
   useRegister
 } from '@redwoodjs/forms'
 import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
-import {get, startCase} from 'lodash'
+import { get, startCase } from 'lodash'
 
 import { DateTimePicker } from '@mui/x-date-pickers';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
@@ -26,15 +26,15 @@ const formatDatetime = (value) => {
 
 const ArresteeArrestForm = (props) => {
   const formMethods = useForm()
-
+  // console.error(props)
   const Field = ({ name, field_type, ...props }) => {
     const register = useRegister({ name })
-    const textField = {name,variant: 'standard', fullWidth: true}
+    const textField = { name, variant: 'standard', fullWidth: true }
     if (field_type === 'date') {
       return <DateTimePicker
         {...props}
         {...register}
-        slotProps={{textField}}
+        slotProps={{ textField }}
         defaultValue={dayjs(props.defaultValue)}
         onChange={(val) => formMethods.setValue(name, val)}
       />
@@ -60,54 +60,82 @@ const ArresteeArrestForm = (props) => {
     return startCase(label.slice(index + 1))
   }
   const fields = props.fields.map(
-    ({fields, title}, index) => {
+    ({ fields, title }, index) => {
       return (
         <Grid key={index} xs={12}>
           {title && <Typography variant='h6' gutterBottom>{title}</Typography>}
-        <Card>
-  {/* <CardHeader title={title}/> */}
-  <CardContent>
-    {/* Form fields for section 1 */}
+          <Card>
+            {/* <CardHeader title={title}/> */}
+            <CardContent>
+              {/* Form fields for section 1 */}
 
-          {/* <Divider textAlign="left">
+              {/* <Divider textAlign="left">
 
           </Divider> */}
-          <Box>
-          <Grid container spacing={2}>
+              <Box>
+                <Grid container spacing={2}>
 
-            {fields.map(([key, {label, ...options}={}]) => {
-              return <Grid xs={6} key={key}>
-              <Field
-                id={key}
-                label={formatLabel(label || key)}
-                name={key}
-                defaultValue={get(props.arrest, key)}
-                {...options}
-              />
-              </Grid>
-            })}
-            </Grid>
-          </Box>
-          </CardContent>
-</Card>
+                  {fields.map(([key, { label, ...options } = {}]) => {
+                    return <Grid xs={6} key={key}>
+                      <Field
+                        id={key}
+                        label={formatLabel(label || key)}
+                        name={key}
+                        defaultValue={get(props.arrest, key)}
+                        {...options}
+                      />
+                    </Grid>
+                  })}
+                </Grid>
+              </Box>
+            </CardContent>
+          </Card>
+
+
+
         </Grid>
       )
     }
   )
+  const stats = {
+    created: dayjs(props?.arrest?.created_at),
+    updated: dayjs(props?.arrest?.updated_at),
+  }
+
+  const ModTime = ({time}) => (
+     <Typography variant='overline'>
+      {startCase(time)}&nbsp;
+      <Tooltip title={stats[time].format('LLLL')}>
+        <b>
+          {stats[time].calendar()}
+        </b>
+      </Tooltip>
+      &nbsp;by&nbsp;
+      <b>
+        {props?.arrest[`${time}_by`]?.name}
+      </b>
+    </Typography>
+  )
 
   return (
-    <div className="rw-form-wrapper">
+    // <div className="rw-form-wrapper">
       <Form formMethods={formMethods} onSubmit={onSubmit} error={props.error}>
-      <Grid container spacing={8}>
-      { fields }
-      </Grid>
+        <Grid container spacing={8}>
+          {fields}
+        </Grid>
+        {props.arrest &&
+        <Grid container rowSpacing={2} spacing={2}  display="flex" justifyContent="space-evenly" alignItems="center">
+          <ModTime time='created'/>
+          <ModTime time='updated'/>
+        </Grid>
+        }
         <div className="rw-button-group">
           <Submit disabled={props.loading} className="rw-button rw-button-blue">
             Save
           </Submit>
         </div>
       </Form>
-    </div>
+    // </div>
   )
 }
 

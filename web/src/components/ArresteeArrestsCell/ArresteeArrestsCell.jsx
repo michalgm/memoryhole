@@ -4,6 +4,7 @@ import {
 } from 'material-react-table';
 
 import ArresteeArrestCell from 'src/components/ArresteeArrest'
+import { Link } from '@redwoodjs/router'
 import { useMemo } from 'react';
 
 export const QUERY = gql`
@@ -16,9 +17,9 @@ export const QUERY = gql`
         first_name
         last_name
       }
-      createdAt
-      updatedAt
-      updatedBy {
+      created_at
+      updated_at
+      updated_by {
         name
       }
     }
@@ -68,7 +69,7 @@ export const Success = ({ arresteeArrests }) => {
   // ], []))
   const columns = useMemo(
     () => [
-        {accessorKey: 'arrestee.first_name', header: 'First Name'},
+        {accessorKey: 'arrestee.first_name', header: 'First Name',  Cell: ({cell, row}) => console.log(row) || <Link to={`/arrestee-arrest/${row.original.id}`}>{cell.getValue()}</Link>,},
 
         {accessorKey: 'arrestee.last_name', header: 'Last Name'},
       { accessorKey: "date", header: "Date", },

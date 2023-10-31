@@ -1,9 +1,9 @@
 import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
 
 import { QUERY } from 'src/components/HotlineLog/HotlineLogsCell'
-import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_HOTLINE_LOG_MUTATION = gql`
   mutation DeleteHotlineLogMutation($id: Int!) {
@@ -59,10 +59,10 @@ const HotlineLogsList = ({ hotlineLogs }) => {
               <td>{truncate(hotlineLog.type)}</td>
               <td>{truncate(hotlineLog.notes)}</td>
               <td>{jsonTruncate(hotlineLog.custom_fields)}</td>
-              <td>{timeTag(hotlineLog.createdAt)}</td>
-              <td>{truncate(hotlineLog.createdby_id)}</td>
-              <td>{timeTag(hotlineLog.updatedAt)}</td>
-              <td>{truncate(hotlineLog.updatedby_id)}</td>
+              <td>{timeTag(hotlineLog.created_at)}</td>
+              <td>{truncate(hotlineLog.created_by_id)}</td>
+              <td>{timeTag(hotlineLog.updated_at)}</td>
+              <td>{truncate(hotlineLog.updated_by_id)}</td>
               <td>
                 <nav className="rw-table-actions">
                   <Link

@@ -8,10 +8,10 @@ export const QUERY = gql`
       type
       notes
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `

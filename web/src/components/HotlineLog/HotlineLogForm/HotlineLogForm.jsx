@@ -1,12 +1,12 @@
 import {
+  FieldError,
   Form,
   FormError,
-  FieldError,
   Label,
-  TextField,
-  TextAreaField,
   NumberField,
   Submit,
+  TextAreaField,
+  TextField,
 } from '@redwoodjs/forms'
 
 const HotlineLogForm = (props) => {
@@ -77,7 +77,7 @@ const HotlineLogForm = (props) => {
         <FieldError name="custom_fields" className="rw-field-error" />
 
         <Label
-          name="createdby_id"
+          name="created_by_id"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
         >
@@ -85,16 +85,16 @@ const HotlineLogForm = (props) => {
         </Label>
 
         <NumberField
-          name="createdby_id"
-          defaultValue={props.hotlineLog?.createdby_id}
+          name="created_by_id"
+          defaultValue={props.hotlineLog?.created_by_id}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
         />
 
-        <FieldError name="createdby_id" className="rw-field-error" />
+        <FieldError name="created_by_id" className="rw-field-error" />
 
         <Label
-          name="updatedby_id"
+          name="updated_by_id"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
         >
@@ -102,13 +102,13 @@ const HotlineLogForm = (props) => {
         </Label>
 
         <NumberField
-          name="updatedby_id"
-          defaultValue={props.hotlineLog?.updatedby_id}
+          name="updated_by_id"
+          defaultValue={props.hotlineLog?.updated_by_id}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
         />
 
-        <FieldError name="updatedby_id" className="rw-field-error" />
+        <FieldError name="updated_by_id" className="rw-field-error" />
 
         <div className="rw-button-group">
           <Submit disabled={props.loading} className="rw-button rw-button-blue">

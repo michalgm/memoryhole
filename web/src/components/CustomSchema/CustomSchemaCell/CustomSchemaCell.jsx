@@ -7,8 +7,8 @@ export const QUERY = gql`
       table
       section
       schema
-      updatedAt
-      updatedby_id
+      updated_at
+      updated_by_id
     }
   }
 `

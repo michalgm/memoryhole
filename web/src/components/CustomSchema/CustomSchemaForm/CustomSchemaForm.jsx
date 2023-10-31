@@ -1,12 +1,12 @@
 import {
+  FieldError,
   Form,
   FormError,
-  FieldError,
   Label,
-  TextField,
-  TextAreaField,
   NumberField,
   Submit,
+  TextAreaField,
+  TextField,
 } from '@redwoodjs/forms'
 
 const CustomSchemaForm = (props) => {
@@ -79,7 +79,7 @@ const CustomSchemaForm = (props) => {
         <FieldError name="schema" className="rw-field-error" />
 
         <Label
-          name="updatedby_id"
+          name="updated_by_id"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
         >
@@ -87,13 +87,13 @@ const CustomSchemaForm = (props) => {
         </Label>
 
         <NumberField
-          name="updatedby_id"
-          defaultValue={props.customSchema?.updatedby_id}
+          name="updated_by_id"
+          defaultValue={props.customSchema?.updated_by_id}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
         />
 
-        <FieldError name="updatedby_id" className="rw-field-error" />
+        <FieldError name="updated_by_id" className="rw-field-error" />
 
         <div className="rw-button-group">
           <Submit disabled={props.loading} className="rw-button rw-button-blue">

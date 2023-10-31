@@ -1,8 +1,8 @@
-import { Link, routes, navigate } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
+import { Link, navigate, routes } from '@redwoodjs/router'
 import { jsonDisplay, timeTag } from 'src/lib/formatters'
+
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_CUSTOM_SCHEMA_MUTATION = gql`
   mutation DeleteCustomSchemaMutation($id: Int!) {
@@ -57,11 +57,11 @@ const CustomSchema = ({ customSchema }) => {
             </tr>
             <tr>
               <th>Updated at</th>
-              <td>{timeTag(customSchema.updatedAt)}</td>
+              <td>{timeTag(customSchema.updated_at)}</td>
             </tr>
             <tr>
               <th>Updatedby id</th>
-              <td>{customSchema.updatedby_id}</td>
+              <td>{customSchema.updated_by_id}</td>
             </tr>
           </tbody>
         </table>

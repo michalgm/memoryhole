@@ -12,10 +12,10 @@ export const QUERY = gql`
       needs_followup
       custom_fields
       arrestee_id
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `

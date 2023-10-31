@@ -4,9 +4,9 @@ export const schema = gql`
     table: String!
     section: String!
     schema: JSON!
-    updatedAt: DateTime
-    updatedBy: User
-    updatedby_id: Int
+    updated_at: DateTime
+    updated_by: User
+    updated_by_id: Int
   }
 
   type Query {
@@ -18,14 +18,14 @@ export const schema = gql`
     table: String!
     section: String!
     schema: JSON!
-    updatedby_id: Int
+    updated_by_id: Int
   }
 
   input UpdateCustomSchemaInput {
     table: String
     section: String
     schema: JSON
-    updatedby_id: Int
+    updated_by_id: Int
   }
 
   type Mutation {

@@ -40,7 +40,7 @@ model Post {
   id        Int      @id @default(autoincrement())
   title     String
   body      String
-  createdAt DateTime @default(now())
+  created_at DateTime @default(now())
 }
 ```
 

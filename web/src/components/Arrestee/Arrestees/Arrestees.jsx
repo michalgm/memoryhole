@@ -1,9 +1,9 @@
 import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
 
 import { QUERY } from 'src/components/Arrestee/ArresteesCell'
-import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_ARRESTEE_MUTATION = gql`
   mutation DeleteArresteeMutation($id: Int!) {
@@ -83,10 +83,10 @@ const ArresteesList = ({ arrestees }) => {
               <td>{truncate(arrestee.zip)}</td>
               <td>{truncate(arrestee.notes)}</td>
               <td>{jsonTruncate(arrestee.custom_fields)}</td>
-              <td>{timeTag(arrestee.createdAt)}</td>
-              <td>{truncate(arrestee.createdby_id)}</td>
-              <td>{timeTag(arrestee.updatedAt)}</td>
-              <td>{truncate(arrestee.updatedby_id)}</td>
+              <td>{timeTag(arrestee.created_at)}</td>
+              <td>{truncate(arrestee.created_by_id)}</td>
+              <td>{timeTag(arrestee.updated_at)}</td>
+              <td>{truncate(arrestee.updated_by_id)}</td>
               <td>
                 <nav className="rw-table-actions">
                   <Link

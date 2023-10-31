@@ -1,14 +1,14 @@
 import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
-import { QUERY } from 'src/components/Log/LogsCell'
 import {
   checkboxInputTag,
   jsonTruncate,
   timeTag,
   truncate,
 } from 'src/lib/formatters'
+
+import { QUERY } from 'src/components/Log/LogsCell'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_LOG_MUTATION = gql`
   mutation DeleteLogMutation($id: Int!) {
@@ -68,10 +68,10 @@ const LogsList = ({ logs }) => {
               <td>{checkboxInputTag(log.needs_followup)}</td>
               <td>{jsonTruncate(log.custom_fields)}</td>
               <td>{truncate(log.arrestee_id)}</td>
-              <td>{timeTag(log.createdAt)}</td>
-              <td>{truncate(log.createdby_id)}</td>
-              <td>{timeTag(log.updatedAt)}</td>
-              <td>{truncate(log.updatedby_id)}</td>
+              <td>{timeTag(log.created_at)}</td>
+              <td>{truncate(log.created_by_id)}</td>
+              <td>{timeTag(log.updated_at)}</td>
+              <td>{truncate(log.updated_by_id)}</td>
               <td>
                 <nav className="rw-table-actions">
                   <Link

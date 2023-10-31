@@ -8,12 +8,12 @@ export const schema = gql`
     custom_fields: JSON
     arrestee: Arrestee
     arrestee_id: Int
-    createdAt: DateTime
-    createdBy: User
-    createdby_id: Int
-    updatedAt: DateTime
-    updatedBy: User
-    updatedby_id: Int
+    created_at: DateTime
+    created_by: User
+    created_by_id: Int
+    updated_at: DateTime
+    updated_by: User
+    updated_by_id: Int
   }
 
   type Query {
@@ -28,8 +28,8 @@ export const schema = gql`
     needs_followup: Boolean!
     custom_fields: JSON
     arrestee_id: Int
-    createdby_id: Int
-    updatedby_id: Int
+    created_by_id: Int
+    updated_by_id: Int
   }
 
   input UpdateLogInput {
@@ -39,8 +39,8 @@ export const schema = gql`
     needs_followup: Boolean
     custom_fields: JSON
     arrestee_id: Int
-    createdby_id: Int
-    updatedby_id: Int
+    created_by_id: Int
+    updated_by_id: Int
   }
 
   type Mutation {

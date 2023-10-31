@@ -17,10 +17,10 @@ CREATE TABLE "Arrestee" (
     "zip" TEXT,
     "notes" TEXT,
     "custom_fields" JSONB,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "createdby_id" INTEGER,
-    "updatedAt" TIMESTAMP(3),
-    "updatedby_id" INTEGER,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "created_by_id" INTEGER,
+    "updated_at" TIMESTAMP(3),
+    "updated_by_id" INTEGER,
 
     CONSTRAINT "Arrestee_pkey" PRIMARY KEY ("id")
 );
@@ -31,8 +31,8 @@ CREATE TABLE "CustomSchema" (
     "table" TEXT NOT NULL,
     "section" TEXT NOT NULL,
     "schema" JSONB NOT NULL,
-    "updatedAt" TIMESTAMP(3),
-    "updatedby_id" INTEGER,
+    "updated_at" TIMESTAMP(3),
+    "updated_by_id" INTEGER,
 
     CONSTRAINT "CustomSchema_pkey" PRIMARY KEY ("id")
 );
@@ -46,10 +46,10 @@ CREATE TABLE "Log" (
     "needs_followup" BOOLEAN NOT NULL DEFAULT false,
     "custom_fields" JSONB,
     "arrestee_id" INTEGER,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "createdby_id" INTEGER,
-    "updatedAt" TIMESTAMP(3),
-    "updatedby_id" INTEGER,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "created_by_id" INTEGER,
+    "updated_at" TIMESTAMP(3),
+    "updated_by_id" INTEGER,
 
     CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
 );
@@ -61,10 +61,10 @@ CREATE TABLE "HotlineLog" (
     "type" TEXT,
     "notes" TEXT,
     "custom_fields" JSONB,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "createdby_id" INTEGER,
-    "updatedAt" TIMESTAMP(3),
-    "updatedby_id" INTEGER,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "created_by_id" INTEGER,
+    "updated_at" TIMESTAMP(3),
+    "updated_by_id" INTEGER,
 
     CONSTRAINT "HotlineLog_pkey" PRIMARY KEY ("id")
 );
@@ -82,10 +82,10 @@ CREATE TABLE "Arrest" (
     "citation_number" TEXT,
     "arrestee_id" INTEGER,
     "custom_fields" JSONB,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "createdby_id" INTEGER,
-    "updatedAt" TIMESTAMP(3),
-    "updatedby_id" INTEGER,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "created_by_id" INTEGER,
+    "updated_at" TIMESTAMP(3),
+    "updated_by_id" INTEGER,
 
     CONSTRAINT "Arrest_pkey" PRIMARY KEY ("id")
 );
@@ -115,34 +115,34 @@ CREATE INDEX "Arrest_search_field_idx" ON "Arrest"("search_field");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
-ALTER TABLE "Arrestee" ADD CONSTRAINT "Arrestee_createdby_id_fkey" FOREIGN KEY ("createdby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Arrestee" ADD CONSTRAINT "Arrestee_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Arrestee" ADD CONSTRAINT "Arrestee_updatedby_id_fkey" FOREIGN KEY ("updatedby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Arrestee" ADD CONSTRAINT "Arrestee_updated_by_id_fkey" FOREIGN KEY ("updated_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CustomSchema" ADD CONSTRAINT "CustomSchema_updatedby_id_fkey" FOREIGN KEY ("updatedby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "CustomSchema" ADD CONSTRAINT "CustomSchema_updated_by_id_fkey" FOREIGN KEY ("updated_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Log" ADD CONSTRAINT "Log_arrestee_id_fkey" FOREIGN KEY ("arrestee_id") REFERENCES "Arrestee"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Log" ADD CONSTRAINT "Log_createdby_id_fkey" FOREIGN KEY ("createdby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Log" ADD CONSTRAINT "Log_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Log" ADD CONSTRAINT "Log_updatedby_id_fkey" FOREIGN KEY ("updatedby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Log" ADD CONSTRAINT "Log_updated_by_id_fkey" FOREIGN KEY ("updated_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "HotlineLog" ADD CONSTRAINT "HotlineLog_createdby_id_fkey" FOREIGN KEY ("createdby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "HotlineLog" ADD CONSTRAINT "HotlineLog_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "HotlineLog" ADD CONSTRAINT "HotlineLog_updatedby_id_fkey" FOREIGN KEY ("updatedby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "HotlineLog" ADD CONSTRAINT "HotlineLog_updated_by_id_fkey" FOREIGN KEY ("updated_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Arrest" ADD CONSTRAINT "Arrest_arrestee_id_fkey" FOREIGN KEY ("arrestee_id") REFERENCES "Arrestee"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Arrest" ADD CONSTRAINT "Arrest_createdby_id_fkey" FOREIGN KEY ("createdby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Arrest" ADD CONSTRAINT "Arrest_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Arrest" ADD CONSTRAINT "Arrest_updatedby_id_fkey" FOREIGN KEY ("updatedby_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Arrest" ADD CONSTRAINT "Arrest_updated_by_id_fkey" FOREIGN KEY ("updated_by_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

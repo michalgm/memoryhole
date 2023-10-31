@@ -1,9 +1,9 @@
 import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
 
 import { QUERY } from 'src/components/CustomSchema/CustomSchemataCell'
-import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_CUSTOM_SCHEMA_MUTATION = gql`
   mutation DeleteCustomSchemaMutation($id: Int!) {
@@ -55,8 +55,8 @@ const CustomSchemataList = ({ customSchemata }) => {
               <td>{truncate(customSchema.table)}</td>
               <td>{truncate(customSchema.section)}</td>
               <td>{jsonTruncate(customSchema.schema)}</td>
-              <td>{timeTag(customSchema.updatedAt)}</td>
-              <td>{truncate(customSchema.updatedby_id)}</td>
+              <td>{timeTag(customSchema.updated_at)}</td>
+              <td>{truncate(customSchema.updated_by_id)}</td>
               <td>
                 <nav className="rw-table-actions">
                   <Link

@@ -30,10 +30,10 @@ export const deleteHotlineLog = ({ id }) => {
 }
 
 export const HotlineLog = {
-  createdBy: (_obj, { root }) => {
-    return db.hotlineLog.findUnique({ where: { id: root?.id } }).createdBy()
+  created_by: (_obj, { root }) => {
+    return db.hotlineLog.findUnique({ where: { id: root?.id } }).created_by()
   },
-  updatedBy: (_obj, { root }) => {
-    return db.hotlineLog.findUnique({ where: { id: root?.id } }).updatedBy()
+  updated_by: (_obj, { root }) => {
+    return db.hotlineLog.findUnique({ where: { id: root?.id } }).updated_by()
   },
 }

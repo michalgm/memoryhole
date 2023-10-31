@@ -1,8 +1,8 @@
-import { Link, routes, navigate } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
+import { Link, navigate, routes } from '@redwoodjs/router'
 import { jsonDisplay, timeTag } from 'src/lib/formatters'
+
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_HOTLINE_LOG_MUTATION = gql`
   mutation DeleteHotlineLogMutation($id: Int!) {
@@ -61,19 +61,19 @@ const HotlineLog = ({ hotlineLog }) => {
             </tr>
             <tr>
               <th>Created at</th>
-              <td>{timeTag(hotlineLog.createdAt)}</td>
+              <td>{timeTag(hotlineLog.created_at)}</td>
             </tr>
             <tr>
               <th>Createdby id</th>
-              <td>{hotlineLog.createdby_id}</td>
+              <td>{hotlineLog.created_by_id}</td>
             </tr>
             <tr>
               <th>Updated at</th>
-              <td>{timeTag(hotlineLog.updatedAt)}</td>
+              <td>{timeTag(hotlineLog.updated_at)}</td>
             </tr>
             <tr>
               <th>Updatedby id</th>
-              <td>{hotlineLog.updatedby_id}</td>
+              <td>{hotlineLog.updated_by_id}</td>
             </tr>
           </tbody>
         </table>

@@ -1,8 +1,8 @@
-import { Link, routes, navigate } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
+import { Link, navigate, routes } from '@redwoodjs/router'
 import { checkboxInputTag, jsonDisplay, timeTag } from 'src/lib/formatters'
+
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_LOG_MUTATION = gql`
   mutation DeleteLogMutation($id: Int!) {
@@ -69,19 +69,19 @@ const Log = ({ log }) => {
             </tr>
             <tr>
               <th>Created at</th>
-              <td>{timeTag(log.createdAt)}</td>
+              <td>{timeTag(log.created_at)}</td>
             </tr>
             <tr>
               <th>Createdby id</th>
-              <td>{log.createdby_id}</td>
+              <td>{log.created_by_id}</td>
             </tr>
             <tr>
               <th>Updated at</th>
-              <td>{timeTag(log.updatedAt)}</td>
+              <td>{timeTag(log.updated_at)}</td>
             </tr>
             <tr>
               <th>Updatedby id</th>
-              <td>{log.updatedby_id}</td>
+              <td>{log.updated_by_id}</td>
             </tr>
           </tbody>
         </table>

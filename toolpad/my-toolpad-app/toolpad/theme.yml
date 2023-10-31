@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: theme
+spec:
+  options:
+    palette:
+      mode: dark
+      primary:
+        main: '#9c27b0'
+        contrastText: '#fff'
+      secondary:
+        main: '#673ab7'
+        contrastText: '#fff'

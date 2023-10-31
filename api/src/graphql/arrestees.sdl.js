@@ -1,8 +1,8 @@
 export const schema = gql`
   type Arrestee {
     id: Int!
-    display_field: String!
-    search_field: String!
+    display_field: String
+    search_field: String
     first_name: String
     last_name: String
     preferred_name: String
@@ -17,12 +17,12 @@ export const schema = gql`
     zip: String
     notes: String
     custom_fields: JSON
-    createdAt: DateTime
-    createdBy: User
-    createdby_id: Int
-    updatedAt: DateTime
-    updatedBy: User
-    updatedby_id: Int
+    created_at: DateTime
+    created_by: User
+    created_by_id: Int
+    updated_at: DateTime
+    updated_by: User
+    updated_by_id: Int
     arrests: [Arrest]!
     arrestee_logs: [Log]!
   }
@@ -33,8 +33,8 @@ export const schema = gql`
   }
 
   input CreateArresteeInput {
-    display_field: String!
-    search_field: String!
+    display_field: String
+    search_field: String
     first_name: String
     last_name: String
     preferred_name: String
@@ -49,8 +49,8 @@ export const schema = gql`
     zip: String
     notes: String
     custom_fields: JSON
-    createdby_id: Int
-    updatedby_id: Int
+    created_by_id: Int
+    updated_by_id: Int
   }
 
   input UpdateArresteeInput {
@@ -70,8 +70,8 @@ export const schema = gql`
     zip: String
     notes: String
     custom_fields: JSON
-    createdby_id: Int
-    updatedby_id: Int
+    created_by_id: Int
+    updated_by_id: Int
   }
 
   type Mutation {

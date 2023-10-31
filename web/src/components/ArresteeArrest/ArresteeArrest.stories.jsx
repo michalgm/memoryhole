@@ -24,9 +24,9 @@ export const  generated = () => {
         first_name: 'First',
         last_name: 'Last'
       },
-      createdAt: '2020-01-01T12:34:45Z',
-      updatedAt: '2020-01-01T12:34:45Z',
-      updatedBy: {
+      created_at: '2020-01-01T12:34:45Z',
+      updated_at: '2020-01-01T12:34:45Z',
+      updated_by: {
         name: 'TheUser'
       }
     }}

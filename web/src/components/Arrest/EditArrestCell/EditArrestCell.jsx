@@ -1,9 +1,8 @@
 import { navigate, routes } from '@redwoodjs/router'
 
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
 import ArrestForm from 'src/components/Arrest/ArrestForm'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 export const QUERY = gql`
   query EditArrestById($id: Int!) {
@@ -19,10 +18,10 @@ export const QUERY = gql`
       citation_number
       arrestee_id
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `
@@ -40,10 +39,10 @@ const UPDATE_ARREST_MUTATION = gql`
       citation_number
       arrestee_id
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `
@@ -73,13 +72,13 @@ export const Success = ({ arrest }) => {
   }
 
   return (
-    <div className="rw-segment">
-      <header className="rw-segment-header">
-        <h2 className="rw-heading rw-heading-secondary">
+    <div>
+      <header>
+        <h2>
           Edit Arrest {arrest?.id}
         </h2>
       </header>
-      <div className="rw-segment-main">
+      <div>
         <ArrestForm
           arrest={arrest}
           onSave={onSave}

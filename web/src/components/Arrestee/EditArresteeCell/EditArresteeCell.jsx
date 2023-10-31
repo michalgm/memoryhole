@@ -1,9 +1,8 @@
 import { navigate, routes } from '@redwoodjs/router'
 
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
 import ArresteeForm from 'src/components/Arrestee/ArresteeForm'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 export const QUERY = gql`
   query EditArresteeById($id: Int!) {
@@ -25,10 +24,10 @@ export const QUERY = gql`
       zip
       notes
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `
@@ -52,10 +51,10 @@ const UPDATE_ARRESTEE_MUTATION = gql`
       zip
       notes
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `

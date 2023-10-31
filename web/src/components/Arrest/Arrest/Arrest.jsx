@@ -1,8 +1,8 @@
-import { Link, routes, navigate } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
+import { Link, navigate, routes } from '@redwoodjs/router'
 import { jsonDisplay, timeTag } from 'src/lib/formatters'
+
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_ARREST_MUTATION = gql`
   mutation DeleteArrestMutation($id: Int!) {
@@ -85,19 +85,19 @@ const Arrest = ({ arrest }) => {
             </tr>
             <tr>
               <th>Created at</th>
-              <td>{timeTag(arrest.createdAt)}</td>
+              <td>{timeTag(arrest.created_at)}</td>
             </tr>
             <tr>
               <th>Createdby id</th>
-              <td>{arrest.createdby_id}</td>
+              <td>{arrest.created_by_id}</td>
             </tr>
             <tr>
               <th>Updated at</th>
-              <td>{timeTag(arrest.updatedAt)}</td>
+              <td>{timeTag(arrest.updated_at)}</td>
             </tr>
             <tr>
               <th>Updatedby id</th>
-              <td>{arrest.updatedby_id}</td>
+              <td>{arrest.updated_by_id}</td>
             </tr>
           </tbody>
         </table>

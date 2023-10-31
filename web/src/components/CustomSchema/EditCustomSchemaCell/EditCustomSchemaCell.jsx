@@ -1,9 +1,8 @@
 import { navigate, routes } from '@redwoodjs/router'
 
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
 import CustomSchemaForm from 'src/components/CustomSchema/CustomSchemaForm'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 export const QUERY = gql`
   query EditCustomSchemaById($id: Int!) {
@@ -12,8 +11,8 @@ export const QUERY = gql`
       table
       section
       schema
-      updatedAt
-      updatedby_id
+      updated_at
+      updated_by_id
     }
   }
 `
@@ -27,8 +26,8 @@ const UPDATE_CUSTOM_SCHEMA_MUTATION = gql`
       table
       section
       schema
-      updatedAt
-      updatedby_id
+      updated_at
+      updated_by_id
     }
   }
 `

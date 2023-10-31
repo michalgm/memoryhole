@@ -30,7 +30,7 @@ export const deleteCustomSchema = ({ id }) => {
 }
 
 export const CustomSchema = {
-  updatedBy: (_obj, { root }) => {
-    return db.customSchema.findUnique({ where: { id: root?.id } }).updatedBy()
+  updated_by: (_obj, { root }) => {
+    return db.customSchema.findUnique({ where: { id: root?.id } }).updated_by()
   },
 }

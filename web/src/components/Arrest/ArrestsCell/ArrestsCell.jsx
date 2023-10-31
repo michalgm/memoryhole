@@ -16,10 +16,10 @@ export const QUERY = gql`
       citation_number
       arrestee_id
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `

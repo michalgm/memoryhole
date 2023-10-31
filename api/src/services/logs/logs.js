@@ -33,10 +33,10 @@ export const Log = {
   arrestee: (_obj, { root }) => {
     return db.log.findUnique({ where: { id: root?.id } }).arrestee()
   },
-  createdBy: (_obj, { root }) => {
-    return db.log.findUnique({ where: { id: root?.id } }).createdBy()
+  created_by: (_obj, { root }) => {
+    return db.log.findUnique({ where: { id: root?.id } }).created_by()
   },
-  updatedBy: (_obj, { root }) => {
-    return db.log.findUnique({ where: { id: root?.id } }).updatedBy()
+  updated_by: (_obj, { root }) => {
+    return db.log.findUnique({ where: { id: root?.id } }).updated_by()
   },
 }

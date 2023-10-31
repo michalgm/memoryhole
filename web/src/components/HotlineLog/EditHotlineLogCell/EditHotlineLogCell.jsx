@@ -1,9 +1,8 @@
 import { navigate, routes } from '@redwoodjs/router'
 
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
 import HotlineLogForm from 'src/components/HotlineLog/HotlineLogForm'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 export const QUERY = gql`
   query EditHotlineLogById($id: Int!) {
@@ -13,10 +12,10 @@ export const QUERY = gql`
       type
       notes
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `
@@ -28,10 +27,10 @@ const UPDATE_HOTLINE_LOG_MUTATION = gql`
       type
       notes
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
+      created_at
+      created_by_id
+      updated_at
+      updated_by_id
     }
   }
 `

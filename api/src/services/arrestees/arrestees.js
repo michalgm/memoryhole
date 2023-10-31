@@ -30,11 +30,11 @@ export const deleteArrestee = ({ id }) => {
 }
 
 export const Arrestee = {
-  createdBy: (_obj, { root }) => {
-    return db.arrestee.findUnique({ where: { id: root?.id } }).createdBy()
+  created_by: (_obj, { root }) => {
+    return db.arrestee.findUnique({ where: { id: root?.id } }).created_by()
   },
-  updatedBy: (_obj, { root }) => {
-    return db.arrestee.findUnique({ where: { id: root?.id } }).updatedBy()
+  updated_by: (_obj, { root }) => {
+    return db.arrestee.findUnique({ where: { id: root?.id } }).updated_by()
   },
   arrests: (_obj, { root }) => {
     return db.arrestee.findUnique({ where: { id: root?.id } }).arrests()

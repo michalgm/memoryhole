@@ -2,6 +2,8 @@ import { useMutation, useQuery } from '@redwoodjs/web'
 
 import ArresteeArrest from 'src/components/ArresteeArrest'
 import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
+import SnackBar from '../utils/SnackBar'
+import { Typography } from '@mui/material'
 import { toast } from '@redwoodjs/web/toast'
 import { useState } from 'react'
 
@@ -20,12 +22,13 @@ export const QUERY = gql`
       citation_number
       arrestee_id
       custom_fields
-      createdAt
-      createdby_id
-      updatedAt
-      updatedby_id
-      updatedBy {
-        email
+      created_at
+      created_by {
+        name
+      }
+      updated_at
+      updated_by {
+        name
       }
       arrestee {
         arrests {
@@ -33,10 +36,10 @@ export const QUERY = gql`
         }
         first_name
         last_name
-        dob,
-        email,
-        phone_1,
-        phone_2,
+        dob
+        email
+        phone_1
+        phone_2
         address
       }
     }
@@ -45,11 +48,8 @@ export const QUERY = gql`
 
 const UPDATE_ARREST_MUTATION = gql`
   mutation UpdateArrestMutation($id: Int!, $input: UpdateArrestInput!) {
-
     updateArrest(id: $id, input: $input) {
       id
-      # display_field
-      # search_field
       date
       location
       charges
@@ -58,22 +58,18 @@ const UPDATE_ARREST_MUTATION = gql`
       citation_number
       arrestee_id
       custom_fields
-      # createdAt
-      # createdby_id
-      # updatedAt
-      # updatedby_id
       arrestee {
         first_name
-          last_name
-          dob
-          email
-            phone_1
+        last_name
+        dob
+        email
+        phone_1
         phone_2
         address
         arrests {
           id
         }
-        }
+      }
     }
   }
 `
@@ -98,35 +94,36 @@ export const Success = ({ arresteeArrest, id, ...rest }) => {
         toast.success('Arrest updated')
         // setHasPosted(true)
         setSaving(false)
+        setShowSuccess(true)
         // refresh()
         // navigate(routes.arresteeArrest({id: }))
       },
       refetchQueries: [{ query: QUERY, variables: { id } }],
       awaitRefetchQueries: true,
       onError: (error) => {
+        setSaving(false)
+        console.log(error.message)
         toast.error(error.message)
       },
     }
   )
 
   const onSave = async (input, id, refresh) => {
-    ['updated_by', 'search_field', 'display_field'].forEach(k => delete input[k])
+    ;['updated_by', 'search_field', 'display_field'].forEach(
+      (k) => delete input[k]
+    )
 
     setSaving(true)
     console.log(input.date)
-    return updateArrest({ variables: { id, input, refresh }, })
-
+    return updateArrest({ variables: { id, input, refresh } })
   }
   // console.log(arresteeArrest)
-  if (saving) {
-    return '...'
-  }
+  // if (saving) {
+  //   return '...'
+  // }
   const fields = [
     {
-      fields: [
-        ['arrestee.first_name'],
-        ['arrestee.last_name'],
-      ]
+      fields: [['arrestee.first_name'], ['arrestee.last_name'], ['arrestee.preferred_name']],
     },
     {
       title: 'Contact Info',
@@ -135,28 +132,50 @@ export const Success = ({ arresteeArrest, id, ...rest }) => {
         ['arrestee.phone_2'],
         ['arrestee.email'],
         ['arrestee.address'],
-
-      ]
+      ],
     },
     {
       title: 'Arrest Info',
       fields: [
-        ['date', {field_type:'date', label: 'arrest date'}],
-        ['location',],
+        ['date', { field_type: 'date', label: 'arrest date' }],
+        ['location'],
         ['charges'],
         ['arrest_city'],
-        ['jurisdiction']
-      ]
-    }
+        ['jurisdiction'],
+        ['custom_fields.release_time', {field_type: 'date'}],
+        ['custom_fields.release_type'],
+      ],
+    },
   ]
+  const [showSuccess, setShowSuccess] = useState(false)
 
-  return (<div className="rw-segment">
-    <header className="rw-segment-header">
-      <h2 className="rw-heading rw-heading-secondary">Edit Arrest</h2>
-    </header>
-    <div className="rw-segment-main">
-      <ArresteeArrestForm arrest={arresteeArrest}
-        onSave={onSave} loading={loading} error={error} fields={fields}/>
+  return (
+    <div>
+      <header>
+        <Typography variant="h5">Edit Arrestee "{arresteeArrest.display_field}"</Typography>
+      </header>
+      <div>
+        <ArresteeArrestForm
+          arrest={arresteeArrest}
+          onSave={onSave}
+          loading={loading}
+          error={error}
+          fields={fields}
+        />
+      </div>
+      <SnackBar
+        open={Boolean(error?.message)}
+        severity="error"
+        message={error?.message}
+      />
+
+      <SnackBar
+        open={showSuccess}
+        handleClose={() => setShowSuccess(false)}
+        severity="success"
+        message={'Arrestee Saved!'}
+        autoHideDuration={6000}
+      />
     </div>
-  </div>)
+  )
 }

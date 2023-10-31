@@ -1,13 +1,13 @@
 import {
+  DatetimeLocalField,
+  FieldError,
   Form,
   FormError,
-  FieldError,
   Label,
-  TextField,
-  DatetimeLocalField,
   NumberField,
-  TextAreaField,
   Submit,
+  TextAreaField,
+  TextField,
 } from '@redwoodjs/forms'
 
 const formatDatetime = (value) => {
@@ -205,7 +205,7 @@ const ArrestForm = (props) => {
         <FieldError name="custom_fields" className="rw-field-error" />
 
         <Label
-          name="createdby_id"
+          name="created_by_id"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
         >
@@ -213,16 +213,16 @@ const ArrestForm = (props) => {
         </Label>
 
         <NumberField
-          name="createdby_id"
-          defaultValue={props.arrest?.createdby_id}
+          name="created_by_id"
+          defaultValue={props.arrest?.created_by_id}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
         />
 
-        <FieldError name="createdby_id" className="rw-field-error" />
+        <FieldError name="created_by_id" className="rw-field-error" />
 
         <Label
-          name="updatedby_id"
+          name="updated_by_id"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
         >
@@ -230,13 +230,13 @@ const ArrestForm = (props) => {
         </Label>
 
         <NumberField
-          name="updatedby_id"
-          defaultValue={props.arrest?.updatedby_id}
+          name="updated_by_id"
+          defaultValue={props.arrest?.updated_by_id}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
         />
 
-        <FieldError name="updatedby_id" className="rw-field-error" />
+        <FieldError name="updated_by_id" className="rw-field-error" />
 
         <div className="rw-button-group">
           <Submit disabled={props.loading} className="rw-button rw-button-blue">
