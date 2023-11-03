@@ -17,7 +17,7 @@
 host = "memoryhole.styrotopia.net"
 username = "memoryhole"
 agentForward = true
-sides = ["api"]
+sides = ["web", "api"]
 packageManagerCommand = "yarn"
 monitorCommand = "pm2"
 path = "/var/www/memoryhole"

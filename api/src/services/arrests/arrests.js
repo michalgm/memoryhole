@@ -1,11 +1,11 @@
 import { validate, validateWithSync } from '@redwoodjs/api'
 
 import { arrestee } from '../arrestees/arrestees'
-import dayjs from 'dayjs'
+import dayjs from '../../lib/day'
 import { db } from 'src/lib/db'
-import localizedFormat from 'dayjs/plugin/localizedFormat'
+import {updateDisplayField as updateAresteeDisplayField} from '../arrestees/arrestees'
 
-dayjs.extend(localizedFormat)
+// import localizedFormat from 'dayjs/plugin/localizedFormat'
 
 export const arrests = () => {
   return db.arrest.findMany()
@@ -28,21 +28,18 @@ export const searchArrestNames = ({ search }) => {
   })
 }
 
-
-const updateDisplayField = (first, last, preferred, date) => {
-  let name = `${first} ${last}`
-  if (preferred) {
-    name = `${preferred} (${name})`
+const updateDisplayField = (arrest) => {
+  if (arrest.date) {
+    arrest.display_field = dayjs(arrest.date).format('L')
+  } else {
+    delete arrest.date
   }
-  if (date) {
-    name = `${name} - ${dayjs(date).format('L')}`
-  }
-  return name
 }
 
-export const createArrest = ({ input: { arrestee, arrest } }) => {
-  arrest.display_field = updateDisplayField(arrestee.first_name, arrestee.last_name, arrestee.preferred_name, arrest.date)
-  arrestee.display_field = updateDisplayField(arrestee.first_name, arrestee.last_name, arrestee.preferred_name)
+export const createArrest = ({ input: { arrestee, ...arrest } }) => {
+  console.log(arrest, arrestee)
+  updateDisplayField(arrest)
+  updateAresteeDisplayField(arrestee)
 
   return db.arrest.create({
     data: {
@@ -51,10 +48,10 @@ export const createArrest = ({ input: { arrestee, arrest } }) => {
         create: arrestee,
       },
       updated_by: {
-        connect: { id: context.currentUser.id }, // Assuming 1 is the ID of the user you want to connect
+        connect: { id: context.currentUser.id },
       },
       created_by: {
-        connect: { id: context.currentUser.id }, // Assuming 1 is the ID of the user you want to connect
+        connect: { id: context.currentUser.id },
       },
     },
   })
@@ -72,9 +69,8 @@ export const updateArrest = ({
       validate(arrestee.email, 'Email', { email: true })
     }
   })
-
-  input.display_field = updateDisplayField(arrestee.first_name, arrestee.last_name, arrestee.preferred_name, input.date)
-  arrestee.display_field = updateDisplayField(arrestee.first_name, arrestee.last_name, arrestee.preferred_name)
+  updateDisplayField(input)
+  updateAresteeDisplayField(arrestee)
 
   return db.arrest.update({
     data: {
@@ -87,7 +83,7 @@ export const updateArrest = ({
         },
       },
       updated_by: {
-        connect: { id: context.currentUser.id }, // Assuming 1 is the ID of the user you want to connect
+        connect: { id: context.currentUser.id },
       },
     },
     where: { id },
