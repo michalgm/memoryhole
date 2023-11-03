@@ -1,7 +1,11 @@
 import { validate, validateWithSync } from '@redwoodjs/api'
 
 import { arrestee } from '../arrestees/arrestees'
+import dayjs from 'dayjs'
 import { db } from 'src/lib/db'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+
+dayjs.extend(localizedFormat)
 
 export const arrests = () => {
   return db.arrest.findMany()
@@ -13,13 +17,25 @@ export const arrest = ({ id }) => {
   })
 }
 
+export const searchArrestNames = ({ search }) => {
+  return db.arrest.findMany({
+    where: {
+      display_field: {
+        contains: search,
+        mode: 'insensitive',
+      },
+    },
+  })
+}
+
+
 const updateDisplayField = (first, last, preferred, date) => {
   let name = `${first} ${last}`
   if (preferred) {
     name = `${preferred} (${name})`
   }
   if (date) {
-    name = `${name} - ${date}`
+    name = `${name} - ${dayjs(date).format('L')}`
   }
   return name
 }

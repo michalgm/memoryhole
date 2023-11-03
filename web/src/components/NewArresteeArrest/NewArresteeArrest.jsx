@@ -5,7 +5,7 @@ import { toast } from '@redwoodjs/web/toast'
 import { useMutation } from '@redwoodjs/web'
 
 const CREATE_ARREST_MUTATION = gql`
-  mutation CreateArrestMutation($input: CreateArrestInput!) {
+  mutation CreateArresteeArrestMutation($input: CreateArrestInput!) {
     createArrest(input: $input) {
       id
       date

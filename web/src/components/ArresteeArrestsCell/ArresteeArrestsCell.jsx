@@ -69,7 +69,7 @@ export const Success = ({ arresteeArrests }) => {
   // ], []))
   const columns = useMemo(
     () => [
-        {accessorKey: 'arrestee.first_name', header: 'First Name',  Cell: ({cell, row}) => console.log(row) || <Link to={`/arrestee-arrest/${row.original.id}`}>{cell.getValue()}</Link>,},
+        {accessorKey: 'arrestee.first_name', header: 'First Name',  Cell: ({cell, row}) => <Link to={`/arrestee-arrest/${row.original.id}`}>{cell.getValue()}</Link>,},
 
         {accessorKey: 'arrestee.last_name', header: 'Last Name'},
       { accessorKey: "date", header: "Date", },

@@ -26,7 +26,6 @@ export default function SnackBar({
     props.action = action
     props.onClose = handleClose
   }
-  console.log(props)
   return (
     <Snackbar
       open={open}

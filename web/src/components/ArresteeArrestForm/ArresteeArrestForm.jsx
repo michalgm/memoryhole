@@ -1,141 +1,253 @@
-import { Box, Card, CardContent, CardHeader, Divider, TextField, Tooltip, Typography } from '@mui/material'
 import {
-  Form,
-  Submit,
-  useForm,
-  useRegister
-} from '@redwoodjs/forms'
-import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
-import { get, startCase } from 'lodash'
+  Autocomplete,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Radio,
+  Select,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import {
+  AutocompleteElement,
+  DatePickerElement,
+  DateTimePickerElement,
+  FormContainer,
+  TextFieldElement,
+  useFormContext,
+} from 'react-hook-form-mui'
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
+import {
+  _,
+  flatMap,
+  get,
+  isEqual,
+  isObject,
+  reduce,
+  set,
+  startCase,
+  transform,
+} from 'lodash'
 
-import { DateTimePicker } from '@mui/x-date-pickers';
-import Grid from '@mui/material/Unstable_Grid2/Grid2';
+import ArresteeLogsCell from '../ArresteeLogsCell/ArresteeLogsCell'
+import CreateArresteeLog from '../ArresteeLogsCell/CreateArresteeLog'
+import Grid from '@mui/material/Unstable_Grid2/Grid2'
+// import { RJSFSchema } from '@rjsf/utils'
+// import SchemaForm from '@rjsf/core'
+import SchemaForm from '@rjsf/mui'
+import Theme from '@rjsf/mui'
 // import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import { toast } from '@redwoodjs/web/toast'
 import { useAuth } from 'src/auth'
+// import { useForm } from 'react-hook-form'
 import { useState } from 'react'
+import validator from '@rjsf/validator-ajv8'
+import { withTheme } from '@rjsf/core'
 
-const formatDatetime = (value) => {
-  if (value) {
-    return value.replace(/:\d{2}\.\d{3}\w/, '')
+const Field = ({ name, field_type, tabIndex, ...props }) => {
+  const { setValue } = useFormContext()
+
+  const textFieldProps = {
+    name,
+    variant: 'outlined',
+    fullWidth: true,
+    size: 'small',
+    inputProps: {
+      tabIndex
+    }
+  }
+
+  const renderDatePicker = () => {
+    const Component =
+      field_type === 'date-time' ? DateTimePickerElement : DatePickerElement
+    return (
+      <Component {...props} name={name} inputProps={textFieldProps} timeSteps={{ minutes: 1 }} />
+    )
+  }
+
+  const renderAutocomplete = () => {
+    const options = ['', ...props.options].map((opt) =>
+      opt.label ? opt : { id: opt, label: opt }
+    )
+    const autocompleteProps = {
+          ...textFieldProps,
+          isOptionEqualToValue: (option = {}, value) =>
+            option.id === value || option.id === value?.id,
+          onChange: (e, value) => setValue(name, value?.id || null),
+    }
+    delete autocompleteProps.inputProps
+    return (
+      <AutocompleteElement
+        name={name}
+        options={options}
+        label={props.label}
+        matchId
+        textFieldProps={textFieldProps}
+        autocompleteProps={autocompleteProps}
+      />
+    )
+  }
+  const renderTextField = () => {
+    const textFieldOptions =
+      field_type === 'textarea' ? { multiline: true, minRows: 3 } : {}
+    return (
+      <TextFieldElement {...props} {...textFieldProps} {...textFieldOptions} />
+    )
+  }
+
+  switch (field_type) {
+    case 'date-time':
+    case 'date':
+      return renderDatePicker()
+    case 'select':
+      return renderAutocomplete()
+    case 'textarea':
+    default:
+      return renderTextField()
   }
 }
 
+const diffObjects = (a, b) => {
+  return transform(b, (result, value, key) => {
+    if (!isEqual(value, a[key])) {
+      result[key] =
+        isObject(value) && isObject(a[key]) ? diffObjects(a[key], value) : value
+    }
+  })
+}
 
+const pruneData = (data, fields) => {
+  const fieldPaths = flatMap(fields, (section) =>
+    section.fields.map((field) => [field[0], field[1]])
+  )
+  const buildNewObject = (paths, originalData) =>
+    reduce(
+      paths,
+      (result, [path, params = {}]) => {
+        let value = get(originalData, path)
+        if (value !== undefined) {
+          if (['date', 'date-time'].includes(params.field_type)) {
+            value = dayjs(value)
+          }
+          set(result, path, value)
+        }
+        return result
+      },
+      {}
+    )
+
+  return buildNewObject(fieldPaths, data)
+}
+
+function reorderFieldsLodash(fields) {
+  const midPoint = Math.ceil(fields.length / 2)
+  fields = fields.map(([name, props = {}], index) => [name, props, index])
+  const chunks = _.chunk(fields, midPoint)
+  const interleaved = _.zip(...chunks)
+  const reorderedFields = _.compact(_.flatten(interleaved))
+  return reorderedFields
+}
 
 const ArresteeArrestForm = (props) => {
-  const formMethods = useForm()
-  // console.error(props)
-  const Field = ({ name, field_type, ...props }) => {
-    const register = useRegister({ name })
-    const textField = { name, variant: 'standard', fullWidth: true }
-    if (field_type === 'date') {
-      return <DateTimePicker
-        {...props}
-        {...register}
-        slotProps={{ textField }}
-        defaultValue={dayjs(props.defaultValue)}
-        onChange={(val) => formMethods.setValue(name, val)}
-      />
-    }
-    return <TextField
-      {...props}
-      {...textField}
-      {...register}
-    />
-  }
-
+  const values = pruneData(props.arrest, props.fields)
   const onSubmit = (data) => {
-    if (data.date) {
-      data.date = dayjs(data.date)
-    }
+    // const diff = diffObjects(props.arrest, data)
+    // console.log(data)
+    console.warn('SAVING', data)
     props.onSave(data, props?.arrest?.id)
-
   }
-  console.log(props.arrest)
 
-  const formatLabel = label => {
+  const formatLabel = (label) => {
     const index = label.lastIndexOf('.')
     return startCase(label.slice(index + 1))
   }
-  const fields = props.fields.map(
-    ({ fields, title }, index) => {
-      return (
-        <Grid key={index} xs={12}>
-          {title && <Typography variant='h6' gutterBottom>{title}</Typography>}
-          <Card>
-            {/* <CardHeader title={title}/> */}
-            <CardContent>
-              {/* Form fields for section 1 */}
 
-              {/* <Divider textAlign="left">
-
-          </Divider> */}
-              <Box>
-                <Grid container spacing={2}>
-
-                  {fields.map(([key, { label, ...options } = {}]) => {
-                    return <Grid xs={6} key={key}>
-                      <Field
-                        id={key}
-                        label={formatLabel(label || key)}
-                        name={key}
-                        defaultValue={get(props.arrest, key)}
-                        {...options}
-                      />
-                    </Grid>
-                  })}
-                </Grid>
-              </Box>
-            </CardContent>
-          </Card>
-
-
-
-        </Grid>
-      )
-    }
-  )
+  const fields = props.fields.map(({ fields, title }, groupIndex) => {
+    return (
+      <Grid xs={12} spacing={2} key={groupIndex} container alignItems={'center'}>
+        {title && (
+          <Grid xs={12}>
+            <Divider
+              textAlign="left"
+              sx={{ styleOverrides: { 'MuiDivider-root': { width: 5 } } }}
+            >
+              {title && (
+                <Typography variant="h6" gutterBottom>
+                  {title}
+                </Typography>
+              )}
+            </Divider>
+          </Grid>
+        )}
+        {reorderFieldsLodash(fields).map(
+          ([key, { label, ...options } = {}, index] = []) => {
+            return (
+              <Grid key={key} xs={6}>
+                <Field
+                  tabIndex={(100* (groupIndex + 1)) + index}
+                  key={key}
+                  id={key}
+                  label={formatLabel(label || key)}
+                  name={key}
+                  {...options}
+                />
+              </Grid>
+            )
+          }
+        )}
+      </Grid>
+    )
+  })
+  //  console.log(reorderFieldsLodash(fields)) ||
   const stats = {
     created: dayjs(props?.arrest?.created_at),
     updated: dayjs(props?.arrest?.updated_at),
   }
 
-  const ModTime = ({time}) => (
-     <Typography variant='overline'>
+  const ModTime = ({ time }) => (
+    <Typography variant="overline">
       {startCase(time)}&nbsp;
       <Tooltip title={stats[time].format('LLLL')}>
-        <b>
-          {stats[time].calendar()}
-        </b>
+        <b>{stats[time].calendar()}</b>
       </Tooltip>
       &nbsp;by&nbsp;
-      <b>
-        {props?.arrest[`${time}_by`]?.name}
-      </b>
+      <b>{props?.arrest[`${time}_by`]?.name}</b>
     </Typography>
   )
-
   return (
-    // <div className="rw-form-wrapper">
-      <Form formMethods={formMethods} onSubmit={onSubmit} error={props.error}>
-        <Grid container spacing={8}>
-          {fields}
+    <>
+      <FormContainer
+        defaultValues={values}
+        onSuccess={(data) => onSubmit(data)}
+      >
+        <Grid container spacing={4} className="content-container">
+          <Grid xs={12} sx={{ textAlign: 'right', clear: 'both' }}>
+            <Button type="submit" variant="contained">
+              Save
+            </Button>
+          </Grid>
+          <Grid xs={12} container className="form-content">
+            {fields}
+          </Grid>
+          <Grid xs={6}>
+            <ModTime time="created" />
+          </Grid>
+          <Grid xs={6}>
+            <ModTime time="updated" />
+          </Grid>
         </Grid>
-        {props.arrest &&
-        <Grid container rowSpacing={2} spacing={2}  display="flex" justifyContent="space-evenly" alignItems="center">
-          <ModTime time='created'/>
-          <ModTime time='updated'/>
-        </Grid>
-        }
-        <div className="rw-button-group">
-          <Submit disabled={props.loading} className="rw-button rw-button-blue">
-            Save
-          </Submit>
-        </div>
-      </Form>
-    // </div>
+      </FormContainer>
+      <CreateArresteeLog arrestee_id={props.arrest.arrestee.id} />
+      <ArresteeLogsCell arrestee_id={props.arrest.arrestee.id} />
+    </>
   )
 }
 

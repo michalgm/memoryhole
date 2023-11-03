@@ -7,6 +7,7 @@ import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import PersonIcon from '@mui/icons-material/Person'
+import QuickSearch from 'src/components/utils/QuickSearch'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { useAuth } from 'src/auth'
@@ -44,7 +45,7 @@ const BlogLayout = ({ children }) => {
                 href="/"
                 sx={{
                   mr: 2,
-                  flexGrow: 1,
+                  flexGrow: 0,
                   fontFamily: 'monospace',
                   // fontWeight: 700,
                   letterSpacing: '-.0rem',
@@ -54,11 +55,14 @@ const BlogLayout = ({ children }) => {
               >
                 MemoryHole
               </Typography>
-              {pages.map((page) => (
-                <CustomLink key={page} to={routes[page]()}>
-                  {page}
-                </CustomLink>
-              ))}
+              <Box sx={{flexGrow: 2}}>
+                {pages.map((page) => (
+                  <CustomLink key={page} to={routes[page]()}>
+                    {page}
+                  </CustomLink>
+                ))}
+              </Box>
+              <QuickSearch/>
               <Tooltip title={`Logged in as ${currentUser.name}foo`}>
                 <PersonIcon />
               </Tooltip>

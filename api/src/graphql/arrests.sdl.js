@@ -23,6 +23,7 @@ export const schema = gql`
   type Query {
     arrests: [Arrest!]! @requireAuth
     arrest(id: Int!): Arrest @requireAuth
+    searchArrestNames(search: String!): [Arrest!]! @requireAuth
   }
 
   input CreateArrestInput {
@@ -53,7 +54,7 @@ export const schema = gql`
     arrestee_id: Int
     custom_fields: JSON
     created_by_id: Int
-    updated_by_id: Int,
+    updated_by_id: Int
     arrestee: UpdateArresteeInput
   }
 

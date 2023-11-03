@@ -17,12 +17,8 @@ import FatalErrorPage from 'src/pages/FatalErrorPage'
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
 import Routes from 'src/Routes'
-import calendar from 'dayjs/plugin/calendar'
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import dayjs from 'dayjs';
+import dayjs from '../../api/src/lib/day'
 
-dayjs.extend(calendar)
-dayjs.extend(customParseFormat);
 const theme = createTheme({
   palette: {
     primary: { main: '#37474f' },

@@ -1,0 +1,17 @@
+.MuiDivider-root::before {
+  width: 3% !important;
+}
+/* html,
+body, #redwood-app, main {
+  height: 100%;
+  overflow: hidden;
+}
+.content-container {
+    height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr;
+        grid-template-rows: 30px 1fr 30px;
+}
+.form-content {
+  overflow-y: scroll;
+} */

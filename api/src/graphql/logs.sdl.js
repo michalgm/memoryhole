@@ -17,16 +17,17 @@ export const schema = gql`
   }
 
   type Query {
+    arresteeLogs(arrestee_id: Int): [Log!]! @requireAuth
     logs: [Log!]! @requireAuth
     log(id: Int!): Log @requireAuth
   }
 
   input CreateLogInput {
-    time: DateTime!
-    type: String
+    # time: DateTime!
+    # type: String
     notes: String
     needs_followup: Boolean!
-    custom_fields: JSON
+    # custom_fields: JSON
     arrestee_id: Int
     created_by_id: Int
     updated_by_id: Int

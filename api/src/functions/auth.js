@@ -1,4 +1,5 @@
-import { DbAuthHandler } from '@redwoodjs/auth-dbauth-api'
+import { DbAuthHandler, PasswordValidationError } from '@redwoodjs/auth-dbauth-api'
+
 import { db } from 'src/lib/db'
 
 export const handler = async (event, context) => {
@@ -20,7 +21,7 @@ export const handler = async (event, context) => {
     },
 
     // How long the resetToken is valid for, in seconds (default is 24 hours)
-    expires: 60 * 60 * 24,
+    expires: 60 * 60 * 12,
 
     errors: {
       // for security reasons you may want to be vague here rather than expose
@@ -86,6 +87,7 @@ export const handler = async (event, context) => {
   }
 
   const signupOptions = {
+    enabled: false,
     // Whatever you want to happen to your data on new user signup. Redwood will
     // check for duplicate usernames before calling this handler. At a minimum
     // you need to save the `username`, `hashedPassword` and `salt` to your
@@ -117,6 +119,9 @@ export const handler = async (event, context) => {
     // password is valid, otherwise throw a `PasswordValidationError`.
     // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.
     passwordValidation: (_password) => {
+      if (_password.length < 8) {
+        throw PasswordValidationError('Password must be at least 8 characters')
+      }
       return true
     },
 
