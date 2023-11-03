@@ -1,55 +1,34 @@
 import { navigate, routes } from '@redwoodjs/router'
 
 import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
+import SnackBar from '../utils/SnackBar'
+import { Typography } from '@mui/material'
 import { toast } from '@redwoodjs/web/toast'
 import { useMutation } from '@redwoodjs/web'
+import { useState } from 'react'
 
 const CREATE_ARREST_MUTATION = gql`
   mutation CreateArresteeArrestMutation($input: CreateArrestInput!) {
     createArrest(input: $input) {
       id
-      date
-      location
-      date
-      # display_field
-      # search_field
-      charges
-      arrest_city
-      jurisdiction
-      citation_number
-      arrestee_id
-      custom_fields
-      created_at
-      created_by {
-        name
-      }
-      updated_at
-      updated_by {
-        name
-      }
       arrestee {
-        arrests {
-          id
-        }
-        first_name
-        last_name
-        dob,
-        email,
-        phone_1,
-        phone_2,
-        address
+        id
       }
     }
   }
 `
 
 const NewArresteeArrest = () => {
+  const [saving, setSaving] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+
   const [createArrest, { loading, error }] = useMutation(
     CREATE_ARREST_MUTATION,
     {
-      onCompleted: () => {
+      onCompleted: (data) => {
+        console.log(data)
         toast.success('Arrest created')
-        navigate(routes.arrests())
+        navigate(routes.arresteeArrest({id: data.createArrest.id}))
       },
       onError: (error) => {
         toast.error(error.message)
@@ -57,22 +36,26 @@ const NewArresteeArrest = () => {
     }
   )
 
-  const onSave = (input) => {
-    ['updated_by', 'search_field', 'display_field'].forEach(k => delete input[k])
-// input.search_field = ''
-// input.display_field = ''
-// input.arrestee.display_field = ''
-// input.arrestee.search_field = ''
-
-    createArrest({ variables: { input } })
+  const onSave = async (input, id, refresh) => {
+    ;[
+      'updated_at',
+      'updated_by',
+      'created_by',
+      'created_at',
+      'search_field',
+      'display_field',
+      'id',
+    ].forEach((k) => delete input[k])
+    if (!input.date) {
+      delete input.date
+    }
+    setSaving(true)
+    return createArrest({ variables: { input } })
   }
 
   const fields = [
     {
-      fields: [
-        ['arrestee.first_name'],
-        ['arrestee.last_name'],
-      ]
+      fields: [['arrestee.first_name'], ['arrestee.last_name']],
     },
     {
       title: 'Contact Info',
@@ -81,30 +64,48 @@ const NewArresteeArrest = () => {
         ['arrestee.phone_2'],
         ['arrestee.email'],
         ['arrestee.address'],
-
-      ]
+      ],
     },
     {
       title: 'Arrest Info',
       fields: [
-        ['date', {field_type:'date', label: 'arrest date'}],
-        ['location',],
+        ['date', { field_type: 'date', label: 'arrest date' }],
+        ['location'],
         ['charges'],
         ['arrest_city'],
-        ['jurisdiction']
-      ]
-    }
+        ['jurisdiction'],
+      ],
+    },
   ]
 
-
   return (
-    <div className="rw-segment">
-      <header className="rw-segment-header">
-        <h2 className="rw-heading rw-heading-secondary">New Arrest</h2>
+    <div>
+      <header>
+        <Typography variant="h5">Create Arrestee</Typography>
       </header>
-      <div className="rw-segment-main">
-        <ArresteeArrestForm onSave={onSave} loading={loading} error={error} fields={fields}/>
+      <div>
+        <ArresteeArrestForm
+          arrest={{}}
+          // arrest={values}
+          onSave={onSave}
+          loading={loading}
+          error={error}
+          fields={fields}
+        />
       </div>
+      <SnackBar
+        open={Boolean(error?.message)}
+        severity="error"
+        message={error?.message}
+      />
+
+      <SnackBar
+        open={showSuccess}
+        handleClose={() => setShowSuccess(false)}
+        severity="success"
+        message={'Arrestee Saved!'}
+        autoHideDuration={6000}
+      />
     </div>
   )
 }

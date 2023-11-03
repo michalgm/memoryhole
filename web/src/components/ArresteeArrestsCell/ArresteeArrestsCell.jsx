@@ -5,6 +5,7 @@ import {
 
 import ArresteeArrestCell from 'src/components/ArresteeArrest'
 import { Link } from '@redwoodjs/router'
+import dayjs from '../../../../api/src/lib/day'
 import { useMemo } from 'react';
 
 export const QUERY = gql`
@@ -69,15 +70,29 @@ export const Success = ({ arresteeArrests }) => {
   // ], []))
   const columns = useMemo(
     () => [
-        {accessorKey: 'arrestee.first_name', header: 'First Name',  Cell: ({cell, row}) => <Link to={`/arrestee-arrest/${row.original.id}`}>{cell.getValue()}</Link>,},
+      {
+        accessorKey: 'arrestee.first_name',
+        header: 'First Name',
+        Cell: ({ cell, row }) => (
+          <Link to={`/arrestee-arrest/${row.original.id}`}>
+            {cell.getValue()}
+          </Link>
+        ),
+      },
 
-        {accessorKey: 'arrestee.last_name', header: 'Last Name'},
-      { accessorKey: "date", header: "Date", },
-      { accessorKey: "location", header: "Location", },
+      { accessorKey: 'arrestee.last_name', header: 'Last Name' },
+      {
+        accessorKey: 'date',
+        header: 'Arrest Date',
+                   filterVariant: 'date',
+            sortingFn: 'datetime',
+        Cell: ({ cell }) => dayjs(cell.getValue()).format('L'),
+      },
 
+      { accessorKey: 'location', header: 'Location' },
     ],
     []
-  );
+  )
   const data = arresteeArrests
   const table = useMaterialReactTable({
     columns,

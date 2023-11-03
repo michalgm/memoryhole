@@ -30,7 +30,7 @@ const CustomLink = ({ to, ...rest }) => {
 
 const BlogLayout = ({ children }) => {
   const { isAuthenticated, currentUser, logOut } = useAuth()
-  const pages = ['home', 'about']
+  const pages = ['home', 'about', 'admin']
 
   return (
     <>
