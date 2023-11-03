@@ -1,7 +1,8 @@
-import { Autocomplete, Box, InputAdornment, TextField, alpha } from '@mui/material'
+import { Autocomplete, Box, InputAdornment, TextField, Typography, alpha } from '@mui/material'
 import { gql, useLazyQuery } from '@apollo/client'
 
 import { Search } from '@mui/icons-material'
+import dayjs from '../../../../api/src/lib/day'
 import { navigate } from '@redwoodjs/router'
 import  {useState} from 'react'
 
@@ -9,8 +10,11 @@ export const SEARCH_ARRESTS = gql`
   query searchArrestNames($search: String!) {
     arrest: searchArrestNames(search: $search) {
       id
-      search,
+      arrestee {
+        display_field
+      },
       date,
+      arrest_city
     }
   }
 `
@@ -31,7 +35,7 @@ function QuickSearch(props) {
 
   const handleInputChange = (event, value) => {
      setSearchValue(value)
-     if (value.length > 2) {
+     if (value.length) {
        searchArrests({variables: { search: searchValue }}) // Refetch the query with new variable
      }
    }
@@ -47,6 +51,7 @@ function QuickSearch(props) {
         blurOnSelect={true}
         clearOnBlur={true}
         value={value}
+        open={true}
         // isOptionEqualToValue={(option, value) => console.log({option, value}) || option.id && value}
         // value={searchValue}
         getOptionLabel={(option) => option.display_field || ''} // Unique identifier, not displayed
@@ -63,11 +68,23 @@ function QuickSearch(props) {
             setValue('')
           }
         }}
-        renderOption={(props, option) => (
-          <li {...props} key={option.id}>
-            {option.display_field}
-          </li>
-        )}
+        renderOption={(
+          props,
+          { id, arrestee: { display_field }, date, arrest_city }
+        ) => {
+          const subtitle = `${date ? dayjs(date).format('L') : ''}${date && arrest_city ? ' - ' : ''}${arrest_city ? arrest_city : ''}`
+          return (
+            <li {...props} key={id}>
+              <div>
+                <Typography>
+                  {display_field}
+                </Typography>
+                <Typography color="GrayText" variant="subtitle2">
+                  {subtitle}
+                </Typography>
+              </div>
+            </li>)
+        }}
         inputValue={searchValue}
         renderInput={(params) => (
           <TextField

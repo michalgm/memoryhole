@@ -1,6 +1,7 @@
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native"]
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -8,6 +9,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model OptionSet {
+  name        String @unique
+  description String?
+  values      OptionSetValues[]
+}
+
+model OptionSetValues {
+  option_set String
+  label   String
+  value   String
+  option_set_details  OptionSet @relation(fields: [option_set], references: [name])
+
+  @@unique([option_set, value])
+  @@index([option_set, label])
+}
 model Arrestee {
   id             Int       @id @default(autoincrement())
   display_field  String?
