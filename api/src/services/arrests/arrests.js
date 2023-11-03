@@ -3,7 +3,7 @@ import { validate, validateWithSync } from '@redwoodjs/api'
 import { arrestee } from '../arrestees/arrestees'
 import dayjs from '../../lib/day'
 import { db } from 'src/lib/db'
-import {updateDisplayField as updateAresteeDisplayField} from '../arrestees/arrestees'
+import { updateDisplayField as updateAresteeDisplayField } from '../arrestees/arrestees'
 
 // import localizedFormat from 'dayjs/plugin/localizedFormat'
 
@@ -20,10 +20,14 @@ export const arrest = ({ id }) => {
 export const searchArrestNames = ({ search }) => {
   return db.arrest.findMany({
     where: {
-      display_field: {
-        contains: search,
-        mode: 'insensitive',
-      },
+      OR: search.split(/\s+/).map((term) => ({
+        arrestee: {
+          display_field: {
+            contains: term,
+            mode: 'insensitive',
+          },
+        },
+      })),
     },
   })
 }

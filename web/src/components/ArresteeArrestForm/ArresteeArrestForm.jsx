@@ -1,28 +1,9 @@
 import {
-  Autocomplete,
-  Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Radio,
-  Select,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material'
-import {
-  AutocompleteElement,
-  DatePickerElement,
-  DateTimePickerElement,
-  FormContainer,
-  TextFieldElement,
-  useFormContext,
-} from 'react-hook-form-mui'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import {
   _,
@@ -38,82 +19,13 @@ import {
 
 import ArresteeLogsCell from '../ArresteeLogsCell/ArresteeLogsCell'
 import CreateArresteeLog from '../ArresteeLogsCell/CreateArresteeLog'
+import { Field } from '../utils/Field'
+import {
+  FormContainer,
+} from 'react-hook-form-mui'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
-// import { RJSFSchema } from '@rjsf/utils'
-// import SchemaForm from '@rjsf/core'
-import SchemaForm from '@rjsf/mui'
-import Theme from '@rjsf/mui'
-// import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
-import { toast } from '@redwoodjs/web/toast'
-import { useAuth } from 'src/auth'
-// import { useForm } from 'react-hook-form'
 import { useState } from 'react'
-import validator from '@rjsf/validator-ajv8'
-import { withTheme } from '@rjsf/core'
-
-const Field = ({ name, field_type, tabIndex, ...props }) => {
-  const { setValue } = useFormContext()
-
-  const textFieldProps = {
-    name,
-    variant: 'outlined',
-    fullWidth: true,
-    size: 'small',
-    inputProps: {
-      tabIndex
-    }
-  }
-
-  const renderDatePicker = () => {
-    const Component =
-      field_type === 'date-time' ? DateTimePickerElement : DatePickerElement
-    return (
-      <Component {...props} name={name} inputProps={textFieldProps} timeSteps={{ minutes: 1 }} />
-    )
-  }
-
-  const renderAutocomplete = () => {
-    const options = ['', ...props.options].map((opt) =>
-      opt.label ? opt : { id: opt, label: opt }
-    )
-    const autocompleteProps = {
-          ...textFieldProps,
-          isOptionEqualToValue: (option = {}, value) =>
-            option.id === value || option.id === value?.id,
-          onChange: (e, value) => setValue(name, value?.id || null),
-    }
-    delete autocompleteProps.inputProps
-    return (
-      <AutocompleteElement
-        name={name}
-        options={options}
-        label={props.label}
-        matchId
-        textFieldProps={textFieldProps}
-        autocompleteProps={autocompleteProps}
-      />
-    )
-  }
-  const renderTextField = () => {
-    const textFieldOptions =
-      field_type === 'textarea' ? { multiline: true, minRows: 3 } : {}
-    return (
-      <TextFieldElement {...props} {...textFieldProps} {...textFieldOptions} />
-    )
-  }
-
-  switch (field_type) {
-    case 'date-time':
-    case 'date':
-      return renderDatePicker()
-    case 'select':
-      return renderAutocomplete()
-    case 'textarea':
-    default:
-      return renderTextField()
-  }
-}
 
 const diffObjects = (a, b) => {
   return transform(b, (result, value, key) => {

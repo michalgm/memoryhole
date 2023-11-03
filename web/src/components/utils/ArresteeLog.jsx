@@ -27,20 +27,6 @@ const FETCH_QUERY = gql`
   }
 `
 
-const CREATE_LOG_MUTATION = gql`
-  mutation CreateArresteeLogMutation($input: CreateLogInput!) {
-    createLog(input: $input) {
-      id
-      time
-      type
-      notes
-      needs_followup
-      custom_fields
-    }
-  }
-`
-
-
 
 const ArresteeLog = ({ arrestee_id }) => {
   console.log(arrestee_id)
