@@ -123,11 +123,11 @@ model Arrest {
 model User {
   id                     Int            @id @default(autoincrement())
   email                  String         @unique
-  name                   String?
+  name                   String
   custom_fields          Json?
-  role                   String?        @default("User")
-  hashedPassword         String
-  salt                   String
+  role                   String        @default("User")
+  hashedPassword         String?
+  salt                   String?
   resetToken             String?
   resetTokenExpiresAt    DateTime?
   created_arrests        Arrest[]       @relation("CreatedArrest")
