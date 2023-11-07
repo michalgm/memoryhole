@@ -1,10 +1,19 @@
-import { Autocomplete, Box, InputAdornment, TextField, Typography, alpha } from '@mui/material'
-import { gql, useLazyQuery } from '@apollo/client'
+import { useState } from 'react'
 
+import { gql, useLazyQuery } from '@apollo/client'
 import { Search } from '@mui/icons-material'
-import dayjs from '../../../../api/src/lib/day'
+import {
+  Autocomplete,
+  Box,
+  InputAdornment,
+  TextField,
+  Typography,
+  alpha,
+} from '@mui/material'
+
 import { navigate } from '@redwoodjs/router'
-import  {useState} from 'react'
+
+import dayjs from '../../../../api/src/lib/day'
 
 export const SEARCH_ARRESTS = gql`
   query searchArrestNames($search: String!) {
@@ -12,8 +21,8 @@ export const SEARCH_ARRESTS = gql`
       id
       arrestee {
         display_field
-      },
-      date,
+      }
+      date
       arrest_city
     }
   }
@@ -23,22 +32,18 @@ function QuickSearch(props) {
   const [value, setValue] = useState('')
   const [results, setResults] = useState([])
 
-   const [searchArrests, { loading }] = useLazyQuery(
-     SEARCH_ARRESTS,
-     {
-       onCompleted: (data) => {
-         console.log(data.arrest)
-         setResults(data.arrest)
-       },
-     }
-   )
+  const [searchArrests, { loading }] = useLazyQuery(SEARCH_ARRESTS, {
+    onCompleted: (data) => {
+      setResults(data.arrest)
+    },
+  })
 
   const handleInputChange = (event, value) => {
-     setSearchValue(value)
-     if (value.length) {
-       searchArrests({variables: { search: searchValue }}) // Refetch the query with new variable
-     }
-   }
+    setSearchValue(value)
+    if (value.length) {
+      searchArrests({ variables: { search: searchValue } }) // Refetch the query with new variable
+    }
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -60,7 +65,6 @@ function QuickSearch(props) {
         // value={(_, value) => setValue(value)}
         onChange={(event, value, reason) => {
           setValue(value)
-          console.log('!!!', reason)
           if (value) {
             navigate(`/arrestee-arrest/${value.id}`)
             setResults([])
@@ -72,35 +76,36 @@ function QuickSearch(props) {
           props,
           { id, arrestee: { display_field }, date, arrest_city }
         ) => {
-          const subtitle = `${date ? dayjs(date).format('L') : ''}${date && arrest_city ? ' - ' : ''}${arrest_city ? arrest_city : ''}`
+          const subtitle = `${date ? dayjs(date).format('L') : ''}${
+            date && arrest_city ? ' - ' : ''
+          }${arrest_city ? arrest_city : ''}`
           return (
             <li {...props} key={id}>
               <div>
-                <Typography>
-                  {display_field}
-                </Typography>
+                <Typography>{display_field}</Typography>
                 <Typography color="GrayText" variant="subtitle2">
                   {subtitle}
                 </Typography>
               </div>
-            </li>)
+            </li>
+          )
         }}
         inputValue={searchValue}
         renderInput={(params) => (
           <TextField
             {...params}
             sx={{
-              borderRadius: 5,
+              // borderRadius: 5,
               backgroundColor: alpha('#fff', 0.65),
             }}
             // InputProps={{
             //   startAdornment: (
             //     <InputAdornment position="start">
-            //       <Search/>
+            //       <Search />
             //     </InputAdornment>
             //   ),
             // }}
-            // placeholder="Search arrests..."
+            placeholder="Search arrests..."
             variant="outlined"
           />
         )}

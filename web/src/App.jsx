@@ -7,17 +7,20 @@ import './index.css'
 
 import * as React from 'react'
 
-import { AuthProvider, useAuth } from './auth'
-import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import CssBaseline from '@mui/material/CssBaseline'
-import FatalErrorPage from 'src/pages/FatalErrorPage'
-import { LocalizationProvider } from '@mui/x-date-pickers';
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { ConfirmProvider } from 'material-ui-confirm'
+
+import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
 import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
+
+import FatalErrorPage from 'src/pages/FatalErrorPage'
 import Routes from 'src/Routes'
-import dayjs from '../../api/src/lib/day'
+
+import { AuthProvider, useAuth } from './auth'
+import { SnackBarProvider } from './components/utils/SnackBar'
 
 const theme = createTheme({
   palette: {
@@ -29,19 +32,23 @@ console.log(theme)
 const App = () => (
   <React.Fragment>
     <CssBaseline />
-      <FatalErrorBoundary page={FatalErrorPage}>
-        <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
-          <ThemeProvider theme={theme}>
-            <AuthProvider>
-              <RedwoodApolloProvider useAuth={useAuth}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Routes />
-                </LocalizationProvider>
-              </RedwoodApolloProvider>
-            </AuthProvider>
-            </ThemeProvider>
-        </RedwoodProvider>
-      </FatalErrorBoundary>
+    <FatalErrorBoundary page={FatalErrorPage}>
+      <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
+        <ThemeProvider theme={theme}>
+          <AuthProvider>
+            <RedwoodApolloProvider useAuth={useAuth}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <ConfirmProvider>
+                  <SnackBarProvider>
+                    <Routes />
+                  </SnackBarProvider>
+                </ConfirmProvider>
+              </LocalizationProvider>
+            </RedwoodApolloProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </RedwoodProvider>
+    </FatalErrorBoundary>
   </React.Fragment>
 )
 

@@ -10,10 +10,11 @@
     "@redwoodjs/auth-dbauth-setup": "6.3.2",
     "@redwoodjs/cli-storybook": "6.3.2",
     "@redwoodjs/core": "6.3.2",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
     "node-ssh": "^13.1.0",
     "postcss": "^8.4.31",
     "postcss-loader": "^7.3.3",
-    "postcss-preset-mantine": "^1.9.0",
     "postcss-simple-vars": "^7.0.1"
   },
   "eslintConfig": {
@@ -33,15 +34,17 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
-    "@mui/icons-material": "^5.14.15",
-    "@mui/material": "^5.14.15",
-    "@mui/x-date-pickers": "^6.17.0",
+    "@mui/icons-material": "^5.14.16",
+    "@mui/material": "^5.14.16",
+    "@mui/x-date-pickers": "^6.18.0",
+    "@redwoodjs/eslint-config": "latest",
     "dayjs": "^1.11.10",
-    "eslint": "^8.52.0",
-    "material-react-table": "^2.0.0",
+    "eslint": "^8.53.0",
+    "material-react-table": "^2.0.2",
+    "material-ui-confirm": "^3.0.9",
     "pm2": "^5.3.0",
-    "react-hook-form": "^7.47.0",
-    "react-hook-form-mui": "^6.5.2",
+    "react-hook-form": "^7.48.2",
+    "react-hook-form-mui": "^6.5.4",
     "yarn": "^1.22.19"
   }
 }
