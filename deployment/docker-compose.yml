@@ -1,0 +1,35 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    env_file:
+      - .env.db
+    ports:
+      - "55432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+  protonmail-bridge:
+    image: shenxn/protonmail-bridge
+    # build:
+    #  context: ./build
+    #  dockerfile: Dockerfile
+    container_name: pm_bridge
+    ports:
+      - 127.0.0.1:1025:25/tcp
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - protonmail:/root
+    # command: init
+
+volumes:
+  pg_data:
+  protonmail:
+    name: protonmail

@@ -5,6 +5,7 @@
   "dependencies": {
     "@redwoodjs/api": "6.3.2",
     "@redwoodjs/auth-dbauth-api": "6.3.2",
-    "@redwoodjs/graphql-server": "6.3.2"
+    "@redwoodjs/graphql-server": "6.3.2",
+    "nodemailer": "^6.9.7"
   }
 }

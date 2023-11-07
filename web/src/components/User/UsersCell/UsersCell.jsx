@@ -8,12 +8,7 @@ export const QUERY = gql`
       id
       email
       name
-      custom_fields
       role
-      hashedPassword
-      salt
-      resetToken
-      resetTokenExpiresAt
     }
   }
 `

@@ -2,11 +2,11 @@ export const schema = gql`
   type User {
     id: Int!
     email: String!
-    name: String
+    name: String!
     custom_fields: JSON
-    role: String
-    hashedPassword: String!
-    salt: String!
+    role: String!
+    hashedPassword: String
+    salt: String
     resetToken: String
     resetTokenExpiresAt: DateTime
     created_arrests: [Arrest]!
@@ -27,11 +27,11 @@ export const schema = gql`
 
   input CreateUserInput {
     email: String!
-    name: String
+    name: String!
     custom_fields: JSON
-    role: String
-    hashedPassword: String!
-    salt: String!
+    role: String!
+    hashedPassword: String
+    salt: String
     resetToken: String
     resetTokenExpiresAt: DateTime
   }
@@ -51,6 +51,6 @@ export const schema = gql`
     createUser(input: CreateUserInput!): User! @requireAuth
     updateUser(id: Int!, input: UpdateUserInput!): User! @requireAuth
     deleteUser(id: Int!): User! @requireAuth
-    # emailUser(id: String!): User! @requireAuth
+    emailUser(id: String!): User! @requireAuth
   }
 `

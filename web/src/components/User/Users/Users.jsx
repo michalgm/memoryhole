@@ -1,9 +1,9 @@
 import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
 
 import { QUERY } from 'src/components/User/UsersCell'
-import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
+import { toast } from '@redwoodjs/web/toast'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_USER_MUTATION = gql`
   mutation DeleteUserMutation($id: Int!) {
@@ -42,12 +42,7 @@ const UsersList = ({ users }) => {
             <th>Id</th>
             <th>Email</th>
             <th>Name</th>
-            <th>Custom fields</th>
             <th>Role</th>
-            <th>Hashed password</th>
-            <th>Salt</th>
-            <th>Reset token</th>
-            <th>Reset token expires at</th>
             <th>&nbsp;</th>
           </tr>
         </thead>
@@ -57,21 +52,9 @@ const UsersList = ({ users }) => {
               <td>{truncate(user.id)}</td>
               <td>{truncate(user.email)}</td>
               <td>{truncate(user.name)}</td>
-              <td>{jsonTruncate(user.custom_fields)}</td>
               <td>{truncate(user.role)}</td>
-              <td>{truncate(user.hashedPassword)}</td>
-              <td>{truncate(user.salt)}</td>
-              <td>{truncate(user.resetToken)}</td>
-              <td>{timeTag(user.resetTokenExpiresAt)}</td>
               <td>
                 <nav className="rw-table-actions">
-                  <Link
-                    to={routes.user({ id: user.id })}
-                    title={'Show user ' + user.id + ' detail'}
-                    className="rw-button rw-button-small"
-                  >
-                    Show
-                  </Link>
                   <Link
                     to={routes.editUser({ id: user.id })}
                     title={'Edit user ' + user.id}
