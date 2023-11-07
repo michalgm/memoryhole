@@ -1,12 +1,13 @@
 import {
+  DatetimeLocalField,
+  FieldError,
   Form,
   FormError,
-  FieldError,
   Label,
-  TextField,
-  TextAreaField,
-  DatetimeLocalField,
+  SelectField,
   Submit,
+  TextAreaField,
+  TextField,
 } from '@redwoodjs/forms'
 
 const formatDatetime = (value) => {
@@ -52,6 +53,7 @@ const UserForm = (props) => {
           name="name"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
+          validation={{ required: true }}
         >
           Name
         </Label>
@@ -66,109 +68,23 @@ const UserForm = (props) => {
         <FieldError name="name" className="rw-field-error" />
 
         <Label
-          name="custom_fields"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Custom fields
-        </Label>
-
-        <TextAreaField
-          name="custom_fields"
-          defaultValue={JSON.stringify(props.user?.custom_fields)}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ valueAsJSON: true }}
-        />
-
-        <FieldError name="custom_fields" className="rw-field-error" />
-
-        <Label
           name="role"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
         >
           Role
         </Label>
-
-        <TextField
+        <SelectField
           name="role"
           defaultValue={props.user?.role}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
-        />
+        >
+          <option>User</option>
+          <option>Admin</option>
+        </SelectField>
 
         <FieldError name="role" className="rw-field-error" />
-
-        <Label
-          name="hashedPassword"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Hashed password
-        </Label>
-
-        <TextField
-          name="hashedPassword"
-          defaultValue={props.user?.hashedPassword}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="hashedPassword" className="rw-field-error" />
-
-        <Label
-          name="salt"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Salt
-        </Label>
-
-        <TextField
-          name="salt"
-          defaultValue={props.user?.salt}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="salt" className="rw-field-error" />
-
-        <Label
-          name="resetToken"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Reset token
-        </Label>
-
-        <TextField
-          name="resetToken"
-          defaultValue={props.user?.resetToken}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-        />
-
-        <FieldError name="resetToken" className="rw-field-error" />
-
-        <Label
-          name="resetTokenExpiresAt"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Reset token expires at
-        </Label>
-
-        <DatetimeLocalField
-          name="resetTokenExpiresAt"
-          defaultValue={formatDatetime(props.user?.resetTokenExpiresAt)}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-        />
-
-        <FieldError name="resetTokenExpiresAt" className="rw-field-error" />
 
         <div className="rw-button-group">
           <Submit disabled={props.loading} className="rw-button rw-button-blue">

@@ -1,6 +1,9 @@
 import { DbAuthHandler, PasswordValidationError } from '@redwoodjs/auth-dbauth-api'
 
 import { db } from 'src/lib/db'
+import { sendEmail } from 'src/lib/email'
+
+const password_reset_hours = 24
 
 export const handler = async (event, context) => {
   const forgotPasswordOptions = {
@@ -16,12 +19,30 @@ export const handler = async (event, context) => {
     // You could use this return value to, for example, show the email
     // address in a toast message so the user will know it worked and where
     // to look for the email.
-    handler: (user) => {
+    handler: async (user) => {
+      console.warn({ user })
+      const text = `Hello ${user.name},
+
+The Memoryhole Legal Support Database received a request to reset the password associated with this email address (${user.email}) OR a new account was created for you.
+Please follow the link below to reset your password:
+${process.env.PUBLIC_URL}/reset-password?resetToken=${user.resetToken}
+
+This password reset link will expire in ${password_reset_hours} hours. If you do not complete the process before then, you will need to start the password reset process again:
+${process.env.PUBLIC_URL}/forgot-password
+
+Please do not reply to this email as it is sent from an unmonitored mailbox.`
+
+      const res = await sendEmail({
+        to: user.email,
+        subject: 'Memoryhole Database Password Reset',
+        text
+      })
+      console.log(res)
       return user
     },
 
     // How long the resetToken is valid for, in seconds (default is 24 hours)
-    expires: 60 * 60 * 12,
+    expires: 60 * 60 * password_reset_hours,
 
     errors: {
       // for security reasons you may want to be vague here rather than expose
