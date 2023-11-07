@@ -1,4 +1,10 @@
 export const schema = gql`
+  input GenericFilterInput {
+    field: String!
+    value: String!
+    operator: String # e.g., "eq", "ne", "lt", "gt", etc.
+  }
+
   type Arrest {
     id: Int!
     display_field: String
@@ -24,6 +30,7 @@ export const schema = gql`
     arrests: [Arrest!]! @requireAuth
     arrest(id: Int!): Arrest @requireAuth
     searchArrestNames(search: String!): [Arrest!]! @requireAuth
+    filterArrests(filters: [GenericFilterInput]): [Arrest]! @requireAuth
   }
 
   input CreateArrestInput {

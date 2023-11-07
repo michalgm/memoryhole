@@ -1,0 +1,3 @@
+- date -> arrest_date
+- display_field -> 'Name'
+- hook up dynamic lists

@@ -11,6 +11,34 @@ export const arrests = () => {
   return db.arrest.findMany()
 }
 
+export const filterArrests = ({ filters = [] }) => {
+  const where = {}
+  filters.forEach((filter) => {
+    let { field, operator, value } = filter
+    let query = {
+      [operator]: value,
+    }
+    const parts = field.split('.')
+    const dbField = parts[0]
+    if (parts.length > 1) {
+      if (parts[0] === 'custom_fields') {
+        query = { path: [parts[1]], ...query }
+      } else {
+        query = {
+          [parts[1]]: {
+            ...query,
+            mode: 'insensitive',
+          },
+        }
+      }
+    }
+    where[dbField] = query
+  })
+
+  return db.arrest.findMany({
+    where,
+  })
+}
 export const arrest = ({ id }) => {
   return db.arrest.findUnique({
     where: { id },

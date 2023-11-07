@@ -10,13 +10,15 @@ const AdminPage = () => {
       <MetaTags title="Admin" description="Admin page" />
 
       <h1>AdminPage</h1>
+      <Link to={routes.editOptions()}>Edit Options</Link>
+
       <ul>
-        {admin_routes.map(route => <li key={route}>
-          <Link to={routes[route]()}>{route}</Link>
-        </li>)}
-
+        {admin_routes.map((route) => (
+          <li key={route}>
+            <Link to={routes[route]()}>{route}</Link>
+          </li>
+        ))}
       </ul>
-
     </>
   )
 }

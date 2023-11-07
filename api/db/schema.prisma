@@ -1,6 +1,6 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native"]
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -10,20 +10,22 @@ datasource db {
 }
 
 model OptionSet {
-  name        String @unique
-  description String?
-  values      OptionSetValues[]
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  values      OptionSetValue[]
 }
 
-model OptionSetValues {
-  option_set String
-  label   String
-  value   String
-  option_set_details  OptionSet @relation(fields: [option_set], references: [name])
+model OptionSetValue {
+  id                 Int       @id @default(autoincrement())
+  option_set_id      Int
+  label              String
+  value              String
+  option_set_details OptionSet @relation(fields: [option_set_id], references: [id])
 
-  @@unique([option_set, value])
-  @@index([option_set, label])
+  @@unique([option_set_id, value])
+  @@index([option_set_id, label])
 }
+
 model Arrestee {
   id             Int       @id @default(autoincrement())
   display_field  String?

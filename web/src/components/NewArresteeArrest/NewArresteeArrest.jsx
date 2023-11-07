@@ -1,11 +1,14 @@
+import { useState } from 'react'
+
+import { Typography } from '@mui/material'
+
 import { navigate, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
-import SnackBar from '../utils/SnackBar'
-import { Typography } from '@mui/material'
-import { toast } from '@redwoodjs/web/toast'
-import { useMutation } from '@redwoodjs/web'
-import { useState } from 'react'
+
+import { useSnackbar } from '../utils/SnackBar'
 
 const CREATE_ARREST_MUTATION = gql`
   mutation CreateArresteeArrestMutation($input: CreateArrestInput!) {
@@ -20,18 +23,17 @@ const CREATE_ARREST_MUTATION = gql`
 
 const NewArresteeArrest = () => {
   const [saving, setSaving] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
+  const { openSnackbar } = useSnackbar()
 
   const [createArrest, { loading, error }] = useMutation(
     CREATE_ARREST_MUTATION,
     {
       onCompleted: (data) => {
-        console.log(data)
-        toast.success('Arrest created')
-        navigate(routes.arresteeArrest({id: data.createArrest.id}))
+        openSnackbar('Arrest creted')
+        navigate(routes.arresteeArrest({ id: data.createArrest.id }))
       },
       onError: (error) => {
-        toast.error(error.message)
+        openSnackbar(error.message, 'error')
       },
     }
   )
@@ -93,19 +95,6 @@ const NewArresteeArrest = () => {
           fields={fields}
         />
       </div>
-      <SnackBar
-        open={Boolean(error?.message)}
-        severity="error"
-        message={error?.message}
-      />
-
-      <SnackBar
-        open={showSuccess}
-        handleClose={() => setShowSuccess(false)}
-        severity="success"
-        message={'Arrestee Saved!'}
-        autoHideDuration={6000}
-      />
     </div>
   )
 }

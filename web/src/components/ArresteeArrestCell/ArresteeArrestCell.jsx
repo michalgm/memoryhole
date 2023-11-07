@@ -1,13 +1,10 @@
-import { flatMap, get, reduce, set, startCase } from 'lodash'
-import { useMutation, useQuery } from '@redwoodjs/web'
-
-import ArresteeArrest from 'src/components/ArresteeArrest'
-import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
-import SnackBar from '../utils/SnackBar'
 import { Typography } from '@mui/material'
-import dayjs from 'dayjs'
-import { toast } from '@redwoodjs/web/toast'
-import { useState } from 'react'
+
+import { useMutation } from '@redwoodjs/web'
+
+import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
+
+import { useSnackbar } from '../utils/SnackBar'
 
 export const QUERY = gql`
   query EditArresteeArrestById($id: Int!) {
@@ -108,55 +105,48 @@ export const Failure = ({ error }) => (
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
 )
 
-export const Success = ({ arresteeArrest, id, ...rest }) => {
+export const Success = ({ arresteeArrest, id }) => {
   // console.log({rest})
-  const { data, refetch } = useQuery(QUERY, { variables: { id } })
-  const [saving, setSaving] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
+  const { openSnackbar } = useSnackbar()
 
+  // const { data, refetch } = useQuery(QUERY, { variables: { id } })
   const [updateArrest, { loading, error }] = useMutation(
     UPDATE_ARREST_MUTATION,
     {
       onCompleted: async () => {
-        toast.success('Arrest updated')
-        // setHasPosted(true)
-        setSaving(false)
-        setShowSuccess(true)
-        // refresh()
-        // navigate(routes.arresteeArrest({id: }))
+        openSnackbar('Arrest updated')
       },
       refetchQueries: [{ query: QUERY, variables: { id } }],
       awaitRefetchQueries: true,
       onError: (error) => {
-        setSaving(false)
-        console.log(error.message)
-        toast.error(error.message)
+        openSnackbar(error.message, 'error')
       },
     }
   )
 
   const onSave = async (input, id, refresh) => {
-    ['updated_at','updated_by', 'created_by', 'created_at', 'search_field', 'display_field', 'id'].forEach(
-      (k) => delete input[k]
-    )
+    ;[
+      'updated_at',
+      'updated_by',
+      'created_by',
+      'created_at',
+      'search_field',
+      'display_field',
+      'id',
+    ].forEach((k) => delete input[k])
     if (!input.date) {
       delete input.date
     }
 
-    setSaving(true)
     return updateArrest({ variables: { id, input, refresh } })
   }
-  // console.log(arresteeArrest)
-  // if (saving) {
-  //   return '...'
-  // }
-
 
   return (
     <div>
       <header>
         <Typography variant="h5">
-          Edit Arrestee "{arresteeArrest.display_field} {arresteeArrest.arrestee.display_field}"
+          Edit Arrestee "{arresteeArrest.display_field}{' '}
+          {arresteeArrest.arrestee.display_field}"
         </Typography>
       </header>
       <div>
@@ -168,19 +158,6 @@ export const Success = ({ arresteeArrest, id, ...rest }) => {
           error={error}
         />
       </div>
-      <SnackBar
-        open={Boolean(error?.message)}
-        severity="error"
-        message={error?.message}
-      />
-
-      <SnackBar
-        open={showSuccess}
-        handleClose={() => setShowSuccess(false)}
-        severity="success"
-        message={'Arrestee Saved!'}
-        autoHideDuration={6000}
-      />
     </div>
   )
 }
