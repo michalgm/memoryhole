@@ -2,6 +2,7 @@ import { Private, Route, Router, Set } from '@redwoodjs/router'
 
 import BlogLayout from 'src/layouts/BlogLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
+
 import { useAuth } from './auth'
 
 // In this file, all Page components from 'src/pages` are auto-imported. Nested
@@ -16,8 +17,6 @@ import { useAuth } from './auth'
 const Routes = () => {
   return (
     <Router useAuth={useAuth}>
-      <Route path="/new-arrestee-arrest" page={NewArresteeArrestPage} name="newArresteeArrest" />
-      <Route path="/admin" page={AdminPage} name="admin" />
       <Route path="/login" page={LoginPage} name="login" />
       <Route path="/signup" page={SignupPage} name="signup" />
       <Route path="/forgot-password" page={ForgotPasswordPage} name="forgotPassword" />
@@ -26,6 +25,9 @@ const Routes = () => {
         <Set wrap={BlogLayout}>
           <Private unauthenticated="login" roles="Admin">
             <Route path="/admin" page={AdminPage} name="admin" />
+            <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
+            <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
+            <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
 
             <Set wrap={ScaffoldLayout} title="Arrests" titleTo="arrests" buttonLabel="New Arrest" buttonTo="newArrest">
               <Route path="/admin/arrests/new" page={ArrestNewArrestPage} name="newArrest" />
