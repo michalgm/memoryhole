@@ -17,10 +17,25 @@
 host = "memoryhole.styrotopia.net"
 username = "memoryhole"
 agentForward = true
+privateKeyPath = "/home/dameat/.ssh/id_rsa"
 sides = ["web", "api"]
 packageManagerCommand = "yarn"
 monitorCommand = "pm2"
 path = "/var/www/memoryhole"
+processNames = ["serve"]
+repo = "https://github.com/michalgm/memoryhole.git"
+branch = "main"
+keepReleases = 5
+
+[[staging.servers]]
+host = "memoryhole.styrotopia.net"
+username = "memoryhole"
+agentForward = true
+privateKeyPath = "/home/dameat/.ssh/id_rsa"
+sides = ["web", "api"]
+packageManagerCommand = "yarn"
+monitorCommand = "pm2"
+path = "/var/www/memoryhole-stage"
 processNames = ["serve"]
 repo = "https://github.com/michalgm/memoryhole.git"
 branch = "main"
