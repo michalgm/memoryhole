@@ -69,7 +69,6 @@ const updateDisplayField = (arrest) => {
 }
 
 export const createArrest = ({ input: { arrestee, ...arrest } }) => {
-  console.log(arrest, arrestee)
   updateDisplayField(arrest)
   updateAresteeDisplayField(arrestee)
 

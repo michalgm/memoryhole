@@ -20,10 +20,9 @@ const NewUser = () => {
 
   const [createUser, { loading, error }] = useMutation(CREATE_USER_MUTATION, {
     onCompleted: async ({ createUser: user }) => {
-      console.log(user)
       await forgotPassword(user.email)
       toast.success('User created')
-      // navigate(routes.users())
+      navigate(routes.user({ id: user.id }))
     },
     onError: (error) => {
       toast.error(error.message)

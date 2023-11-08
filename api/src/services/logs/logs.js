@@ -4,12 +4,12 @@ export const logs = () => {
   return db.log.findMany()
 }
 
-export const arresteeLogs = ({arrestee_id}) => {
+export const arresteeLogs = ({ arrestee_id }) => {
   return db.log.findMany({
     where: { arrestee_id },
     orderBy: {
-      created_at: 'desc'
-    }
+      created_at: 'desc',
+    },
   })
 }
 
@@ -19,14 +19,14 @@ export const log = ({ id }) => {
   })
 }
 
-export const createLog = ({input: { arrestee_id, ...input}} ) => {
+export const createLog = ({ input: { arrestee_id, ...input } }) => {
   return db.log.create({
     data: {
       ...input,
       arrestee: {
         connect: {
-          id: arrestee_id
-        }
+          id: arrestee_id,
+        },
       },
       updated_by: {
         connect: { id: context.currentUser.id }, // Assuming 1 is the ID of the user you want to connect
@@ -39,7 +39,6 @@ export const createLog = ({input: { arrestee_id, ...input}} ) => {
 }
 
 export const updateLog = ({ id, input }) => {
-  input.time = Date.now()
   return db.log.update({
     data: {
       ...input,

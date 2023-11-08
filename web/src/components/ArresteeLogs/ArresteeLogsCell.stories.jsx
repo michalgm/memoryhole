@@ -1,4 +1,5 @@
-import { Loading, Empty, Failure, Success } from './ArresteeLogsCell'
+import { Empty, Failure, Loading, Success } from './ArresteeLogsCell'
+
 import { standard } from './ArresteeLogsCell.mock'
 
 const meta = {

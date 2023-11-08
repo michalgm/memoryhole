@@ -1,9 +1,9 @@
+import { Link, routes } from '@redwoodjs/router'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { useMemo, useState } from 'react'
 
 import ArrestFields from 'src/lib/ArrestFields'
 import ArresteeArrestCell from 'src/components/ArresteeArrest'
-import { Link } from '@redwoodjs/router'
 import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/Field'
 
@@ -36,11 +36,6 @@ const fields = ArrestFields.reduce((acc, { fields }) => {
   })
   return acc
 }, {})
-console.log(
-  Object.keys(fields)
-    .filter((f) => !f.includes('.'))
-    .join('\n')
-)
 
 export const QUERY = gql`
   query ArresteeArrestsQuery($filters: [GenericFilterInput]) {
@@ -123,7 +118,7 @@ export const QUERY = gql`
 
 export const Loading = () => <div>Loading...</div>
 
-export const Empty = () => <div>Empty</div>
+// export const Empty = () => <div>Empty</div>
 
 export const Failure = ({ error }) => (
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
@@ -156,7 +151,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
         // accessorKey: 'arrestee.first_name',
         header: 'Name',
         Cell: ({ cell, row }) => (
-          <Link to={`/arrestee-arrest/${row.original.id}`}>
+          <Link to={routes.arrest({ id: row.original.id })}>
             {cell.getValue()}
           </Link>
         ),
@@ -192,7 +187,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
       showGlobalFilter: true,
       enableDensityToggle: false,
       sorting: [{ id: 'date', desc: false }],
-      pagination: { pageSize: 50, pageIndex: 1 },
+      pagination: { pageSize: 50, pageIndex: 0 },
     },
   })
 
@@ -215,7 +210,6 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
 
   return (
     <>
-      <Link onClick={doFilter}>Clickme</Link>
       <MaterialReactTable table={table} />
     </>
   )

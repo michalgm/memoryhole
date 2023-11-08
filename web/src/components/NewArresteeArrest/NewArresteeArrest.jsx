@@ -4,7 +4,6 @@ import { Typography } from '@mui/material'
 
 import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
 
 import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
 
@@ -29,8 +28,8 @@ const NewArresteeArrest = () => {
     CREATE_ARREST_MUTATION,
     {
       onCompleted: (data) => {
-        openSnackbar('Arrest creted')
-        navigate(routes.arresteeArrest({ id: data.createArrest.id }))
+        openSnackbar('Arrest created')
+        navigate(routes.arrest({ id: data.createArrest.id }))
       },
       onError: (error) => {
         openSnackbar(error.message, 'error')
