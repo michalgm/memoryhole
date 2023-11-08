@@ -1,6 +1,7 @@
 import { db } from 'api/src/lib/db'
+
 // import { hashPassword } from 'api/src/lib/auth'
-import {hashPassword} from '@redwoodjs/auth-dbauth-api/'
+import { hashPassword } from '@redwoodjs/auth-dbauth-api/'
 export default async () => {
   try {
     //
@@ -13,7 +14,12 @@ export default async () => {
       // To try this example data with the UserExample model in schema.prisma,
       // uncomment the lines below and run 'yarn rw prisma migrate dev'
       //
-      { email: process.env.SEED_USER_EMAIL, role: 'Admin', password: process.env.SEED_USER_PASSWORD},
+      {
+        email: process.env.SEED_USER_EMAIL,
+        role: 'Admin',
+        password: process.env.SEED_USER_PASSWORD,
+        name: process.env.SEED_USER_NAME,
+      },
       // { name: 'mark', email: 'mark@example.com' },
       // { name: 'jackie', email: 'jackie@example.com' },
       // { name: 'bob', email: 'bob@example.com' },
@@ -28,13 +34,15 @@ export default async () => {
       //
       // Change to match your data model and seeding needs
       //
-      data.map(async ({password, ...data}) => {
+      data.map(async ({ password, ...data }) => {
         const [hashedPassword, salt] = await hashPassword(password)
-        const record = await db.user.create({ data: {
-          ...data,
-          hashedPassword,
-          salt
-        } })
+        const record = await db.user.create({
+          data: {
+            ...data,
+            hashedPassword,
+            salt,
+          },
+        })
       })
     )
 

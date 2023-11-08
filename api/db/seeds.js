@@ -1,6 +1,6 @@
 // api/db/seeds.js
-import { db } from 'src/lib/db'
 import { hashPassword } from 'src/lib/auth'
+import { db } from 'src/lib/db'
 
 const usStates = [
   { label: 'Alabama', value: 'AL' },
@@ -75,9 +75,9 @@ const option_sets = { release_types, usStates }
 const importOptionStates = async () => {
   await Promise.all(
     Object.keys(option_sets).map(async (option_set) => {
-      return Promise.all(option_sets[option_set]
-        .map(({ label, value }) => {
-          return db.optionSet.create({option_set, label, value})
+      return Promise.all(
+        option_sets[option_set].map(({ label, value }) => {
+          return db.optionSet.create({ option_set, label, value })
         })
       )
     })
@@ -90,7 +90,8 @@ const createUser = async () => {
     data: {
       email: process.env.SEED_USER_EMAIL,
       password: hashedPassword,
-      role: 'Admin'
+      role: 'Admin',
+      name: process.env.SEED_USER_NAME,
     },
   })
 }
