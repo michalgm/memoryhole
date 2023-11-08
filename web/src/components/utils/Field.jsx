@@ -1,6 +1,15 @@
-import { startCase } from 'lodash'
+import {
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  FormHelperText,
+  FormLabel,
+} from '@mui/material'
+import Grid from '@mui/material/Unstable_Grid2/Grid2'
+import { capitalize } from 'lodash'
 import {
   AutocompleteElement,
+  CheckboxElement,
   DatePickerElement,
   DateTimePickerElement,
   RadioButtonGroup,
@@ -10,7 +19,10 @@ import {
 
 export const formatLabel = (label) => {
   const index = label.lastIndexOf('.')
-  return startCase(label.slice(index + 1))
+  return label
+    .slice(index + 1)
+    .replace(/_/g, ' ')
+    .replace(/\w+/g, capitalize)
 }
 
 export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
@@ -45,11 +57,13 @@ export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
     const options = ['', ...props.options].map((opt) =>
       opt.label ? opt : { id: opt, label: opt }
     )
+    delete props.options
     const autocompleteProps = {
       ...textFieldProps,
       isOptionEqualToValue: (option = {}, value) =>
         option.id === value || option.id === value?.id,
       onChange: (e, value) => setValue(name, value?.id || null),
+      ...props,
     }
     delete autocompleteProps.inputProps
     return (
@@ -60,12 +74,15 @@ export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
         matchId
         textFieldProps={textFieldProps}
         autocompleteProps={autocompleteProps}
+        {...props}
       />
     )
   }
   const renderTextField = () => {
     const textFieldOptions =
-      field_type === 'textarea' ? { multiline: true, minRows: 3 } : {}
+      field_type === 'textarea'
+        ? { multiline: true, minRows: props.minRows || 3 }
+        : {}
     return (
       <TextFieldElement {...props} {...textFieldProps} {...textFieldOptions} />
     )
@@ -75,7 +92,55 @@ export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
     return <RadioButtonGroup {...props} {...textFieldProps} />
   }
 
+  const renderCheckboxGroup = () => {
+    return (
+      <Grid container spacing={2}>
+        <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+          <FormLabel component="legend">{props.label}</FormLabel>
+          <FormGroup>
+            {props.options.map((option) => (
+              <Grid xs={6} key={option}>
+                <FormControlLabel
+                  control={
+                    <CheckboxElement
+                      helperText="huh"
+                      name={`${name}_${option}`}
+                    />
+                  }
+                  label={option}
+                />
+              </Grid>
+            ))}
+          </FormGroup>
+          <FormHelperText>{props.helperText}</FormHelperText>
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  const renderCheckbox = () => {
+    return (
+      <CheckboxElement
+        name={`${name}`}
+        sx={{ p: 0, pr: 1, pl: 1 }}
+        label={props.label}
+      />
+    )
+    // return <FormGroup>
+    //   <FormControlLabel
+    //     control={
+    //     }
+    //     label={props.label}
+    //   />
+    // </FormGroup>
+  }
+
   switch (field_type) {
+    case 'checkbox':
+      return renderCheckbox()
+
+    case 'checkbox_group':
+      return renderCheckboxGroup()
     case 'radio':
       return renderRadio()
     case 'date-time':

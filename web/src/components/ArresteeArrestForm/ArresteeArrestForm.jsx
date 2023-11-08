@@ -1,4 +1,4 @@
-import { Button, Divider, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
 import {
@@ -16,9 +16,9 @@ import { FormContainer } from 'react-hook-form-mui'
 
 import ArrestFields from 'src/lib/ArrestFields'
 
-import ArresteeLogsCell from '../ArresteeLogsCell/ArresteeLogsCell'
-import CreateArresteeLog from '../ArresteeLogsCell/CreateArresteeLog'
-import { Field } from '../utils/Field'
+import ArresteeLogsDrawer from '../ArresteeLogs/ArresteeLogsDrawer'
+import { Field, formatLabel } from '../utils/Field'
+import FormSection from '../utils/FormSection'
 
 const diffObjects = (a, b) => {
   return transform(b, (result, value, key) => {
@@ -38,6 +38,9 @@ const pruneData = (data, fields) => {
       paths,
       (result, [path, params = {}]) => {
         let value = get(originalData, path)
+        if (value === undefined && params.default) {
+          value = params.default
+        }
         if (value !== undefined) {
           if (['date', 'date-time'].includes(params.field_type)) {
             value = dayjs(value)
@@ -70,51 +73,28 @@ const ArresteeArrestForm = (props) => {
     props.onSave(data, props?.arrest?.id)
   }
 
-  const formatLabel = (label) => {
-    const index = label.lastIndexOf('.')
-    return startCase(label.slice(index + 1))
-  }
-
   const fields = ArrestFields.map(({ fields, title }, groupIndex) => {
     return (
-      <Grid
-        xs={12}
-        spacing={2}
-        key={groupIndex}
-        container
-        alignItems={'center'}
-      >
-        {title && (
-          <Grid xs={12}>
-            <Divider
-              textAlign="left"
-              sx={{ styleOverrides: { 'MuiDivider-root': { width: 5 } } }}
-            >
-              {title && (
-                <Typography variant="h6" gutterBottom>
-                  {title}
-                </Typography>
-              )}
-            </Divider>
-          </Grid>
-        )}
+      <FormSection key={groupIndex} title={title}>
         {reorderFieldsLodash(fields).map(
-          ([key, { label, ...options } = {}, index] = []) => {
+          ([key, { label, span = 6, ...options } = {}, index] = []) => {
             return (
-              <Grid key={key} xs={6}>
-                <Field
-                  tabIndex={100 * (groupIndex + 1) + index}
-                  key={key}
-                  id={key}
-                  label={formatLabel(label || key)}
-                  name={key}
-                  {...options}
-                />
+              <Grid key={key || index} xs={span}>
+                {key && (
+                  <Field
+                    tabIndex={100 * (groupIndex + 1) + index}
+                    key={key}
+                    id={key}
+                    label={formatLabel(label || key)}
+                    name={key}
+                    {...options}
+                  />
+                )}
               </Grid>
             )
           }
         )}
-      </Grid>
+      </FormSection>
     )
   })
   //  console.log(reorderFieldsLodash(fields)) ||
@@ -133,41 +113,54 @@ const ArresteeArrestForm = (props) => {
       <b>{props?.arrest[`${time}_by`]?.name}</b>
     </Typography>
   )
-
   return (
-    <>
+    <Box>
       <FormContainer
         defaultValues={values}
         onSuccess={(data) => onSubmit(data)}
       >
-        <Grid container spacing={4} className="content-container">
-          <Grid xs={12} sx={{ textAlign: 'right', clear: 'both' }}>
-            <Button type="submit" variant="contained">
-              Save
-            </Button>
-          </Grid>
+        <Grid
+          sx={{ pb: 8 }}
+          container
+          spacing={4}
+          className="content-container"
+        >
           <Grid xs={12} container className="form-content">
             {fields}
           </Grid>
-          {props.arrest?.id && (
-            <>
-              <Grid xs={6}>
-                <ModTime time="created" />
-              </Grid>
-              <Grid xs={6}>
-                <ModTime time="updated" />
-              </Grid>
-            </>
-          )}
+        </Grid>
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            bgcolor: 'primary.main',
+            color: 'white',
+            zIndex: 10,
+            p: 2,
+          }}
+          xs={12}
+        >
+          <Grid xs>{props.arrest?.id && <ModTime time="created" />}</Grid>
+          <Grid xs>{props.arrest?.id && <ModTime time="updated" />}</Grid>
+          <Grid xs sx={{ textAlign: 'right' }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="secondary"
+              size="small"
+            >
+              Save Arrestee
+            </Button>
+          </Grid>
         </Grid>
       </FormContainer>
-      {props.arrest?.id && (
-        <>
-          <CreateArresteeLog arrestee_id={props.arrest.arrestee.id} />
-          <ArresteeLogsCell arrestee_id={props.arrest.arrestee.id} />
-        </>
+      {props.arrest?.arrestee?.id && (
+        <ArresteeLogsDrawer arrestee_id={props.arrest?.arrestee?.id} />
       )}
-    </>
+    </Box>
   )
 }
 

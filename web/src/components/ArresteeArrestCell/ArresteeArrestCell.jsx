@@ -1,9 +1,6 @@
-import { Typography } from '@mui/material'
-
-import { useMutation } from '@redwoodjs/web'
-
 import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
-
+import { Typography } from '@mui/material'
+import { useMutation } from '@redwoodjs/web'
 import { useSnackbar } from '../utils/SnackBar'
 
 export const QUERY = gql`
@@ -143,12 +140,12 @@ export const Success = ({ arresteeArrest, id }) => {
 
   return (
     <div>
-      <header>
+      {/* <header>
         <Typography variant="h5">
           Edit Arrestee "{arresteeArrest.display_field}{' '}
           {arresteeArrest.arrestee.display_field}"
         </Typography>
-      </header>
+      </header> */}
       <div>
         <ArresteeArrestForm
           arrest={arresteeArrest}

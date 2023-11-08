@@ -1,5 +1,6 @@
+import { Empty, Failure, Loading, Success } from './ArresteeLogsCell'
+
 import { render } from '@redwoodjs/testing/web'
-import { Loading, Empty, Failure, Success } from './ArresteeLogsCell'
 import { standard } from './ArresteeLogsCell.mock'
 
 // Generated boilerplate tests do not account for all circumstances

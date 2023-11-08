@@ -8,14 +8,6 @@ interface Options {
 }
 
 export async function sendEmail({ to, subject, text, html }: Options) {
-  console.log('Sending email to:', to)
-  console.log({
-    auth: {
-      user: process.env.PROTONMAIL_EMAIL,
-      pass: process.env.PROTONMAIL_PW,
-    },
-  })
-
   // create reusable transporter object using SendInBlue for SMTP
   const transporter = nodemailer.createTransport({
     host: '127.0.0.1',

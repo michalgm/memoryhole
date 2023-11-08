@@ -1,16 +1,17 @@
 import * as React from 'react'
 
+import PersonIcon from '@mui/icons-material/Person'
 import { Container, Tooltip } from '@mui/material'
-import { NavLink, routes, useMatch } from '@redwoodjs/router'
-
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import PersonIcon from '@mui/icons-material/Person'
-import QuickSearch from 'src/components/utils/QuickSearch'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
+
+import { NavLink, routes, useMatch } from '@redwoodjs/router'
+
 import { useAuth } from 'src/auth'
+import QuickSearch from 'src/components/utils/QuickSearch'
 
 const CustomLink = ({ to, ...rest }) => {
   const matchInfo = useMatch(to)
@@ -22,16 +23,17 @@ const CustomLink = ({ to, ...rest }) => {
   }
   if (isActive) {
     props.color = 'secondary'
-    props.sx = {
-    }
+    props.sx = {}
   }
   return <Button component={NavLink} to={to} {...rest} {...props} />
 }
 
 const BlogLayout = ({ children }) => {
   const { isAuthenticated, currentUser, logOut } = useAuth()
-  const pages = ['home', 'about', 'admin']
-
+  const pages = [['home', 'Arrests']]
+  if (currentUser && currentUser) {
+    pages.push(['admin', 'Admin'])
+  }
   return (
     <>
       <header>
@@ -55,27 +57,31 @@ const BlogLayout = ({ children }) => {
               >
                 MemoryHole
               </Typography>
-              <Box sx={{flexGrow: 2}}>
-                {pages.map((page) => (
-                  <CustomLink key={page} to={routes[page]()}>
-                    {page}
+              <Box sx={{ flexGrow: 2 }}>
+                {pages.map(([route, label]) => (
+                  <CustomLink key={route} to={routes[route]()}>
+                    {label}
                   </CustomLink>
                 ))}
               </Box>
-              <QuickSearch/>
-              <Tooltip title={`Logged in as ${currentUser.name}foo`}>
-                <PersonIcon />
-              </Tooltip>
-              <Button color="inherit" onClick={logOut}>
-                Logout
-              </Button>
+              <QuickSearch />
+              {isAuthenticated && currentUser && (
+                <>
+                  <Tooltip title={`Logged in as ${currentUser.name}foo`}>
+                    <PersonIcon />
+                  </Tooltip>
+                  <Button color="inherit" onClick={logOut}>
+                    Logout
+                  </Button>
+                </>
+              )}
             </Toolbar>
           </AppBar>
         </Box>
       </header>
-      <main>
+      <Box component="main" sx={{ p: 3, backgroundColor: '#f3f3f3' }}>
         <Container>{children}</Container>
-      </main>
+      </Box>
     </>
   )
 }
