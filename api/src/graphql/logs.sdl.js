@@ -24,9 +24,9 @@ export const schema = gql`
 
   input CreateLogInput {
     # time: DateTime!
-    # type: String
+    type: String
     notes: String
-    needs_followup: Boolean!
+    needs_followup: Boolean
     # custom_fields: JSON
     arrestee_id: Int
     created_by_id: Int

@@ -20,7 +20,6 @@ export const handler = async (event, context) => {
     // address in a toast message so the user will know it worked and where
     // to look for the email.
     handler: async (user) => {
-      console.warn({ user })
       const text = `Hello ${user.name},
 
 The Memoryhole Legal Support Database received a request to reset the password associated with this email address (${user.email}) OR a new account was created for you.
@@ -37,7 +36,6 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
         subject: 'Memoryhole Database Password Reset',
         text
       })
-      console.log(res)
       return user
     },
 
@@ -125,6 +123,7 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
     handler: ({ username, hashedPassword, salt, userAttributes }) => {
+      return false
       return db.user.create({
         data: {
           email: username,

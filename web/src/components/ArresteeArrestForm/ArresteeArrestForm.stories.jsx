@@ -10,7 +10,7 @@
 //
 // See https://storybook.js.org/docs/react/writing-stories/args.
 
-import ArresteeArrestForm from './ArresteeArrestForm'
+import ArresteeArrestForm from './ArresteeArrestForm.1'
 
 export default { component: ArresteeArrestForm }
 
