@@ -28,6 +28,7 @@ branch = "main"
 keepReleases = 5
 
 [[staging.servers]]
+before.build = 'sed -i -e "s/37474f/790e3c/" web/src/App.jsx'
 host = "memoryhole.styrotopia.net"
 username = "memoryhole"
 agentForward = true
