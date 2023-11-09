@@ -25,7 +25,7 @@ path = "/var/www/memoryhole"
 processNames = ["prod"]
 repo = "https://github.com/michalgm/memoryhole.git"
 branch = "main"
-keepReleases = 5
+keepReleases = 3
 
 [[staging.servers]]
 before.build = 'sed -i -e "s/MemoryHole/MemoryHole (Stage)/" web/src/layouts/BlogLayout/BlogLayout.jsx'
@@ -40,7 +40,7 @@ path = "/var/www/memoryhole-stage"
 processNames = ["stage"]
 repo = "https://github.com/michalgm/memoryhole.git"
 branch = "main"
-keepReleases = 5
+keepReleases = 3
 
 # If you have separate api and web servers:
 #
