@@ -1,20 +1,11 @@
 import { useState } from 'react'
 
 import { ChevronRight, Notes } from '@mui/icons-material'
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  IconButton,
-  Tooltip,
-  Typography,
-} from '@mui/material'
+import { Box, Button, Divider, Drawer, IconButton } from '@mui/material'
 
 import ArresteeLogsCell from './ArresteeLogsCell'
 
 const ArresteeLogsDrawer = (props) => {
-  console.log(props)
   const [open, setOpen] = useState(false)
   if (!open) {
     return (

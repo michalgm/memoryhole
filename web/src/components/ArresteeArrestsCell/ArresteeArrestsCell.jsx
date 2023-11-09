@@ -1,11 +1,14 @@
-import { Link, routes } from '@redwoodjs/router'
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { useMemo, useState } from 'react'
 
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
+
+import { routes } from '@redwoodjs/router'
+
 import ArrestFields from 'src/lib/ArrestFields'
-import ArresteeArrestCell from 'src/components/ArresteeArrest'
+
 import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/Field'
+import Link from '../utils/Link'
 
 // import schema from '../../types/graphql'
 
@@ -151,7 +154,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
         // accessorKey: 'arrestee.first_name',
         header: 'Name',
         Cell: ({ cell, row }) => (
-          <Link to={routes.arrest({ id: row.original.id })}>
+          <Link color="secondary" to={routes.arrest({ id: row.original.id })}>
             {cell.getValue()}
           </Link>
         ),

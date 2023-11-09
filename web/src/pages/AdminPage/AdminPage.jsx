@@ -1,10 +1,17 @@
-import { Link, routes } from '@redwoodjs/router'
-
+import { routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
 
+import Link from 'src/components/utils/Link'
+
 const AdminPage = () => {
-  const admin_routes = ['arrests', 'users', 'arrestees', 'hotlineLogs', 'customSchemata','logs']
-  console.log(routes)
+  const admin_routes = [
+    'arrests',
+    'users',
+    'arrestees',
+    'hotlineLogs',
+    'customSchemata',
+    'logs',
+  ]
   return (
     <>
       <MetaTags title="Admin" description="Admin page" />

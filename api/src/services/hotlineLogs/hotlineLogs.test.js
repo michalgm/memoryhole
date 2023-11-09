@@ -1,4 +1,10 @@
-import { hotlineLogs, hotlineLog, deleteHotlineLog } from './hotlineLogs'
+import {
+  hotlineLogs,
+  hotlineLog,
+  createHotlineLog,
+  updateHotlineLog,
+  deleteHotlineLog,
+} from './hotlineLogs'
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float.
@@ -17,6 +23,30 @@ describe('hotlineLogs', () => {
     const result = await hotlineLog({ id: scenario.hotlineLog.one.id })
 
     expect(result).toEqual(scenario.hotlineLog.one)
+  })
+
+  scenario('creates a hotlineLog', async () => {
+    const result = await createHotlineLog({
+      input: {
+        start_time: '2023-11-08T20:43:16.860Z',
+        end_time: '2023-11-08T20:43:16.860Z',
+      },
+    })
+
+    expect(result.start_time).toEqual(new Date('2023-11-08T20:43:16.860Z'))
+    expect(result.end_time).toEqual(new Date('2023-11-08T20:43:16.860Z'))
+  })
+
+  scenario('updates a hotlineLog', async (scenario) => {
+    const original = await hotlineLog({
+      id: scenario.hotlineLog.one.id,
+    })
+    const result = await updateHotlineLog({
+      id: original.id,
+      input: { start_time: '2023-11-09T20:43:16.861Z' },
+    })
+
+    expect(result.start_time).toEqual(new Date('2023-11-09T20:43:16.861Z'))
   })
 
   scenario('deletes a hotlineLog', async (scenario) => {
