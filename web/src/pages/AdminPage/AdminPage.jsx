@@ -8,7 +8,7 @@ const AdminPage = () => {
     'arrests',
     'users',
     'arrestees',
-    'hotlineLogs',
+    // 'hotlineLogs',
     'customSchemata',
     'logs',
   ]
