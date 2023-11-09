@@ -30,7 +30,7 @@ export const EDIT_LOG_MUTATION = gql`
   }
 `
 
-const CreateArresteeLog = ({
+const ArresteeLogsForm = ({
   arrestee_id,
   callback,
   log: { id: log_id, ...log } = {},
@@ -103,4 +103,4 @@ const CreateArresteeLog = ({
     </Grid>
   )
 }
-export default CreateArresteeLog
+export default ArresteeLogsForm

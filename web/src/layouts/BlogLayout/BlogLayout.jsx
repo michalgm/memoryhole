@@ -30,7 +30,10 @@ const CustomLink = ({ to, ...rest }) => {
 
 const BlogLayout = ({ children }) => {
   const { isAuthenticated, currentUser, logOut } = useAuth()
-  const pages = [['home', 'Arrests']]
+  const pages = [
+    ['home', 'Arrests'],
+    ['hotline-logs', 'Hotline Logs'],
+  ]
   if (currentUser && currentUser) {
     pages.push(['admin', 'Admin'])
   }
@@ -49,9 +52,8 @@ const BlogLayout = ({ children }) => {
                   mr: 2,
                   flexGrow: 0,
                   fontFamily: 'monospace',
-                  // fontWeight: 700,
-                  letterSpacing: '-.0rem',
-                  color: 'secondary.light',
+                  // letterSpacing: '-.0rem',
+                  color: 'secondary.main',
                   textDecoration: 'none',
                 }}
               >
@@ -79,7 +81,7 @@ const BlogLayout = ({ children }) => {
           </AppBar>
         </Box>
       </header>
-      <Box component="main" sx={{ p: 3, backgroundColor: '#f3f3f3' }}>
+      <Box component="main" sx={{ p: 3 }}>
         <Container>{children}</Container>
       </Box>
     </>

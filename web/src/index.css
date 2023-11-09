@@ -1,6 +1,9 @@
 .MuiDivider-root::before {
   width: 3% !important;
 }
+body {
+  background-color: #f3f3f3 !important;
+}
 /* html,
 body, #redwood-app, main {
   height: 100%;

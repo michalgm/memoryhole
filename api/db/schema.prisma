@@ -85,9 +85,11 @@ model Log {
 
 model HotlineLog {
   id            Int       @id @default(autoincrement())
-  time          DateTime  @default(now())
+  start_time    DateTime
+  end_time      DateTime
   type          String?
   notes         String?
+  notes_raw     String?
   custom_fields Json?
   created_at    DateTime? @default(now())
   created_by_id Int?

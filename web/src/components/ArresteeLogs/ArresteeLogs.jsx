@@ -21,7 +21,7 @@ import Grid from '@mui/material/Unstable_Grid2/Grid2'
 
 import dayjs from '../../../../api/src/lib/day'
 
-import CreateArresteeLog from './CreateArresteeLog'
+import ArresteeLogsForm from './ArresteeLogsForm'
 
 // import CreateArresteeLog from "./CreateArresteeLog";
 const LogContainer = ({ children }) => {
@@ -43,9 +43,10 @@ const ArresteeLogs = ({ logs, arrestee_id, refetch }) => {
   }
   const notes_regex = new RegExp(filter.notes, 'i')
   const filteredLogs = logs.filter((log) => {
-    return log.notes.match(notes_regex) && filter.needs_followup
-      ? log.needs_followup
-      : true
+    return (
+      log.notes.match(notes_regex) &&
+      (filter.needs_followup ? log.needs_followup : true)
+    )
   })
   return (
     <>
@@ -105,13 +106,13 @@ const ArresteeLogs = ({ logs, arrestee_id, refetch }) => {
       </Grid>
       {editItem === 'new' && (
         <LogContainer>
-          <CreateArresteeLog arrestee_id={arrestee_id} callback={onCreate} />
+          <ArresteeLogsForm arrestee_id={arrestee_id} callback={onCreate} />
         </LogContainer>
       )}
       {filteredLogs.map((item) => (
         <LogContainer key={item.id}>
           {editItem === item.id ? (
-            <CreateArresteeLog
+            <ArresteeLogsForm
               arrestee_id={arrestee_id}
               callback={onCreate}
               log={{
@@ -129,7 +130,7 @@ const ArresteeLogs = ({ logs, arrestee_id, refetch }) => {
                 </Typography>
                 <Tooltip title="Edit Log">
                   <IconButton onClick={() => setEditItem(item.id)}>
-                    <Edit sx={{ fontSize: 16 }} color="primary" />
+                      <Edit sx={{ fontSize: 16 }} color="secondary" />{' '}
                   </IconButton>
                 </Tooltip>
               </Grid>

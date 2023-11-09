@@ -1,7 +1,11 @@
 import { db } from 'src/lib/db'
 
 export const hotlineLogs = () => {
-  return db.hotlineLog.findMany()
+  return db.hotlineLog.findMany({
+    orderBy: {
+      created_at: 'desc',
+    },
+  })
 }
 
 export const hotlineLog = ({ id }) => {
@@ -12,13 +16,26 @@ export const hotlineLog = ({ id }) => {
 
 export const createHotlineLog = ({ input }) => {
   return db.hotlineLog.create({
-    data: input,
+    data: {
+      ...input,
+      updated_by: {
+        connect: { id: context.currentUser.id },
+      },
+      created_by: {
+        connect: { id: context.currentUser.id },
+      },
+    },
   })
 }
 
 export const updateHotlineLog = ({ id, input }) => {
   return db.hotlineLog.update({
-    data: input,
+    data: {
+      ...input,
+      updated_by: {
+        connect: { id: context.currentUser.id },
+      },
+    },
     where: { id },
   })
 }

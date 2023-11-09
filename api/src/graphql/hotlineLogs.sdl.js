@@ -1,16 +1,18 @@
 export const schema = gql`
   type HotlineLog {
     id: Int!
-    time: DateTime!
+    start_time: DateTime!
+    end_time: DateTime!
     type: String
     notes: String
+    notes_raw: String
     custom_fields: JSON
     created_at: DateTime
-    created_by: User
     created_by_id: Int
     updated_at: DateTime
-    updated_by: User
     updated_by_id: Int
+    created_by: User
+    updated_by: User
   }
 
   type Query {
@@ -19,20 +21,28 @@ export const schema = gql`
   }
 
   input CreateHotlineLogInput {
-    time: DateTime!
+    start_time: DateTime!
+    end_time: DateTime!
     type: String
     notes: String
+    notes_raw: String
     custom_fields: JSON
+    created_at: DateTime
     created_by_id: Int
+    updated_at: DateTime
     updated_by_id: Int
   }
 
   input UpdateHotlineLogInput {
-    time: DateTime
+    start_time: DateTime
+    end_time: DateTime
     type: String
     notes: String
+    notes_raw: String
     custom_fields: JSON
+    created_at: DateTime
     created_by_id: Int
+    updated_at: DateTime
     updated_by_id: Int
   }
 
