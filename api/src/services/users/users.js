@@ -1,5 +1,7 @@
+import { requireAuth } from 'src/lib/auth'
 import { db } from 'src/lib/db'
 
+const requireAdmin = () => requireAuth({ roles: 'Admin' })
 export const users = () => {
   return db.user.findMany()
 }
@@ -11,12 +13,16 @@ export const user = ({ id }) => {
 }
 
 export const createUser = ({ input }) => {
+  requireAdmin()
   return db.user.create({
     data: input,
   })
 }
 
 export const updateUser = ({ id, input }) => {
+  if (input.email || input.role) {
+    requireAdmin()
+  }
   return db.user.update({
     data: input,
     where: { id },
@@ -24,6 +30,7 @@ export const updateUser = ({ id, input }) => {
 }
 
 export const deleteUser = ({ id }) => {
+  requireAdmin()
   return db.user.delete({
     where: { id },
   })

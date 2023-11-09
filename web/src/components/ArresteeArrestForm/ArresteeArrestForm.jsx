@@ -67,8 +67,6 @@ function reorderFieldsLodash(fields) {
 const ArresteeArrestForm = (props) => {
   const values = pruneData(props.arrest, ArrestFields)
   const onSubmit = (data) => {
-    // const diff = diffObjects(props.arrest, data)
-    // console.log(data)
     console.warn('SAVING', data)
     props.onSave(data, props?.arrest?.id)
   }
@@ -97,7 +95,6 @@ const ArresteeArrestForm = (props) => {
       </FormSection>
     )
   })
-  //  console.log(reorderFieldsLodash(fields)) ||
   const stats = {
     created: dayjs(props?.arrest?.created_at),
     updated: dayjs(props?.arrest?.updated_at),

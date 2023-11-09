@@ -7,23 +7,25 @@ import './index.css'
 
 import * as React from 'react'
 
-import { AuthProvider, useAuth } from './auth'
-import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
+import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-
+import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { ConfirmProvider } from 'material-ui-confirm'
-import CssBaseline from '@mui/material/CssBaseline'
-import FatalErrorPage from 'src/pages/FatalErrorPage'
-import { LocalizationProvider } from '@mui/x-date-pickers'
+
+import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
 import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
+
+import FatalErrorPage from 'src/pages/FatalErrorPage'
 import Routes from 'src/Routes'
+
+import { AuthProvider, useAuth } from './auth'
 import { SnackBarProvider } from './components/utils/SnackBar'
 
 const theme = createTheme({
   palette: {
     primary: { main: '#37474f' },
-    secondary: { main: '#ef6c00' },
+    secondary: { main: '#ad1457' },
   },
 })
 const App = () => (

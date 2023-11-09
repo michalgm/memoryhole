@@ -24,13 +24,13 @@ export const getCurrentUser = async (session) => {
     throw new Error('Invalid session')
   }
 
-  const {role, ...user} =  await db.user.findUnique({
+  const { role, ...user } = await db.user.findUnique({
     where: { id: session.id },
     select: { id: true, email: true, name: true, role: true },
   })
   return {
     ...user,
-    roles: role
+    roles: [role],
   }
 }
 

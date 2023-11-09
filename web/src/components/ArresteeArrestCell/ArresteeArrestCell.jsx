@@ -1,6 +1,7 @@
-import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
-import { Typography } from '@mui/material'
 import { useMutation } from '@redwoodjs/web'
+
+import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
+
 import { useSnackbar } from '../utils/SnackBar'
 
 export const QUERY = gql`
@@ -103,10 +104,8 @@ export const Failure = ({ error }) => (
 )
 
 export const Success = ({ arresteeArrest, id }) => {
-  // console.log({rest})
   const { openSnackbar } = useSnackbar()
 
-  // const { data, refetch } = useQuery(QUERY, { variables: { id } })
   const [updateArrest, { loading, error }] = useMutation(
     UPDATE_ARREST_MUTATION,
     {
