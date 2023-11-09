@@ -45,12 +45,6 @@ const Routes = () => {
               <Route path="/admin/arrestees/{id:Int}" page={ArresteeArresteePage} name="arrestee" />
               <Route path="/admin/arrestees" page={ArresteeArresteesPage} name="arrestees" />
             </Set>
-            <Set wrap={ScaffoldLayout} title="HotlineLogs" titleTo="hotlineLogs" buttonLabel="New HotlineLog" buttonTo="newHotlineLog">
-              <Route path="/admin/hotline-logs/new" page={HotlineLogNewHotlineLogPage} name="newHotlineLog" />
-              <Route path="/admin/hotline-logs/{id:Int}/edit" page={HotlineLogEditHotlineLogPage} name="editHotlineLog" />
-              <Route path="/admin/hotline-logs/{id:Int}" page={HotlineLogHotlineLogPage} name="hotlineLog" />
-              <Route path="/admin/hotline-logs" page={HotlineLogHotlineLogsPage} name="hotlineLogs" />
-            </Set>
             <Set wrap={ScaffoldLayout} title="CustomSchemata" titleTo="customSchemata" buttonLabel="New CustomSchema" buttonTo="newCustomSchema">
               <Route path="/admin/custom-schemata/new" page={CustomSchemaNewCustomSchemaPage} name="newCustomSchema" />
               <Route path="/admin/custom-schemata/{id:Int}/edit" page={CustomSchemaEditCustomSchemaPage} name="editCustomSchema" />
