@@ -83,18 +83,18 @@ const ArrestFields = [
   {
     title: 'Risk Identifiers',
     fields: [
-      ['arrestee.custom_fields.BIPOC', { field_type: 'checkbox' }],
-      ['arrestee.custom_fields.Trans/Non-Binary', { field_type: 'checkbox' }],
-      ['arrestee.custom_fields.Medical Needs', { field_type: 'checkbox' }],
-      ['arrestee.custom_fields.Houseless', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.bipoc', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.trans/non-binary', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.medical_needs', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.houseless', { field_type: 'checkbox' }],
       [
-        'arrestee.custom_fields.Immigration Concerns',
+        'arrestee.custom_fields.immigration_concerns',
         { field_type: 'checkbox' },
       ],
-      ['arrestee.custom_fields.Legal History', { field_type: 'checkbox' }],
-      ['arrestee.custom_fields.Minor', { field_type: 'checkbox' }],
-      ['arrestee.custom_fields.Disablity', { field_type: 'checkbox' }],
-      ['arrestee.custom_fields.Felony Charges', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.legal_history', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.minor', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.disablity', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.felony_charges', { field_type: 'checkbox' }],
 
       // [],
       [
@@ -111,6 +111,7 @@ const ArrestFields = [
         {
           validation: {
             validate: (value) =>
+              !value ||
               /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value) ||
               'Email must be formatted like an email',
           },

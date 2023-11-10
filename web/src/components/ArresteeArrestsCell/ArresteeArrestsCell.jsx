@@ -1,5 +1,9 @@
 import { useMemo, useState } from 'react'
 
+import { FileDownload } from '@mui/icons-material'
+import { Box, Button } from '@mui/material'
+import { download, generateCsv, mkConfig } from 'export-to-csv' //or use your library of choice here
+import _ from 'lodash'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 
 import { routes } from '@redwoodjs/router'
@@ -11,6 +15,11 @@ import { formatLabel } from '../utils/Field'
 import Link from '../utils/Link'
 
 // import schema from '../../types/graphql'
+const csvConfig = mkConfig({
+  fieldSeparator: ',',
+  decimalSeparator: '.',
+  useKeysAsHeaders: true,
+})
 
 const fieldTables = {
   arrest: {
@@ -35,7 +44,7 @@ const fields = ArrestFields.reduce((acc, { fields }) => {
     } else {
       fieldTables[table].custom_fields[field] = type
     }
-    acc[name] = type
+    acc[name] = { type, props }
   })
   return acc
 }, {})
@@ -131,19 +140,34 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
   const [display_fields, setDisplayFields] = useState([
     'display_name',
     'date',
-    'arrest_city',
+    'custom_fields.custody_status',
     'custom_fields.disposition',
     'custom_fields.release_type',
   ])
 
   const extraCols = Object.keys(fields).map((field) => {
-    const type = fields[field]
+    const fieldDef = fields[field]
+    const type = fieldDef.type
     const col = {
       accessorKey: field,
       header: formatLabel(field),
     }
     if (type === 'date-time' || type === 'date') {
-      col.Cell = ({ cell }) => dayjs(cell.getValue()).format('L')
+      col.accessorFn = (originalRow) => {
+        const val = _.get(originalRow, field)
+        return val ? dayjs(val).startOf('day') : null
+      }
+      col.Cell = ({ cell }) => cell.getValue() && cell.getValue().format('L')
+      col.filterVariant = 'date'
+    } else if (type === 'checkbox') {
+      col.id = field
+      col.accessorFn = (originalRow) =>
+        _.get(originalRow, field) ? 'true' : 'false'
+      col.Cell = ({ cell }) => (cell.getValue() === 'true' ? 'Yes' : 'No')
+      col.filterVariant = 'checkbox'
+    } else if (type === 'select') {
+      col.filterVariant = 'multi-select'
+      col.filterSelectOptions = fieldDef.props.options
     }
     return col
   })
@@ -163,6 +187,18 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
     ],
     []
   )
+  const handleExportRows = (data) => {
+    const columns = table.getAllColumns().filter((c) => c.getIsVisible())
+    const rows = data.map((item) => {
+      return columns.reduce((acc, { columnDef }) => {
+        const value = _.get(item.original, columnDef.id)
+        acc[columnDef.header] = value
+        return acc
+      }, {})
+    })
+    const csv = generateCsv(csvConfig)(rows)
+    download(csvConfig)(csv)
+  }
 
   const data = arresteeArrests
   const columnVisibility = Object.keys(fields).reduce((acc, f) => {
@@ -180,10 +216,13 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
         },
       },
     },
-
+    enableStickyHeader: true,
     muiPaginationProps: {
       // rowsPerPageOptions: [50, 100, 500],
     },
+    enableColumnFilterModes: true,
+    muiTableContainerProps: { sx: { maxHeight: 'calc(100vh - 320px)' } },
+    enableColumnPinning: true,
     initialState: {
       columnVisibility,
       density: 'compact',
@@ -191,25 +230,47 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
       enableDensityToggle: false,
       sorting: [{ id: 'date', desc: false }],
       pagination: { pageSize: 50, pageIndex: 0 },
+      columnPinning: { left: ['arrestee.display_field'] },
     },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Box
+        sx={{
+          display: 'flex',
+          gap: '16px',
+          padding: '8px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <Button
+          disabled={table.getPrePaginationRowModel().rows.length === 0}
+          //export all rows, including from the next page, (still respects filtering and sorting)
+          onClick={() =>
+            handleExportRows(table.getPrePaginationRowModel().rows)
+          }
+          startIcon={<FileDownload />}
+        >
+          Save as Spreadsheet
+        </Button>
+      </Box>
+    ),
   })
 
-  const doFilter = () => {
-    refetch({
-      filters: [
-        {
-          field: 'custom_fields.arresting_officer',
-          value: 'bad',
-          operator: 'string_contains',
-        },
-        {
-          field: 'arrestee.first_name',
-          value: 'greg',
-          operator: 'contains',
-        },
-      ],
-    })
-  }
+  // const doFilter = () => {
+  //   refetch({
+  //     filters: [
+  //       {
+  //         field: 'custom_fields.arresting_officer',
+  //         value: 'bad',
+  //         operator: 'string_contains',
+  //       },
+  //       {
+  //         field: 'arrestee.first_name',
+  //         value: 'greg',
+  //         operator: 'contains',
+  //       },
+  //     ],
+  //   })
+  // }
 
   return (
     <>
