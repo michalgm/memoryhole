@@ -22,7 +22,7 @@ import Routes from 'src/Routes'
 import { AuthProvider, useAuth } from './auth'
 import { SnackBarProvider } from './components/utils/SnackBar'
 
-const theme = createTheme({
+export const theme = createTheme({
   palette: {
     primary: { main: '#37474f' },
     secondary: { main: '#ad1457' },

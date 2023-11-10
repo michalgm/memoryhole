@@ -13,17 +13,22 @@ import { NavLink, routes, useMatch } from '@redwoodjs/router'
 import { useAuth } from 'src/auth'
 import QuickSearch from 'src/components/utils/QuickSearch'
 
+import { theme } from '../../App'
+
 const CustomLink = ({ to, ...rest }) => {
   const matchInfo = useMatch(to)
   const isActive = matchInfo.match
 
   const props = {
     color: 'inherit',
-    style: { textDecoration: 'none' },
   }
   if (isActive) {
-    props.color = 'secondary'
-    props.sx = {}
+    // props.color = 'secondary'
+    props.sx = {
+      textDecoration: 'underline',
+      textDecorationColor: theme.palette.secondary.main,
+      textDecorationThickness: 3,
+    }
   }
   return <Button component={NavLink} to={to} {...rest} {...props} />
 }
@@ -41,7 +46,7 @@ const BlogLayout = ({ children }) => {
     <>
       <header>
         <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static">
+          <AppBar position="static" enableColorOnDark>
             <Toolbar>
               <Typography
                 variant="h5"
@@ -49,15 +54,14 @@ const BlogLayout = ({ children }) => {
                 component="a"
                 href="/"
                 sx={{
+                  color: 'white',
                   mr: 2,
                   flexGrow: 0,
                   fontFamily: 'monospace',
-                  // letterSpacing: '-.0rem',
-                  color: 'secondary.main',
                   textDecoration: 'none',
                 }}
               >
-                MemoryHole
+                memoryhole
               </Typography>
               <Box sx={{ flexGrow: 2 }}>
                 {pages.map(([route, label]) => (
@@ -69,7 +73,7 @@ const BlogLayout = ({ children }) => {
               <QuickSearch />
               {isAuthenticated && currentUser && (
                 <>
-                  <Tooltip title={`Logged in as ${currentUser.name}foo`}>
+                  <Tooltip title={`Logged in as ${currentUser.name}`}>
                     <PersonIcon />
                   </Tooltip>
                   <Button color="inherit" onClick={logOut}>
