@@ -52,8 +52,7 @@ const usStates = [
 ]
 
 const release_types = [
-  'In Custody - Unconfirmed/Pre Cite',
-  'In Custody - Confirmed No Cite',
+  'Unknown/In Custody',
   'Own Recognizance',
   'Bail',
   'Cited Out',
@@ -76,18 +75,8 @@ const ArrestFields = [
       ['arrestee.pronoun', { label: 'pronouns' }],
       ['arrestee.dob', { label: 'date of birth', field_type: 'date' }],
       [
-        'arrestee.custom_fields.jail_population',
-        {
-          label: 'jail population_assignment',
-          field_type: 'select',
-          options: [
-            'Male',
-            'Female',
-            'Transgender/Gender Variant/Non-Binary',
-            'Unknown',
-          ],
-          default: 'Unknown',
-        },
+        'arrestee.custom_fields.arrestee_notes',
+        { field_type: 'textarea', span: 12 },
       ],
     ],
   },
@@ -117,7 +106,16 @@ const ArrestFields = [
   {
     title: 'Contact Info',
     fields: [
-      ['arrestee.email'],
+      [
+        'arrestee.email',
+        {
+          validation: {
+            validate: (value) =>
+              /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value) ||
+              'Email must be formatted like an email',
+          },
+        },
+      ],
       ['arrestee.phone_1'],
       ['arrestee.phone_2'],
       ['arrestee.custom_fields.support_person'],
@@ -127,6 +125,10 @@ const ArrestFields = [
       ['arrestee.city'],
       ['arrestee.state', { field_type: 'select', options: usStates }],
       ['arrestee.zip'],
+      [
+        'arrestee.custom_fields.contact/support_notes',
+        { field_type: 'textarea', span: 12 },
+      ],
     ],
   },
   {
@@ -157,36 +159,71 @@ const ArrestFields = [
       ],
 
       ['custom_fields.arresting_officer'],
+      ['custom_fields.arresting_agency'],
       ['custom_fields.badge_number'],
       ['custom_fields.police_report_number'],
       ['charges', { field_type: 'textarea' }],
+      ['custom_fields.arrest_notes', { field_type: 'textarea', span: 12 }],
     ],
   },
   {
     title: 'Jail Info',
     fields: [
+      [
+        'custom_fields.custody_status',
+        {
+          field_type: 'select',
+          options: ['Unknown/Unconfirmed', 'In Custody', 'Out of Custody'],
+          default: 'Unknown/Unconfirmed',
+        },
+      ],
       ['custom_fields.jail_facility'],
-      ['custom_fields.bail_amount'],
+      [
+        'arrestee.custom_fields.jail_population',
+        {
+          label: 'jail population_assignment',
+          field_type: 'select',
+          options: [
+            'Male',
+            'Female',
+            'Transgender/Gender Variant/Non-Binary',
+            'Unknown',
+          ],
+          default: 'Unknown',
+        },
+      ],
       ['custom_fields.jail_id', { label: 'Booking ID/PFN' }],
+      ['custom_fields.bail_amount'],
       ['custom_fields.release_time', { field_type: 'date-time' }],
       [
         'custom_fields.release_type',
         {
           field_type: 'select',
           options: release_types,
-          default: 'In Custody - Unconfirmed/Pre Cite',
+          default: 'Unknown/In Custody',
         },
       ],
+      ['custom_fields.jail_notes', { field_type: 'textarea', span: 12 }],
     ],
   },
   {
     title: 'Case Info',
     fields: [
       [
-        'citation_number',
-        { helperText: 'Number on their citation (if they receieved one)' },
+        'custom_fields.case_status',
+        {
+          field_type: 'select',
+          default: 'Pre-Arraignment',
+          options: [
+            'Pre-Arraignment',
+            'No Charges Filed',
+            'Pre-Trial',
+            'Trial',
+            'Resolved',
+            'Unknown',
+          ],
+        },
       ],
-      ['custom_fields.docket_number'],
       [
         'jurisdiction',
         {
@@ -203,20 +240,11 @@ const ArrestFields = [
         },
       ],
       [
-        'custom_fields.case_status',
-        {
-          field_type: 'select',
-          default: 'Pre-Arraignment',
-          options: [
-            'Pre-Arraignment',
-            'No Charges Filed',
-            'Pre-Trial',
-            'Trial',
-            'Resolved',
-            'Unknown',
-          ],
-        },
+        'citation_number',
+        { helperText: 'Number on their citation (if they receieved one)' },
       ],
+      ['custom_fields.docket_number'],
+
       [
         'custom_fields.disposition',
         {
@@ -239,8 +267,11 @@ const ArrestFields = [
           ],
         },
       ],
-      ['lawyer', { disabled: true, helperText: 'Not yet implemented' }],
-      ['court_dates', { disabled: true, helperText: 'Not yet implemented' }],
+      ['custom_fields.lawyer'],
+      ['custom_fields.next_court_date', { field_type: 'date-time' }],
+      ['custom_fields.next_court_location'],
+      // [],
+      ['custom_fields.case_notes', { field_type: 'textarea', span: 12 }],
     ],
   },
 ]
