@@ -56,12 +56,24 @@ const pruneData = (data, fields) => {
 }
 
 function reorderFieldsLodash(fields) {
-  const midPoint = Math.ceil(fields.length / 2)
-  fields = fields.map(([name, props = {}], index) => [name, props, index])
-  const chunks = _.chunk(fields, midPoint)
-  const interleaved = _.zip(...chunks)
-  const reorderedFields = _.compact(_.flatten(interleaved))
-  return reorderedFields
+  const { fullSpan, nonFullSpan } = fields.reduce(
+    (acc, [name, props = {}], index) => {
+      const res = [name, props, index]
+      if (props.span === 12) {
+        acc.fullSpan.push(res)
+      } else {
+        acc.nonFullSpan.push(res)
+      }
+      return acc
+    },
+    { nonFullSpan: [], fullSpan: [] }
+  )
+
+  const midPoint = Math.ceil(nonFullSpan.length / 2)
+  const leftColumn = nonFullSpan.slice(0, midPoint)
+  const rightColumn = nonFullSpan.slice(midPoint)
+
+  return { leftColumn, rightColumn, fullSpan }
 }
 
 const ArresteeArrestForm = (props) => {
@@ -72,26 +84,39 @@ const ArresteeArrestForm = (props) => {
   }
 
   const fields = ArrestFields.map(({ fields, title }, groupIndex) => {
+    const { leftColumn, rightColumn, fullSpan } = reorderFieldsLodash(fields)
     return (
       <FormSection key={groupIndex} title={title}>
-        {reorderFieldsLodash(fields).map(
-          ([key, { label, span = 6, ...options } = {}, index] = []) => {
-            return (
-              <Grid key={key || index} xs={span}>
-                {key && (
-                  <Field
-                    tabIndex={100 * (groupIndex + 1) + index}
-                    key={key}
-                    id={key}
-                    label={formatLabel(label || key)}
-                    name={key}
-                    {...options}
-                  />
-                )}
-              </Grid>
-            )
-          }
-        )}
+        <Grid container sx={{ alignItems: 'start' }} xs={12}>
+          {[leftColumn, rightColumn, fullSpan].map(
+            (fieldSet, fieldSetIndex) => {
+              return (
+                <Grid
+                  key={fieldSetIndex}
+                  xs={fieldSetIndex == 2 ? 12 : 6}
+                  container
+                >
+                  {fieldSet.map(
+                    ([key, { label, ...options } = {}, index] = []) => {
+                      return (
+                        <Grid key={key || index} xs={12}>
+                          <Field
+                            tabIndex={100 * (groupIndex + 1) + index}
+                            key={key}
+                            id={key}
+                            label={formatLabel(label || key)}
+                            name={key}
+                            {...options}
+                          />
+                        </Grid>
+                      )
+                    }
+                  )}
+                </Grid>
+              )
+            }
+          )}
+        </Grid>
       </FormSection>
     )
   })
@@ -122,7 +147,7 @@ const ArresteeArrestForm = (props) => {
           spacing={4}
           className="content-container"
         >
-          <Grid xs={12} container className="form-content">
+          <Grid xs={12} container>
             {fields}
           </Grid>
         </Grid>
