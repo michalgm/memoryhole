@@ -1,9 +1,13 @@
-import { DbAuthHandler, PasswordValidationError } from '@redwoodjs/auth-dbauth-api'
+import {
+  DbAuthHandler,
+  PasswordValidationError,
+} from '@redwoodjs/auth-dbauth-api'
 
 import { db } from 'src/lib/db'
 import { sendEmail } from 'src/lib/email'
 
 const password_reset_hours = 24
+const login_expire_hours = 6
 
 export const handler = async (event, context) => {
   const forgotPasswordOptions = {
@@ -34,7 +38,7 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
       const res = await sendEmail({
         to: user.email,
         subject: 'Memoryhole Database Password Reset',
-        text
+        text,
       })
       return user
     },
@@ -78,7 +82,7 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
     },
 
     // How long a user will remain logged in, in seconds
-    expires: 60 * 60 * 24 * 365 * 10,
+    expires: 60 * 60 * login_expire_hours,
   }
 
   const resetPasswordOptions = {
@@ -130,7 +134,7 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
           hashedPassword: hashedPassword,
           salt: salt,
           name: userAttributes.name,
-          role: userAttributes.role
+          role: userAttributes.role,
         },
       })
     },
