@@ -37,7 +37,7 @@ export const SnackBarProvider = ({ children }) => {
       </IconButton>
     </>
   )
-  const duration = snackbar.severity === 'success' ? 4000 : 0
+  const duration = snackbar.severity === 'success' ? 4000 : null
 
   return (
     <SnackbarContext.Provider value={{ openSnackbar, closeSnackbar }}>
