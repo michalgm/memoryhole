@@ -1,48 +1,49 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
-import { Form, Label, TextField, Submit, FieldError } from '@redwoodjs/forms'
-import { navigate, routes } from '@redwoodjs/router'
-import { MetaTags } from '@redwoodjs/web'
-import { toast, Toaster } from '@redwoodjs/web/toast'
+import { FieldError, Form, Label, Submit, TextField } from "@redwoodjs/forms";
+import { navigate, routes } from "@redwoodjs/router";
+import { MetaTags } from "@redwoodjs/web";
+import { Toaster, toast } from "@redwoodjs/web/toast";
 
-import { useAuth } from 'src/auth'
+import { useAuth } from "src/auth";
 
 const ForgotPasswordPage = () => {
-  const { isAuthenticated, forgotPassword } = useAuth()
+  const { isAuthenticated, forgotPassword } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(routes.home())
+      navigate(routes.home());
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated]);
 
-  const emailRef = useRef(null)
+  const emailRef = useRef(null);
   useEffect(() => {
-    emailRef?.current?.focus()
-  }, [])
+    emailRef?.current?.focus();
+  }, []);
 
   const onSubmit = async (data) => {
-    const response = await forgotPassword(data.email)
+    const response = await forgotPassword(data.email);
 
     if (response.error) {
-      toast.error(response.error)
+      toast.error(response.error);
     } else {
       // The function `forgotPassword.handler` in api/src/functions/auth.js has
       // been invoked, let the user know how to get the link to reset their
       // password (sent in email, perhaps?)
       toast.success(
-        'A link to reset your password was sent to ' + response.email
-      )
-      navigate(routes.login())
+        "A link to reset your password was sent to " + response.email,
+      );
+      console.log(response);
+      // navigate(routes.login())
     }
-  }
+  };
 
   return (
     <>
       <MetaTags title="Forgot Password" />
 
       <main className="rw-main">
-        <Toaster toastOptions={{ className: 'rw-toast', duration: 6000 }} />
+        <Toaster toastOptions={{ className: "rw-toast", duration: 6000 }} />
         <div className="rw-scaffold rw-login-container">
           <div className="rw-segment">
             <header className="rw-segment-header">
@@ -70,7 +71,7 @@ const ForgotPasswordPage = () => {
                       validation={{
                         required: {
                           value: true,
-                          message: 'Email is required',
+                          message: "Email is required",
                         },
                       }}
                     />
@@ -88,7 +89,7 @@ const ForgotPasswordPage = () => {
         </div>
       </main>
     </>
-  )
-}
+  );
+};
 
-export default ForgotPasswordPage
+export default ForgotPasswordPage;
