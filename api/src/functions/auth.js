@@ -1,13 +1,12 @@
 import {
   DbAuthHandler,
   PasswordValidationError,
-} from '@redwoodjs/auth-dbauth-api'
+} from "@redwoodjs/auth-dbauth-api";
 
-import { db } from 'src/lib/db'
-import { sendEmail } from 'src/lib/email'
+import { sendReset, tokenExpireHours } from "src/lib/authHelpers";
+import { db } from "src/lib/db";
 
-const password_reset_hours = 24
-const login_expire_hours = 6
+const login_expire_hours = 6;
 
 export const handler = async (event, context) => {
   const forgotPasswordOptions = {
@@ -24,37 +23,23 @@ export const handler = async (event, context) => {
     // address in a toast message so the user will know it worked and where
     // to look for the email.
     handler: async (user) => {
-      const text = `Hello ${user.name},
+      await sendReset(user);
 
-The Memoryhole Legal Support Database received a request to reset the password associated with this email address (${user.email}) OR a new account was created for you.
-Please follow the link below to reset your password:
-${process.env.PUBLIC_URL}/reset-password?resetToken=${user.resetToken}
-
-This password reset link will expire in ${password_reset_hours} hours. If you do not complete the process before then, you will need to start the password reset process again:
-${process.env.PUBLIC_URL}/forgot-password
-
-Please do not reply to this email as it is sent from an unmonitored mailbox.`
-
-      const res = await sendEmail({
-        to: user.email,
-        subject: 'Memoryhole Database Password Reset',
-        text,
-      })
-      return user
+      return user;
     },
 
     // How long the resetToken is valid for, in seconds (default is 24 hours)
-    expires: 60 * 60 * password_reset_hours,
+    expires: 60 * 60 * tokenExpireHours,
 
     errors: {
       // for security reasons you may want to be vague here rather than expose
       // the fact that the email address wasn't found (prevents fishing for
       // valid email addresses)
-      usernameNotFound: 'Username not found',
+      usernameNotFound: "Username not found",
       // if the user somehow gets around client validation
-      usernameRequired: 'Username is required',
+      usernameRequired: "Username is required",
     },
-  }
+  };
 
   const loginOptions = {
     // handler() is called after finding the user that matches the
@@ -69,21 +54,21 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
     // by the `logIn()` function from `useAuth()` in the form of:
     // `{ message: 'Error message' }`
     handler: (user) => {
-      return user
+      return user;
     },
 
     errors: {
-      usernameOrPasswordMissing: 'Both username and password are required',
-      usernameNotFound: 'Username ${username} not found',
+      usernameOrPasswordMissing: "Both username and password are required",
+      usernameNotFound: "Username ${username} not found",
       // For security reasons you may want to make this the same as the
       // usernameNotFound error so that a malicious user can't use the error
       // to narrow down if it's the username or password that's incorrect
-      incorrectPassword: 'Incorrect password for ${username}',
+      incorrectPassword: "Incorrect password for ${username}",
     },
 
     // How long a user will remain logged in, in seconds
     expires: 60 * 60 * login_expire_hours,
-  }
+  };
 
   const resetPasswordOptions = {
     // handler() is invoked after the password has been successfully updated in
@@ -91,7 +76,7 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
     // in. Return `false` otherwise, and in the Reset Password page redirect the
     // user to the login page.
     handler: (_user) => {
-      return true
+      return true;
     },
 
     // If `false` then the new password MUST be different from the current one
@@ -99,15 +84,15 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
 
     errors: {
       // the resetToken is valid, but expired
-      resetTokenExpired: 'resetToken is expired',
+      resetTokenExpired: "resetToken is expired",
       // no user was found with the given resetToken
-      resetTokenInvalid: 'resetToken is invalid',
+      resetTokenInvalid: "resetToken is invalid",
       // the resetToken was not present in the URL
-      resetTokenRequired: 'resetToken is required',
+      resetTokenRequired: "resetToken is required",
       // new password is the same as the old password (apparently they did not forget it)
-      reusedPassword: 'Must choose a new password',
+      reusedPassword: "Must choose a new password",
     },
-  }
+  };
 
   const signupOptions = {
     enabled: false,
@@ -127,7 +112,7 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
     handler: ({ username, hashedPassword, salt, userAttributes }) => {
-      return false
+      return false;
       return db.user.create({
         data: {
           email: username,
@@ -136,7 +121,7 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
           name: userAttributes.name,
           role: userAttributes.role,
         },
-      })
+      });
     },
 
     // Include any format checks for password here. Return `true` if the
@@ -144,17 +129,17 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
     // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.
     passwordValidation: (_password) => {
       if (_password.length < 8) {
-        throw PasswordValidationError('Password must be at least 8 characters')
+        throw PasswordValidationError("Password must be at least 8 characters");
       }
-      return true
+      return true;
     },
 
     errors: {
       // `field` will be either "username" or "password"
-      fieldMissing: '${field} is required',
-      usernameTaken: 'Username `${username}` already in use',
+      fieldMissing: "${field} is required",
+      usernameTaken: "Username `${username}` already in use",
     },
-  }
+  };
 
   const authHandler = new DbAuthHandler(event, context, {
     // Provide prisma db client
@@ -162,27 +147,27 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
 
     // The name of the property you'd call on `db` to access your user table.
     // i.e. if your Prisma model is named `User` this value would be `user`, as in `db.user`
-    authModelAccessor: 'user',
+    authModelAccessor: "user",
 
     // A map of what dbAuth calls a field to what your database calls it.
     // `id` is whatever column you use to uniquely identify a user (probably
     // something like `id` or `userId` or even `email`)
     authFields: {
-      id: 'id',
-      username: 'email',
-      hashedPassword: 'hashedPassword',
-      salt: 'salt',
-      resetToken: 'resetToken',
-      resetTokenExpiresAt: 'resetTokenExpiresAt',
+      id: "id",
+      username: "email",
+      hashedPassword: "hashedPassword",
+      salt: "salt",
+      resetToken: "resetToken",
+      resetTokenExpiresAt: "resetTokenExpiresAt",
     },
 
     // Specifies attributes on the cookie that dbAuth sets in order to remember
     // who is logged in. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies
     cookie: {
       HttpOnly: true,
-      Path: '/',
-      SameSite: 'Strict',
-      Secure: process.env.NODE_ENV !== 'development',
+      Path: "/",
+      SameSite: "Strict",
+      Secure: process.env.NODE_ENV !== "development",
 
       // If you need to allow other domains (besides the api side) access to
       // the dbAuth session cookie:
@@ -193,7 +178,7 @@ Please do not reply to this email as it is sent from an unmonitored mailbox.`
     login: loginOptions,
     resetPassword: resetPasswordOptions,
     signup: signupOptions,
-  })
+  });
 
-  return await authHandler.invoke()
-}
+  return await authHandler.invoke();
+};
