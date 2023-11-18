@@ -8,7 +8,7 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 
 import { routes } from '@redwoodjs/router'
 
-import ArrestFields from 'src/lib/ArrestFields'
+import { fieldTables, schema } from 'src/lib/ArrestFields'
 
 import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/Field'
@@ -20,34 +20,6 @@ const csvConfig = mkConfig({
   decimalSeparator: '.',
   useKeysAsHeaders: true,
 })
-
-const fieldTables = {
-  arrest: {
-    custom_fields: {},
-  },
-  arrestee: {
-    custom_fields: {},
-  },
-}
-const fields = ArrestFields.reduce((acc, { fields }) => {
-  fields.forEach(([name, props = {}]) => {
-    const type = props.field_type || 'text'
-    let [field, custom, table] = name.split('.').reverse()
-    if (!table) {
-      if (!custom) {
-        fieldTables.arrest[field] = type
-      } else if (custom == 'custom_fields') {
-        fieldTables.arrest.custom_fields[field] = type
-      } else {
-        fieldTables[custom][field] = type
-      }
-    } else {
-      fieldTables[table].custom_fields[field] = type
-    }
-    acc[name] = { type, props }
-  })
-  return acc
-}, {})
 
 export const QUERY = gql`
   query ArresteeArrestsQuery($filters: [GenericFilterInput]) {
@@ -145,8 +117,8 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
     'custom_fields.release_type',
   ])
 
-  const extraCols = Object.keys(fields).map((field) => {
-    const fieldDef = fields[field]
+  const extraCols = Object.keys(schema).map((field) => {
+    const fieldDef = schema[field]
     const type = fieldDef.type
     const col = {
       accessorKey: field,
@@ -201,7 +173,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
   }
 
   const data = arresteeArrests
-  const columnVisibility = Object.keys(fields).reduce((acc, f) => {
+  const columnVisibility = Object.keys(schema).reduce((acc, f) => {
     acc[f] = display_fields.includes(f)
     return acc
   }, {})
