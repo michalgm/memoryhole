@@ -4,6 +4,8 @@ import {
   FormGroup,
   FormHelperText,
   FormLabel,
+  Radio,
+  RadioGroup,
 } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { capitalize } from 'lodash'
@@ -89,7 +91,16 @@ export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
   }
 
   const renderRadio = () => {
-    return <RadioButtonGroup {...props} {...textFieldProps} />
+    const options = props.options.map((opt) =>
+      opt.label ? opt : { id: opt, label: formatLabel(opt) }
+    )
+    return (
+      <RadioButtonGroup
+        name={name}
+        {...props}
+        options={options}
+      ></RadioButtonGroup>
+    )
   }
 
   const renderCheckboxGroup = () => {
@@ -101,12 +112,7 @@ export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
             {props.options.map((option) => (
               <Grid xs={6} key={option}>
                 <FormControlLabel
-                  control={
-                    <CheckboxElement
-                      helperText="huh"
-                      name={`${name}_${option}`}
-                    />
-                  }
+                  control={<CheckboxElement name={`${name}_${option}`} />}
                   label={option}
                 />
               </Grid>
