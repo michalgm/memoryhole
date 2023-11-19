@@ -15,10 +15,8 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 })
 
-export const defineColumns = (schema, displayColumns = []) => {
-  const columnNames = displayColumns.length
-    ? displayColumns
-    : Object.keys(schema)
+export const defineColumns = (schema) => {
+  const columnNames = Object.keys(schema)
   const columns = columnNames.map((field) => {
     const fieldDef = schema[field]
     const type = fieldDef.type
