@@ -1,7 +1,8 @@
-import { Private, Route, Router, Set } from '@redwoodjs/router'
+import { PrivateSet, Route, Router, Set } from '@redwoodjs/router'
 
 import BlogLayout from 'src/layouts/BlogLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
+
 import { useAuth } from './auth'
 
 // In this file, all Page components from 'src/pages` are auto-imported. Nested
@@ -19,9 +20,9 @@ const Routes = () => {
       <Route path="/login" page={LoginPage} name="login" />
       <Route path="/forgot-password" page={ForgotPasswordPage} name="forgotPassword" />
       <Route path="/reset-password" page={ResetPasswordPage} name="resetPassword" />
-      <Private unauthenticated="login">
+      <PrivateSet unauthenticated="login">
         <Set wrap={BlogLayout}>
-          <Private unauthenticated="login" roles="Admin">
+          <PrivateSet unauthenticated="login" roles="Admin">
             <Route path="/admin" page={AdminPage} name="admin" />
             <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
             <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
@@ -56,14 +57,14 @@ const Routes = () => {
               <Route path="/admin/logs/{id:Int}" page={LogLogPage} name="log" />
               <Route path="/admin/logs" page={LogLogsPage} name="logs" />
             </Set>
-          </Private>
+          </PrivateSet>
           <Route path="/arrest/new" page={NewArresteeArrestPage} name="newArresteeArrest" />
           <Route path="/arrest/{id:Int}" page={ArresteeArrestPage} name="arrest" />
           <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" />
           <Route path="/docket-sheets" page={DocketSheetsPage} name="docketSheets" />
           <Route path="/" page={HomePage} name="home" />
         </Set>
-      </Private>
+      </PrivateSet>
       <Route notfound page={NotFoundPage} />
     </Router>
   )
