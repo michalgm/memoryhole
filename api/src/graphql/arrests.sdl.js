@@ -31,6 +31,13 @@ export const schema = gql`
     arrest(id: Int!): Arrest @requireAuth
     searchArrestNames(search: String!): [Arrest!]! @requireAuth
     filterArrests(filters: [GenericFilterInput]): [Arrest]! @requireAuth
+    docketSheetSearch(
+      date: DateTime!
+      days: Int!
+      jurisdiction: String
+      report_type: String!
+      include_contact: Boolean
+    ): [Arrest]! @requireAuth
   }
 
   input CreateArrestInput {

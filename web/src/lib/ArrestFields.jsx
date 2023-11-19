@@ -141,6 +141,7 @@ const ArrestFields = [
           field_type: 'date-time',
           label: 'arrest date',
           validation: { required: true },
+          required: true,
         },
       ],
       ['location'],

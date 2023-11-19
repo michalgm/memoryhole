@@ -1,19 +1,17 @@
 import * as React from 'react'
 
-import PersonIcon from '@mui/icons-material/Person'
 import { Container, Tooltip } from '@mui/material'
+import { NavLink, routes, useMatch } from '@redwoodjs/router'
+
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import PersonIcon from '@mui/icons-material/Person'
+import QuickSearch from 'src/components/utils/QuickSearch'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-
-import { NavLink, routes, useMatch } from '@redwoodjs/router'
-
-import { useAuth } from 'src/auth'
-import QuickSearch from 'src/components/utils/QuickSearch'
-
 import { theme } from '../../App'
+import { useAuth } from 'src/auth'
 
 const CustomLink = ({ to, ...rest }) => {
   const matchInfo = useMatch(to)
@@ -37,7 +35,8 @@ const BlogLayout = ({ children }) => {
   const { isAuthenticated, currentUser, logOut } = useAuth()
   const pages = [
     ['home', 'Arrests'],
-    ['hotline-logs', 'Hotline Logs'],
+    ['hotlineLogs', 'Hotline Logs'],
+    ['docketSheets', 'Docket Sheets'],
   ]
   if (currentUser && currentUser) {
     pages.push(['admin', 'Admin'])

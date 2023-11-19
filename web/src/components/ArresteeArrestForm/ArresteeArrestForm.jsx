@@ -1,17 +1,7 @@
 import { Box, Button, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
-import {
-  _,
-  flatMap,
-  get,
-  isEqual,
-  isObject,
-  reduce,
-  set,
-  startCase,
-  transform,
-} from 'lodash'
+import { _, flatMap, get, reduce, set, startCase } from 'lodash'
 import { FormContainer } from 'react-hook-form-mui'
 
 import ArrestFields from 'src/lib/ArrestFields'
@@ -20,14 +10,14 @@ import ArresteeLogsDrawer from '../ArresteeLogs/ArresteeLogsDrawer'
 import { Field, formatLabel } from '../utils/Field'
 import FormSection from '../utils/FormSection'
 
-const diffObjects = (a, b) => {
-  return transform(b, (result, value, key) => {
-    if (!isEqual(value, a[key])) {
-      result[key] =
-        isObject(value) && isObject(a[key]) ? diffObjects(a[key], value) : value
-    }
-  })
-}
+// const diffObjects = (a, b) => {
+//   return transform(b, (result, value, key) => {
+//     if (!isEqual(value, a[key])) {
+//       result[key] =
+//         isObject(value) && isObject(a[key]) ? diffObjects(a[key], value) : value
+//     }
+//   })
+// }
 
 const pruneData = (data, fields) => {
   const fieldPaths = flatMap(fields, (section) =>
@@ -38,10 +28,10 @@ const pruneData = (data, fields) => {
       paths,
       (result, [path, params = {}]) => {
         let value = get(originalData, path)
-        if (value === undefined && params.default) {
+        if ((value === undefined || value == null) && params.default) {
           value = params.default
         }
-        if (value !== undefined) {
+        if (value !== undefined && value !== null) {
           if (['date', 'date-time'].includes(params.field_type)) {
             value = dayjs(value)
           }
