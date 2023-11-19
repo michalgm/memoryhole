@@ -4,6 +4,9 @@
 body {
   background-color: #f3f3f3 !important;
 }
+.radio-label .MuiFormControlLabel-label  {
+  font-size: 12px;
+}
 /* html,
 body, #redwood-app, main {
   height: 100%;

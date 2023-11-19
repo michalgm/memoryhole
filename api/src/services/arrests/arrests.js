@@ -1,8 +1,8 @@
 import { validate, validateWithSync } from '@redwoodjs/api'
 
-import { arrestee } from '../arrestees/arrestees'
-import dayjs from '../../lib/day'
 import { db } from 'src/lib/db'
+
+import dayjs from '../../lib/day'
 import { updateDisplayField as updateAresteeDisplayField } from '../arrestees/arrestees'
 
 // import localizedFormat from 'dayjs/plugin/localizedFormat'
@@ -57,6 +57,69 @@ export const searchArrestNames = ({ search }) => {
         },
       })),
     },
+  })
+}
+
+export const docketSheetSearch = async ({
+  date: dateRaw,
+  days,
+  report_type,
+  jurisdiction,
+  // include_contact,
+}) => {
+  const date = dayjs(dateRaw)
+  const dateLimit = date.add(days, 'day').toDate()
+  const where = {
+    jurisdiction,
+  }
+
+  // 'arrestee.last_name',
+  // 'arrestee.first_name',
+  // 'arrestee.preferred_name',
+  // 'arrestee.pronoun',
+  // 'date',
+  // 'citation_number',
+  // 'custom_fields.booking_number',
+  // 'custom_fields.docket_number',
+  // 'arrestee.dob',
+  // 'custom_fields.next_court_date',
+  // 'charges',
+  // 'custom_fields.lawyer',
+  // 'custom_fields.bail',
+  // 'custom_fields.case_status',
+  // 'custom_fields.release_type',
+
+  if (report_type === 'arrest_date') {
+    where.date = {
+      gte: date,
+      lt: dateLimit,
+    }
+  } else {
+    where.date = {
+      lte: dateLimit,
+    }
+  }
+  // const select = {
+  //   arrestee: {
+  //     select: {
+  //       first_name: true,
+  //       last_name: true,
+  //       preferred_name: true,
+  //       pronoun: true
+  //     }
+
+  // }
+  const records = await db.arrest.findMany({
+    where,
+  })
+  return records.filter(({ custom_fields }) => {
+    if (report_type === 'arrest_date') {
+      return true
+    }
+    if (custom_fields.next_court_date) {
+      const court_date = new Date(custom_fields.next_court_date)
+      return court_date >= date && court_date < dateLimit
+    }
   })
 }
 

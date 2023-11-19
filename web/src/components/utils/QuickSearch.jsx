@@ -1,3 +1,7 @@
+import { useState } from 'react'
+
+import { gql, useLazyQuery } from '@apollo/client'
+import { Search } from '@mui/icons-material'
 import {
   Autocomplete,
   Box,
@@ -6,12 +10,10 @@ import {
   Typography,
   alpha,
 } from '@mui/material'
-import { gql, useLazyQuery } from '@apollo/client'
+
 import { navigate, routes } from '@redwoodjs/router'
 
-import { Search } from '@mui/icons-material'
 import dayjs from '../../../../api/src/lib/day'
-import { useState } from 'react'
 
 export const SEARCH_ARRESTS = gql`
   query searchArrestNames($search: String!) {
@@ -25,7 +27,7 @@ export const SEARCH_ARRESTS = gql`
     }
   }
 `
-function QuickSearch(props) {
+function QuickSearch() {
   const [searchValue, setSearchValue] = useState('')
   const [value, setValue] = useState('')
   const [results, setResults] = useState([])
@@ -63,7 +65,7 @@ function QuickSearch(props) {
         onInputChange={handleInputChange}
         filterOptions={(x) => x}
         // value={(_, value) => setValue(value)}
-        onChange={(event, value, reason) => {
+        onChange={(event, value) => {
           setValue(value)
           if (value) {
             setResults([])

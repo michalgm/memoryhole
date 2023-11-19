@@ -4,8 +4,6 @@ import {
   FormGroup,
   FormHelperText,
   FormLabel,
-  Radio,
-  RadioGroup,
 } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { capitalize } from 'lodash'
@@ -27,7 +25,13 @@ export const formatLabel = (label) => {
     .replace(/\w+/g, capitalize)
 }
 
-export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
+export const Field = ({
+  name,
+  field_type = 'text',
+  tabIndex,
+  fullWidth = true,
+  ...props
+}) => {
   const { setValue } = useFormContext()
 
   props.label = props.label || formatLabel(name)
@@ -35,7 +39,7 @@ export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
   const textFieldProps = {
     name,
     variant: 'outlined',
-    fullWidth: true,
+    fullWidth: fullWidth,
     size: 'small',
     inputProps: {
       tabIndex,
@@ -86,7 +90,7 @@ export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
         ? { multiline: true, minRows: props.minRows || 3 }
         : {}
     return (
-      <TextFieldElement {...props} {...textFieldProps} {...textFieldOptions} />
+      <TextFieldElement {...textFieldProps} {...textFieldOptions} {...props} />
     )
   }
 
@@ -99,6 +103,9 @@ export const Field = ({ name, field_type = 'text', tabIndex, ...props }) => {
         name={name}
         {...props}
         options={options}
+        labelProps={{
+          className: 'radio-label',
+        }}
       ></RadioButtonGroup>
     )
   }
