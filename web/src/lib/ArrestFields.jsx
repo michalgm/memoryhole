@@ -273,7 +273,6 @@ const ArrestFields = [
       ['custom_fields.next_court_location'],
       ['custom_fields.lawyer'],
       ['custom_fields.lawyer_contact_info'],
-      // [],
       ['custom_fields.case_notes', { field_type: 'textarea', span: 12 }],
     ],
   },
@@ -287,24 +286,32 @@ export const fieldTables = {
     custom_fields: {},
   },
 }
-export const schema = ArrestFields.reduce((acc, { fields }) => {
-  fields.forEach(([name, props = {}]) => {
-    const type = props.field_type || 'text'
-    let [field, custom, table] = name.split('.').reverse()
-    if (!table) {
-      if (!custom) {
-        fieldTables.arrest[field] = type
-      } else if (custom == 'custom_fields') {
-        fieldTables.arrest.custom_fields[field] = type
+export const schema = ArrestFields.reduce(
+  (acc, { fields }) => {
+    fields.forEach(([name, props = {}]) => {
+      const type = props.field_type || 'text'
+      let [field, custom, table] = name.split('.').reverse()
+      if (!table) {
+        if (!custom) {
+          fieldTables.arrest[field] = type
+        } else if (custom == 'custom_fields') {
+          fieldTables.arrest.custom_fields[field] = type
+        } else {
+          fieldTables[custom][field] = type
+        }
       } else {
-        fieldTables[custom][field] = type
+        fieldTables[table].custom_fields[field] = type
       }
-    } else {
-      fieldTables[table].custom_fields[field] = type
-    }
-    acc[name] = { type, props }
-  })
-  return acc
-}, {})
+      acc[name] = { type, props }
+    })
+    return acc
+  },
+  {
+    'created_by.name': { type: 'text', props: { label: 'Created By' } },
+    created_at: { type: 'date-time', props: {} },
+    updated_at: { type: 'date-time', props: {} },
+    'updated_by.name': { type: 'text', props: { label: 'Updated By' } },
+  }
+)
 
 export default ArrestFields
