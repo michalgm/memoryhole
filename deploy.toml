@@ -28,7 +28,7 @@ branch = "main"
 keepReleases = 3
 
 [[staging.servers]]
-before.build = 'sed -i -e "s/MemoryHole/MemoryHole (Stage)/" web/src/layouts/BlogLayout/BlogLayout.jsx'
+before.build = 'sed -i -e "s/memoryhole/memoryhole (Stage)/" web/src/layouts/BlogLayout/BlogLayout.jsx'
 host = "memoryhole.styrotopia.net"
 username = "memoryhole"
 agentForward = true
