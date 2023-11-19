@@ -15,10 +15,10 @@ import DocketSheetCell from '../../components/DocketSheetCell/DocketSheetCell'
 const DocketSheetsPage = () => {
   const [search, setSearch] = useState({
     days: 1,
-    report_type: 'arrest_date',
+    report_type: 'court_date',
     date: dayjs('2023-11-11'),
     jurisdiction: 'Alameda',
-    include_contact: true,
+    include_contact: false,
   })
   // const days = 1
   const onSubmit = (data) => {
