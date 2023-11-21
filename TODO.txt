@@ -1,4 +1,26 @@
-- date -> arrest_date
-- display_field -> 'Name'
-- hook up dynamic lists
-- check mod time before save
+ArrestsTable:
+  ☐ allow save/restore of queries
+  ☐ PDF export?
+  ☐ Allow re-order of fields
+  ☐ Bulk updates
+
+General:
+  ☐ custom fields via UI
+  ☐ custom option lists on select/radio/etc
+
+Arrests:
+  ☐ Add court_date table + relationship
+    ☐ display court data in arrest view
+  ☐ Interface to manage arrestee w/ multiple arrests
+  ☐ Check mod time before save
+  ☐ Auto-handle cities->jurisdiction?
+
+Lawyers:
+  ☐ Add lawyers table
+
+Users:
+  ☐ improve user management UI
+  ☐ allow admin to reset user password UI?
+
+Deployment:
+  ☐ Linode encrypted volume
