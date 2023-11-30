@@ -23,6 +23,7 @@ export const formatLabel = (label) => {
     .slice(index + 1)
     .replace(/_/g, ' ')
     .replace(/\w+/g, capitalize)
+    .replace(/\b(bipoc|id\/pfn)\b/gi, (s) => s.toUpperCase())
 }
 
 export const Field = ({
@@ -60,7 +61,7 @@ export const Field = ({
   }
 
   const renderAutocomplete = () => {
-    const options = ['', ...props.options].map((opt) =>
+    const options = ['', ...(props.options || [])].map((opt) =>
       opt.label ? opt : { id: opt, label: opt }
     )
     delete props.options
