@@ -4,6 +4,7 @@ import { FileDownload, Refresh } from '@mui/icons-material'
 import { Box, IconButton, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv' //or use your library of choice here
 import { get, merge, sortBy } from 'lodash'
+import { difference } from 'lodash'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 
 import dayjs from '../../../../api/src/lib/day'
@@ -13,13 +14,13 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 })
 
-export const defineColumns = (schema) => {
+export const defineColumns = (schema, displayColumns) => {
   const columnNames = sortBy(
-    Object.keys(schema),
+    difference(Object.keys(schema), displayColumns),
     (k) => schema[k].props.label || formatLabel(k)
   )
 
-  const columns = columnNames.map((field) => {
+  const columns = [...displayColumns, ...columnNames].map((field) => {
     const fieldDef = schema[field]
     const type = fieldDef.type
 
@@ -27,6 +28,7 @@ export const defineColumns = (schema) => {
       accessorKey: field,
       header: fieldDef.props?.label || formatLabel(field),
       fieldType: type,
+      enablePinning: false,
     }
     if (type === 'date-time' || type === 'date') {
       const format = type === 'date' ? 'L' : 'L hh:mm A'
@@ -76,7 +78,7 @@ const DataTable = ({
           const cell = row.getVisibleCells()[index]
           const value =
             filterVariant === 'date' ? Cell({ cell }) : cell.getValue()
-          acc[header] = value
+          acc[header] = value === null ? '' : value
           return acc
         },
         {}
