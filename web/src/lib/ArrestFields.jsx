@@ -1,3 +1,7 @@
+import { fromPairs, sortBy, toPairs } from 'lodash'
+
+import { formatLabel } from '../components/utils/Field'
+
 const usStates = [
   'Alabama',
   'Alaska',
@@ -243,7 +247,7 @@ const ArrestFields = [
       ],
       [
         'citation_number',
-        { helperText: 'Number on their citation (if they receieved one)' },
+        { helperText: 'Number on their citation (if they received one)' },
       ],
       ['custom_fields.docket_number'],
 
@@ -286,32 +290,60 @@ export const fieldTables = {
     custom_fields: {},
   },
 }
-export const schema = ArrestFields.reduce(
-  (acc, { fields }) => {
-    fields.forEach(([name, props = {}]) => {
-      const type = props.field_type || 'text'
-      let [field, custom, table] = name.split('.').reverse()
-      if (!table) {
-        if (!custom) {
-          fieldTables.arrest[field] = type
-        } else if (custom == 'custom_fields') {
-          fieldTables.arrest.custom_fields[field] = type
+
+const sortObjectKeys = (obj) => {
+  // Convert the object to an array of [key, value] pairs
+  const pairs = toPairs(obj)
+
+  // Sort the pairs based on the key
+  const sortedPairs = sortBy(pairs, 0)
+
+  // Convert the sorted pairs back to an object
+  return fromPairs(sortedPairs)
+}
+
+export const schema = sortObjectKeys(
+  ArrestFields.reduce(
+    (acc, { fields }) => {
+      fields.forEach(([name, props = {}]) => {
+        const type = props.field_type || 'text'
+        props.label = formatLabel(props.label || name)
+        let [field, custom, table] = name.split('.').reverse()
+        if (!table) {
+          if (!custom) {
+            fieldTables.arrest[field] = type
+          } else if (custom == 'custom_fields') {
+            fieldTables.arrest.custom_fields[field] = type
+          } else {
+            fieldTables[custom][field] = type
+          }
         } else {
-          fieldTables[custom][field] = type
+          fieldTables[table].custom_fields[field] = type
         }
-      } else {
-        fieldTables[table].custom_fields[field] = type
-      }
-      acc[name] = { type, props }
-    })
-    return acc
-  },
-  {
-    'created_by.name': { type: 'text', props: { label: 'Created By' } },
-    created_at: { type: 'date-time', props: {} },
-    updated_at: { type: 'date-time', props: {} },
-    'updated_by.name': { type: 'text', props: { label: 'Updated By' } },
-  }
+        acc[name] = { type, props }
+      })
+      return acc
+    },
+    {
+      'created_by.name': {
+        type: 'text',
+        props: { label: 'Created By', readonly: true },
+      },
+      created_at: {
+        type: 'date-time',
+        props: { label: 'Created At', readonly: true },
+      },
+      updated_at: {
+        type: 'date-time',
+        props: { label: 'Update At', readonly: true },
+      },
+      'updated_by.name': {
+        type: 'text',
+        props: { label: 'Updated By', readonly: true },
+      },
+    }
+  ),
+  'props.label'
 )
 
 export default ArrestFields
