@@ -3,30 +3,33 @@ import { useMemo } from 'react'
 import { FileDownload, Refresh } from '@mui/icons-material'
 import { Box, IconButton, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv' //or use your library of choice here
-import { get, merge } from 'lodash'
+import { get, merge, sortBy } from 'lodash'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 
 import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/Field'
 
 const csvConfig = mkConfig({
-  fieldSeparator: ',',
-  decimalSeparator: '.',
   useKeysAsHeaders: true,
 })
 
 export const defineColumns = (schema) => {
-  const columnNames = Object.keys(schema)
+  const columnNames = sortBy(
+    Object.keys(schema),
+    (k) => schema[k].props.label || formatLabel(k)
+  )
+
   const columns = columnNames.map((field) => {
     const fieldDef = schema[field]
     const type = fieldDef.type
 
     const col = {
       accessorKey: field,
-      header: formatLabel(fieldDef.props?.label || field),
+      header: fieldDef.props?.label || formatLabel(field),
+      fieldType: type,
     }
     if (type === 'date-time' || type === 'date') {
-      const format = type === 'date' ? 'L' : 'L hh:MM A'
+      const format = type === 'date' ? 'L' : 'L hh:mm A'
       col.accessorFn = (originalRow) => {
         const val = get(originalRow, field)
         if (type == 'date') {
@@ -64,12 +67,20 @@ const DataTable = ({
 }) => {
   const handleExportRows = (data) => {
     const columns = table.getAllColumns().filter((c) => c.getIsVisible())
-    const rows = data.map((item) => {
-      return columns.reduce((acc, { columnDef }) => {
-        const value = get(item.original, columnDef.id)
-        acc[columnDef.header] = value
-        return acc
-      }, {})
+    const rows = data.map((row) => {
+      return columns.reduce(
+        (acc, { columnDef: { id, header, Cell, filterVariant } }, index) => {
+          if (id.match(/^mrt/)) {
+            return acc
+          }
+          const cell = row.getVisibleCells()[index]
+          const value =
+            filterVariant === 'date' ? Cell({ cell }) : cell.getValue()
+          acc[header] = value
+          return acc
+        },
+        {}
+      )
     })
     const csv = generateCsv(csvConfig)(rows)
     download(csvConfig)(csv)
@@ -98,6 +109,7 @@ const DataTable = ({
       density: 'compact',
       enableDensityToggle: false,
     },
+    getRowId: (originalRow) => originalRow.id,
     muiTableBodyProps: {
       sx: {
         '& tr:nth-of-type(odd) > td': {
@@ -120,7 +132,7 @@ const DataTable = ({
           </Tooltip>
         )}
         {!disableDownload && (
-          <Tooltip title="Save as spreadshtee (CSV)">
+          <Tooltip title="Save as spreadsheet (CSV)">
             <IconButton
               disabled={table.getPrePaginationRowModel().rows.length === 0}
               onClick={() =>
