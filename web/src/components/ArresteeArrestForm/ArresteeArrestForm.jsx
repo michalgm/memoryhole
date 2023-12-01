@@ -2,13 +2,18 @@ import { Box, Button, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
 import { _, flatMap, get, reduce, set, startCase } from 'lodash'
+import { useConfirm } from 'material-ui-confirm'
 import { FormContainer } from 'react-hook-form-mui'
+
+import { navigate, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
 
 import ArrestFields from 'src/lib/ArrestFields'
 
 import ArresteeLogsDrawer from '../ArresteeLogs/ArresteeLogsDrawer'
 import { Field, formatLabel } from '../utils/Field'
 import FormSection from '../utils/FormSection'
+import { useSnackbar } from '../utils/SnackBar'
 
 // const diffObjects = (a, b) => {
 //   return transform(b, (result, value, key) => {
@@ -18,6 +23,14 @@ import FormSection from '../utils/FormSection'
 //     }
 //   })
 // }
+
+export const DELETE_ARRESTEE = gql`
+  mutation deleteArrestee($id: Int!) {
+    deleteArrestee(id: $id) {
+      id
+    }
+  }
+`
 
 const pruneData = (data, fields) => {
   const fieldPaths = flatMap(fields, (section) =>
@@ -67,6 +80,16 @@ function reorderFieldsLodash(fields) {
 }
 
 const ArresteeArrestForm = (props) => {
+  const confirm = useConfirm()
+  const { openSnackbar } = useSnackbar()
+
+  const [deleteArrestee] = useMutation(DELETE_ARRESTEE, {
+    onCompleted: () => {
+      openSnackbar(`Arrestee "${props.arrest.arrestee.display_field}" deleted`)
+      navigate(routes.home())
+    },
+  })
+
   const values = pruneData(props.arrest, ArrestFields)
   const onSubmit = (data) => {
     console.warn('SAVING', data)
@@ -125,6 +148,15 @@ const ArresteeArrestForm = (props) => {
       <b>{props?.arrest[`${time}_by`]?.name}</b>
     </Typography>
   )
+
+  const confirmDeleteArrestee = async () => {
+    await confirm({
+      title: 'Confirm Delete',
+      description: `Are you sure you want to delete the arrestee "${props.arrest.arrestee.display_field}"`,
+    })
+    await deleteArrestee({ variables: { id: props.arrest.arrestee.id } })
+  }
+
   return (
     <Box>
       <FormContainer
@@ -157,7 +189,23 @@ const ArresteeArrestForm = (props) => {
         >
           <Grid xs>{props.arrest?.id && <ModTime time="created" />}</Grid>
           <Grid xs>{props.arrest?.id && <ModTime time="updated" />}</Grid>
-          <Grid xs sx={{ textAlign: 'right' }}>
+          <Grid
+            xs
+            sx={{
+              textAlign: 'right',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 2,
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="inherit"
+              size="small"
+              onClick={() => confirmDeleteArrestee()}
+            >
+              Delete Arrestee
+            </Button>
             <Button
               type="submit"
               variant="contained"
