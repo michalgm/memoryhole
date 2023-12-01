@@ -16,8 +16,8 @@ const DocketSheetsPage = () => {
   const [search, setSearch] = useState({
     days: 1,
     report_type: 'court_date',
-    date: dayjs('2023-11-11'),
-    jurisdiction: 'Alameda',
+    date: dayjs(),
+    jurisdiction: '',
     include_contact: false,
   })
   // const days = 1
