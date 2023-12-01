@@ -115,7 +115,7 @@ model Arrest {
   created_by_id   Int?
   updated_at      DateTime? @updatedAt
   updated_by_id   Int?
-  arrestee        Arrestee? @relation(fields: [arrestee_id], references: [id])
+  arrestee        Arrestee? @relation(fields: [arrestee_id], references: [id], onDelete: Cascade)
   created_by      User?     @relation("CreatedArrest", fields: [created_by_id], references: [id])
   updated_by      User?     @relation("ModifiedArrest", fields: [updated_by_id], references: [id])
 
