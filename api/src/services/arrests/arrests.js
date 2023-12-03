@@ -1,3 +1,5 @@
+import { merge } from 'lodash'
+
 import { validate, validateWithSync } from '@redwoodjs/api'
 
 import { db } from 'src/lib/db'
@@ -182,6 +184,39 @@ export const updateArrest = ({
     },
     where: { id },
   })
+}
+
+export const bulkUpdateArrests = async ({ ids, input }) => {
+  const arrests = await db.arrest.findMany({
+    where: {
+      id: { in: ids },
+    },
+    include: {
+      arrestee: true,
+    },
+  })
+  const res = await db.$transaction(
+    arrests.map(({ id, ...arrest }) => {
+      ;[
+        'id',
+        'arrestee_id',
+        'created_by_id',
+        'updated_by_id',
+        'updated_at',
+        'created_at',
+      ].forEach((key) => {
+        delete arrest[key]
+        delete arrest.arrestee[key]
+      })
+      const arrest_input = merge(arrest, input)
+
+      return updateArrest({
+        id,
+        input: arrest_input,
+      })
+    })
+  )
+  return { count: res.length }
 }
 
 export const deleteArrest = ({ id }) => {

@@ -5,6 +5,7 @@ import { routes } from '@redwoodjs/router'
 import { schema } from 'src/lib/ArrestFields'
 
 import DataTable from '../DataTable/DataTable'
+import BulkUpdateModal from '../utils/BulkUpdateModal'
 import Link from '../utils/Link'
 
 // import schema from '../../types/graphql'
@@ -57,6 +58,8 @@ export const Failure = ({ error }) => (
 )
 
 export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
+  const [bulkUpdateRows, setBulkUpdateRows] = useState(null)
+
   const [displayColumns] = useState([
     'date',
     'custom_fields.custody_status',
@@ -77,28 +80,45 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
   ]
 
   const data = arresteeArrests
-
+  const bulkUpdate = (table) => {
+    setBulkUpdateRows(table.getSelectedRowModel().rows)
+  }
   const tableProps = {
     enableColumnFilterModes: true,
     muiTableContainerProps: { sx: { maxHeight: 'calc(100vh - 320px)' } },
     enableColumnPinning: true,
+    enableRowSelection: true,
+    enableColumnOrdering: true,
+    selectAllMode: 'all',
+
     initialState: {
       showGlobalFilter: true,
       sorting: [{ id: 'date', desc: false }],
       pagination: { pageSize: 50, pageIndex: 0 },
-      columnPinning: { left: ['arrestee.display_field'] },
+      columnPinning: {
+        left: ['mrt-row-select', 'arrestee.display_field'],
+      },
     },
   }
 
   return (
-    <DataTable
-      data={data}
-      schema={schema}
-      displayColumns={displayColumns}
-      // columns={columns}
-      tableProps={tableProps}
-      refetch={refetch}
-      preColumns={preColumns}
-    />
+    <>
+      <DataTable
+        data={data}
+        schema={schema}
+        displayColumns={displayColumns}
+        tableProps={tableProps}
+        refetch={refetch}
+        preColumns={preColumns}
+        bulkUpdate={bulkUpdate}
+      />
+      <BulkUpdateModal
+        bulkUpdateRows={bulkUpdateRows}
+        setBulkUpdateRows={setBulkUpdateRows}
+        onSuccess={() => {
+          refetch()
+        }}
+      />
+    </>
   )
 }

@@ -31,6 +31,7 @@ export const Field = ({
   field_type = 'text',
   tabIndex,
   fullWidth = true,
+  helperText = '',
   ...props
 }) => {
   const { setValue } = useFormContext()
@@ -39,6 +40,7 @@ export const Field = ({
 
   const textFieldProps = {
     name,
+    helperText,
     variant: 'outlined',
     fullWidth: fullWidth,
     size: 'small',
@@ -64,6 +66,7 @@ export const Field = ({
     const options = ['', ...(props.options || [])].map((opt) =>
       opt.label ? opt : { id: opt, label: opt }
     )
+
     delete props.options
     const autocompleteProps = {
       ...textFieldProps,
@@ -73,6 +76,7 @@ export const Field = ({
       ...props,
     }
     delete autocompleteProps.inputProps
+    delete autocompleteProps.helperText
     return (
       <AutocompleteElement
         name={name}
@@ -126,7 +130,7 @@ export const Field = ({
               </Grid>
             ))}
           </FormGroup>
-          <FormHelperText>{props.helperText}</FormHelperText>
+          <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
       </Grid>
     )

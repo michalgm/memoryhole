@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
-import { FileDownload, Refresh } from '@mui/icons-material'
-import { Box, IconButton, Tooltip } from '@mui/material'
+import { EditNote, FileDownload, Refresh } from '@mui/icons-material'
+import { Box, Button, IconButton, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv' //or use your library of choice here
 import { get, merge, sortBy } from 'lodash'
 import { difference } from 'lodash'
@@ -66,6 +66,8 @@ const DataTable = ({
   disableDownload,
   preColumns = [],
   postColumns = [],
+  actionButtons,
+  bulkUpdate,
 }) => {
   const handleExportRows = (data) => {
     const columns = table.getAllColumns().filter((c) => c.getIsVisible())
@@ -114,6 +116,7 @@ const DataTable = ({
     getRowId: (originalRow) => originalRow.id,
     muiTableBodyProps: {
       sx: {
+        backgroundColor: '#fff',
         '& tr:nth-of-type(odd) > td': {
           backgroundColor: '#f5f5f5',
         },
@@ -146,9 +149,30 @@ const DataTable = ({
             </IconButton>
           </Tooltip>
         )}
+        {actionButtons && actionButtons(table)}
       </Box>
     ),
   }
+
+  if (bulkUpdate) {
+    defaultProps.muiToolbarAlertBannerProps = {
+      children: (
+        <Box sx={{ position: 'absolute', right: 16, bottom: 8 }}>
+          <Tooltip title="Bulk Update">
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<EditNote />}
+              onClick={() => bulkUpdate(table)}
+            >
+              Bulk Update
+            </Button>
+          </Tooltip>
+        </Box>
+      ),
+    }
+  }
+
   const table = useMaterialReactTable({
     ...merge(defaultProps, tableProps),
   })

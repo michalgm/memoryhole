@@ -18,7 +18,7 @@ export const arrestee = ({ id }) => {
 }
 
 export const createArrestee = ({ input }) => {
-  input.display_field = updateDisplayField( input )
+  input.display_field = updateDisplayField(input)
 
   return db.arrestee.create({
     data: input,
