@@ -20,9 +20,10 @@ export const SnackBarProvider = ({ children }) => {
     setSnackbar({ open: true, message, severity })
   }
 
-  // Function to close the Snackbar
-  const closeSnackbar = () => {
-    setSnackbar({ open: false, message: '', severity: 'success' })
+  const closeSnackbar = (event, reason) => {
+    if (reason !== 'clickaway' && reason !== 'escapeKeyDown') {
+      setSnackbar({ ...snackbar, open: false })
+    }
   }
 
   const action = (
@@ -49,7 +50,8 @@ export const SnackBarProvider = ({ children }) => {
       >
         <Alert severity={snackbar.severity} sx={{ width: '100%' }}>
           {snackbar.message}
-          {snackbar.severity !== 'error' && action}
+          {action}
+          {/* {snackbar.severity !== 'error' && action} */}
         </Alert>
       </Snackbar>
       {children}

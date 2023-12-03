@@ -7,6 +7,9 @@ body {
 .radio-label .MuiFormControlLabel-label  {
   font-size: 12px;
 }
+.MuiAlert-message br {
+  display: none;
+}
 /* html,
 body, #redwood-app, main {
   height: 100%;

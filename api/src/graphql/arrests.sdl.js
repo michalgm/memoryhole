@@ -72,9 +72,15 @@ export const schema = gql`
     arrestee: UpdateArresteeInput
   }
 
+  type BatchPayload {
+    count: Int!
+  }
+
   type Mutation {
     createArrest(input: CreateArrestInput!): Arrest! @requireAuth
     updateArrest(id: Int!, input: UpdateArrestInput!): Arrest! @requireAuth
     deleteArrest(id: Int!): Arrest! @requireAuth
+    bulkUpdateArrests(ids: [Int]!, input: UpdateArrestInput): BatchPayload
+      @requireAuth
   }
 `
