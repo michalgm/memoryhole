@@ -2,8 +2,8 @@ import {
   DbAuthHandler,
   PasswordValidationError,
 } from '@redwoodjs/auth-dbauth-api'
-
 import { sendReset, tokenExpireHours } from 'src/lib/authHelpers'
+
 import { db } from 'src/lib/db'
 
 const login_expire_hours = 6
@@ -22,8 +22,8 @@ export const handler = async (event, context) => {
     // You could use this return value to, for example, show the email
     // address in a toast message so the user will know it worked and where
     // to look for the email.
-    handler: async (user) => {
-      await sendReset(user)
+    handler: async (user, resetToken) => {
+      await sendReset(user, resetToken)
 
       return user
     },
@@ -160,7 +160,7 @@ export const handler = async (event, context) => {
     // The name of the property you'd call on `db` to access your user table.
     // i.e. if your Prisma model is named `User` this value would be `user`, as in `db.user`
     authModelAccessor: 'user',
-
+    allowedUserFields: ['id', 'email'],
     // A map of what dbAuth calls a field to what your database calls it.
     // `id` is whatever column you use to uniquely identify a user (probably
     // something like `id` or `userId` or even `email`)

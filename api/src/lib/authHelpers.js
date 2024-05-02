@@ -14,14 +14,14 @@ export const sanitize = (user) => {
   return sanitized
 }
 
-export const sendReset = async (user, newUser = false) => {
+export const sendReset = async (user, resetToken, newUser = false) => {
   const reason = newUser
     ? `A new account was created on the Memoryhole Legal Support Database for thie email address (${user.email})`
     : `The Memoryhole Legal Support Database received a request to reset the password associated with this email address (${user.email}) `
   const text = `Hello ${user.name},
 ${reason}
 Please follow the link below to reset your password:
-${process.env.PUBLIC_URL}/reset-password?resetToken=${user.resetToken}
+${process.env.PUBLIC_URL}/reset-password?resetToken=${resetToken}
 
 This password reset link will expire in ${tokenExpireHours} hours. If you do not complete the process before then, you will need to start the password reset process again:
 ${process.env.PUBLIC_URL}/forgot-password
@@ -63,7 +63,7 @@ export const initUser = (input) => {
 }
 
 export const onboardUser = (user, token) => {
-  user.resetToken = token
+  // user.resetToken = token
   // call user-defined handler in their functions/auth.js
-  return sendReset(sanitize(user), true)
+  return sendReset(sanitize(user), token, true)
 }
