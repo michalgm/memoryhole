@@ -6,6 +6,6 @@
     "@redwoodjs/api": "7.4.3",
     "@redwoodjs/auth-dbauth-api": "7.4.3",
     "@redwoodjs/graphql-server": "7.4.3",
-    "nodemailer": "^6.9.7"
+    "nodemailer": "^6.9.13"
   }
 }
