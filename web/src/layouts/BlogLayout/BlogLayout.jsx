@@ -1,19 +1,17 @@
 import * as React from 'react'
 
-import PersonIcon from '@mui/icons-material/Person'
 import { Container, Tooltip } from '@mui/material'
+import { NavLink, routes, useMatch, useRouteName } from '@redwoodjs/router'
+
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import PersonIcon from '@mui/icons-material/Person'
+import QuickSearch from 'src/components/utils/QuickSearch'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-
-import { NavLink, routes, useMatch } from '@redwoodjs/router'
-
-import { useAuth } from 'src/auth'
-import QuickSearch from 'src/components/utils/QuickSearch'
-
 import { theme } from '../../App'
+import { useAuth } from 'src/auth'
 
 const CustomLink = ({ to, ...rest }) => {
   const matchInfo = useMatch(to)
@@ -35,6 +33,8 @@ const CustomLink = ({ to, ...rest }) => {
 
 const BlogLayout = ({ children }) => {
   const { isAuthenticated, currentUser, logOut } = useAuth()
+  const routeName = useRouteName()
+
   const pages = [
     ['home', 'Arrests'],
     ['hotlineLogs', 'Hotline Logs'],
@@ -87,7 +87,7 @@ const BlogLayout = ({ children }) => {
         </Box>
       </header>
       <Box component="main" sx={{ p: 3 }}>
-        <Container>{children}</Container>
+        <Container maxWidth={routeName === 'home'? false : 'lg'}>{children}</Container>
       </Box>
     </>
   )
