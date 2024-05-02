@@ -8,6 +8,10 @@ interface Options {
 }
 
 export async function sendEmail({ to, subject, text, html }: Options) {
+  if (process.env.NODE_ENV === 'development') {
+    console.log({ to, subject, text })
+    return
+  }
   // create reusable transporter object using SendInBlue for SMTP
   const transporter = nodemailer.createTransport({
     host: '127.0.0.1',
