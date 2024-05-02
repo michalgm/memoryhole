@@ -1,14 +1,13 @@
-import { useMemo } from 'react'
-
-import { EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import { Box, Button, IconButton, Tooltip } from '@mui/material'
+import { EditNote, FileDownload, Refresh } from '@mui/icons-material'
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { download, generateCsv, mkConfig } from 'export-to-csv' //or use your library of choice here
 import { get, merge, sortBy } from 'lodash'
-import { difference } from 'lodash'
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 
 import dayjs from '../../../../api/src/lib/day'
+import { difference } from 'lodash'
 import { formatLabel } from '../utils/Field'
+import { useMemo } from 'react'
 
 const csvConfig = mkConfig({
   useKeysAsHeaders: true,
@@ -102,17 +101,23 @@ const DataTable = ({
     acc[f] = displayColumns.includes(f)
     return acc
   }, {})
+  const savedState = JSON.parse(sessionStorage.getItem('table_state'))
+  const initialState =
+    savedState ||
+    merge(
+      {
+        columnVisibility,
+        density: 'compact',
+        enableDensityToggle: false,
+      },
+      tableProps.initialState
+    )
 
   const defaultProps = {
     columns,
     data,
     enableDensityToggle: false,
     enableStickyHeader: true,
-    initialState: {
-      columnVisibility,
-      density: 'compact',
-      enableDensityToggle: false,
-    },
     getRowId: (originalRow) => originalRow.id,
     muiTableBodyProps: {
       sx: {
@@ -173,9 +178,11 @@ const DataTable = ({
     }
   }
 
-  const table = useMaterialReactTable({
-    ...merge(defaultProps, tableProps),
-  })
+  const properties = merge(merge(defaultProps, tableProps), { initialState })
+  const table = useMaterialReactTable(properties)
+
+  sessionStorage.setItem('table_state', JSON.stringify(table.getState()))
+
   return <MaterialReactTable table={table} />
 }
 
