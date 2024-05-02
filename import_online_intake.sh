@@ -1,14 +1,15 @@
 #!/bin/bash
+set -e
+
+. /home/memoryhole/.nvm/nvm.sh
 
 REMOTE_HOST=arrestee-form.legalsolidaritybayarea.org
 REMOTE_USER=arrestee_intake
 REMOTE_DIR=/home/arrestee_intake/data
-LOCAL_DIR=~/arrestee_intake
+LOCAL_DIR=/home/memoryhole/arrestee_intake
 IMPORT_DIR="${LOCAL_DIR}/import"
 IMPORTED_DIR="${LOCAL_DIR}/imported"
 ERROR_DIR="${LOCAL_DIR}/error"
-
-set -e
 
 echo "### Starting intake process ###"
 for d in $LOCAL_DIR $IMPORT_DIR $IMPORTED_DIR $ERROR_DIR; do
@@ -52,6 +53,7 @@ for file in $(ls -p $IMPORT_DIR | grep -v /); do
   if yarn rw exec process_intake "${IMPORT_DIR}/${file}"; then
     mv "${IMPORT_DIR}/${file}" "${IMPORTED_DIR}/${file}"
   else
+    echo "import failed - moving file to ${ERROR_DIR}"
     mv "${IMPORT_DIR}/${file}" "${ERROR_DIR}/${file}"
   fi
 done
