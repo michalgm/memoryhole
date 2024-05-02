@@ -1,15 +1,17 @@
-import { Button, FormControlLabel, Radio, Typography } from '@mui/material'
-import { FormContainer, RadioButtonGroup, useForm } from 'react-hook-form-mui'
-import { navigate, routes } from '@redwoodjs/router'
-
 import { CheckBox } from '@mui/icons-material'
-import { Field } from '../utils/Field'
+import { Button, FormControlLabel, Radio, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
-import { QUERY } from '../OptionSetValuesCell/OptionSetValuesCell'
-import { QUERY as QUERYLIST } from './EditOptionsCell'
 import { useConfirm } from 'material-ui-confirm'
+import { FormContainer, RadioButtonGroup, useForm } from 'react-hook-form-mui'
+
+import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
+
+import { QUERY } from '../OptionSetValuesCell/OptionSetValuesCell'
+import { Field } from '../utils/Field'
 import { useSnackbar } from '../utils/SnackBar'
+
+import { QUERY as QUERYLIST } from './EditOptionsCell'
 
 export const UPDATE_OPTION_SET_MUTATION = gql`
   mutation ReplaceOptionSetValuesQuery(
@@ -111,7 +113,7 @@ const EditOptionsForm = ({ optionsSet = {} }) => {
       }, [])
       .sort((a, b) =>
         sortType === 'sort' ? a.value.localeCompare(b.value) : 0
-    )
+      )
     if (id) {
       return updateOptionSet({
         variables: {
