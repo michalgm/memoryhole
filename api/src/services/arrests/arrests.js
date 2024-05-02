@@ -1,10 +1,8 @@
-import { merge } from 'lodash'
-
 import { validate, validateWithSync } from '@redwoodjs/api'
 
-import { db } from 'src/lib/db'
-
 import dayjs from '../../lib/day'
+import { db } from 'src/lib/db'
+import { merge } from 'lodash'
 import { updateDisplayField as updateAresteeDisplayField } from '../arrestees/arrestees'
 
 // import localizedFormat from 'dayjs/plugin/localizedFormat'
