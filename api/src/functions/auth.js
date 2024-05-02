@@ -1,12 +1,12 @@
 import {
   DbAuthHandler,
   PasswordValidationError,
-} from "@redwoodjs/auth-dbauth-api";
+} from '@redwoodjs/auth-dbauth-api'
 
-import { sendReset, tokenExpireHours } from "src/lib/authHelpers";
-import { db } from "src/lib/db";
+import { sendReset, tokenExpireHours } from 'src/lib/authHelpers'
+import { db } from 'src/lib/db'
 
-const login_expire_hours = 6;
+const login_expire_hours = 6
 
 export const handler = async (event, context) => {
   const forgotPasswordOptions = {
@@ -23,9 +23,9 @@ export const handler = async (event, context) => {
     // address in a toast message so the user will know it worked and where
     // to look for the email.
     handler: async (user) => {
-      await sendReset(user);
+      await sendReset(user)
 
-      return user;
+      return user
     },
 
     // How long the resetToken is valid for, in seconds (default is 24 hours)
@@ -35,11 +35,11 @@ export const handler = async (event, context) => {
       // for security reasons you may want to be vague here rather than expose
       // the fact that the email address wasn't found (prevents fishing for
       // valid email addresses)
-      usernameNotFound: "Username not found",
+      usernameNotFound: 'Username not found',
       // if the user somehow gets around client validation
-      usernameRequired: "Username is required",
+      usernameRequired: 'Username is required',
     },
-  };
+  }
 
   const loginOptions = {
     // handler() is called after finding the user that matches the
@@ -54,21 +54,33 @@ export const handler = async (event, context) => {
     // by the `logIn()` function from `useAuth()` in the form of:
     // `{ message: 'Error message' }`
     handler: (user) => {
-      return user;
+      const requestOrigin = event.headers['x-forwarded-for'] || event.clientIp
+
+      console.log(requestOrigin)
+      // Ensure the login attempt is from localhost
+      if (
+        user.name.match(/^svc-/) &&
+        requestOrigin !== '127.0.0.1' &&
+        requestOrigin !== '::1'
+      ) {
+        throw Error('Login restricted to localhost')
+      }
+      return user
     },
 
     errors: {
-      usernameOrPasswordMissing: "Both username and password are required",
-      usernameNotFound: "Username ${username} not found",
+      usernameOrPasswordMissing: 'Both username and password are required',
+      usernameNotFound: 'Username ${username} not found',
       // For security reasons you may want to make this the same as the
       // usernameNotFound error so that a malicious user can't use the error
       // to narrow down if it's the username or password that's incorrect
-      incorrectPassword: "Incorrect password for ${username}",
+      // incorrectPassword: "Incorrect password for ${username}",
+      incorrectPassword: 'Username ${username} not found',
     },
 
     // How long a user will remain logged in, in seconds
     expires: 60 * 60 * login_expire_hours,
-  };
+  }
 
   const resetPasswordOptions = {
     // handler() is invoked after the password has been successfully updated in
@@ -76,7 +88,7 @@ export const handler = async (event, context) => {
     // in. Return `false` otherwise, and in the Reset Password page redirect the
     // user to the login page.
     handler: (_user) => {
-      return true;
+      return true
     },
 
     // If `false` then the new password MUST be different from the current one
@@ -84,15 +96,15 @@ export const handler = async (event, context) => {
 
     errors: {
       // the resetToken is valid, but expired
-      resetTokenExpired: "resetToken is expired",
+      resetTokenExpired: 'resetToken is expired',
       // no user was found with the given resetToken
-      resetTokenInvalid: "resetToken is invalid",
+      resetTokenInvalid: 'resetToken is invalid',
       // the resetToken was not present in the URL
-      resetTokenRequired: "resetToken is required",
+      resetTokenRequired: 'resetToken is required',
       // new password is the same as the old password (apparently they did not forget it)
-      reusedPassword: "Must choose a new password",
+      reusedPassword: 'Must choose a new password',
     },
-  };
+  }
 
   const signupOptions = {
     enabled: false,
@@ -112,7 +124,7 @@ export const handler = async (event, context) => {
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
     handler: ({ username, hashedPassword, salt, userAttributes }) => {
-      return false;
+      return false
       return db.user.create({
         data: {
           email: username,
@@ -121,7 +133,7 @@ export const handler = async (event, context) => {
           name: userAttributes.name,
           role: userAttributes.role,
         },
-      });
+      })
     },
 
     // Include any format checks for password here. Return `true` if the
@@ -129,17 +141,17 @@ export const handler = async (event, context) => {
     // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.
     passwordValidation: (_password) => {
       if (_password.length < 8) {
-        throw PasswordValidationError("Password must be at least 8 characters");
+        throw PasswordValidationError('Password must be at least 8 characters')
       }
-      return true;
+      return true
     },
 
     errors: {
       // `field` will be either "username" or "password"
-      fieldMissing: "${field} is required",
-      usernameTaken: "Username `${username}` already in use",
+      fieldMissing: '${field} is required',
+      usernameTaken: 'Username `${username}` already in use',
     },
-  };
+  }
 
   const authHandler = new DbAuthHandler(event, context, {
     // Provide prisma db client
@@ -147,27 +159,27 @@ export const handler = async (event, context) => {
 
     // The name of the property you'd call on `db` to access your user table.
     // i.e. if your Prisma model is named `User` this value would be `user`, as in `db.user`
-    authModelAccessor: "user",
+    authModelAccessor: 'user',
 
     // A map of what dbAuth calls a field to what your database calls it.
     // `id` is whatever column you use to uniquely identify a user (probably
     // something like `id` or `userId` or even `email`)
     authFields: {
-      id: "id",
-      username: "email",
-      hashedPassword: "hashedPassword",
-      salt: "salt",
-      resetToken: "resetToken",
-      resetTokenExpiresAt: "resetTokenExpiresAt",
+      id: 'id',
+      username: 'email',
+      hashedPassword: 'hashedPassword',
+      salt: 'salt',
+      resetToken: 'resetToken',
+      resetTokenExpiresAt: 'resetTokenExpiresAt',
     },
 
     // Specifies attributes on the cookie that dbAuth sets in order to remember
     // who is logged in. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies
     cookie: {
       HttpOnly: true,
-      Path: "/",
-      SameSite: "Strict",
-      Secure: process.env.NODE_ENV !== "development",
+      Path: '/',
+      SameSite: 'Strict',
+      Secure: process.env.NODE_ENV !== 'development',
 
       // If you need to allow other domains (besides the api side) access to
       // the dbAuth session cookie:
@@ -178,7 +190,7 @@ export const handler = async (event, context) => {
     login: loginOptions,
     resetPassword: resetPasswordOptions,
     signup: signupOptions,
-  });
+  })
 
-  return await authHandler.invoke();
-};
+  return await authHandler.invoke()
+}
