@@ -1,7 +1,6 @@
-import { routes } from '@redwoodjs/router'
-import { MetaTags } from '@redwoodjs/web'
-
 import Link from 'src/components/utils/Link'
+import { MetaTags } from '@redwoodjs/web'
+import { routes } from '@redwoodjs/router'
 
 const AdminPage = () => {
   const admin_routes = [
@@ -11,6 +10,7 @@ const AdminPage = () => {
     // 'hotlineLogs',
     'customSchemata',
     'logs',
+    'tableViews',
   ]
   return (
     <>

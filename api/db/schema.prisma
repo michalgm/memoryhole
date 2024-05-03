@@ -10,9 +10,9 @@ datasource db {
 }
 
 model OptionSet {
-  id          Int               @id @default(autoincrement())
-  name        String            @unique
-  values      OptionSetValue[]
+  id     Int              @id @default(autoincrement())
+  name   String           @unique
+  values OptionSetValue[]
 }
 
 model OptionSetValue {
@@ -127,7 +127,7 @@ model User {
   email                  String         @unique
   name                   String
   custom_fields          Json?
-  role                   String        @default("User")
+  role                   String         @default("User")
   hashedPassword         String?
   salt                   String?
   resetToken             String?
@@ -141,4 +141,19 @@ model User {
   updated_hotline_logs   HotlineLog[]   @relation("ModifiedHotlineLog")
   created_arrestee_logs  Log[]          @relation("CreatedLog")
   updated_arrestee_logs  Log[]          @relation("ModifiedLog")
+  created_table_views    TableView[]    @relation("CreatedTableView")
+  updated_table_views    TableView[]    @relation("ModifiedTableView")
+}
+
+model TableView {
+  id            Int       @id @default(autoincrement())
+  name          String
+  state         String
+  type          String
+  created_at    DateTime? @default(now())
+  created_by_id Int?
+  updated_at    DateTime? @updatedAt
+  updated_by_id Int?
+  created_by    User?     @relation("CreatedTableView", fields: [created_by_id], references: [id])
+  updated_by    User?     @relation("ModifiedTableView", fields: [updated_by_id], references: [id])
 }
