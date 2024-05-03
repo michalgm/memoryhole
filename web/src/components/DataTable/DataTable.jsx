@@ -1,13 +1,14 @@
 import { Box, Button, IconButton, Tooltip } from '@mui/material'
 import { EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
-import { download, generateCsv, mkConfig } from 'export-to-csv' //or use your library of choice here
+import { download, generateCsv, mkConfig } from 'export-to-csv'
 import { get, merge, sortBy } from 'lodash'
+import { useEffect, useMemo, useState } from 'react'
 
+import ManageViews from './ManageViews'
 import dayjs from '../../../../api/src/lib/day'
 import { difference } from 'lodash'
 import { formatLabel } from '../utils/Field'
-import { useMemo } from 'react'
 
 const csvConfig = mkConfig({
   useKeysAsHeaders: true,
@@ -68,6 +69,56 @@ const DataTable = ({
   actionButtons,
   bulkUpdate,
 }) => {
+  const initialState = merge(
+    {
+      columnVisibility: Object.keys(schema).reduce((acc, f) => {
+        acc[f] = displayColumns.includes(f)
+        return acc
+      }, {}),
+      density: 'compact',
+      enableDensityToggle: false,
+      columnFilters: [],
+      columnOrder: [{ id: 'date', desc: true }],
+      sorting: [],
+      globalFilter: '',
+    },
+    tableProps.initialState
+  )
+  delete tableProps.initialState
+
+  const [localState, setLocalState] = useState({})
+  const [stateLoaded, setStateLoaded] = useState(false)
+
+  useEffect(() => {
+    const sessionState = merge(
+      initialState,
+      JSON.parse(sessionStorage.getItem('table_state'))
+    )
+    loadState(sessionState)
+  }, [])
+
+  const getDefault = (key) => localState[key] || initialState[key]
+
+  const [columnFilters, setColumnFilters] = useState(
+    getDefault('columnFilters')
+  )
+  const [columnVisibility, setColumnVisibility] = useState(
+    getDefault('columnVisibility')
+  )
+  const [globalFilter, setGlobalFilter] = useState(getDefault('globalFilter '))
+  const [sorting, setSorting] = useState(getDefault('sorting'))
+  const [columnOrder, setColumnOrder] = useState(getDefault('columnOrder'))
+
+  const loadState = (state) => {
+    setColumnFilters(state.columnFilters)
+    setGlobalFilter(state.globalFilter)
+    setColumnOrder(state.columnOrder)
+    setColumnVisibility(state.columnVisibility)
+    setSorting(state.sorting)
+    setLocalState(state)
+    setStateLoaded(true)
+  }
+
   const handleExportRows = (data) => {
     const columns = table.getAllColumns().filter((c) => c.getIsVisible())
     const rows = data.map((row) => {
@@ -88,6 +139,7 @@ const DataTable = ({
     const csv = generateCsv(csvConfig)(rows)
     download(csvConfig)(csv)
   }
+
   const columns = useMemo(
     () => [
       ...preColumns,
@@ -97,21 +149,26 @@ const DataTable = ({
     [preColumns, postColumns, displayColumns, schema]
   )
 
-  const columnVisibility = Object.keys(schema).reduce((acc, f) => {
-    acc[f] = displayColumns.includes(f)
-    return acc
-  }, {})
-  const savedState = JSON.parse(sessionStorage.getItem('table_state'))
-  const initialState =
-    savedState ||
-    merge(
-      {
-        columnVisibility,
-        density: 'compact',
-        enableDensityToggle: false,
-      },
-      tableProps.initialState
-    )
+  const state = {
+    columnFilters,
+    columnVisibility,
+    globalFilter,
+    sorting,
+    columnOrder,
+  }
+
+  useEffect(() => {
+    if (stateLoaded) {
+      sessionStorage.setItem('table_state', JSON.stringify(state))
+    }
+  }, [
+    columnFilters,
+    columnVisibility,
+    globalFilter,
+    sorting,
+    columnOrder,
+    stateLoaded,
+  ])
 
   const defaultProps = {
     columns,
@@ -119,6 +176,12 @@ const DataTable = ({
     enableDensityToggle: false,
     enableStickyHeader: true,
     getRowId: (originalRow) => originalRow.id,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onGlobalFilterChange: setGlobalFilter,
+    onSortingChange: setSorting,
+    onColumnOrderChange: setColumnOrder,
+
     muiTableBodyProps: {
       sx: {
         backgroundColor: '#fff',
@@ -143,17 +206,24 @@ const DataTable = ({
         )}
         {!disableDownload && (
           <Tooltip title="Save as spreadsheet (CSV)">
-            <IconButton
-              disabled={table.getPrePaginationRowModel().rows.length === 0}
-              onClick={() =>
-                //export all rows, including from the next page, (still respects filtering and sorting)
-                handleExportRows(table.getPrePaginationRowModel().rows)
-              }
-            >
-              <FileDownload />
-            </IconButton>
+            <span>
+              <IconButton
+                disabled={table.getPrePaginationRowModel().rows.length === 0}
+                onClick={() =>
+                  //export all rows, including from the next page, (still respects filtering and sorting)
+                  handleExportRows(table.getPrePaginationRowModel().rows)
+                }
+              >
+                <FileDownload />
+              </IconButton>
+            </span>
           </Tooltip>
         )}
+        <ManageViews
+          tableState={state}
+          setTableState={loadState}
+          defaultState={initialState}
+        />
         {actionButtons && actionButtons(table)}
       </Box>
     ),
@@ -178,10 +248,20 @@ const DataTable = ({
     }
   }
 
-  const properties = merge(merge(defaultProps, tableProps), { initialState })
-  const table = useMaterialReactTable(properties)
+  if (globalFilter) {
+    state.showGlobalFilter = true
+  }
+  if (state.columnFilters.length) {
+    state.showColumnFilters = true
+  }
 
-  sessionStorage.setItem('table_state', JSON.stringify(table.getState()))
+  const properties = merge(defaultProps, tableProps)
+  properties.data = stateLoaded ? data : []
+  properties.state = state
+
+  const table = useMaterialReactTable(properties)
+  // const currentTableState = table.getState()
+  // console.log('live', currentTableState.sorting[0])
 
   return <MaterialReactTable table={table} />
 }

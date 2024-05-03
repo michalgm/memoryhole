@@ -1,12 +1,9 @@
-import { useState } from 'react'
-
-import { routes } from '@redwoodjs/router'
-
-import { schema } from 'src/lib/ArrestFields'
-
-import DataTable from '../DataTable/DataTable'
 import BulkUpdateModal from '../utils/BulkUpdateModal'
+import DataTable from '../DataTable/DataTable'
 import Link from '../utils/Link'
+import { routes } from '@redwoodjs/router'
+import { schema } from 'src/lib/ArrestFields'
+import { useState } from 'react'
 
 // import schema from '../../types/graphql'
 
@@ -71,9 +68,9 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
     {
       accessorKey: 'arrestee.display_field',
       header: 'Name',
-      Cell: ({ cell, row }) => (
+      Cell: ({ cell, row, renderedCellValue }) => (
         <Link color="secondary" to={routes.arrest({ id: row.original.id })}>
-          {cell.getValue()}
+          {renderedCellValue}
         </Link>
       ),
     },

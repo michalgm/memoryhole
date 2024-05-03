@@ -2,7 +2,6 @@ import { PrivateSet, Route, Router, Set } from '@redwoodjs/router'
 
 import BlogLayout from 'src/layouts/BlogLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
-
 import { useAuth } from './auth'
 
 // In this file, all Page components from 'src/pages` are auto-imported. Nested
@@ -32,6 +31,12 @@ const Routes = () => {
               <Route path="/admin/arrests/new" page={ArrestNewArrestPage} name="newArrest" />
               <Route path="/admin/arrests/{id:Int}/edit" page={ArrestEditArrestPage} name="editArrest" />
               <Route path="/admin/arrests" page={ArrestArrestsPage} name="arrests" />
+            </Set>
+            <Set wrap={ScaffoldLayout} title="TableViews" titleTo="tableViews" buttonLabel="New TableView" buttonTo="newTableView">
+              <Route path="/table-views/new" page={TableViewNewTableViewPage} name="newTableView" />
+              <Route path="/table-views/{id:Int}/edit" page={TableViewEditTableViewPage} name="editTableView" />
+              <Route path="/table-views/{id:Int}" page={TableViewTableViewPage} name="tableView" />
+              <Route path="/table-views" page={TableViewTableViewsPage} name="tableViews" />
             </Set>
             <Set wrap={ScaffoldLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
               <Route path="/admin/users/new" page={UserNewUserPage} name="newUser" />
