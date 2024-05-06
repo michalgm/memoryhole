@@ -82,5 +82,6 @@ export const schema = gql`
     deleteArrest(id: Int!): Arrest! @requireAuth
     bulkUpdateArrests(ids: [Int]!, input: UpdateArrestInput): BatchPayload
       @requireAuth
+    bulkDeleteArrests(ids: [Int]!): BatchPayload @requireAuth
   }
 `
