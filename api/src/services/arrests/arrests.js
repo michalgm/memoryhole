@@ -1,8 +1,10 @@
+import { merge } from 'lodash'
+
 import { validate, validateWithSync } from '@redwoodjs/api'
 
-import dayjs from '../../lib/day'
 import { db } from 'src/lib/db'
-import { merge } from 'lodash'
+
+import dayjs from '../../lib/day'
 import { updateDisplayField as updateAresteeDisplayField } from '../arrestees/arrestees'
 
 // import localizedFormat from 'dayjs/plugin/localizedFormat'
@@ -220,6 +222,12 @@ export const bulkUpdateArrests = async ({ ids, input }) => {
 export const deleteArrest = ({ id }) => {
   return db.arrest.delete({
     where: { id },
+  })
+}
+
+export const bulkDeleteArrests = async ({ ids }) => {
+  return db.arrest.deleteMany({
+    where: { id: { in: ids } },
   })
 }
 

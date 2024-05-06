@@ -1,14 +1,16 @@
-import { Box, Button, IconButton, Tooltip } from '@mui/material'
-import { EditNote, FileDownload, Refresh } from '@mui/icons-material'
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
-import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { get, merge, sortBy } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 
-import ManageViews from './ManageViews'
-import dayjs from '../../../../api/src/lib/day'
+import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
+import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material'
+import { download, generateCsv, mkConfig } from 'export-to-csv'
+import { get, merge, sortBy } from 'lodash'
 import { difference } from 'lodash'
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
+
+import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/Field'
+
+import ManageViews from './ManageViews'
 
 const csvConfig = mkConfig({
   useKeysAsHeaders: true,
@@ -68,6 +70,7 @@ const DataTable = ({
   postColumns = [],
   actionButtons,
   bulkUpdate,
+  bulkDelete,
 }) => {
   const initialState = merge(
     {
@@ -229,21 +232,43 @@ const DataTable = ({
     ),
   }
 
-  if (bulkUpdate) {
+  if (bulkUpdate || bulkDelete) {
+    const buttons = []
+    if (bulkDelete) {
+      buttons.push(
+        <Button
+          key="delete"
+          variant="contained"
+          color="secondary"
+          startIcon={<Delete />}
+          onClick={() => bulkDelete(table)}
+        >
+          Delete Selected Arrests
+        </Button>
+      )
+    }
+    if (bulkUpdate) {
+      buttons.push(
+        <Button
+          key="update"
+          variant="outlined"
+          color="secondary"
+          startIcon={<EditNote />}
+          onClick={() => bulkUpdate(table)}
+        >
+          Update Selected Arrests
+        </Button>
+      )
+    }
     defaultProps.muiToolbarAlertBannerProps = {
       children: (
-        <Box sx={{ position: 'absolute', right: 16, bottom: 8 }}>
-          <Tooltip title="Bulk Update">
-            <Button
-              variant="contained"
-              color="secondary"
-              startIcon={<EditNote />}
-              onClick={() => bulkUpdate(table)}
-            >
-              Bulk Update
-            </Button>
-          </Tooltip>
-        </Box>
+        <Stack
+          sx={{ position: 'absolute', right: 16, bottom: 8 }}
+          spacing={2}
+          direction={'row'}
+        >
+          {buttons}
+        </Stack>
       ),
     }
   }

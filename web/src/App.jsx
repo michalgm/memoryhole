@@ -7,17 +7,19 @@ import './index.css'
 
 import * as React from 'react'
 
-import { AuthProvider, useAuth } from './auth'
-import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
+import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-
+import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { ConfirmProvider } from 'material-ui-confirm'
-import CssBaseline from '@mui/material/CssBaseline'
-import FatalErrorPage from 'src/pages/FatalErrorPage'
-import { LocalizationProvider } from '@mui/x-date-pickers'
+
+import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
 import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
+
+import FatalErrorPage from 'src/pages/FatalErrorPage'
 import Routes from 'src/Routes'
+
+import { AuthProvider, useAuth } from './auth'
 import { SnackBarProvider } from './components/utils/SnackBar'
 
 export const theme = createTheme({
@@ -37,7 +39,15 @@ const App = () => (
           <AuthProvider>
             <RedwoodApolloProvider useAuth={useAuth}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <ConfirmProvider>
+                <ConfirmProvider
+                  defaultOptions={{
+                    confirmationButtonProps: {
+                      variant: 'contained',
+                      color: 'secondary',
+                    },
+                    cancellationButtonProps: { variant: 'outlined' },
+                  }}
+                >
                   <SnackBarProvider>
                     <Routes />
                   </SnackBarProvider>

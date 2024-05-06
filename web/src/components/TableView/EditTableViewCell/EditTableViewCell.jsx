@@ -1,5 +1,4 @@
 import { navigate, routes } from '@redwoodjs/router'
-
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
@@ -20,7 +19,7 @@ export const QUERY = gql`
   }
 `
 
-const UPDATE_TABLE_VIEW_MUTATION = gql`
+const UPDATE_TABLE_VIEW_MUTATION_GENERIC = gql`
   mutation UpdateTableViewMutation($id: Int!, $input: UpdateTableViewInput!) {
     updateTableView(id: $id, input: $input) {
       id
@@ -43,7 +42,7 @@ export const Failure = ({ error }) => (
 
 export const Success = ({ tableView }) => {
   const [updateTableView, { loading, error }] = useMutation(
-    UPDATE_TABLE_VIEW_MUTATION,
+    UPDATE_TABLE_VIEW_MUTATION_GENERIC,
     {
       onCompleted: () => {
         toast.success('TableView updated')
