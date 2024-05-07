@@ -12,6 +12,7 @@ import ArrestFields from 'src/lib/ArrestFields'
 
 import ArresteeLogsDrawer from '../ArresteeLogs/ArresteeLogsDrawer'
 import { Field, formatLabel } from '../utils/Field'
+import Footer from '../utils/Footer'
 import FormSection from '../utils/FormSection'
 import { useSnackbar } from '../utils/SnackBar'
 
@@ -140,12 +141,12 @@ const ArresteeArrestForm = (props) => {
 
   const ModTime = ({ time }) => (
     <Typography variant="overline">
-      {startCase(time)}&nbsp;
+      {' '}
+      {startCase(time)}{' '}
       <Tooltip title={stats[time].format('LLLL')}>
         <b>{stats[time].calendar()}</b>
-      </Tooltip>
-      &nbsp;by&nbsp;
-      <b>{props?.arrest[`${time}_by`]?.name}</b>
+      </Tooltip>{' '}
+      by <b>{props?.arrest[`${time}_by`]?.name}</b>
     </Typography>
   )
 
@@ -173,20 +174,7 @@ const ArresteeArrestForm = (props) => {
             {fields}
           </Grid>
         </Grid>
-        <Grid
-          container
-          spacing={2}
-          sx={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            bgcolor: 'primary.main',
-            color: 'white',
-            zIndex: 10,
-            p: 2,
-          }}
-          xs={12}
-        >
+        <Footer>
           <Grid xs>{props.arrest?.id && <ModTime time="created" />}</Grid>
           <Grid xs>{props.arrest?.id && <ModTime time="updated" />}</Grid>
           <Grid
@@ -215,7 +203,7 @@ const ArresteeArrestForm = (props) => {
               Save Arrestee
             </Button>
           </Grid>
-        </Grid>
+        </Footer>
       </FormContainer>
       {props.arrest?.arrestee?.id && (
         <ArresteeLogsDrawer arrestee_id={props.arrest?.arrestee?.id} />

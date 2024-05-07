@@ -251,7 +251,7 @@ const DataTable = ({
       buttons.push(
         <Button
           key="update"
-          variant="outlined"
+          variant="contained"
           color="secondary"
           startIcon={<EditNote />}
           onClick={() => bulkUpdate(table)}
