@@ -59,7 +59,7 @@ const UsersList = ({ users }) => {
               <td>
                 {user.expiresAt && (
                   <>
-                    {dayjs(user.expiresAt).format('L YYYY-MM-DD hh:mm A')} (
+                    {dayjs(user.expiresAt).format('YYYY-MM-DD hh:mm A')} (
                     {dayjs(user.expiresAt).fromNow()})
                   </>
                 )}
