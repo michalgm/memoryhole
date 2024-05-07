@@ -7,6 +7,7 @@ export const schema = gql`
     role: String!
     hashedPassword: String
     salt: String
+    expiresAt: DateTime
     resetToken: String
     resetTokenExpiresAt: DateTime
     created_arrests: [Arrest]!
@@ -32,6 +33,7 @@ export const schema = gql`
     role: String!
     hashedPassword: String
     salt: String
+    expiresAt: DateTime
     resetToken: String
     resetTokenExpiresAt: DateTime
   }
@@ -43,6 +45,7 @@ export const schema = gql`
     role: String
     hashedPassword: String
     salt: String
+    expiresAt: DateTime
     resetToken: String
     resetTokenExpiresAt: DateTime
   }

@@ -20,7 +20,10 @@ export const QUERY = gql`
 `
 
 const UPDATE_TABLE_VIEW_MUTATION_GENERIC = gql`
-  mutation UpdateTableViewMutation($id: Int!, $input: UpdateTableViewInput!) {
+  mutation DefaultUpdateTableViewMutation(
+    $id: Int!
+    $input: UpdateTableViewInput!
+  ) {
     updateTableView(id: $id, input: $input) {
       id
       name

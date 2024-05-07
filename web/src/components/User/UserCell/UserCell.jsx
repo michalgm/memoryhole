@@ -8,6 +8,7 @@ export const QUERY = gql`
       name
       custom_fields
       role
+      expiresAt
       hashedPassword
       salt
       resetToken

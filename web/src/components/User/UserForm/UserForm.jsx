@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 import {
   DatetimeLocalField,
   FieldError,
@@ -6,20 +8,17 @@ import {
   Label,
   SelectField,
   Submit,
-  TextAreaField,
   TextField,
 } from '@redwoodjs/forms'
-
-const formatDatetime = (value) => {
-  if (value) {
-    return value.replace(/:\d{2}\.\d{3}\w/, '')
-  }
-}
 
 const UserForm = (props) => {
   const onSubmit = (data) => {
     props.onSave(data, props?.user?.id)
   }
+
+  const expiresAt = props?.user?.expiresAt
+    ? dayjs(props.user.expiresAt).format('YYYY-MM-DDTHH:mm')
+    : null
 
   return (
     <div className="rw-form-wrapper">
@@ -83,6 +82,20 @@ const UserForm = (props) => {
           <option>User</option>
           <option>Admin</option>
         </SelectField>
+
+        <Label
+          name="expiresAt"
+          className="rw-label"
+          errorClassName="rw-label rw-label-error"
+        >
+          Expires At
+        </Label>
+        <DatetimeLocalField
+          name="expiresAt"
+          defaultValue={expiresAt}
+          className="rw-input"
+          errorClassName="rw-input rw-input-error"
+        ></DatetimeLocalField>
 
         <FieldError name="role" className="rw-field-error" />
 
