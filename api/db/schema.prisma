@@ -130,6 +130,7 @@ model User {
   role                   String         @default("User")
   hashedPassword         String?
   salt                   String?
+  expiresAt              DateTime?
   resetToken             String?
   resetTokenExpiresAt    DateTime?
   created_arrests        Arrest[]       @relation("CreatedArrest")

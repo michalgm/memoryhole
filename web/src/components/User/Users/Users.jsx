@@ -1,9 +1,11 @@
+import dayjs from 'dayjs'
+
 import { Link, routes } from '@redwoodjs/router'
-import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 import { QUERY } from 'src/components/User/UsersCell'
-import { toast } from '@redwoodjs/web/toast'
-import { useMutation } from '@redwoodjs/web'
+import { truncate } from 'src/lib/formatters'
 
 const DELETE_USER_MUTATION = gql`
   mutation DeleteUserMutation($id: Int!) {
@@ -43,6 +45,7 @@ const UsersList = ({ users }) => {
             <th>Email</th>
             <th>Name</th>
             <th>Role</th>
+            <th>Expires At</th>
             <th>&nbsp;</th>
           </tr>
         </thead>
@@ -53,6 +56,14 @@ const UsersList = ({ users }) => {
               <td>{truncate(user.email)}</td>
               <td>{truncate(user.name)}</td>
               <td>{truncate(user.role)}</td>
+              <td>
+                {user.expiresAt && (
+                  <>
+                    {dayjs(user.expiresAt).format('L YYYY-MM-DD hh:mm A')} (
+                    {dayjs(user.expiresAt).fromNow()})
+                  </>
+                )}
+              </td>
               <td>
                 <nav className="rw-table-actions">
                   <Link

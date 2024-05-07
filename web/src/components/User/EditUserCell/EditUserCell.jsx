@@ -1,8 +1,8 @@
 import { navigate, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 import UserForm from 'src/components/User/UserForm'
-import { toast } from '@redwoodjs/web/toast'
-import { useMutation } from '@redwoodjs/web'
 
 export const QUERY = gql`
   query EditUserById($id: Int!) {
@@ -11,6 +11,7 @@ export const QUERY = gql`
       email
       name
       role
+      expiresAt
     }
   }
 `
@@ -21,6 +22,7 @@ const UPDATE_USER_MUTATION = gql`
       email
       name
       role
+      expiresAt
     }
   }
 `

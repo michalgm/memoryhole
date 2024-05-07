@@ -9,6 +9,7 @@ export const QUERY = gql`
       email
       name
       role
+      expiresAt
     }
   }
 `

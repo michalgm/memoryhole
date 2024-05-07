@@ -2,8 +2,8 @@ import {
   DbAuthHandler,
   PasswordValidationError,
 } from '@redwoodjs/auth-dbauth-api'
-import { sendReset, tokenExpireHours } from 'src/lib/authHelpers'
 
+import { sendReset, tokenExpireHours } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
 
 const login_expire_hours = 6
@@ -55,9 +55,10 @@ export const handler = async (event, context) => {
     // `{ message: 'Error message' }`
     handler: (user) => {
       const requestOrigin = event.headers['x-forwarded-for'] || event.clientIp
-
-      console.log(requestOrigin)
       // Ensure the login attempt is from localhost
+      if (user.expiresAt && user.expiresAt < Date.now()) {
+        throw Error('Login expired')
+      }
       if (
         user.name.match(/^svc-/) &&
         requestOrigin !== '127.0.0.1' &&
