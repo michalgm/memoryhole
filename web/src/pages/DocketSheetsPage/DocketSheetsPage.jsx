@@ -16,7 +16,7 @@ const DocketSheetsPage = () => {
   const [search, setSearch] = useState({
     days: 1,
     report_type: 'court_date',
-    date: dayjs(),
+    date: dayjs().startOf('day'),
     jurisdiction: '',
     include_contact: false,
   })
@@ -80,7 +80,7 @@ const DocketSheetsPage = () => {
         </Grid2>
       </Paper>
       <DocketSheetCell
-        date={dayjs(search.date)}
+        date={dayjs(search.date).startOf('day')}
         days={search.days}
         jurisdiction={search.jurisdiction}
         report_type={search.report_type}

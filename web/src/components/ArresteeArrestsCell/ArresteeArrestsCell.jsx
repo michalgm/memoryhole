@@ -182,6 +182,8 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
         preColumns={preColumns}
         bulkUpdate={bulkUpdate}
         bulkDelete={bulkDelete}
+        manageViews
+        type="arrestees"
       />
       <BulkUpdateModal
         bulkUpdateRows={bulkUpdateRows}

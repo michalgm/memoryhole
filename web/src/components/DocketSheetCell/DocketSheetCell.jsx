@@ -92,6 +92,7 @@ export const Success = ({
         enableHiding: false,
         enableBottomToolbar: false,
       }}
+      type="docket"
     />
   )
 }

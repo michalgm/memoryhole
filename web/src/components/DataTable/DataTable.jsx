@@ -71,6 +71,8 @@ const DataTable = ({
   actionButtons,
   bulkUpdate,
   bulkDelete,
+  manageViews = false,
+  type = '',
 }) => {
   const initialState = merge(
     {
@@ -95,10 +97,10 @@ const DataTable = ({
   useEffect(() => {
     const sessionState = merge(
       initialState,
-      JSON.parse(sessionStorage.getItem('table_state'))
+      type ? JSON.parse(sessionStorage.getItem(`${type}_table_state`)) : {}
     )
     loadState(sessionState)
-  }, [])
+  }, [type])
 
   const getDefault = (key) => localState[key] || initialState[key]
 
@@ -162,7 +164,16 @@ const DataTable = ({
 
   useEffect(() => {
     if (stateLoaded) {
-      sessionStorage.setItem('table_state', JSON.stringify(state))
+      sessionStorage.setItem(
+        'table_state',
+        JSON.stringify({
+          columnFilters,
+          columnVisibility,
+          globalFilter,
+          sorting,
+          columnOrder,
+        })
+      )
     }
   }, [
     columnFilters,
@@ -222,11 +233,13 @@ const DataTable = ({
             </span>
           </Tooltip>
         )}
-        <ManageViews
-          tableState={state}
-          setTableState={loadState}
-          defaultState={initialState}
-        />
+        {manageViews && (
+          <ManageViews
+            tableState={state}
+            setTableState={loadState}
+            defaultState={initialState}
+          />
+        )}
         {actionButtons && actionButtons(table)}
       </Box>
     ),
