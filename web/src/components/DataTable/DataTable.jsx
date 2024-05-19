@@ -86,6 +86,7 @@ const DataTable = ({
       columnOrder: [{ id: 'date', desc: true }],
       sorting: [],
       globalFilter: '',
+      pagination: { pageSize: 50, pageIndex: 0 },
     },
     tableProps.initialState
   )
@@ -113,6 +114,7 @@ const DataTable = ({
   const [globalFilter, setGlobalFilter] = useState(getDefault('globalFilter '))
   const [sorting, setSorting] = useState(getDefault('sorting'))
   const [columnOrder, setColumnOrder] = useState(getDefault('columnOrder'))
+  const [pagination, setPagination] = useState(getDefault('pagination'))
 
   const loadState = (state) => {
     setColumnFilters(state.columnFilters)
@@ -120,6 +122,7 @@ const DataTable = ({
     setColumnOrder(state.columnOrder)
     setColumnVisibility(state.columnVisibility)
     setSorting(state.sorting)
+    setPagination(state.pagination)
     setLocalState(state)
     setStateLoaded(true)
   }
@@ -160,18 +163,20 @@ const DataTable = ({
     globalFilter,
     sorting,
     columnOrder,
+    pagination,
   }
 
   useEffect(() => {
-    if (stateLoaded) {
+    if (stateLoaded && type) {
       sessionStorage.setItem(
-        'table_state',
+        `${type}_table_state`,
         JSON.stringify({
           columnFilters,
           columnVisibility,
           globalFilter,
           sorting,
           columnOrder,
+          pagination,
         })
       )
     }
@@ -182,6 +187,8 @@ const DataTable = ({
     sorting,
     columnOrder,
     stateLoaded,
+    pagination,
+    type,
   ])
 
   const defaultProps = {
@@ -195,7 +202,7 @@ const DataTable = ({
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     onColumnOrderChange: setColumnOrder,
-
+    onPaginationChange: setPagination,
     muiTableBodyProps: {
       sx: {
         backgroundColor: '#fff',

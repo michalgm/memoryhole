@@ -13,7 +13,6 @@ import { schema } from 'src/lib/ArrestFields'
 import DataTable from '../DataTable/DataTable'
 import BulkUpdateModal from '../utils/BulkUpdateModal'
 import Link from '../utils/Link'
-
 import { useSnackbar } from '../utils/SnackBar'
 
 // import schema from '../../types/graphql'
@@ -164,7 +163,6 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
     initialState: {
       showGlobalFilter: true,
       sorting: [{ id: 'date', desc: false }],
-      pagination: { pageSize: 50, pageIndex: 0 },
       columnPinning: {
         left: ['mrt-row-select', 'arrestee.display_field'],
       },
