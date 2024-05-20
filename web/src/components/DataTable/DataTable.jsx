@@ -131,8 +131,10 @@ const DataTable = ({
   }
 
   const handleExportRows = (data) => {
-    console.log(data)
-    const columns = table.getAllColumns().filter((c) => c.getIsVisible())
+    const columns = table
+      .getVisibleFlatColumns()
+      .sort((a, b) => columnOrder.indexOf(a.id) - columnOrder.indexOf(b.id))
+
     const rows = data.map((row) => {
       return columns.reduce(
         (acc, { columnDef: { id, header, Cell, filterVariant } }, index) => {
@@ -154,7 +156,6 @@ const DataTable = ({
         {}
       )
     })
-    console.log(rows)
     const csv = generateCsv(csvConfig)(rows)
     download(csvConfig)(csv)
   }
