@@ -43,7 +43,7 @@ const fieldMap = {
   prn: 'custom_fields.jail_id',
   docket: 'custom_fields.docket_number',
   court_date: 'custom_fields.next_court_date',
-  // courttime: 'custom_fields.next_court_date',
+  // court_time: 'custom_fields.next_court_date',
   court_location: 'custom_fields.next_court_location',
   lawyer_name: 'custom_fields.lawyer',
   lawyer_contact_info: 'custom_fields.lawyer_contact_info',
@@ -84,7 +84,7 @@ const query = `mutation CreateArresteeArrestMutation($input: CreateArrestInput!)
 //     prn: '12345678',
 //     docket: 'AB-123456',
 //     court_date: '2024-07-20',
-//     courttime: '9:00 AM - Wiley Courthouse',
+//     court_time: '9:00 AM - Wiley Courthouse',
 //     lawyer: '',
 //     notes: 'Thank you',
 //   }
@@ -157,7 +157,7 @@ const importRecord = async (data) => {
     },
   }
   Object.keys(data).forEach((key) => {
-    if (['arrest_time', 'courttime'].includes(key)) {
+    if (['arrest_time', 'court_time'].includes(key)) {
       return
     }
     let val = data[key]
@@ -167,7 +167,7 @@ const importRecord = async (data) => {
         if (key === 'arrest_date') {
           val = combineDateTime(data.arrest_date, data.arrest_time)
         } else if (key == 'court_date') {
-          val = combineDateTime(data.court_date, data.courttime)
+          val = combineDateTime(data.court_date, data.court_time)
         } else if (key == 'birth_date') {
           val = dayjs(val, 'YYYY-MM-DD').format()
         }
