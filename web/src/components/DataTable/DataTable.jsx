@@ -131,6 +131,7 @@ const DataTable = ({
   }
 
   const handleExportRows = (data) => {
+    console.log(data)
     const columns = table.getAllColumns().filter((c) => c.getIsVisible())
     const rows = data.map((row) => {
       return columns.reduce(
@@ -142,11 +143,10 @@ const DataTable = ({
           let value =
             filterVariant === 'date' ? Cell({ cell }) : cell.getValue()
           if (typeof value === 'object') {
-            if (value === null) {
-              value = ''
-            } else {
-              value = 'UNKNOWN'
+            if (value !== null) {
+              console.error(`Unknown value for ${header}`, value)
             }
+            value = ''
           }
           acc[header] = value === null ? '' : value
           return acc
@@ -154,6 +154,7 @@ const DataTable = ({
         {}
       )
     })
+    console.log(rows)
     const csv = generateCsv(csvConfig)(rows)
     download(csvConfig)(csv)
   }
