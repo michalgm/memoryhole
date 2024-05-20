@@ -58,6 +58,9 @@ export const Field = ({
         name={name}
         inputProps={textFieldProps}
         timeSteps={{ minutes: 1 }}
+        slotProps={{
+          field: { clearable: true },
+        }}
       />
     )
   }
