@@ -42,7 +42,10 @@ export const defineColumns = (schema, displayColumns) => {
           return val ? dayjs(val) : null
         }
       }
-      col.Cell = ({ cell }) => cell.getValue() && cell.getValue().format(format)
+      col.Cell = ({ cell }) =>
+        cell.getValue() &&
+        cell.getValue().format &&
+        cell.getValue().format(format)
       col.filterVariant = 'date'
     } else if (type === 'checkbox') {
       col.id = field
@@ -136,8 +139,15 @@ const DataTable = ({
             return acc
           }
           const cell = row.getVisibleCells()[index]
-          const value =
+          let value =
             filterVariant === 'date' ? Cell({ cell }) : cell.getValue()
+          if (typeof value === 'object') {
+            if (value === null) {
+              value = ''
+            } else {
+              value = 'UNKNOWN'
+            }
+          }
           acc[header] = value === null ? '' : value
           return acc
         },
