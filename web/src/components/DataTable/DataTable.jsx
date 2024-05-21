@@ -114,20 +114,6 @@ const DataTable = ({
       const storageState = JSON.parse(
         sessionStorage.getItem(`${type}_table_state`)
       )
-      storageState.columnFilters = (storageState.columnFilters || []).reduce(
-        (acc, { id, value }) => {
-          const colDef = columns.find((c) => c.id === id)
-          if (
-            colDef?.fieldType === 'date' ||
-            colDef?.fieldType === 'date-time'
-          ) {
-            value = dayjs(value)
-          }
-          acc.push({ id, value })
-          return acc
-        },
-        []
-      )
       sessionState = merge(sessionState, storageState)
     }
     loadState(sessionState)
@@ -151,6 +137,17 @@ const DataTable = ({
   )
 
   const loadState = (state) => {
+    state.columnFilters = (state.columnFilters || []).reduce(
+      (acc, { id, value }) => {
+        const colDef = columns.find((c) => c.id === id)
+        if (colDef?.fieldType === 'date' || colDef?.fieldType === 'date-time') {
+          value = dayjs(value)
+        }
+        acc.push({ id, value })
+        return acc
+      },
+      []
+    )
     setColumnFilters(state.columnFilters)
     setGlobalFilter(state.globalFilter)
     setColumnOrder(state.columnOrder)
