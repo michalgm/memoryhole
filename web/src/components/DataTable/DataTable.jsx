@@ -6,6 +6,7 @@ import { download, generateCsv, mkConfig } from 'export-to-csv'
 import { get, merge, sortBy } from 'lodash'
 import { difference } from 'lodash'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
+import { getDefaultColumnFilterFn } from 'material-react-table'
 
 import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/Field'
@@ -37,15 +38,12 @@ export const defineColumns = (schema, displayColumns) => {
       col.accessorFn = (originalRow) => {
         const val = get(originalRow, field)
         if (type == 'date') {
-          return val ? dayjs(val).startOf('day') : null
+          return val ? dayjs(val).startOf('day').toDate() : null
         } else {
-          return val ? dayjs(val) : null
+          return val ? dayjs(val).toDate() : null
         }
       }
-      col.Cell = ({ cell }) =>
-        cell.getValue() &&
-        cell.getValue().format &&
-        cell.getValue().format(format)
+      col.Cell = ({ cell }) => dayjs(cell.getValue()).format(format)
       col.filterVariant = 'date'
     } else if (type === 'checkbox') {
       col.id = field
@@ -77,6 +75,14 @@ const DataTable = ({
   manageViews = false,
   type = '',
 }) => {
+  const columns = useMemo(
+    () => [
+      ...preColumns,
+      ...defineColumns(schema, displayColumns),
+      ...postColumns,
+    ],
+    [preColumns, postColumns, displayColumns, schema]
+  )
   const initialState = merge(
     {
       columnVisibility: Object.keys(schema).reduce((acc, f) => {
@@ -90,6 +96,10 @@ const DataTable = ({
       sorting: [],
       globalFilter: '',
       pagination: { pageSize: 50, pageIndex: 0 },
+      columnFilterFns: columns.reduce((acc, column) => {
+        acc[column.accessorKey] = getDefaultColumnFilterFn(column)
+        return acc
+      }, {}),
     },
     tableProps.initialState
   )
@@ -99,10 +109,27 @@ const DataTable = ({
   const [stateLoaded, setStateLoaded] = useState(false)
 
   useEffect(() => {
-    const sessionState = merge(
-      initialState,
-      type ? JSON.parse(sessionStorage.getItem(`${type}_table_state`)) : {}
-    )
+    let sessionState = initialState
+    if (type) {
+      const storageState = JSON.parse(
+        sessionStorage.getItem(`${type}_table_state`)
+      )
+      storageState.columnFilters = (storageState.columnFilters || []).reduce(
+        (acc, { id, value }) => {
+          const colDef = columns.find((c) => c.id === id)
+          if (
+            colDef?.fieldType === 'date' ||
+            colDef?.fieldType === 'date-time'
+          ) {
+            value = dayjs(value)
+          }
+          acc.push({ id, value })
+          return acc
+        },
+        []
+      )
+      sessionState = merge(sessionState, storageState)
+    }
     loadState(sessionState)
   }, [type])
 
@@ -114,10 +141,14 @@ const DataTable = ({
   const [columnVisibility, setColumnVisibility] = useState(
     getDefault('columnVisibility')
   )
+
   const [globalFilter, setGlobalFilter] = useState(getDefault('globalFilter '))
   const [sorting, setSorting] = useState(getDefault('sorting'))
   const [columnOrder, setColumnOrder] = useState(getDefault('columnOrder'))
   const [pagination, setPagination] = useState(getDefault('pagination'))
+  const [columnFilterFns, setColumnFilterFns] = useState(
+    getDefault('columnFilterFns')
+  )
 
   const loadState = (state) => {
     setColumnFilters(state.columnFilters)
@@ -126,6 +157,7 @@ const DataTable = ({
     setColumnVisibility(state.columnVisibility)
     setSorting(state.sorting)
     setPagination(state.pagination)
+    setColumnFilterFns(state.columnFilterFns)
     setLocalState(state)
     setStateLoaded(true)
   }
@@ -160,15 +192,6 @@ const DataTable = ({
     download(csvConfig)(csv)
   }
 
-  const columns = useMemo(
-    () => [
-      ...preColumns,
-      ...defineColumns(schema, displayColumns),
-      ...postColumns,
-    ],
-    [preColumns, postColumns, displayColumns, schema]
-  )
-
   const state = {
     columnFilters,
     columnVisibility,
@@ -176,6 +199,7 @@ const DataTable = ({
     sorting,
     columnOrder,
     pagination,
+    columnFilterFns,
   }
 
   useEffect(() => {
@@ -189,6 +213,7 @@ const DataTable = ({
           sorting,
           columnOrder,
           pagination,
+          columnFilterFns,
         })
       )
     }
@@ -200,6 +225,7 @@ const DataTable = ({
     columnOrder,
     stateLoaded,
     pagination,
+    columnFilterFns,
     type,
   ])
 
@@ -210,6 +236,7 @@ const DataTable = ({
     enableStickyHeader: true,
     getRowId: (originalRow) => originalRow.id,
     onColumnFiltersChange: setColumnFilters,
+    onColumnFilterFnsChange: setColumnFilterFns,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
@@ -319,6 +346,7 @@ const DataTable = ({
   const table = useMaterialReactTable(properties)
   // const currentTableState = table.getState()
   // console.log('live', currentTableState.sorting[0])
+  // console.log(state.columnFilterFns) // console.log(columns, { columnFilterFns })
 
   return <MaterialReactTable table={table} />
 }
