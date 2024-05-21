@@ -1,17 +1,19 @@
 import * as React from 'react'
 
+import PersonIcon from '@mui/icons-material/Person'
 import { Container, Tooltip } from '@mui/material'
-import { NavLink, routes, useMatch, useRouteName } from '@redwoodjs/router'
-
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import PersonIcon from '@mui/icons-material/Person'
-import QuickSearch from 'src/components/utils/QuickSearch'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { theme } from '../../App'
+
+import { NavLink, routes, useMatch, useRouteName } from '@redwoodjs/router'
+
 import { useAuth } from 'src/auth'
+import QuickSearch from 'src/components/utils/QuickSearch'
+
+import { theme } from '../../App'
 
 const CustomLink = ({ to, ...rest }) => {
   const matchInfo = useMatch(to)
@@ -47,7 +49,7 @@ const BlogLayout = ({ children }) => {
     <>
       <header>
         <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static" enableColorOnDark>
+          <AppBar position="fixed" enableColorOnDark>
             <Toolbar>
               <Typography
                 variant="h5"
@@ -86,8 +88,10 @@ const BlogLayout = ({ children }) => {
           </AppBar>
         </Box>
       </header>
-      <Box component="main" sx={{ p: 3 }}>
-        <Container maxWidth={routeName === 'home'? false : 'lg'}>{children}</Container>
+      <Box component="main" sx={{ p: 3, mt: 8 }}>
+        <Container maxWidth={routeName === 'home' ? false : 'lg'}>
+          {children}
+        </Container>
       </Box>
     </>
   )
