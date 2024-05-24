@@ -82,7 +82,10 @@ const ArrestFields = [
         'arrestee.custom_fields.legal_name_confidential',
         { label: 'keep_legal_name_confidential', field_type: 'checkbox' },
       ],
-      ['custom_fields.needs_review', { field_type: 'checkbox' }],
+      [
+        'custom_fields.needs_review',
+        { field_type: 'checkbox', default: false },
+      ],
       [
         'arrestee.custom_fields.arrestee_notes',
         { field_type: 'textarea', span: 12 },
