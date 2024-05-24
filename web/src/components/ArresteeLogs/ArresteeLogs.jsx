@@ -20,6 +20,7 @@ import {
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 
 import dayjs from '../../../../api/src/lib/day'
+import RichTextInput from '../utils/RichTextInput'
 
 import ArresteeLogsForm from './ArresteeLogsForm'
 
@@ -130,7 +131,7 @@ const ArresteeLogs = ({ logs, arrestee_id, refetch }) => {
                 </Typography>
                 <Tooltip title="Edit Log">
                   <IconButton onClick={() => setEditItem(item.id)}>
-                      <Edit sx={{ fontSize: 16 }} color="secondary" />{' '}
+                    <Edit sx={{ fontSize: 16 }} color="secondary" />{' '}
                   </IconButton>
                 </Tooltip>
               </Grid>
@@ -150,9 +151,7 @@ const ArresteeLogs = ({ logs, arrestee_id, refetch }) => {
                 </Grid>
               )}
               <Divider sx={{ mb: 1 }} />
-              <Typography sx={{ whiteSpace: 'break-spaces' }} variant="body2">
-                {item.notes}
-              </Typography>
+              <RichTextInput editable={false} content={item.notes} />
             </>
           )}
         </LogContainer>

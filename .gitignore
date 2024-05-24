@@ -22,3 +22,4 @@ api/src/lib/generateGraphiQLHeader.*
 !.yarn/sdks
 !.yarn/versions
 tryouts/
+deploy.toml

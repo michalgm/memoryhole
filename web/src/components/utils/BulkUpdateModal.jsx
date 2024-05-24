@@ -59,9 +59,15 @@ const BulkUpdateModal = ({
           </Typography>
 
           {...getValues().fields.map(({ field_name, field_value }) => {
+            let value = field_value
+            switch (typeof field_value) {
+              case 'boolean':
+                value = field_value ? 'Yes' : 'No'
+                break
+            }
             return (
               <Typography key={field_name}>
-                <b>{fieldLabel(field_name)}:</b> {field_value}
+                <b>{fieldLabel(field_name)}:</b> {value}
               </Typography>
             )
           })}

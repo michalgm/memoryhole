@@ -1,57 +1,63 @@
 import { useState } from 'react'
 
-import { Add, Edit, ExpandMore, FilterList } from '@mui/icons-material'
+import { Add, Edit, FilterList } from '@mui/icons-material'
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Button,
-  Divider,
-  IconButton,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
   InputAdornment,
+  Stack,
   TextField,
   Tooltip,
-  Typography,
 } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
+
+import RichTextInput from '../utils/RichTextInput'
 
 import HotlineLogsForm from './HotlineLogsForm'
 
 const Log = ({ log, setEditItem }) => {
   return (
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMore />} sx={{ mb: 0 }}>
-        <Grid2 container spacing={0} sx={{ alignItems: 'center' }} xs={12}>
-          <Typography variant="h6" sx={{ width: '40%', flexShrink: 0 }}>
-            {dayjs(log.start_time).format('MM/DD/YY, LT')}
-            &nbsp;&mdash;&nbsp;
-            {dayjs(log.end_time).format('MM/DD/YY, LT')}
-          </Typography>
-          <Typography variant="subtitle1" sx={{ color: 'GrayText' }}>
-            Created by {log?.created_by?.name}
-          </Typography>
-        </Grid2>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Divider />
-        <Typography
-          variant="body1"
-          component="div"
-          sx={{ whiteSpace: 'break-spaces', position: 'relative', pt: 2 }}
-        >
-          <Box sx={{ position: 'absolute', top: 10, right: 10 }}>
-            <Tooltip title="Edit Log">
-              <IconButton onClick={() => setEditItem(log.id)}>
-                <Edit color="secondary" />
-              </IconButton>
-            </Tooltip>
+    <Card>
+      <CardHeader
+        title={
+          <>
+            {dayjs(log.start_time).format('MM/DD/YY LT')}
+            <>&nbsp;&mdash;&nbsp;</>
+            {dayjs(log.end_time).format('MM/DD/YY LT')}
+          </>
+        }
+        subheader={`Created by ${log?.created_by?.name}`} // | Updated by ${log?.created_by?.name}`}
+      ></CardHeader>
+      <CardContent>
+        {/* <Divider /> */}
+        <Stack direction={'row'}>
+          <Box xs={11} overflow={'hidden'}>
+            <RichTextInput
+              sx={{ width: '100%' }}
+              content={log.notes}
+              editable={false}
+            />
           </Box>
-          {log.notes}
-        </Typography>
-      </AccordionDetails>
-    </Accordion>
+        </Stack>
+      </CardContent>
+      <CardActions sx={{ justifyContent: 'end' }}>
+        <Tooltip title="Edit Log">
+          <Button
+            onClick={() => setEditItem(log.id)}
+            variant="contained"
+            color="secondary"
+            startIcon={<Edit />}
+          >
+            Edit Log
+          </Button>
+        </Tooltip>
+      </CardActions>
+    </Card>
   )
 }
 
@@ -97,8 +103,12 @@ const HotlineLogs = ({ hotlineLogs = [], refetch }) => {
             Add Log
           </Button>
         </Grid2>
-        {editItem === 'new' && <HotlineLogsForm callback={onCreate} />}
       </Grid2>
+      {editItem === 'new' && (
+        <Grid2>
+          <HotlineLogsForm callback={onCreate} />
+        </Grid2>
+      )}
       {filteredLogs.map((log) => {
         return (
           <Grid2 key={log.id} xs={12}>
