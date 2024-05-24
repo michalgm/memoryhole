@@ -17,6 +17,8 @@ import {
   useFormContext,
 } from 'react-hook-form-mui'
 
+import RichTextInput from './RichTextInput'
+
 export const formatLabel = (label) => {
   const index = label.lastIndexOf('.')
   return label
@@ -34,7 +36,7 @@ export const Field = ({
   helperText = '',
   ...props
 }) => {
-  const { setValue } = useFormContext()
+  const { setValue, getValues } = useFormContext()
 
   props.label = props.label || formatLabel(name)
 
@@ -92,6 +94,19 @@ export const Field = ({
       />
     )
   }
+
+  const renderRichTextField = () => {
+    const textFieldOptions = {
+      multiline: true,
+      minRows: props.minRows || 3,
+      content: getValues(name),
+      onChange: (value) => setValue(name, value),
+    }
+    return (
+      <RichTextInput {...textFieldProps} {...textFieldOptions} {...props} />
+    )
+  }
+
   const renderTextField = () => {
     const textFieldOptions =
       field_type === 'textarea'
@@ -155,7 +170,6 @@ export const Field = ({
     //   />
     // </FormGroup>
   }
-
   switch (field_type) {
     case 'checkbox':
       return renderCheckbox()
@@ -169,6 +183,8 @@ export const Field = ({
       return renderDatePicker()
     case 'select':
       return renderAutocomplete()
+    case 'richtext':
+      return renderRichTextField()
     case 'textarea':
     default:
       return renderTextField()

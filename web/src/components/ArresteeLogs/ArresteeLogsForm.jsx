@@ -84,7 +84,7 @@ const ArresteeLogsForm = ({
           </Grid>
           <Grid xs={12}>
             <Field
-              field_type="textarea"
+              field_type="richtext"
               name="notes"
               multiline
               minRows={log_id ? 1 : 5}
