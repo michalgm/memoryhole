@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@redwoodjs/api": "7.5.1",
-    "@redwoodjs/auth-dbauth-api": "7.5.1",
-    "@redwoodjs/graphql-server": "7.5.1",
+    "@redwoodjs/api": "7.6.2",
+    "@redwoodjs/auth-dbauth-api": "7.6.2",
+    "@redwoodjs/graphql-server": "7.6.2",
     "nodemailer": "^6.9.13"
   }
 }
