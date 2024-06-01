@@ -10,6 +10,8 @@ import {
   Typography,
 } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import dayjs from 'dayjs'
+import { isBoolean } from 'lodash'
 import { useConfirm } from 'material-ui-confirm'
 import { set, useFieldArray, useForm } from 'react-hook-form'
 import { FormContainer } from 'react-hook-form-mui'
@@ -60,10 +62,13 @@ const BulkUpdateModal = ({
 
           {...getValues().fields.map(({ field_name, field_value }) => {
             let value = field_value
-            switch (typeof field_value) {
-              case 'boolean':
-                value = field_value ? 'Yes' : 'No'
-                break
+
+            if (isBoolean(value)) {
+              value = field_value ? 'Yes' : 'No'
+            } else if (dayjs.isDayjs(value)) {
+              value = dayjs(value).format('L hh:mm A')
+            } else if (typeof value === 'object') {
+              value = 'ERROR - unknown type'
             }
             return (
               <Typography key={field_name}>
