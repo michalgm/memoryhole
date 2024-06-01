@@ -5,12 +5,16 @@ const { wrapper } = require('axios-cookiejar-support')
 const dayjs = require('dayjs')
 const customParseFormat = require('dayjs/plugin/customParseFormat')
 const apiHost = process.env.PUBLIC_URL
+const timezone = require('dayjs/plugin/timezone')
+const utc = require('dayjs/plugin/utc')
 const { set } = require('lodash')
 const { CookieJar } = require('tough-cookie')
 
 const cookieJar = new CookieJar()
 
 dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const axiosInstance = wrapper(
   axios.create({
@@ -92,7 +96,10 @@ const query = `mutation CreateArresteeArrestMutation($input: CreateArrestInput!)
 let id = null
 
 const combineDateTime = (date, time) => {
-  return dayjs(`${date} ${time}`, 'YYYY-MM-DD hh:mm A').format()
+  return dayjs
+    .tz(`${date} ${time}`, 'YYYY-MM-DD hh:mm A', 'America/Los_Angeles')
+    .utc()
+    .format()
 }
 
 const apiRequest = async (url, data, method = 'post') => {
