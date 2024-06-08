@@ -12,12 +12,12 @@
   },
   "dependencies": {
     "@emotion/styled": "^11.11.5",
-    "@mui/icons-material": "^5.15.18",
-    "@mui/material": "^5.15.18",
-    "@redwoodjs/auth-dbauth-web": "7.6.2",
-    "@redwoodjs/forms": "7.6.2",
-    "@redwoodjs/router": "7.6.2",
-    "@redwoodjs/web": "7.6.2",
+    "@mui/icons-material": "^5.15.19",
+    "@mui/material": "^5.15.19",
+    "@redwoodjs/auth-dbauth-web": "7.6.3",
+    "@redwoodjs/forms": "7.6.3",
+    "@redwoodjs/router": "7.6.3",
+    "@redwoodjs/web": "7.6.3",
     "@tiptap/core": "^2.4.0",
     "@tiptap/extension-heading": "^2.4.0",
     "@tiptap/extension-image": "^2.4.0",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@emotion/react": "^11.11.4",
-    "@redwoodjs/vite": "7.6.2",
+    "@redwoodjs/vite": "7.6.3",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0"
   }
