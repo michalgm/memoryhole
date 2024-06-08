@@ -30,6 +30,9 @@ export const QUERY = gql`
         preferred_name
         pronoun
         dob
+        phone_1
+        phone_2
+        email
       }
     }
   }
