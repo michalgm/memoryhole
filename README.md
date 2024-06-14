@@ -37,7 +37,7 @@ Note - the dev setup is not secure and should not be used with actual arrestee d
 
 The app will start on `http://localhost:8910/`, and you can log in using the email and password you set in `.env`
 
-### dDeployment
+### Deployment
 
 make sure you have a `deploy.toml` file in the root directory with info about the deploy targets.
 
@@ -45,3 +45,9 @@ Deployments will deploy the code from github in the `main` brach, so make sure t
 
 - to deploy to staging, run `yarn rw deploy baremetal staging`
 - to deploy to production, run `yarn rw deploy baremetal production`
+
+### managing deploys
+
+- you can restart deploys by ssh-ing to the server and running `pm2 restart [prod|stage]` (depending on which instance you want to restart)
+- you can see the current status with `pm2 status`
+- you can view logs view `pm2 logs [prod|stage]`
