@@ -1,9 +1,11 @@
-import { hashPassword, hashToken } from '@redwoodjs/auth-dbauth-api/'
-
 import crypto from 'crypto'
+
 import md5 from 'md5'
-import { sendEmail } from 'src/lib/email'
 import { v4 as uuidv4 } from 'uuid'
+
+import { hashPassword, hashToken } from '@redwoodjs/auth-dbauth-api'
+
+import { sendEmail } from 'src/lib/email'
 
 export const tokenExpireHours = 24
 
@@ -16,7 +18,7 @@ export const sanitize = (user) => {
 
 export const sendReset = async (user, resetToken, newUser = false) => {
   const reason = newUser
-    ? `A new account was created on the Memoryhole Legal Support Database for thie email address (${user.email})`
+    ? `A new account was created on the Memoryhole Legal Support Database for the email address (${user.email})`
     : `The Memoryhole Legal Support Database received a request to reset the password associated with this email address (${user.email}) `
   const text = `Hello ${user.name},
 ${reason}

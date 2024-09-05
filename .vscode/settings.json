@@ -12,5 +12,6 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[dotenv]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
-  }
+  },
+  "cSpell.words": ["Memoryhole", "redwoodjs"]
 }
