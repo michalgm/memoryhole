@@ -1,19 +1,15 @@
-import { useState } from 'react'
-
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
-import dayjs from 'dayjs'
-import { useConfirm } from 'material-ui-confirm'
-
-import { routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/dist/toast'
-
-import { schema } from 'src/lib/ArrestFields'
-
-import DataTable from '../DataTable/DataTable'
 import BulkUpdateModal from '../utils/BulkUpdateModal'
+import DataTable from '../DataTable/DataTable'
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import Link from '../utils/Link'
+import dayjs from 'dayjs'
+import { routes } from '@redwoodjs/router'
+import { schema } from 'src/lib/ArrestFields'
+import { toast } from '@redwoodjs/web/toast'
+import { useConfirm } from 'material-ui-confirm'
+import { useMutation } from '@redwoodjs/web'
 import { useSnackbar } from '../utils/SnackBar'
+import { useState } from 'react'
 
 // import schema from '../../types/graphql'
 
