@@ -8,7 +8,7 @@ import Button from '@mui/material/Button'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 
-import { NavLink, routes, useMatch, useRouteName } from '@redwoodjs/router'
+import { Link, routes, useMatch, useRouteName } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
 import QuickSearch from 'src/components/utils/QuickSearch'
@@ -21,16 +21,20 @@ const CustomLink = ({ to, ...rest }) => {
 
   const props = {
     color: 'inherit',
+    sx: {
+      '&:hover': 'underline',
+    },
   }
   if (isActive) {
     // props.color = 'secondary'
     props.sx = {
+      ...props.sx,
       textDecoration: 'underline',
       textDecorationColor: theme.palette.secondary.main,
       textDecorationThickness: 3,
     }
   }
-  return <Button component={NavLink} to={to} {...rest} {...props} />
+  return <Button component={Link} to={to} {...rest} {...props} />
 }
 
 const BlogLayout = ({ children }) => {
@@ -50,7 +54,7 @@ const BlogLayout = ({ children }) => {
       <header>
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="fixed" enableColorOnDark>
-            <Toolbar>
+            <Toolbar className="navbar">
               <Typography
                 variant="h5"
                 noWrap
