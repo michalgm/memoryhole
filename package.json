@@ -10,9 +10,9 @@
     "@babel/eslint-plugin": "^7.25.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@redwoodjs/auth-dbauth-setup": "8.0.0",
-    "@redwoodjs/cli-data-migrate": "8.0.0",
-    "@redwoodjs/core": "8.0.0",
+    "@redwoodjs/auth-dbauth-setup": "8.1.1",
+    "@redwoodjs/cli-data-migrate": "8.1.1",
+    "@redwoodjs/core": "8.1.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.30.0",
@@ -35,8 +35,7 @@
     }
   },
   "engines": {
-    "node": "=18.x",
-    "yarn": ">=1.15"
+    "node": "=20.x"
   },
   "prisma": {
     "seed": "yarn rw exec seed",
@@ -45,17 +44,17 @@
   "version": "0.1.2",
   "packageManager": "yarn@4.4.0",
   "dependencies": {
-    "@fontsource/roboto": "^5.0.14",
+    "@fontsource/roboto": "^5.0.15",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "@mui/x-date-pickers": "^6.20.2",
-    "@redwoodjs/eslint-config": "8.0.0",
+    "@redwoodjs/eslint-config": "8.1.1",
     "@tiptap/extension-link": "^2.6.6",
     "@tiptap/extension-task-item": "^2.6.6",
     "@tiptap/extension-task-list": "^2.6.6",
     "@tiptap/extension-text-align": "^2.6.6",
     "@tiptap/extension-underline": "^2.6.6",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.5.0",
     "axios": "^1.7.7",
     "axios-cookiejar-support": "^5.0.2",
     "dayjs": "^1.11.13",
