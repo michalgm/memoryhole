@@ -11,30 +11,30 @@
     ]
   },
   "dependencies": {
-    "@emotion/styled": "^11.11.5",
-    "@mui/icons-material": "^5.15.19",
-    "@mui/material": "^5.15.19",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
     "@redwoodjs/auth-dbauth-web": "8.0.0",
     "@redwoodjs/forms": "8.0.0",
     "@redwoodjs/router": "8.0.0",
     "@redwoodjs/web": "8.0.0",
-    "@tiptap/core": "^2.4.0",
-    "@tiptap/extension-heading": "^2.4.0",
-    "@tiptap/extension-image": "^2.4.0",
-    "@tiptap/extension-table": "^2.4.0",
-    "@tiptap/pm": "^2.4.0",
-    "@tiptap/react": "^2.4.0",
-    "@tiptap/starter-kit": "^2.4.0",
+    "@tiptap/core": "^2.6.6",
+    "@tiptap/extension-heading": "^2.6.6",
+    "@tiptap/extension-image": "^2.6.6",
+    "@tiptap/extension-table": "^2.6.6",
+    "@tiptap/pm": "^2.6.6",
+    "@tiptap/react": "^2.6.6",
+    "@tiptap/starter-kit": "^2.6.6",
     "humanize-string": "2.1.0",
-    "mui-tiptap": "^1.9.0",
+    "mui-tiptap": "^1.10.0",
     "prop-types": "15.8.1",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@emotion/react": "^11.11.4",
+    "@emotion/react": "^11.13.3",
     "@redwoodjs/vite": "8.0.0",
-    "@types/react": "18.3.3",
+    "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0"
   }
 }
