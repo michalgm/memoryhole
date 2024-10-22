@@ -14,10 +14,10 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
-    "@redwoodjs/auth-dbauth-web": "8.1.1",
-    "@redwoodjs/forms": "8.1.1",
-    "@redwoodjs/router": "8.1.1",
-    "@redwoodjs/web": "8.1.1",
+    "@redwoodjs/auth-dbauth-web": "8.4.0",
+    "@redwoodjs/forms": "8.4.0",
+    "@redwoodjs/router": "8.4.0",
+    "@redwoodjs/web": "8.4.0",
     "@tiptap/core": "^2.6.6",
     "@tiptap/extension-heading": "^2.6.6",
     "@tiptap/extension-image": "^2.6.6",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@emotion/react": "^11.13.3",
-    "@redwoodjs/vite": "8.1.1",
+    "@redwoodjs/vite": "8.4.0",
     "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0"
   }
