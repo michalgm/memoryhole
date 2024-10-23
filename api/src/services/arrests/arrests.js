@@ -5,7 +5,7 @@ import { validate, validateWithSync } from '@redwoodjs/api'
 import { db } from 'src/lib/db'
 
 import dayjs from '../../lib/day'
-import { updateDisplayField as updateAresteeDisplayField } from '../arrestees/arrestees'
+import { updateDisplayField as updateArresteeDisplayField } from '../arrestees/arrestees'
 
 // import localizedFormat from 'dayjs/plugin/localizedFormat'
 
@@ -135,7 +135,7 @@ const updateDisplayField = (arrest) => {
 
 export const createArrest = ({ input: { arrestee, ...arrest } }) => {
   updateDisplayField(arrest)
-  updateAresteeDisplayField(arrestee)
+  updateArresteeDisplayField(arrestee)
 
   return db.arrest.create({
     data: {
@@ -166,7 +166,7 @@ export const updateArrest = ({
     }
   })
   updateDisplayField(input)
-  updateAresteeDisplayField(arrestee)
+  updateArresteeDisplayField(arrestee)
 
   return db.arrest.update({
     data: {
