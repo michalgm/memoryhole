@@ -46,7 +46,7 @@ const BlogLayout = ({ children }) => {
     ['hotlineLogs', 'Hotline Logs'],
     ['docketSheets', 'Docket Sheets'],
   ]
-  if (currentUser && currentUser) {
+  if (currentUser && currentUser.roles.includes('Admin')) {
     pages.push(['admin', 'Admin'])
   }
   return (
