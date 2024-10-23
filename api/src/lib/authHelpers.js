@@ -20,19 +20,24 @@ export const sendReset = async (user, resetToken, newUser = false) => {
   const reason = newUser
     ? `A new account was created on the Memoryhole Legal Support Database for the email address (${user.email})`
     : `The Memoryhole Legal Support Database received a request to reset the password associated with this email address (${user.email}) `
+  const action = `${newUser ? '' : 're'}set`
+  const subject = newUser
+    ? 'New Memoryhole Database Account'
+    : 'Memoryhole Database Password Reset'
+
   const text = `Hello ${user.name},
 ${reason}
-Please follow the link below to reset your password:
+Please follow the link below to ${action} your password:
 ${process.env.PUBLIC_URL}/reset-password?resetToken=${resetToken}
 
-This password reset link will expire in ${tokenExpireHours} hours. If you do not complete the process before then, you will need to start the password reset process again:
+This password ${action} link will expire in ${tokenExpireHours} hours. If you do not complete the process before then, you will need to start the password reset process again:
 ${process.env.PUBLIC_URL}/forgot-password
 
 Please do not reply to this email as it is sent from an unmonitored mailbox.`
 
   await sendEmail({
     to: user.email,
-    subject: 'Memoryhole Database Password Reset',
+    subject,
     text,
   })
   return user
