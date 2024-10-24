@@ -75,8 +75,7 @@ const ArrestFields = [
     fields: [
       ['arrestee.first_name', { label: 'legal_first_name' }],
       ['arrestee.last_name', { label: 'legal_last_name' }],
-      ['arrestee.first_name'],
-      ['arrestee.last_name'],
+      // ['action_id', { type: 'number', field_type: 'action_chooser' }],
       ['arrestee.preferred_name'],
       ['arrestee.pronoun', { label: 'pronouns' }],
       ['arrestee.dob', { label: 'date of birth', field_type: 'date' }],
