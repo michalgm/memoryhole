@@ -156,11 +156,14 @@ export const Field = ({
 
   const renderCheckbox = () => {
     return (
-      <CheckboxElement
-        name={`${name}`}
-        sx={{ p: 0, pr: 1, pl: 1 }}
-        label={props.label}
-      />
+      <FormGroup>
+        <CheckboxElement
+          name={`${name}`}
+          sx={{ p: 0, pr: 1, pl: 1 }}
+          label={props.label}
+        />
+        <FormHelperText>{helperText}</FormHelperText>
+      </FormGroup>
     )
     // return <FormGroup>
     //   <FormControlLabel
