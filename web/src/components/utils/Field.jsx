@@ -24,7 +24,9 @@ export const formatLabel = (label) => {
   return label
     .slice(index + 1)
     .replace(/_/g, ' ')
-    .replace(/\w+/g, capitalize)
+    .replace(/\w+/g, (word) => {
+      return ['and'].includes(word) ? word : capitalize(word)
+    })
     .replace(/\b(bipoc|id\/pfn)\b/gi, (s) => s.toUpperCase())
 }
 
