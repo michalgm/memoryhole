@@ -73,6 +73,8 @@ const ArrestFields = [
   {
     title: 'Arrestee',
     fields: [
+      ['arrestee.first_name', { label: 'legal_first_name' }],
+      ['arrestee.last_name', { label: 'legal_last_name' }],
       ['arrestee.first_name'],
       ['arrestee.last_name'],
       ['arrestee.preferred_name'],
@@ -84,8 +86,13 @@ const ArrestFields = [
       ],
       [
         'custom_fields.needs_review',
-        { field_type: 'checkbox', default: false },
+        {
+          field_type: 'checkbox',
+          helperText: '(For verification of auto-imported arrest records)',
+          default: false,
+        },
       ],
+      ['custom_fields.has_completed_outtake_form', { field_type: 'checkbox' }],
       [
         'arrestee.custom_fields.arrestee_notes',
         { field_type: 'textarea', span: 12 },
@@ -93,7 +100,7 @@ const ArrestFields = [
     ],
   },
   {
-    title: 'Risk Identifiers',
+    title: 'Triage Issues',
     fields: [
       ['arrestee.custom_fields.bipoc', { field_type: 'checkbox' }],
       ['arrestee.custom_fields.trans/non-binary', { field_type: 'checkbox' }],
@@ -105,13 +112,17 @@ const ArrestFields = [
       ],
       ['arrestee.custom_fields.legal_history', { field_type: 'checkbox' }],
       ['arrestee.custom_fields.minor', { field_type: 'checkbox' }],
-      ['arrestee.custom_fields.disablity', { field_type: 'checkbox' }],
+      ['arrestee.custom_fields.disability', { field_type: 'checkbox' }],
       ['arrestee.custom_fields.felony_charges', { field_type: 'checkbox' }],
+      [
+        'arrestee.custom_fields.violent_arrest',
+        { field_type: 'checkbox', label: 'Violent/Targeted Arrest' },
+      ],
 
       // [],
       [
         'arrestee.custom_fields.risk_identifier_notes',
-        { field_type: 'textarea', span: 12 },
+        { field_type: 'textarea', span: 12, label: 'triage_issues_notes' },
       ],
     ],
   },
@@ -185,6 +196,14 @@ const ArrestFields = [
       ['custom_fields.badge_number'],
       ['custom_fields.police_report_number'],
       ['charges', { field_type: 'textarea' }],
+      [
+        'custom_fields.arrest_witnesses',
+        {
+          field_type: 'textarea',
+          span: 12,
+          label: 'Arrest Witnesses and Contact Info',
+        },
+      ],
       ['custom_fields.arrest_notes', { field_type: 'textarea', span: 12 }],
     ],
   },
@@ -225,6 +244,7 @@ const ArrestFields = [
           default: 'Unknown/In Custody',
         },
       ],
+      ['custom_fields.bail_notes', { field_type: 'textarea', span: 12 }],
       ['custom_fields.jail_notes', { field_type: 'textarea', span: 12 }],
     ],
   },
@@ -296,7 +316,12 @@ const ArrestFields = [
         },
       ],
       ['custom_fields.next_court_date', { field_type: 'date-time' }],
-      ['custom_fields.next_court_location'],
+      [
+        'custom_fields.next_court_location',
+        {
+          helperText: '(Court name and room)',
+        },
+      ],
       ['custom_fields.lawyer'],
       ['custom_fields.lawyer_contact_info'],
       ['custom_fields.case_notes', { field_type: 'textarea', span: 12 }],
