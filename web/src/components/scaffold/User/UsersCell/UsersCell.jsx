@@ -1,6 +1,6 @@
 import { Link, routes } from '@redwoodjs/router'
 
-import Users from 'src/components/User/Users'
+import Users from 'src/components/scaffold/User/Users/Users'
 
 export const QUERY = gql`
   query FindUsers {

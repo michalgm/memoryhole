@@ -17,6 +17,8 @@ export const schema = gql`
     citation_number: String
     arrestee: Arrestee
     arrestee_id: Int
+    action: Action
+    action_id: Int
     custom_fields: JSON
     created_at: DateTime
     created_by: User
@@ -50,6 +52,7 @@ export const schema = gql`
     jurisdiction: String
     citation_number: String
     arrestee_id: Int
+    action_id: Int
     custom_fields: JSON
     created_by_id: Int
     updated_by_id: Int
@@ -66,6 +69,7 @@ export const schema = gql`
     jurisdiction: String
     citation_number: String
     arrestee_id: Int
+    action_id: Int
     custom_fields: JSON
     created_by_id: Int
     updated_by_id: Int

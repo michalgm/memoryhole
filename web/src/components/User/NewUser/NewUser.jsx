@@ -1,8 +1,8 @@
-import { navigate, routes } from "@redwoodjs/router";
-import { useMutation } from "@redwoodjs/web";
-import { toast } from "@redwoodjs/web/toast";
+import { navigate, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
-import UserForm from "src/components/User/UserForm";
+import UserForm from 'src/components//User/UserForm/UserForm'
 
 const CREATE_USER_MUTATION = gql`
   mutation CreateUserMutation($input: CreateUserInput!) {
@@ -10,24 +10,29 @@ const CREATE_USER_MUTATION = gql`
       id
       name
       email
+      role
+      action_ids
+      arrest_date_max
+      arrest_date_min
+      expiresAt
     }
   }
-`;
+`
 
 const NewUser = () => {
   const [createUser, { loading, error }] = useMutation(CREATE_USER_MUTATION, {
     onCompleted: async ({ createUser: user }) => {
-      toast.success("User created");
-      navigate(routes.user({ id: user.id }));
+      toast.success('User created')
+      navigate(routes.user({ id: user.id }))
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message)
     },
-  });
+  })
 
   const onSave = (input) => {
-    createUser({ variables: { input } });
-  };
+    createUser({ variables: { input } })
+  }
 
   return (
     <div className="rw-segment">
@@ -38,7 +43,7 @@ const NewUser = () => {
         <UserForm onSave={onSave} loading={loading} error={error} />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default NewUser;
+export default NewUser

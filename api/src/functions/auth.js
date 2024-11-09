@@ -126,15 +126,15 @@ export const handler = async (event, context) => {
     // `signUp()` function in the form of: `{ message: 'String here' }`.
     handler: ({ username, hashedPassword, salt, userAttributes }) => {
       return false
-      return db.user.create({
-        data: {
-          email: username,
-          hashedPassword: hashedPassword,
-          salt: salt,
-          name: userAttributes.name,
-          role: userAttributes.role,
-        },
-      })
+      // return db.user.create({
+      //   data: {
+      //     email: username,
+      //     hashedPassword: hashedPassword,
+      //     salt: salt,
+      //     name: userAttributes.name,
+      //     role: userAttributes.role,
+      //   },
+      // })
     },
 
     // Include any format checks for password here. Return `true` if the

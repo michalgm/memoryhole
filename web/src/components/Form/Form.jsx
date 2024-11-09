@@ -8,7 +8,6 @@ const Form = ({
   onCancel,
   children,
   loading,
-
   submitText = 'Save',
   error,
 }) => {

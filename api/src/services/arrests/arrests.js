@@ -1,6 +1,7 @@
 import { merge } from 'lodash'
 
 import { validate, validateWithSync } from '@redwoodjs/api'
+import { ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
 
@@ -9,8 +10,72 @@ import { updateDisplayField as updateArresteeDisplayField } from '../arrestees/a
 
 // import localizedFormat from 'dayjs/plugin/localizedFormat'
 
+const checkArrestAccess = (arrest) => {
+  const {
+    action_ids = [],
+    arrest_date_min,
+    arrest_date_max,
+  } = context.currentUser
+
+  if (arrest_date_min && arrest.date < arrest_date_min) {
+    throw new ForbiddenError(
+      `Arrest date ${arrest.date} is before your minimum access date ${arrest_date_min}`
+    )
+  }
+  if (arrest_date_max && arrest.date > arrest_date_max) {
+    throw new ForbiddenError(
+      `Arrest date ${arrest.date} is after your maximum access date ${arrest_date_max}`
+    )
+  }
+  if (action_ids.length === 0) return true
+
+  if (!arrest.action_id || !action_ids.includes(arrest.action_id)) {
+    throw new ForbiddenError(`You don't have access to arrest id ${arrest.id}`)
+  }
+}
+
+const checkArrestsAccess = async (ids) => {
+  const arrests = await db.arrest.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, action_id: true, date: true },
+  })
+
+  arrests.forEach((arrest) => {
+    checkArrestAccess(arrest)
+  })
+  return arrests
+}
+
+const filterAccess = (baseWhere = {}) => {
+  const {
+    action_ids = [],
+    arrest_date_min,
+    arrest_date_max,
+  } = context.currentUser
+  const where = { ...baseWhere }
+
+  if (arrest_date_min || arrest_date_max) {
+    where.date = {
+      ...where.date,
+      ...(arrest_date_min && { gte: arrest_date_min }),
+      ...(arrest_date_max && { lte: arrest_date_max }),
+    }
+  }
+
+  if (action_ids.length > 0) {
+    where.action_id = {
+      ...where.action_id,
+      in: action_ids,
+    }
+  }
+
+  return where
+}
+
 export const arrests = () => {
-  return db.arrest.findMany()
+  return db.arrest.findMany({
+    where: filterAccess({}),
+  })
 }
 
 export const filterArrests = ({ filters = [] }) => {
@@ -38,27 +103,30 @@ export const filterArrests = ({ filters = [] }) => {
   })
 
   return db.arrest.findMany({
-    where,
+    where: filterAccess(where),
   })
 }
-export const arrest = ({ id }) => {
-  return db.arrest.findUnique({
+export const arrest = async ({ id }) => {
+  const arrest = await db.arrest.findUnique({
     where: { id },
   })
+  checkArrestAccess(arrest)
+  return arrest
 }
 
 export const searchArrestNames = ({ search }) => {
-  return db.arrest.findMany({
-    where: {
-      OR: search.split(/\s+/).map((term) => ({
-        arrestee: {
-          display_field: {
-            contains: term,
-            mode: 'insensitive',
-          },
+  const where = {
+    OR: search.split(/\s+/).map((term) => ({
+      arrestee: {
+        display_field: {
+          contains: term,
+          mode: 'insensitive',
         },
-      })),
-    },
+      },
+    })),
+  }
+  return db.arrest.findMany({
+    where: filterAccess(where),
   })
 }
 
@@ -133,16 +201,18 @@ const updateDisplayField = (arrest) => {
   }
 }
 
-export const createArrest = ({ input: { arrestee, ...arrest } }) => {
+export const createArrest = ({ input: { arrestee, action_id, ...arrest } }) => {
+  checkArrestAccess({ ...arrest, action_id })
   updateDisplayField(arrest)
   updateArresteeDisplayField(arrestee)
-
+  const action = action_id ? { connect: { id: action_id } } : {}
   return db.arrest.create({
     data: {
       ...arrest,
       arrestee: {
         create: arrestee,
       },
+      action,
       updated_by: {
         connect: { id: context.currentUser.id },
       },
@@ -153,13 +223,16 @@ export const createArrest = ({ input: { arrestee, ...arrest } }) => {
   })
 }
 
-export const updateArrest = ({
+export const updateArrest = async ({
   id,
   input: {
     arrestee: { id: arrestee_id, ...arrestee },
+    action_id,
     ...input
   },
 }) => {
+  await arrest({ id })
+
   validateWithSync(() => {
     if (arrestee.email) {
       validate(arrestee.email, 'Email', { email: true })
@@ -167,6 +240,7 @@ export const updateArrest = ({
   })
   updateDisplayField(input)
   updateArresteeDisplayField(arrestee)
+  const action = action_id ? { connect: { id: action_id } } : {}
 
   return db.arrest.update({
     data: {
@@ -178,6 +252,7 @@ export const updateArrest = ({
           where: { id: arrestee_id },
         },
       },
+      action,
       updated_by: {
         connect: { id: context.currentUser.id },
       },
@@ -187,6 +262,7 @@ export const updateArrest = ({
 }
 
 export const bulkUpdateArrests = async ({ ids, input }) => {
+  checkArrestsAccess(ids)
   const arrests = await db.arrest.findMany({
     where: {
       id: { in: ids },
@@ -219,21 +295,28 @@ export const bulkUpdateArrests = async ({ ids, input }) => {
   return { count: res.length }
 }
 
-export const deleteArrest = ({ id }) => {
+export const deleteArrest = async ({ id }) => {
+  await arrest({ id })
   return db.arrest.delete({
     where: { id },
   })
 }
 
 export const bulkDeleteArrests = async ({ ids }) => {
+  checkArrestsAccess(ids)
   return db.arrest.deleteMany({
-    where: { id: { in: ids } },
+    where: {
+      id: { in: ids },
+    },
   })
 }
 
 export const Arrest = {
   arrestee: (_obj, { root }) => {
     return db.arrest.findUnique({ where: { id: root?.id } }).arrestee()
+  },
+  action: (_obj, { root }) => {
+    return db.arrest.findUnique({ where: { id: root?.id } }).action()
   },
   created_by: (_obj, { root }) => {
     return db.arrest.findUnique({ where: { id: root?.id } }).created_by()

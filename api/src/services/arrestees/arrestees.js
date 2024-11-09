@@ -1,7 +1,8 @@
 import { db } from 'src/lib/db'
 
 export const updateDisplayField = (arrestee) => {
-  arrestee.display_field = `${arrestee.first_name} ${arrestee.last_name}`
+  arrestee.display_field =
+    `${arrestee.first_name || ''} ${arrestee.last_name || ''}`.trim()
   if (arrestee.preferred_name) {
     arrestee.display_field = `${arrestee.preferred_name} (${arrestee.display_field})`
   }

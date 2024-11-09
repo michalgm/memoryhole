@@ -1,11 +1,10 @@
-import dayjs from 'dayjs'
-
 import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
 
-import { QUERY } from 'src/components/User/UsersCell'
+import { QUERY } from 'src/components/scaffold/User/UsersCell/UsersCell'
+import dayjs from 'dayjs'
+import { toast } from '@redwoodjs/web/toast'
 import { truncate } from 'src/lib/formatters'
+import { useMutation } from '@redwoodjs/web'
 
 const DELETE_USER_MUTATION = gql`
   mutation DeleteUserMutation($id: Int!) {

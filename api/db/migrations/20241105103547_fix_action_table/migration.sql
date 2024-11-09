@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Action" ALTER COLUMN "jurisdiction" DROP NOT NULL,
+ALTER COLUMN "city" DROP NOT NULL;

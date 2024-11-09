@@ -118,6 +118,8 @@ model Arrest {
   arrestee        Arrestee? @relation(fields: [arrestee_id], references: [id], onDelete: Cascade)
   created_by      User?     @relation("CreatedArrest", fields: [created_by_id], references: [id])
   updated_by      User?     @relation("ModifiedArrest", fields: [updated_by_id], references: [id])
+  action_id       Int?
+  action          Action?   @relation(fields: [action_id], references: [id])
 
   @@index([search_field])
 }
@@ -133,6 +135,9 @@ model User {
   expiresAt              DateTime?
   resetToken             String?
   resetTokenExpiresAt    DateTime?
+  action_ids             Int[] // Array of action IDs
+  arrest_date_min        DateTime?
+  arrest_date_max        DateTime?
   created_arrests        Arrest[]       @relation("CreatedArrest")
   updated_arrests        Arrest[]       @relation("ModifiedArrest")
   created_arrestees      Arrestee[]     @relation("CreatedArrestee")
@@ -157,4 +162,16 @@ model TableView {
   updated_by_id Int?
   created_by    User?     @relation("CreatedTableView", fields: [created_by_id], references: [id])
   updated_by    User?     @relation("ModifiedTableView", fields: [updated_by_id], references: [id])
+}
+
+model Action {
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String?
+  start_date    DateTime
+  end_date      DateTime?
+  jurisdiction  String?
+  city          String?
+  custom_fields Json?
+  Arrest        Arrest[]
 }

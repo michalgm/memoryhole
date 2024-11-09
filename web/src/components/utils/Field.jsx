@@ -4,11 +4,12 @@ import {
   FormGroup,
   FormHelperText,
   FormLabel,
+  ListItemText,
+  Typography,
 } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { capitalize } from 'lodash'
 import {
-  AutocompleteElement,
   CheckboxElement,
   DatePickerElement,
   DateTimePickerElement,
@@ -16,6 +17,9 @@ import {
   TextFieldElement,
   useFormContext,
 } from 'react-hook-form-mui'
+
+import dayjs from '../../../../api/src/lib/day'
+import Autocomplete from '../Autocomplete/Autocomplete'
 
 import RichTextInput from './RichTextInput'
 
@@ -36,6 +40,7 @@ export const Field = ({
   tabIndex,
   fullWidth = true,
   helperText = '',
+  options: defaultOptions,
   ...props
 }) => {
   const { setValue, getValues } = useFormContext()
@@ -70,28 +75,19 @@ export const Field = ({
   }
 
   const renderAutocomplete = () => {
-    const options = ['', ...(props.options || [])].map((opt) =>
-      opt.label ? opt : { id: opt, label: opt }
-    )
+    const options = defaultOptions
+      ? [...(defaultOptions || [])].map((opt) =>
+          opt.label ? opt : { id: opt, label: opt }
+        )
+      : null
 
-    delete props.options
-    const autocompleteProps = {
-      ...textFieldProps,
-      isOptionEqualToValue: (option = {}, value) =>
-        option.id === value || option.id === value?.id,
-      onChange: (e, value) => setValue(name, value?.id || null),
-      ...props,
-    }
-    delete autocompleteProps.inputProps
-    delete autocompleteProps.helperText
     return (
-      <AutocompleteElement
+      <Autocomplete
         name={name}
         options={options}
         label={props.label}
-        matchId
+        matchId={!props.storeFullObject}
         textFieldProps={textFieldProps}
-        autocompleteProps={autocompleteProps}
         {...props}
       />
     )
@@ -119,8 +115,52 @@ export const Field = ({
     )
   }
 
+  const renderActionChooser = () => {
+    return (
+      <Autocomplete
+        name={name}
+        label={props.label}
+        helperText={helperText}
+        query={{
+          model: 'action',
+          select: { id: true, name: true, start_date: true },
+          orderBy: {
+            start_date: 'desc',
+          },
+          searchField: 'name',
+        }}
+        storeFullObject
+        textFieldProps={textFieldProps}
+        autocompleteProps={{
+          getOptionLabel: (option) => {
+            const date = dayjs(option.start_date).format('L LT')
+            return `${option.name} (${date})`
+          },
+
+          renderOption: ({ key, ...props }, option) => (
+            <li key={key} {...props}>
+              <ListItemText
+                primary={
+                  <Typography variant="body1" component="span">
+                    {option.name}
+                  </Typography>
+                }
+                secondary={
+                  <Typography variant="body2" color="textSecondary">
+                    {dayjs(option.start_date).format('L LT')}
+                  </Typography>
+                }
+              />
+            </li>
+          ),
+        }}
+        {...props}
+      />
+    )
+  }
+
   const renderRadio = () => {
-    const options = props.options.map((opt) =>
+    const options = defaultOptions.map((opt) =>
       opt.label ? opt : { id: opt, label: formatLabel(opt) }
     )
     return (
@@ -141,7 +181,7 @@ export const Field = ({
         <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
           <FormLabel component="legend">{props.label}</FormLabel>
           <FormGroup>
-            {props.options.map((option) => (
+            {defaultOptions.map((option) => (
               <Grid xs={6} key={option}>
                 <FormControlLabel
                   control={<CheckboxElement name={`${name}_${option}`} />}
@@ -190,6 +230,8 @@ export const Field = ({
       return renderAutocomplete()
     case 'richtext':
       return renderRichTextField()
+    case 'action_chooser':
+      return renderActionChooser()
     case 'textarea':
     default:
       return renderTextField()

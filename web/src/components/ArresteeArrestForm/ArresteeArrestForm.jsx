@@ -1,7 +1,7 @@
 import { Box, Button, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
-import { _, flatMap, get, reduce, set, startCase } from 'lodash'
+import { startCase } from 'lodash'
 import { useConfirm } from 'material-ui-confirm'
 import { FormContainer } from 'react-hook-form-mui'
 
@@ -9,6 +9,7 @@ import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 
 import ArrestFields from 'src/lib/ArrestFields'
+import { transformData } from 'src/lib/transforms'
 
 import ArresteeLogsDrawer from '../ArresteeLogs/ArresteeLogsDrawer'
 import { Field, formatLabel } from '../utils/Field'
@@ -33,33 +34,7 @@ export const DELETE_ARRESTEE = gql`
   }
 `
 
-const pruneData = (data, fields) => {
-  const fieldPaths = flatMap(fields, (section) =>
-    section.fields.map((field) => [field[0], field[1]])
-  )
-  const buildNewObject = (paths, originalData) =>
-    reduce(
-      paths,
-      (result, [path, params = {}]) => {
-        let value = get(originalData, path)
-        if ((value === undefined || value == null) && params.default) {
-          value = params.default
-        }
-        if (value !== undefined && value !== null) {
-          if (['date', 'date-time'].includes(params.field_type)) {
-            value = dayjs(value)
-          }
-          set(result, path, value)
-        }
-        return result
-      },
-      {}
-    )
-
-  return buildNewObject(fieldPaths, data)
-}
-
-function reorderFieldsLodash(fields) {
+function fieldsToColumns(fields) {
   const { fullSpan, nonFullSpan } = fields.reduce(
     (acc, [name, props = {}], index) => {
       const res = [name, props, index]
@@ -91,14 +66,14 @@ const ArresteeArrestForm = (props) => {
     },
   })
 
-  const values = pruneData(props.arrest, ArrestFields)
+  const values = transformData(props.arrest, ArrestFields)
   const onSubmit = (data) => {
     console.warn('SAVING', data)
     props.onSave(data, props?.arrest?.id)
   }
 
   const fields = ArrestFields.map(({ fields, title }, groupIndex) => {
-    const { leftColumn, rightColumn, fullSpan } = reorderFieldsLodash(fields)
+    const { leftColumn, rightColumn, fullSpan } = fieldsToColumns(fields)
     return (
       <FormSection key={groupIndex} title={title}>
         <Grid container sx={{ alignItems: 'start' }} xs={12}>

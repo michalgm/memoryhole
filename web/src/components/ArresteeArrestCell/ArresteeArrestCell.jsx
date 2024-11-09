@@ -2,7 +2,7 @@ import { useMutation } from '@redwoodjs/web'
 
 import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
 
-import { useSnackbar } from '../utils/SnackBar'
+import { useDisplayError, useSnackbar } from '../utils/SnackBar'
 
 export const QUERY = gql`
   query EditArresteeArrestById($id: Int!) {
@@ -18,6 +18,12 @@ export const QUERY = gql`
       jurisdiction
       citation_number
       arrestee_id
+      action_id
+      action {
+        id
+        name
+        start_date
+      }
       custom_fields
       created_at
       created_by {
@@ -71,6 +77,7 @@ const UPDATE_ARREST_MUTATION = gql`
       jurisdiction
       citation_number
       arrestee_id
+      action_id
       custom_fields
       arrestee {
         id
@@ -105,6 +112,7 @@ export const Failure = ({ error }) => (
 
 export const Success = ({ arresteeArrest, id }) => {
   const { openSnackbar } = useSnackbar()
+  const displayError = useDisplayError()
 
   const [updateArrest, { loading, error }] = useMutation(
     UPDATE_ARREST_MUTATION,
@@ -115,7 +123,7 @@ export const Success = ({ arresteeArrest, id }) => {
       refetchQueries: [{ query: QUERY, variables: { id } }],
       awaitRefetchQueries: true,
       onError: (error) => {
-        openSnackbar(error.message, 'error')
+        displayError(error)
       },
     }
   )
@@ -133,6 +141,10 @@ export const Success = ({ arresteeArrest, id }) => {
     if (!input.date) {
       delete input.date
     }
+    if (input.action?.id) {
+      input.action_id = input.action.id
+    }
+    delete input.action
 
     return updateArrest({ variables: { id, input, refresh } })
   }

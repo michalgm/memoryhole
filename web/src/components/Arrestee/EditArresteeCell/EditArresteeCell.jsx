@@ -1,8 +1,8 @@
 import { navigate, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 import ArresteeForm from 'src/components/Arrestee/ArresteeForm'
-import { toast } from '@redwoodjs/web/toast'
-import { useMutation } from '@redwoodjs/web'
 
 export const QUERY = gql`
   query EditArresteeById($id: Int!) {

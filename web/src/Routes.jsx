@@ -2,6 +2,7 @@ import { PrivateSet, Route, Router, Set } from '@redwoodjs/router'
 
 import BlogLayout from 'src/layouts/BlogLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
+
 import { useAuth } from './auth'
 
 // In this file, all Page components from 'src/pages` are auto-imported. Nested
@@ -26,6 +27,7 @@ const Routes = () => {
             <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
             <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
             <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
+            {/* <Route path="/admin/users/{id:Int}" page={UserPage} name="user" /> */}
 
             <Set wrap={ScaffoldLayout} title="Arrests" titleTo="arrests" buttonLabel="New Arrest" buttonTo="newArrest">
               <Route path="/admin/arrests/new" page={ArrestNewArrestPage} name="newArrest" />
@@ -40,9 +42,9 @@ const Routes = () => {
             </Set>
             <Set wrap={ScaffoldLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
               <Route path="/admin/users/new" page={UserNewUserPage} name="newUser" />
-              <Route path="/admin/users/{id:Int}/edit" page={UserEditUserPage} name="editUser" />
+              <Route path="/admin/users/{id:Int}/edit" page={UserUserPage} name="editUser" />
               <Route path="/admin/users/{id:Int}" page={UserUserPage} name="user" />
-              <Route path="/admin/users" page={UserUsersPage} name="users" />
+              <Route path="/admin/users" page={ScaffoldUserUsersPage} name="users" />
             </Set>
             <Set wrap={ScaffoldLayout} title="Arrestees" titleTo="arrestees" buttonLabel="New Arrestee" buttonTo="newArrestee">
               <Route path="/admin/arrestees/new" page={ArresteeNewArresteePage} name="newArrestee" />
@@ -61,6 +63,12 @@ const Routes = () => {
               <Route path="/admin/logs/{id:Int}/edit" page={LogEditLogPage} name="editLog" />
               <Route path="/admin/logs/{id:Int}" page={LogLogPage} name="log" />
               <Route path="/admin/logs" page={LogLogsPage} name="logs" />
+            </Set>
+            <Set wrap={ScaffoldLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
+              <Route path="/admin/actions/new" page={ActionNewActionPage} name="newAction" />
+              <Route path="/admin/actions/{id:Int}/edit" page={ActionEditActionPage} name="editAction" />
+              <Route path="/admin/actions/{id:Int}" page={ActionActionPage} name="action" />
+              <Route path="/admin/actions" page={ActionActionsPage} name="actions" />
             </Set>
           </PrivateSet>
           <Route path="/arrest/new" page={NewArresteeArrestPage} name="newArresteeArrest" />

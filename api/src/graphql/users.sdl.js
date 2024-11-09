@@ -10,15 +10,21 @@ export const schema = gql`
     expiresAt: DateTime
     resetToken: String
     resetTokenExpiresAt: DateTime
+    action_ids: [Int]
+    arrest_date_min: DateTime
+    arrest_date_max: DateTime
     created_arrests: [Arrest]!
     updated_arrests: [Arrest]!
     created_arrestees: [Arrestee]!
     updated_arrestees: [Arrestee]!
-    created_arrestee_logs: [Log]!
-    updated_arrestee_logs: [Log]!
+    updated_custom_schemas: [CustomSchema]!
     created_hotline_logs: [HotlineLog]!
     updated_hotline_logs: [HotlineLog]!
-    updated_custom_schemas: [CustomSchema]!
+    created_arrestee_logs: [Log]!
+    updated_arrestee_logs: [Log]!
+    created_table_views: [TableView]!
+    updated_table_views: [TableView]!
+    actions: [Action]!
   }
 
   type Query {
@@ -36,6 +42,9 @@ export const schema = gql`
     expiresAt: DateTime
     resetToken: String
     resetTokenExpiresAt: DateTime
+    arrest_date_min: DateTime
+    arrest_date_max: DateTime
+    action_ids: [Int]
   }
 
   input UpdateUserInput {
@@ -48,6 +57,9 @@ export const schema = gql`
     expiresAt: DateTime
     resetToken: String
     resetTokenExpiresAt: DateTime
+    arrest_date_min: DateTime
+    arrest_date_max: DateTime
+    action_ids: [Int]
   }
 
   type Mutation {

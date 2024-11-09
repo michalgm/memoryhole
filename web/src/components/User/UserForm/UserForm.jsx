@@ -1,111 +1,129 @@
-import dayjs from 'dayjs'
+import { Box, Button } from '@mui/material'
+import Grid from '@mui/material/Unstable_Grid2/Grid2'
+import { FormContainer } from 'react-hook-form-mui'
 
-import {
-  DatetimeLocalField,
-  FieldError,
-  Form,
-  FormError,
-  Label,
-  SelectField,
-  Submit,
-  TextField,
-} from '@redwoodjs/forms'
+import { transformData } from 'src/lib/transforms'
 
-const UserForm = (props) => {
-  const onSubmit = (data) => {
-    props.onSave(data, props?.user?.id)
-  }
+import dayjs from '../../../../../api/src/lib/day'
+import { Field } from '../../utils/Field'
+import Footer from '../../utils/Footer'
+import FormSection from '../../utils/FormSection'
 
-  const expiresAt = props?.user?.expiresAt
-    ? dayjs(props.user.expiresAt).format('YYYY-MM-DDTHH:mm')
-    : null
+const UserFields = [
+  {
+    title: 'User Details',
+    fields: [
+      ['name'],
+      ['email'],
+      [
+        'role',
+        {
+          field_type: 'select',
+          options: ['User', 'Admin'],
+        },
+      ],
+    ],
+  },
+  {
+    title: 'Restrict Access',
+    fields: [
+      [
+        'expiresAt',
+        {
+          field_type: 'date-time',
+          label: 'Expires At',
+          helperText: "User's login will be disabled after this date",
+        },
+      ],
+      [
+        'actions',
+        {
+          field_type: 'select',
+          multiple: true,
+          query: {
+            model: 'action',
+            orderBy: {
+              start_date: 'desc',
+            },
+            searchField: 'name',
+          },
+          storeFullObject: true,
+          autocompleteProps: {
+            getOptionLabel: (option) => {
+              const date = dayjs(option.start_date).format('L LT')
+              return `${option.name} (${date})`
+            },
+          },
+          helperText:
+            'User will not have access to arrests outside of these actions',
+        },
+      ],
+      [
+        'arrest_date_min',
+        {
+          field_type: 'date',
+          label: 'Minimum Arrest Date',
+          helperText: 'User will not have access to arrests before this date',
+        },
+      ],
+      [
+        'arrest_date_max',
+        {
+          field_type: 'date',
+          label: 'Maximum Arrest Date',
+          helperText: 'User will not have access to arrests after this date',
+        },
+      ],
+    ],
+  },
+]
+
+const UserForm = ({ user, onSave, loading, error }) => {
+  const values = transformData(user || {}, UserFields)
 
   return (
-    <div className="rw-form-wrapper">
-      <Form onSubmit={onSubmit} error={props.error}>
-        <FormError
-          error={props.error}
-          wrapperClassName="rw-form-error-wrapper"
-          titleClassName="rw-form-error-title"
-          listClassName="rw-form-error-list"
-        />
-
-        <Label
-          name="email"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
+    <Box>
+      <FormContainer
+        defaultValues={{
+          ...values,
+          // expiresAt: values.expiresAt ? dayjs(values.expiresAt) : null,
+        }}
+        onSuccess={(data) => onSave(data, user?.id)}
+      >
+        <Grid
+          sx={{ pb: 8 }}
+          container
+          spacing={4}
+          className="content-container"
         >
-          Email
-        </Label>
-
-        <TextField
-          name="email"
-          defaultValue={props.user?.email}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="email" className="rw-field-error" />
-
-        <Label
-          name="name"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-          validation={{ required: true }}
-        >
-          Name
-        </Label>
-
-        <TextField
-          name="name"
-          defaultValue={props.user?.name}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-        />
-
-        <FieldError name="name" className="rw-field-error" />
-
-        <Label
-          name="role"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Role
-        </Label>
-        <SelectField
-          name="role"
-          defaultValue={props.user?.role}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-        >
-          <option>User</option>
-          <option>Admin</option>
-        </SelectField>
-
-        <Label
-          name="expiresAt"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Expires At
-        </Label>
-        <DatetimeLocalField
-          name="expiresAt"
-          defaultValue={expiresAt}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-        ></DatetimeLocalField>
-
-        <FieldError name="role" className="rw-field-error" />
-
-        <div className="rw-button-group">
-          <Submit disabled={props.loading} className="rw-button rw-button-blue">
-            Save
-          </Submit>
-        </div>
-      </Form>
-    </div>
+          <Grid xs={12} container>
+            {UserFields.map(({ fields, title }, groupIndex) => (
+              <FormSection key={groupIndex} title={title}>
+                <Grid container spacing={2}>
+                  {fields.map(([key, options = {}]) => (
+                    <Grid xs={options.span || 12} key={key}>
+                      <Field name={key} {...options} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </FormSection>
+            ))}
+          </Grid>
+        </Grid>
+        <Footer>
+          <Grid xs sx={{ textAlign: 'right' }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="secondary"
+              size="small"
+            >
+              Save User
+            </Button>
+          </Grid>
+        </Footer>
+      </FormContainer>
+    </Box>
   )
 }
 

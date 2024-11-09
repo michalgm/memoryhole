@@ -41,28 +41,3 @@ export async function sendEmail({ to, subject, text, html }: Options) {
     throw err
   }
 }
-
-// async function main() {
-//   let transporter = nodemailer.createTransport({
-//     host: '127.0.0.1',
-//     port: 1025,
-//     secure: false, // true for 465, false for other ports
-//     auth: {
-//       user: 'johnnycash@protonmail.com',
-//       pass: '$cHI4cyrtfUM',
-//     },
-//     tls: {
-//       rejectUnauthorized: false,
-//     },
-//   })
-
-//   let info = await transporter.sendMail({
-//     from: '"Me" <johnnycash@protonmail.com>',
-//     to: 'someonecool@email.com',
-//     subject: 'Hello!',
-//     text: 'Hello world?',
-//     html: '<b>Hello world?</b>',
-//   })
-
-//   // console.log("Message sent: %s", info.messageId);
-// }
