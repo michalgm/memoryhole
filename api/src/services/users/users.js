@@ -1,3 +1,5 @@
+import { validate } from '@redwoodjs/api'
+
 import { requireAuth } from 'src/lib/auth'
 import { initUser, onboardUser } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
@@ -30,6 +32,15 @@ export const createUser = async ({ input }) => {
 export const updateUser = ({ id, input }) => {
   if (input.email || input.role) {
     requireAdmin()
+  }
+  if (context.currentUser.id === id) {
+    ;['expiresAt', 'arrest_date_min', 'arrest_date_max'].forEach((key) => {
+      validate(input[key], {
+        absence: {
+          message: `You cannot change your own ${key} value`,
+        },
+      })
+    })
   }
   return db.user.update({
     data: input,
