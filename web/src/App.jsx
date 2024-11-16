@@ -27,6 +27,8 @@ export const theme = createTheme({
     contrastThreshold: 4.5,
     primary: { main: '#37474f' },
     secondary: { main: '#ad1457' },
+    success: { main: '#392e3d' },
+    error: { main: '#FF5449' },
   },
 })
 

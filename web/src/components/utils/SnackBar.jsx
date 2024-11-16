@@ -104,7 +104,11 @@ export const SnackBarProvider = ({ children }) => {
       >
         <Alert
           severity={snackbar.severity}
-          sx={{ width: '100%' }}
+          sx={{
+            width: '100%',
+            border: '1px solid',
+            borderColor: `${snackbar.severity}.light`,
+          }}
           onClose={closeSnackbar}
         >
           {snackbar.message}
