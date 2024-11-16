@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 import { validate } from '@redwoodjs/api'
 
 import { requireAuth } from 'src/lib/auth'
@@ -41,6 +43,9 @@ export const updateUser = ({ id, input }) => {
         },
       })
     })
+  }
+  if (input.arrest_date_max) {
+    input.arrest_date_max = dayjs(input.arrest_date_max).endOf('day')
   }
   return db.user.update({
     data: input,
