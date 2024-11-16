@@ -15,7 +15,7 @@ import ArresteeLogsDrawer from '../ArresteeLogs/ArresteeLogsDrawer'
 import { Field, formatLabel } from '../utils/Field'
 import Footer from '../utils/Footer'
 import FormSection from '../utils/FormSection'
-import { useSnackbar } from '../utils/SnackBar'
+import { useDisplayError, useSnackbar } from '../utils/SnackBar'
 
 // const diffObjects = (a, b) => {
 //   return transform(b, (result, value, key) => {
@@ -58,17 +58,18 @@ function fieldsToColumns(fields) {
 const ArresteeArrestForm = (props) => {
   const confirm = useConfirm()
   const { openSnackbar } = useSnackbar()
+  const displayError = useDisplayError()
 
   const [deleteArrestee] = useMutation(DELETE_ARRESTEE, {
     onCompleted: () => {
       openSnackbar(`Arrestee "${props.arrest.arrestee.display_field}" deleted`)
       navigate(routes.home())
     },
+    onError: displayError,
   })
 
   const values = transformData(props.arrest, ArrestFields)
   const onSubmit = (data) => {
-    console.warn('SAVING', data)
     props.onSave(data, props?.arrest?.id)
   }
 

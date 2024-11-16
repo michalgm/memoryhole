@@ -90,11 +90,7 @@ const BulkUpdateModal = ({
       }
 
       const ids = bulkUpdateRows.map(({ id }) => id)
-      console.log(
-        name,
-        pluralize(name),
-        `bulkUpdate${capitalize(pluralize(name))}`
-      )
+
       const {
         data: {
           // [`bulkUpdateArrests`]: { count },
