@@ -245,13 +245,19 @@ const validateAndPrepareData = (
     }
   }
   if (custom_fields) {
-    validateWithSync(() => {
-      if (custom_fields.next_court_date) {
+    if (custom_fields.next_court_date) {
+      validateWithSync(() => {
         validate(custom_fields.next_court_date, 'Next Court Date', {
-          date: true,
+          custom: {
+            with: (value) => {
+              if (!dayjs(value).isValid()) {
+                throw new Error('Invalid date')
+              }
+            },
+          },
         })
-      }
-    })
+      })
+    }
     data.custom_fields = merge(current.custom_fields, custom_fields)
   }
   updateDisplayField(arrest)
