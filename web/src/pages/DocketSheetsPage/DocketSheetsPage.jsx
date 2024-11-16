@@ -7,7 +7,7 @@ import { MetaTags } from '@redwoodjs/web'
 
 import Form from 'src/components/Form/Form'
 import { Field } from 'src/components/utils/Field'
-import { schema } from 'src/lib/ArrestFields'
+import { schema } from 'src/lib/FieldSchemas'
 
 import dayjs from '../../../../api/src/lib/day'
 import DocketSheetCell from '../../components/DocketSheetCell/DocketSheetCell'

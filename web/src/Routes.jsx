@@ -4,6 +4,7 @@ import BlogLayout from 'src/layouts/BlogLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
 
 import { useAuth } from './auth'
+import AdminLayout from './layouts/AdminLayout/AdminLayout'
 
 // In this file, all Page components from 'src/pages` are auto-imported. Nested
 // directories are supported, and should be uppercase. Each subdirectory will be
@@ -23,7 +24,9 @@ const Routes = () => {
       <PrivateSet unauthenticated="login">
         <Set wrap={BlogLayout}>
           <PrivateSet unauthenticated="login" roles="Admin">
-            <Route path="/admin" page={AdminPage} name="admin" />
+            <Set wrap={AdminLayout}>
+              <Route path="/admin" page={AdminPage} name="admin" />
+            </Set>
             <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
             <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
             <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
@@ -71,7 +74,7 @@ const Routes = () => {
               <Route path="/admin/actions" page={ActionActionsPage} name="actions" />
             </Set>
           </PrivateSet>
-          <Route path="/arrest/new" page={NewArresteeArrestPage} name="newArresteeArrest" />
+          <Route path="/arrest/new" page={ArresteeArrestPage} name="newArresteeArrest" />
           <Route path="/arrest/{id:Int}" page={ArresteeArrestPage} name="arrest" />
           <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" />
           <Route path="/docket-sheets" page={DocketSheetsPage} name="docketSheets" />

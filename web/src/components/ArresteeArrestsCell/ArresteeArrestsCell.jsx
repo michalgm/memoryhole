@@ -1,15 +1,19 @@
-import BulkUpdateModal from '../utils/BulkUpdateModal'
-import DataTable from '../DataTable/DataTable'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
-import Link from '../utils/Link'
-import dayjs from 'dayjs'
-import { routes } from '@redwoodjs/router'
-import { schema } from 'src/lib/ArrestFields'
-import { toast } from '@redwoodjs/web/toast'
-import { useConfirm } from 'material-ui-confirm'
-import { useMutation } from '@redwoodjs/web'
-import { useSnackbar } from '../utils/SnackBar'
 import { useState } from 'react'
+
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import dayjs from 'dayjs'
+import { useConfirm } from 'material-ui-confirm'
+
+import { routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
+
+import { schema } from 'src/lib/FieldSchemas'
+
+import DataTable from '../DataTable/DataTable'
+import BulkUpdateModal from '../utils/BulkUpdateModal'
+import Link from '../utils/Link'
+import { useSnackbar } from '../utils/SnackBar'
 
 // import schema from '../../types/graphql'
 
@@ -54,6 +58,14 @@ export const QUERY = gql`
 const BULK_DELETE_ARRESTS = gql`
   mutation BulkDeleteArrests($ids: [Int]!) {
     bulkDeleteArrests(ids: $ids) {
+      count
+    }
+  }
+`
+
+const BULK_UPDATE_ARRESTS = gql`
+  mutation BulkUpdateArrests($ids: [Int]!, $input: UpdateArrestInput!) {
+    bulkUpdateArrests(ids: $ids, input: $input) {
       count
     }
   }
@@ -178,10 +190,14 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
         bulkDelete={bulkDelete}
         manageViews
         type="arrestees"
+        name="arrest"
       />
       <BulkUpdateModal
         bulkUpdateRows={bulkUpdateRows}
         setBulkUpdateRows={setBulkUpdateRows}
+        mutation={BULK_UPDATE_ARRESTS}
+        schema={schema}
+        name="arrest"
         onSuccess={() => {
           refetch()
         }}

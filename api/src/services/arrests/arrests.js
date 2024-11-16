@@ -22,7 +22,7 @@ const checkArrestAccess = (arrest) => {
       `Arrest date ${arrest.date} is before your minimum access date ${arrest_date_min}`
     )
   }
-  if (arrest_date_max && arrest.date > arrest_date_max) {
+  if (arrest_date_max && arrest.date > dayjs(arrest_date_max).endOf('day')) {
     throw new ForbiddenError(
       `Arrest date ${arrest.date} is after your maximum access date ${arrest_date_max}`
     )
@@ -34,10 +34,23 @@ const checkArrestAccess = (arrest) => {
   }
 }
 
-const checkArrestsAccess = async (ids) => {
-  const arrests = await db.arrest.findMany({
+const checkArrestsAccess = async (ids, tx) => {
+  const arrests = await (tx || db).arrest.findMany({
     where: { id: { in: ids } },
-    select: { id: true, action_id: true, date: true },
+    select: {
+      id: true,
+      action_id: true,
+      date: true,
+      custom_fields: true,
+      arrestee: {
+        select: {
+          first_name: true,
+          last_name: true,
+          preferred_name: true,
+          custom_fields: true,
+        },
+      },
+    },
   })
 
   arrests.forEach((arrest) => {
@@ -201,21 +214,68 @@ const updateDisplayField = (arrest) => {
   }
 }
 
+const validateAndPrepareData = (
+  { id: _id, action_id, arrestee, custom_fields, ...arrest },
+  current = {}
+) => {
+  const data = {
+    ...arrest,
+    updated_by: {
+      connect: { id: context.currentUser.id },
+    },
+  }
+
+  if (arrestee) {
+    validateWithSync(() => {
+      if (arrestee.email) {
+        validate(arrestee.email, 'Email', { email: true })
+      }
+    })
+    updateArresteeDisplayField(arrestee, current.arrestee)
+    if (arrestee.custom_fields) {
+      arrestee.custom_fields = merge(
+        current.custom_fields,
+        arrestee.custom_fields
+      )
+    }
+    data.arrestee = {
+      update: {
+        data: arrestee,
+      },
+    }
+  }
+  if (custom_fields) {
+    validateWithSync(() => {
+      if (custom_fields.next_court_date) {
+        validate(custom_fields.next_court_date, 'Next Court Date', {
+          date: true,
+        })
+      }
+    })
+    data.custom_fields = merge(current.custom_fields, custom_fields)
+  }
+  updateDisplayField(arrest)
+  if (action_id) {
+    data.action = { connect: { id: action_id } }
+  }
+
+  return data
+}
+
 export const createArrest = ({ input: { arrestee, action_id, ...arrest } }) => {
   checkArrestAccess({ ...arrest, action_id })
-  updateDisplayField(arrest)
-  updateArresteeDisplayField(arrestee)
-  const action = action_id ? { connect: { id: action_id } } : {}
+  const data = validateAndPrepareData({
+    action_id,
+    arrestee,
+    ...arrest,
+  })
+  if (data.arrestee) {
+    data.arrestee.create = data.arrestee.update.data
+    delete data.arrestee.update
+  }
   return db.arrest.create({
     data: {
-      ...arrest,
-      arrestee: {
-        create: arrestee,
-      },
-      action,
-      updated_by: {
-        connect: { id: context.currentUser.id },
-      },
+      ...data,
       created_by: {
         connect: { id: context.currentUser.id },
       },
@@ -225,74 +285,44 @@ export const createArrest = ({ input: { arrestee, action_id, ...arrest } }) => {
 
 export const updateArrest = async ({
   id,
-  input: {
-    arrestee: { id: arrestee_id, ...arrestee },
-    action_id,
-    ...input
-  },
+  input: { arrestee, action_id, ...input },
 }) => {
-  await arrest({ id })
-
-  validateWithSync(() => {
-    if (arrestee.email) {
-      validate(arrestee.email, 'Email', { email: true })
-    }
-  })
-  updateDisplayField(input)
-  updateArresteeDisplayField(arrestee)
-  const action = action_id ? { connect: { id: action_id } } : {}
+  const [arrest] = await checkArrestsAccess([id])
+  const data = validateAndPrepareData(
+    {
+      id,
+      action_id,
+      arrestee,
+      ...input,
+    },
+    arrest
+  )
 
   return db.arrest.update({
-    data: {
-      ...input,
-      // updated_by_id: context.currentUser.id,
-      arrestee: {
-        update: {
-          data: arrestee,
-          where: { id: arrestee_id },
-        },
-      },
-      action,
-      updated_by: {
-        connect: { id: context.currentUser.id },
-      },
-    },
+    data,
     where: { id },
   })
 }
 
 export const bulkUpdateArrests = async ({ ids, input }) => {
-  checkArrestsAccess(ids)
-  const arrests = await db.arrest.findMany({
-    where: {
-      id: { in: ids },
-    },
-    include: {
-      arrestee: true,
-    },
-  })
-  const res = await db.$transaction(
-    arrests.map(({ id, ...arrest }) => {
-      ;[
-        'id',
-        'arrestee_id',
-        'created_by_id',
-        'updated_by_id',
-        'updated_at',
-        'created_at',
-      ].forEach((key) => {
-        delete arrest[key]
-        delete arrest.arrestee[key]
-      })
-      const arrest_input = merge(arrest, input)
-
-      return updateArrest({
-        id,
-        input: arrest_input,
+  return db.$transaction(async (tx) => {
+    const arrests = await checkArrestsAccess(ids, tx)
+    const updates = arrests.map(async ({ id, ...arrest }) => {
+      const data = await validateAndPrepareData(
+        {
+          id,
+          ...input,
+        },
+        arrest
+      )
+      return tx.arrest.update({
+        data,
+        where: { id },
       })
     })
-  )
-  return { count: res.length }
+    const results = await Promise.all(updates)
+    return { count: results.length }
+  })
 }
 
 export const deleteArrest = async ({ id }) => {
@@ -303,7 +333,7 @@ export const deleteArrest = async ({ id }) => {
 }
 
 export const bulkDeleteArrests = async ({ ids }) => {
-  checkArrestsAccess(ids)
+  await checkArrestsAccess(ids)
   return db.arrest.deleteMany({
     where: {
       id: { in: ids },
@@ -324,4 +354,9 @@ export const Arrest = {
   updated_by: (_obj, { root }) => {
     return db.arrest.findUnique({ where: { id: root?.id } }).updated_by()
   },
+  // display_field: (_obj, { root }) => {
+  //   if (root.date) {
+  //     return dayjs(root.date).format('L')
+  //   }
+  // },
 }

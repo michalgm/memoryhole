@@ -1,8 +1,4 @@
-import { useMutation } from '@redwoodjs/web'
-
 import ArresteeArrestForm from 'src/components/ArresteeArrestForm'
-
-import { useDisplayError, useSnackbar } from '../utils/SnackBar'
 
 export const QUERY = gql`
   query EditArresteeArrestById($id: Int!) {
@@ -65,43 +61,6 @@ export const QUERY = gql`
   }
 `
 
-const UPDATE_ARREST_MUTATION = gql`
-  mutation UpdateArresteeArrestMutation($id: Int!, $input: UpdateArrestInput!) {
-    updateArrest(id: $id, input: $input) {
-      id
-      date
-      location
-      date
-      charges
-      arrest_city
-      jurisdiction
-      citation_number
-      arrestee_id
-      action_id
-      custom_fields
-      arrestee {
-        id
-        first_name
-        last_name
-        preferred_name
-        pronoun
-        dob
-        email
-        phone_1
-        phone_2
-        address
-        city
-        state
-        zip
-        custom_fields
-        arrests {
-          id
-        }
-      }
-    }
-  }
-`
-
 export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
@@ -110,62 +69,13 @@ export const Failure = ({ error }) => (
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
 )
 
-export const Success = ({ arresteeArrest, id }) => {
-  const { openSnackbar } = useSnackbar()
-  const displayError = useDisplayError()
-
-  const [updateArrest, { loading, error }] = useMutation(
-    UPDATE_ARREST_MUTATION,
-    {
-      onCompleted: async () => {
-        openSnackbar('Arrest updated')
-      },
-      refetchQueries: [{ query: QUERY, variables: { id } }],
-      awaitRefetchQueries: true,
-      onError: (error) => {
-        displayError(error)
-      },
-    }
-  )
-
-  const onSave = async (input, id, refresh) => {
-    ;[
-      'updated_at',
-      'updated_by',
-      'created_by',
-      'created_at',
-      'search_field',
-      'display_field',
-      'id',
-    ].forEach((k) => delete input[k])
-    if (!input.date) {
-      delete input.date
-    }
-    if (input.action?.id) {
-      input.action_id = input.action.id
-    }
-    delete input.action
-
-    return updateArrest({ variables: { id, input, refresh } })
-  }
-
+export const Success = ({ arresteeArrest = null, onSave, error, loading }) => {
   return (
-    <div>
-      {/* <header>
-        <Typography variant="h5">
-          Edit Arrestee "{arresteeArrest.display_field}{' '}
-          {arresteeArrest.arrestee.display_field}"
-        </Typography>
-      </header> */}
-      <div>
-        <ArresteeArrestForm
-          arrest={arresteeArrest}
-          // arrest={values}
-          onSave={onSave}
-          loading={loading}
-          error={error}
-        />
-      </div>
-    </div>
+    <ArresteeArrestForm
+      arrest={arresteeArrest}
+      onSave={onSave}
+      loading={loading}
+      error={error}
+    />
   )
 }

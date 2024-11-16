@@ -7,6 +7,7 @@ import { get, merge, sortBy } from 'lodash'
 import { difference } from 'lodash'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { getDefaultColumnFilterFn } from 'material-react-table'
+import pluralize from 'pluralize'
 
 import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/Field'
@@ -17,10 +18,19 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 })
 
-export const defineColumns = (schema, displayColumns) => {
+export const defineColumns = (
+  schema,
+  displayColumns,
+  preColumns = [],
+  postColumns = []
+) => {
   const columnNames = sortBy(
-    difference(Object.keys(schema), displayColumns),
-    (k) => schema[k].props.label || formatLabel(k)
+    difference(Object.keys(schema), [
+      ...displayColumns,
+      ...preColumns.map((c) => c.accessorKey),
+      ...postColumns.map((c) => c.accessorKey),
+    ]),
+    (k) => schema[k]?.props.label || formatLabel(k)
   )
 
   const columns = [...displayColumns, ...columnNames].map((field) => {
@@ -43,7 +53,8 @@ export const defineColumns = (schema, displayColumns) => {
           return val ? dayjs(val).toDate() : null
         }
       }
-      col.Cell = ({ cell }) => dayjs(cell.getValue()).format(format)
+      col.Cell = ({ cell }) =>
+        cell.getValue() ? dayjs(cell.getValue()).format(format) : null
       col.filterVariant = 'date'
     } else if (type === 'checkbox') {
       col.id = field
@@ -74,15 +85,17 @@ const DataTable = ({
   bulkDelete,
   manageViews = false,
   type = '',
+  name = '',
 }) => {
   const columns = useMemo(
     () => [
       ...preColumns,
-      ...defineColumns(schema, displayColumns),
+      ...defineColumns(schema, displayColumns, preColumns, postColumns),
       ...postColumns,
     ],
     [preColumns, postColumns, displayColumns, schema]
   )
+
   const initialState = merge(
     {
       columnVisibility: Object.keys(schema).reduce((acc, f) => {
@@ -299,7 +312,7 @@ const DataTable = ({
           startIcon={<Delete />}
           onClick={() => bulkDelete(table)}
         >
-          Delete Selected Arrests
+          Delete Selected {pluralize(name)}
         </Button>
       )
     }
@@ -312,7 +325,7 @@ const DataTable = ({
           startIcon={<EditNote />}
           onClick={() => bulkUpdate(table)}
         >
-          Update Selected Arrests
+          Update Selected {pluralize(name)}
         </Button>
       )
     }

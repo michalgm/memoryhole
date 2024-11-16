@@ -8,7 +8,7 @@ import { FormContainer } from 'react-hook-form-mui'
 import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 
-import ArrestFields from 'src/lib/ArrestFields'
+import ArrestFields from 'src/lib/FieldSchemas'
 import { transformData } from 'src/lib/transforms'
 
 import ArresteeLogsDrawer from '../ArresteeLogs/ArresteeLogsDrawer'
@@ -128,7 +128,7 @@ const ArresteeArrestForm = (props) => {
   const confirmDeleteArrestee = async () => {
     await confirm({
       title: 'Confirm Delete',
-      description: `Are you sure you want to delete the arrestee "${props.arrest.arrestee.display_field}"`,
+      description: `Are you sure you want to delete the arrestee "${props.arrest.arrestee.display_field}"?`,
     })
     await deleteArrestee({ variables: { id: props.arrest.arrestee.id } })
   }

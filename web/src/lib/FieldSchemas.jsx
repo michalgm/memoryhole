@@ -1,5 +1,6 @@
 import { fromPairs, sortBy, toPairs } from 'lodash'
 
+import dayjs from '../../../api/src/lib/day'
 import { formatLabel } from '../components/utils/Field'
 
 const usStates = [
@@ -348,48 +349,162 @@ const sortObjectKeys = (obj) => {
   return fromPairs(sortedPairs)
 }
 
-export const schema = sortObjectKeys(
-  ArrestFields.reduce(
-    (acc, { fields }) => {
-      fields.forEach(([name, props = {}]) => {
-        const type = props.field_type || 'text'
-        props.label = formatLabel(props.label || name)
-        let [field, custom, table] = name.split('.').reverse()
-        if (!table) {
-          if (!custom) {
-            fieldTables.arrest[field] = type
-          } else if (custom == 'custom_fields') {
-            fieldTables.arrest.custom_fields[field] = type
-          } else {
-            fieldTables[custom][field] = type
-          }
+const getSchema = (fields) => {
+  return fields.reduce((acc, { fields }) => {
+    fields.forEach(([name, props = {}]) => {
+      const type = props.field_type || 'text'
+      props.label = formatLabel(props.label || name)
+      let [field, custom, table] = name.split('.').reverse()
+      if (!table) {
+        if (!custom) {
+          fieldTables.arrest[field] = type
+        } else if (custom == 'custom_fields') {
+          fieldTables.arrest.custom_fields[field] = type
         } else {
-          fieldTables[table].custom_fields[field] = type
+          fieldTables[custom][field] = type
         }
-        acc[name] = { type, props }
-      })
-      return acc
+      } else {
+        fieldTables[table].custom_fields[field] = type
+      }
+      acc[name] = { type, props }
+    })
+    return acc
+  }, {})
+}
+
+export const schema = sortObjectKeys(
+  {
+    ...getSchema(ArrestFields),
+    'created_by.name': {
+      type: 'text',
+      props: { label: 'Created By', readonly: true },
     },
-    {
-      'created_by.name': {
-        type: 'text',
-        props: { label: 'Created By', readonly: true },
-      },
-      created_at: {
-        type: 'date-time',
-        props: { label: 'Created At', readonly: true },
-      },
-      updated_at: {
-        type: 'date-time',
-        props: { label: 'Update At', readonly: true },
-      },
-      'updated_by.name': {
-        type: 'text',
-        props: { label: 'Updated By', readonly: true },
-      },
-    }
-  ),
+    created_at: {
+      type: 'date-time',
+      props: { label: 'Created At', readonly: true },
+    },
+    updated_at: {
+      type: 'date-time',
+      props: { label: 'Update At', readonly: true },
+    },
+    'updated_by.name': {
+      type: 'text',
+      props: { label: 'Updated By', readonly: true },
+    },
+  },
+  // ArrestFields.reduce(
+  //   (acc, { fields }) => {
+  //     fields.forEach(([name, props = {}]) => {
+  //       const type = props.field_type || 'text'
+  //       props.label = formatLabel(props.label || name)
+  //       let [field, custom, table] = name.split('.').reverse()
+  //       if (!table) {
+  //         if (!custom) {
+  //           fieldTables.arrest[field] = type
+  //         } else if (custom == 'custom_fields') {
+  //           fieldTables.arrest.custom_fields[field] = type
+  //         } else {
+  //           fieldTables[custom][field] = type
+  //         }
+  //       } else {
+  //         fieldTables[table].custom_fields[field] = type
+  //       }
+  //       acc[name] = { type, props }
+  //     })
+  //     return acc
+  //   },
+  //   {
+  //     'created_by.name': {
+  //       type: 'text',
+  //       props: { label: 'Created By', readonly: true },
+  //     },
+  //     created_at: {
+  //       type: 'date-time',
+  //       props: { label: 'Created At', readonly: true },
+  //     },
+  //     updated_at: {
+  //       type: 'date-time',
+  //       props: { label: 'Update At', readonly: true },
+  //     },
+  //     'updated_by.name': {
+  //       type: 'text',
+  //       props: { label: 'Updated By', readonly: true },
+  //     },
+  //   }
+  // ),
   'props.label'
 )
 
+export const UserFields = [
+  {
+    title: 'User Details',
+    fields: [
+      ['name', { required: true }],
+      ['email', { required: true }],
+      [
+        'role',
+        {
+          field_type: 'select',
+          options: ['User', 'Admin'],
+          required: true,
+        },
+      ],
+    ],
+  },
+  {
+    title: 'Restrict Access',
+    fields: [
+      [
+        'expiresAt',
+        {
+          field_type: 'date-time',
+          label: 'Expires At',
+          helperText: "User's login will be disabled after this date",
+        },
+      ],
+      [
+        'actions',
+        {
+          field_type: 'select',
+          multiple: true,
+          query: {
+            model: 'action',
+            orderBy: {
+              start_date: 'desc',
+            },
+            searchField: 'name',
+          },
+          storeFullObject: true,
+          autocompleteProps: {
+            getOptionLabel: (option) => {
+              const date = dayjs(option.start_date).format('L LT')
+              return `${option.name} (${date})`
+            },
+          },
+          helperText:
+            'User will not have access to arrests outside of these actions',
+        },
+      ],
+      [
+        'arrest_date_min',
+        {
+          field_type: 'date',
+          label: 'Minimum Arrest Date',
+          helperText: 'User will not have access to arrests before this date',
+        },
+      ],
+      [
+        'arrest_date_max',
+        {
+          field_type: 'date',
+          label: 'Maximum Arrest Date',
+          helperText: 'User will not have access to arrests after this date',
+        },
+      ],
+    ],
+  },
+]
+
 export default ArrestFields
+
+export const userSchema = sortObjectKeys(getSchema(UserFields), 'props.label')

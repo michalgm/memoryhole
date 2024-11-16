@@ -1,4 +1,4 @@
-import { schema } from 'src/lib/ArrestFields'
+import { schema } from 'src/lib/FieldSchemas'
 
 import DataTable from '../DataTable/DataTable'
 

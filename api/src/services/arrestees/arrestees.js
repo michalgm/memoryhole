@@ -1,10 +1,13 @@
 import { db } from 'src/lib/db'
 
-export const updateDisplayField = (arrestee) => {
-  arrestee.display_field =
-    `${arrestee.first_name || ''} ${arrestee.last_name || ''}`.trim()
-  if (arrestee.preferred_name) {
-    arrestee.display_field = `${arrestee.preferred_name} (${arrestee.display_field})`
+export const updateDisplayField = (arrestee, current = {}) => {
+  if (arrestee.first_name || arrestee.last_name || arrestee.preferred_name) {
+    const combined = { ...current, ...arrestee }
+    arrestee.display_field =
+      `${combined.first_name || ''} ${combined.last_name || ''}`.trim()
+    if (combined.preferred_name) {
+      arrestee.display_field = `${combined.preferred_name} (${arrestee.display_field})`
+    }
   }
 }
 
@@ -54,4 +57,10 @@ export const Arrestee = {
   arrestee_logs: (_obj, { root }) => {
     return db.arrestee.findUnique({ where: { id: root?.id } }).arrestee_logs()
   },
+  // display_field: (_obj, { root }) => {
+  //   console.log(root)
+  //   const name = `${root.first_name || ''} ${root.last_name || ''}`.trim()
+  //   console.log(name)
+  //   return root.preferred_name ? `${root.preferred_name} (${name})` : name
+  // },
 }

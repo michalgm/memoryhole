@@ -11,34 +11,30 @@ import {
 } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
-import { isBoolean } from 'lodash'
+import { capitalize, isBoolean } from 'lodash'
 import { useConfirm } from 'material-ui-confirm'
+import pluralize from 'pluralize'
 import { set, useFieldArray, useForm } from 'react-hook-form'
 import { FormContainer } from 'react-hook-form-mui'
 
 import { useMutation } from '@redwoodjs/web'
-
-import { schema } from 'src/lib/ArrestFields'
+// import { schema } from 'src/lib/FieldSchemas'
 
 import { Field } from '../utils/Field'
 
-import { useSnackbar } from './SnackBar'
-
-const BULK_UPDATE_ARRESTS = gql`
-  mutation BulkUpdateArrests($ids: [Int]!, $input: UpdateArrestInput!) {
-    bulkUpdateArrests(ids: $ids, input: $input) {
-      count
-    }
-  }
-`
+import { useSnackbar, useDisplayError } from './SnackBar'
 
 const BulkUpdateModal = ({
   bulkUpdateRows,
   setBulkUpdateRows,
+  schema,
+  mutation,
+  name = '',
   onSuccess = () => {},
 }) => {
-  const [bulkUpdate] = useMutation(BULK_UPDATE_ARRESTS)
+  const [bulkUpdate] = useMutation(mutation)
   const { openSnackbar } = useSnackbar()
+  const displayError = useDisplayError()
   const defaultField = { field_name: null, field_value: null }
   const confirm = useConfirm()
 
@@ -57,7 +53,7 @@ const BulkUpdateModal = ({
         <>
           <Typography gutterBottom>
             Are you sure you want to bulk update the following fields on{' '}
-            {bulkUpdateRows.length} arrestees?
+            {bulkUpdateRows.length} {pluralize(name, bulkUpdateRows.length)}?
           </Typography>
 
           {...getValues().fields.map(({ field_name, field_value }) => {
@@ -94,16 +90,22 @@ const BulkUpdateModal = ({
       }
 
       const ids = bulkUpdateRows.map(({ id }) => id)
+      console.log(
+        name,
+        pluralize(name),
+        `bulkUpdate${capitalize(pluralize(name))}`
+      )
       const {
         data: {
-          bulkUpdateArrests: { count },
+          // [`bulkUpdateArrests`]: { count },
+          [`bulkUpdate${capitalize(pluralize(name))}`]: { count },
         },
       } = await bulkUpdate({ variables: { ids, input } })
-      openSnackbar(`${count} arrestee records updated`)
+      openSnackbar(`${count} ${name} records updated`)
       closeModal()
       onSuccess()
     } catch (error) {
-      openSnackbar(`Update failed: ${error}`, 'error')
+      displayError(`Update failed: ${error}`, 'error')
     }
   }
   const watchFieldArray = watch('fields')
@@ -129,7 +131,9 @@ const BulkUpdateModal = ({
   return (
     bulkUpdateRows && (
       <Dialog open={Boolean(bulkUpdateRows)} onClose={closeModal}>
-        <DialogTitle>Bulk Update {bulkUpdateRows.length} Arrests</DialogTitle>
+        <DialogTitle>
+          Bulk Update {bulkUpdateRows.length} {pluralize(name)}
+        </DialogTitle>
         <DialogContent>
           <Typography component="ol">
             <li>Choose a field to update from the dropdown on the left.</li>
