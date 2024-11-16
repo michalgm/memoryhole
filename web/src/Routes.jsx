@@ -43,11 +43,10 @@ const Routes = () => {
               <Route path="/table-views/{id:Int}" page={TableViewTableViewPage} name="tableView" />
               <Route path="/table-views" page={TableViewTableViewsPage} name="tableViews" />
             </Set>
-            <Set wrap={ScaffoldLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
-              <Route path="/admin/users/new" page={UserNewUserPage} name="newUser" />
-              <Route path="/admin/users/{id:Int}/edit" page={UserUserPage} name="editUser" />
+            <Set wrap={AdminLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
+              <Route path="/admin/users/new" page={UserUserPage} name="newUser" />
               <Route path="/admin/users/{id:Int}" page={UserUserPage} name="user" />
-              <Route path="/admin/users" page={ScaffoldUserUsersPage} name="users" />
+              <Route path="/admin/users" page={UserUsersPage} name="users" />
             </Set>
             <Set wrap={ScaffoldLayout} title="Arrestees" titleTo="arrestees" buttonLabel="New Arrestee" buttonTo="newArrestee">
               <Route path="/admin/arrestees/new" page={ArresteeNewArresteePage} name="newArrestee" />

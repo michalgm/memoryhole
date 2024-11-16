@@ -1,92 +1,56 @@
 import { Box, Button } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
+import { useConfirm } from 'material-ui-confirm'
 import { FormContainer } from 'react-hook-form-mui'
 
+import { navigate, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+
+import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
+import { UserFields } from 'src/lib/FieldSchemas'
 import { transformData } from 'src/lib/transforms'
 
-import dayjs from '../../../../../api/src/lib/day'
 import { Field } from '../../utils/Field'
 import Footer from '../../utils/Footer'
 import FormSection from '../../utils/FormSection'
 
-const UserFields = [
-  {
-    title: 'User Details',
-    fields: [
-      ['name'],
-      ['email'],
-      [
-        'role',
-        {
-          field_type: 'select',
-          options: ['User', 'Admin'],
-        },
-      ],
-    ],
-  },
-  {
-    title: 'Restrict Access',
-    fields: [
-      [
-        'expiresAt',
-        {
-          field_type: 'date-time',
-          label: 'Expires At',
-          helperText: "User's login will be disabled after this date",
-        },
-      ],
-      [
-        'actions',
-        {
-          field_type: 'select',
-          multiple: true,
-          query: {
-            model: 'action',
-            orderBy: {
-              start_date: 'desc',
-            },
-            searchField: 'name',
-          },
-          storeFullObject: true,
-          autocompleteProps: {
-            getOptionLabel: (option) => {
-              const date = dayjs(option.start_date).format('L LT')
-              return `${option.name} (${date})`
-            },
-          },
-          helperText:
-            'User will not have access to arrests outside of these actions',
-        },
-      ],
-      [
-        'arrest_date_min',
-        {
-          field_type: 'date',
-          label: 'Minimum Arrest Date',
-          helperText: 'User will not have access to arrests before this date',
-        },
-      ],
-      [
-        'arrest_date_max',
-        {
-          field_type: 'date',
-          label: 'Maximum Arrest Date',
-          helperText: 'User will not have access to arrests after this date',
-        },
-      ],
-    ],
-  },
-]
+export const DELETE_USER = gql`
+  mutation deleteUser($id: Int!) {
+    deleteUser(id: $id) {
+      id
+    }
+  }
+`
 
 const UserForm = ({ user, onSave, loading, error }) => {
+  const confirm = useConfirm()
+  const { openSnackbar } = useSnackbar()
+  const displayError = useDisplayError()
   const values = transformData(user || {}, UserFields)
+
+  const [deleteUser] = useMutation(DELETE_USER, {
+    onCompleted: () => {
+      openSnackbar(`User "${user.name}" deleted`)
+      navigate(routes.users())
+    },
+    onError: (error) => {
+      displayError(error)
+    },
+  })
+
+  const confirmDeleteUser = async () => {
+    await confirm({
+      title: 'Confirm Delete',
+      description: `Are you sure you want to delete the user "${user.name}"?`,
+    })
+    await deleteUser({ variables: { id: user.id } })
+  }
 
   return (
     <Box>
       <FormContainer
         defaultValues={{
           ...values,
-          // expiresAt: values.expiresAt ? dayjs(values.expiresAt) : null,
         }}
         onSuccess={(data) => onSave(data, user?.id)}
       >
@@ -111,7 +75,23 @@ const UserForm = ({ user, onSave, loading, error }) => {
           </Grid>
         </Grid>
         <Footer>
-          <Grid xs sx={{ textAlign: 'right' }}>
+          <Grid
+            xs
+            sx={{
+              textAlign: 'right',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 2,
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="inherit"
+              size="small"
+              onClick={() => confirmDeleteUser()}
+            >
+              Delete User
+            </Button>
             <Button
               type="submit"
               variant="contained"

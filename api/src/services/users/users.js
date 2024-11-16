@@ -53,6 +53,36 @@ export const updateUser = ({ id, input }) => {
   })
 }
 
+export const bulkUpdateUsers = async ({ ids, input }) => {
+  const users = await db.user.findMany({
+    where: {
+      id: { in: ids },
+    },
+  })
+  const res = await db.$transaction(
+    users.map(({ id, ...user }) => {
+      // ;[
+      //   'id',
+      //   'arrestee_id',
+      //   'created_by_id',
+      //   'updated_by_id',
+      //   'updated_at',
+      //   'created_at',
+      // ].forEach((key) => {
+      //   delete arrest[key]
+      //   delete arrest.arrestee[key]
+      // })
+      // const arrest_input = merge(arrest, input)
+
+      return updateUser({
+        id,
+        input,
+      })
+    })
+  )
+  return { count: res.length }
+}
+
 export const deleteUser = ({ id }) => {
   requireAdmin()
   return db.user.delete({
