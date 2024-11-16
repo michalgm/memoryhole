@@ -15,25 +15,24 @@ import QuickSearch from 'src/components/utils/QuickSearch'
 
 import { theme } from '../../App'
 
-const CustomLink = ({ to, ...rest }) => {
-  const matchInfo = useMatch(to)
+const NavLink = ({ to, ...rest }) => {
+  const matchInfo = useMatch(to, { matchSubPaths: true })
   const isActive = matchInfo.match
+
+  const underline = {
+    textDecoration: 'underline',
+    textDecorationColor: theme.palette.secondary.main,
+    textDecorationThickness: 3,
+  }
 
   const props = {
     color: 'inherit',
     sx: {
-      '&:hover': 'underline',
+      '&:hover': underline,
+      ...(isActive && underline),
     },
   }
-  if (isActive) {
-    // props.color = 'secondary'
-    props.sx = {
-      ...props.sx,
-      textDecoration: 'underline',
-      textDecorationColor: theme.palette.secondary.main,
-      textDecorationThickness: 3,
-    }
-  }
+
   return <Button component={Link} to={to} {...rest} {...props} />
 }
 
@@ -72,9 +71,9 @@ const BlogLayout = ({ children }) => {
               </Typography>
               <Box sx={{ flexGrow: 2 }}>
                 {pages.map(([route, label]) => (
-                  <CustomLink key={route} to={routes[route]()}>
+                  <NavLink key={route} to={routes[route]()}>
                     {label}
-                  </CustomLink>
+                  </NavLink>
                 ))}
               </Box>
               <QuickSearch />
