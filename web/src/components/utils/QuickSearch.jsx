@@ -59,12 +59,9 @@ function QuickSearch() {
         clearOnBlur={true}
         value={value}
         open={true}
-        // isOptionEqualToValue={(option, value) => console.log({option, value}) || option.id && value}
-        // value={searchValue}
-        getOptionLabel={(option) => option.display_field || ''} // Unique identifier, not displayed
+        getOptionLabel={(option) => option.display_field || ''}
         onInputChange={handleInputChange}
         filterOptions={(x) => x}
-        // value={(_, value) => setValue(value)}
         onChange={(event, value) => {
           setValue(value)
           if (value) {
