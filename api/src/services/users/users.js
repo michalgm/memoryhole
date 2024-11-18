@@ -35,6 +35,16 @@ export const updateUser = ({ id, input }) => {
   if (input.email || input.role) {
     requireAdmin()
   }
+  if (input.email) {
+    validate(input.email, {
+      presence: {
+        message: 'Email is required',
+      },
+      email: {
+        message: 'Email is invalid',
+      },
+    })
+  }
   if (context.currentUser.id === id) {
     ;['expiresAt', 'arrest_date_min', 'arrest_date_max'].forEach((key) => {
       validate(input[key], {
@@ -60,7 +70,7 @@ export const bulkUpdateUsers = async ({ ids, input }) => {
     },
   })
   const res = await db.$transaction(
-    users.map(({ id, ...user }) => {
+    users.map(({ id, ..._user }) => {
       // ;[
       //   'id',
       //   'arrestee_id',
