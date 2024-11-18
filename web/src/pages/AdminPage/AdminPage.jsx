@@ -1,4 +1,4 @@
-import { People } from '@mui/icons-material'
+import { Flag, People } from '@mui/icons-material'
 import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 
 import { routes } from '@redwoodjs/router'
@@ -17,19 +17,32 @@ const AdminPage = () => {
     'tableViews',
     'actions',
   ]
+
+  const route_links = [
+    {
+      to: routes.users(),
+      label: 'Manage Users',
+      icon: <People />,
+    },
+    {
+      to: routes.actions(),
+      label: 'Manage Actions',
+      icon: <Flag />,
+    },
+  ]
   return (
     <>
       <MetaTags title="Admin" description="Admin page" />
-      <h1>Memoryhole Admin Page</h1>
-      <List>
-        <Link to={routes.users()}>
-          <ListItemButton>
-            <ListItemIcon>
-              <People />
-            </ListItemIcon>
-            <ListItemText primary={'Manage Users'} />
-          </ListItemButton>
-        </Link>
+      {/* <h1>Memoryhole Admin Page</h1> */}
+      <List dense>
+        {route_links.map((route) => (
+          <Link key={route.to} to={route.to}>
+            <ListItemButton>
+              <ListItemIcon>{route.icon}</ListItemIcon>
+              <ListItemText primary={route.label} />
+            </ListItemButton>
+          </Link>
+        ))}
       </List>
       {/* <Link to={routes.editOptions()}>Edit Options</Link> */}
 

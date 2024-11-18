@@ -1,10 +1,29 @@
 import { navigate, routes } from '@redwoodjs/router'
-import { MetaTags, useMutation } from '@redwoodjs/web'
+import { useQuery } from '@redwoodjs/web'
+import FormContainer from 'src/components/utils/FormContainer'
+import { useDisplayError } from 'src/components/utils/SnackBar'
+import { UserFields } from 'src/lib/FieldSchemas'
 
-import UserCell from 'src/components/User/UserCell/UserCell'
-import { QUERY } from 'src/components/User/UserCell/UserCell'
-import UserForm from 'src/components/User/UserForm/UserForm'
-import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
+export const QUERY = gql`
+  query EditUser($id: Int!) {
+    user: user(id: $id) {
+      id
+      email
+      name
+      expiresAt
+      role
+      custom_fields
+      arrest_date_max
+      arrest_date_min
+      action_ids
+      actions {
+        id
+        name
+        start_date
+      }
+    }
+  }
+`
 
 const UPDATE_USER_MUTATION = gql`
   mutation UpdateUser($id: Int!, $input: UpdateUserInput!) {
@@ -38,64 +57,54 @@ const CREATE_USER_MUTATION = gql`
   }
 `
 
+export const DELETE_USER_MUTATION = gql`
+  mutation deleteUser($id: Int!) {
+    deleteUser(id: $id) {
+      id
+    }
+  }
+`
+
 const UserPage = ({ id }) => {
-  const { openSnackbar } = useSnackbar()
   const displayError = useDisplayError()
 
-  const [createUser, { loadingCreate, errorCreate }] = useMutation(
-    CREATE_USER_MUTATION,
-    {
-      onCompleted: async ({ createUser: user }) => {
-        openSnackbar('User created')
-        navigate(routes.user({ id: user.createUser.id }))
-      },
-      onError: (error) => {
-        displayError(error)
-      },
-    }
-  )
-
-  const [updateUser, { loading, error }] = useMutation(UPDATE_USER_MUTATION, {
-    onCompleted: () => {
-      openSnackbar('User updated')
-    },
-    refetchQueries: [{ query: QUERY, variables: { id } }],
-    awaitRefetchQueries: true,
-    onError: (error) => {
-      displayError(error)
-    },
+  const { data, loading, error } = useQuery(QUERY, {
+    variables: { id: parseInt(id) },
+    skip: !id || id === 'new',
+    onError: displayError,
   })
 
-  const onSave = async (input, id) => {
+  const transformInput = (input) => {
     const fieldsToRemove = ['id', '__typename']
     fieldsToRemove.forEach((k) => delete input[k])
     if (input.actions) {
       input.action_ids = input.actions.map(({ id }) => id)
       delete input.actions
     }
-    if (id) {
-      return updateUser({ variables: { id, input } })
-    } else {
-      return createUser({ variables: { input } })
-    }
+    return input
   }
+
+  if (error) return null
+
   return (
     <>
-      <MetaTags title="Edit User" description="Edit User" />
-      {id && id !== 'new' ? (
-        <UserCell
-          id={parseInt(id)}
-          onSave={onSave}
-          loading={loading || loadingCreate}
-          error={error || errorCreate}
-        />
-      ) : (
-        <UserForm
-          onSave={onSave}
-          loading={loading || loadingCreate}
-          error={error || errorCreate}
-        />
-      )}
+      <FormContainer
+        fields={UserFields}
+        entity={data?.user}
+        displayConfig={{
+          type: 'User',
+          name: data?.user?.name,
+        }}
+        loading={loading}
+        fetchQuery={QUERY}
+        columnCount={1}
+        createMutation={CREATE_USER_MUTATION}
+        updateMutation={UPDATE_USER_MUTATION}
+        deleteMutation={DELETE_USER_MUTATION}
+        transformInput={transformInput}
+        onDelete={() => navigate(routes.users())}
+        onCreate={(data) => navigate(routes.user({ id: data.createUser.id }))}
+      />
     </>
   )
 }

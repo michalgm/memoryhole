@@ -9,7 +9,10 @@ const AdminLayout = ({ title, titleTo, buttonLabel, buttonTo, children }) => {
   return (
     <div className="admin-view">
       <header className="rw-header">
-        <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
+        <Breadcrumbs
+          fontSize={26}
+          separator={<NavigateNext fontSize="small" />}
+        >
           <Link to={routes.admin()} className="rw-link">
             Admin
           </Link>

@@ -1,9 +1,9 @@
 import { Link, routes } from '@redwoodjs/router'
-import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 import { QUERY } from 'src/components/Arrest/ArrestsCell'
-import { toast } from '@redwoodjs/web/toast'
-import { useMutation } from '@redwoodjs/web'
+import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
 
 const DELETE_ARREST_MUTATION = gql`
   mutation DeleteArrestMutation($id: Int!) {

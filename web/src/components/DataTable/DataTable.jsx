@@ -18,18 +18,9 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 })
 
-export const defineColumns = (
-  schema,
-  displayColumns,
-  preColumns = [],
-  postColumns = []
-) => {
+export const defineColumns = (schema, displayColumns, visibleColumns) => {
   const columnNames = sortBy(
-    difference(Object.keys(schema), [
-      ...displayColumns,
-      ...preColumns.map((c) => c.accessorKey),
-      ...postColumns.map((c) => c.accessorKey),
-    ]),
+    difference(Object.keys(schema), [...displayColumns, ...visibleColumns]),
     (k) => schema[k]?.props.label || formatLabel(k)
   )
 
@@ -86,11 +77,16 @@ const DataTable = ({
   manageViews = false,
   type = '',
   name = '',
+  persistState = false,
 }) => {
+  const visibleColumns = [
+    ...displayColumns,
+    ...[...preColumns, ...postColumns].map((c) => c.accessorKey),
+  ]
   const columns = useMemo(
     () => [
       ...preColumns,
-      ...defineColumns(schema, displayColumns, preColumns, postColumns),
+      ...defineColumns(schema, displayColumns, visibleColumns),
       ...postColumns,
     ],
     [preColumns, postColumns, displayColumns, schema]
@@ -99,7 +95,7 @@ const DataTable = ({
   const initialState = merge(
     {
       columnVisibility: Object.keys(schema).reduce((acc, f) => {
-        acc[f] = displayColumns.includes(f)
+        acc[f] = visibleColumns.includes(f)
         return acc
       }, {}),
       density: 'compact',
@@ -130,7 +126,7 @@ const DataTable = ({
       sessionState = merge(sessionState, storageState)
     }
     loadState(sessionState)
-  }, [type])
+  }, [type, persistState])
 
   const getDefault = (key) => localState[key] || initialState[key]
 
@@ -213,7 +209,7 @@ const DataTable = ({
   }
 
   useEffect(() => {
-    if (stateLoaded && type) {
+    if (persistState && stateLoaded && type) {
       sessionStorage.setItem(
         `${type}_table_state`,
         JSON.stringify({
@@ -237,6 +233,7 @@ const DataTable = ({
     pagination,
     columnFilterFns,
     type,
+    persistState,
   ])
 
   const defaultProps = {
@@ -357,7 +354,6 @@ const DataTable = ({
   // const currentTableState = table.getState()
   // console.log('live', currentTableState.sorting[0])
   // console.log(state.columnFilterFns) // console.log(columns, { columnFilterFns })
-
   return <MaterialReactTable table={table} />
 }
 

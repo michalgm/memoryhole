@@ -505,6 +505,23 @@ export const UserFields = [
   },
 ]
 
+export const ActionFields = [
+  {
+    fields: [
+      ['name', { required: true }],
+      ['description', { field_type: 'richtext' }],
+      ['start_date', { field_type: 'date-time' }],
+      ['end_date', { field_type: 'date-time' }],
+      ['jurisdiction'],
+      ['city'],
+    ],
+  },
+]
+
 export default ArrestFields
 
 export const userSchema = sortObjectKeys(getSchema(UserFields), 'props.label')
+export const actionSchema = sortObjectKeys(
+  getSchema(ActionFields),
+  'props.label'
+)

@@ -1,5 +1,4 @@
 import { Link, routes } from '@redwoodjs/router'
-
 import { Toaster } from '@redwoodjs/web/toast'
 
 const ScaffoldLayout = ({

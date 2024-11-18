@@ -35,7 +35,7 @@ const Routes = () => {
             <Set wrap={ScaffoldLayout} title="Arrests" titleTo="arrests" buttonLabel="New Arrest" buttonTo="newArrest">
               <Route path="/admin/arrests/new" page={ArrestNewArrestPage} name="newArrest" />
               <Route path="/admin/arrests/{id:Int}/edit" page={ArrestEditArrestPage} name="editArrest" />
-              <Route path="/admin/arrests" page={ArrestArrestsPage} name="arrests" />
+              {/* <Route path="/admin/arrests" page={ArrestArrestsPage} name="arrests" /> */}
             </Set>
             <Set wrap={ScaffoldLayout} title="TableViews" titleTo="tableViews" buttonLabel="New TableView" buttonTo="newTableView">
               <Route path="/table-views/new" page={TableViewNewTableViewPage} name="newTableView" />
@@ -66,17 +66,17 @@ const Routes = () => {
               <Route path="/admin/logs/{id:Int}" page={LogLogPage} name="log" />
               <Route path="/admin/logs" page={LogLogsPage} name="logs" />
             </Set>
-            <Set wrap={ScaffoldLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
-              <Route path="/admin/actions/new" page={ActionNewActionPage} name="newAction" />
-              <Route path="/admin/actions/{id:Int}/edit" page={ActionEditActionPage} name="editAction" />
+            <Set wrap={AdminLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
+              <Route path="/admin/actions/new" page={ActionActionPage} name="newAction" />
               <Route path="/admin/actions/{id:Int}" page={ActionActionPage} name="action" />
               <Route path="/admin/actions" page={ActionActionsPage} name="actions" />
             </Set>
           </PrivateSet>
-          <Route path="/arrest/new" page={ArresteeArrestPage} name="newArresteeArrest" />
-          <Route path="/arrest/{id:Int}" page={ArresteeArrestPage} name="arrest" />
+          <Route path="/arrests/new" page={ArresteeArrestPage} name="newArresteeArrest" />
+          <Route path="/arrests/{id:Int}" page={ArresteeArrestPage} name="arrest" />
           <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" />
           <Route path="/docket-sheets" page={DocketSheetsPage} name="docketSheets" />
+          <Route path="/arrests" page={HomePage} name="arrests" />
           <Route path="/" page={HomePage} name="home" />
         </Set>
       </PrivateSet>

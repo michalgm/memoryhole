@@ -1,13 +1,11 @@
 import { useState } from 'react'
 
 import { routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
 
 import DataTable from 'src/components/DataTable/DataTable'
 import BulkUpdateModal from 'src/components/utils/BulkUpdateModal'
 import Link from 'src/components/utils/Link'
-import { useSnackbar } from 'src/components/utils/SnackBar'
-import { UserFields, userSchema } from 'src/lib/FieldSchemas'
+import { userSchema } from 'src/lib/FieldSchemas'
 
 export const QUERY = gql`
   query UsersQuery {
@@ -34,9 +32,8 @@ const BULK_UPDATE_USERS = gql`
 
 export const Success = ({ users, queryResult: { refetch } }) => {
   const [bulkUpdateRows, setBulkUpdateRows] = useState(null)
-  const { openSnackbar } = useSnackbar()
 
-  const [displayColumns] = useState(['email', 'role', 'expiresAt'])
+  const displayColumns = ['email', 'role', 'expiresAt']
 
   const tableProps = {
     enableColumnFilterModes: true,
@@ -60,6 +57,7 @@ export const Success = ({ users, queryResult: { refetch } }) => {
     {
       accessorKey: 'name',
       header: 'Name',
+      columnVisibility: true,
       Cell: ({ row, renderedCellValue }) => (
         <Link color="secondary" to={routes.user({ id: row.original.id })}>
           {renderedCellValue}

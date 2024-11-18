@@ -1,10 +1,69 @@
 import { navigate, routes } from '@redwoodjs/router'
-import { MetaTags, useMutation } from '@redwoodjs/web'
+import { useQuery } from '@redwoodjs/web'
+import FormContainer from 'src/components/utils/FormContainer'
+import { useDisplayError } from 'src/components/utils/SnackBar'
+import ArrestFields from 'src/lib/FieldSchemas'
 
-import ArresteeArrestCell from 'src/components/ArresteeArrestCell'
-import { QUERY } from 'src/components/ArresteeArrestCell'
-import ArresteeArrestForm from 'src/components/ArresteeArrestForm/ArresteeArrestForm'
-import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
+export const QUERY = gql`
+  query EditArresteeArrestById($id: Int!) {
+    arresteeArrest: arrest(id: $id) {
+      id
+      date
+      location
+      display_field
+      search_field
+      date
+      charges
+      arrest_city
+      jurisdiction
+      citation_number
+      arrestee_id
+      action_id
+      action {
+        id
+        name
+        start_date
+      }
+      custom_fields
+      created_at
+      created_by {
+        name
+      }
+      updated_at
+      updated_by {
+        name
+      }
+      arrestee {
+        id
+        display_field
+        first_name
+        last_name
+        preferred_name
+        pronoun
+        dob
+        email
+        phone_1
+        phone_2
+        address
+        city
+        state
+        zip
+        custom_fields
+        # logs {
+        #   id
+        #   time
+        #   type
+        #   notes
+        #   needs_followup
+
+        # }
+        arrests {
+          id
+        }
+      }
+    }
+  }
+`
 
 const UPDATE_ARREST_MUTATION = gql`
   mutation UpdateArresteeArrestMutation($id: Int!, $input: UpdateArrestInput!) {
@@ -54,34 +113,24 @@ const CREATE_ARREST_MUTATION = gql`
   }
 `
 
+export const DELETE_ARREST_MUTATION = gql`
+  mutation deleteArrestee($id: Int!) {
+    deleteArrestee(id: $id) {
+      id
+    }
+  }
+`
+
 const ArresteeArrestPage = ({ id }) => {
-  const { openSnackbar } = useSnackbar()
   const displayError = useDisplayError()
 
-  const [createArrest, { loadingCreate, errorCreate }] = useMutation(
-    CREATE_ARREST_MUTATION,
-    {
-      onCompleted: (data) => {
-        openSnackbar('Arrest created')
-        navigate(routes.arrest({ id: data.createArrest.id }))
-      },
-      onError: displayError,
-    }
-  )
+  const { data, loading, error } = useQuery(QUERY, {
+    variables: { id: parseInt(id) },
+    skip: !id || id === 'new',
+    onError: displayError,
+  })
 
-  const [updateArrest, { loading, error }] = useMutation(
-    UPDATE_ARREST_MUTATION,
-    {
-      onCompleted: async () => {
-        openSnackbar('Arrest updated')
-      },
-      refetchQueries: [{ query: QUERY, variables: { id } }],
-      awaitRefetchQueries: true,
-      onError: displayError,
-    }
-  )
-
-  const onSave = async (input, id) => {
+  const transformInput = (input) => {
     ;[
       'updated_at',
       'updated_by',
@@ -98,30 +147,31 @@ const ArresteeArrestPage = ({ id }) => {
       input.action_id = input.action.id
     }
     delete input.action
-    if (id) {
-      return updateArrest({ variables: { id, input } })
-    } else {
-      return createArrest({ variables: { input } })
-    }
+    return input
   }
+
+  if (error) return null
 
   return (
     <>
-      <MetaTags title="Arrest" description="Arrest page" />
-      {id && id !== 'new' ? (
-        <ArresteeArrestCell
-          id={id}
-          onSave={onSave}
-          loading={loading || loadingCreate}
-          error={error || errorCreate}
-        />
-      ) : (
-        <ArresteeArrestForm
-          onSave={onSave}
-          loading={loading || loadingCreate}
-          error={error || errorCreate}
-        />
-      )}
+      <FormContainer
+        fields={ArrestFields}
+        entity={data?.arresteeArrest}
+        displayConfig={{
+          type: 'Arrest',
+          name: data?.arresteeArrest?.arrestee?.display_field,
+        }}
+        loading={loading}
+        fetchQuery={QUERY}
+        createMutation={CREATE_ARREST_MUTATION}
+        updateMutation={UPDATE_ARREST_MUTATION}
+        deleteMutation={DELETE_ARREST_MUTATION}
+        transformInput={transformInput}
+        onDelete={() => navigate(routes.arrests())}
+        onCreate={(data) =>
+          navigate(routes.arrest({ id: data.createArrest.id }))
+        }
+      />
     </>
   )
 }

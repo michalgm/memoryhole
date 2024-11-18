@@ -191,6 +191,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
         manageViews
         type="arrestees"
         name="arrest"
+        persistState
       />
       <BulkUpdateModal
         bulkUpdateRows={bulkUpdateRows}

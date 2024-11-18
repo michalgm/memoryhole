@@ -31,6 +31,7 @@ export const theme = createTheme({
     error: { main: '#FF5449' },
   },
 })
+// console.log({ theme })
 
 const App = () => (
   <React.Fragment>
