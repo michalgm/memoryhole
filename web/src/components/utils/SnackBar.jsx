@@ -1,4 +1,10 @@
-import { createContext, useContext, useState } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
@@ -15,12 +21,23 @@ import {
 
 const SnackbarContext = createContext()
 
+export let globalDisplayError = null
+const INVALID_AUTH_HEADER_ERROR =
+  'Exception in getAuthenticationContext: The `Authorization` header is not valid.'
+
+export const setGlobalDisplayError = (fn) => {
+  globalDisplayError = fn
+}
+
 export const useSnackbar = () => {
   return useContext(SnackbarContext)
 }
 
 const errorList = (errors) => {
   const errorMessages = errors.map((err, index) => {
+    const message = [err.message, err.extensions?.originalError?.message].join(
+      ' '
+    )
     return (
       <ListItem key={`error-${index}`}>
         <Typography
@@ -31,22 +48,34 @@ const errorList = (errors) => {
             whiteSpace: 'pre-wrap', // Preserve formatting and wrap long lines
           }}
         >
-          {err.message}
+          {message}
         </Typography>
       </ListItem>
     )
   })
   return <List dense>{errorMessages}</List>
 }
-export const useDisplayError = () => {
-  const { openSnackbar } = useSnackbar() // Access openSnackbar from your snackbar hook
 
-  return (error) => {
-    const errorMessage = (
-      <>
-        <AlertTitle>Error</AlertTitle>
-        <Typography gutterBottom>{error.message}</Typography>
+const formatError = (error) => {
+  if (
+    error?.graphQLErrors?.[0]?.extensions?.originalError?.message ===
+      INVALID_AUTH_HEADER_ERROR ||
+    error?.networkError?.result?.errors?.[0]?.extensions?.originalError
+      ?.message === INVALID_AUTH_HEADER_ERROR
+  ) {
+    return
+  }
+  const message =
+    typeof error === 'string'
+      ? error
+      : error?.message || error?.[0]?.message || 'Unknown error'
 
+  const errorMessage = (
+    <>
+      <AlertTitle>Error</AlertTitle>
+      <Typography gutterBottom>{message || 'Unknown error'}</Typography>
+      {(error.graphQLErrors?.length > 0 ||
+        error.networkError?.result?.errors?.length > 0) && (
         <Accordion sx={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body2">Details</Typography>
@@ -68,11 +97,21 @@ export const useDisplayError = () => {
             )}
           </AccordionDetails>
         </Accordion>
-      </>
-    )
+      )}
+    </>
+  )
+  return errorMessage
+}
 
-    openSnackbar(errorMessage, 'error')
-  }
+export const useDisplayError = () => {
+  const { openSnackbar } = useSnackbar() // Access openSnackbar from your snackbar hook
+  useEffect(() => {
+    setGlobalDisplayError((error) => {
+      openSnackbar(formatError(error), 'error')
+    })
+  }, [openSnackbar])
+
+  return globalDisplayError
 }
 
 export const SnackBarProvider = ({ children }) => {

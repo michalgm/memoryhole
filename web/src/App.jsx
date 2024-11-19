@@ -7,6 +7,7 @@ import './index.css'
 
 import * as React from 'react'
 
+import { ApolloLink } from '@apollo/client'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { LocalizationProvider } from '@mui/x-date-pickers'
@@ -21,6 +22,8 @@ import Routes from 'src/Routes'
 
 import { AuthProvider, useAuth } from './auth'
 import { SnackBarProvider } from './components/utils/SnackBar'
+import AppProvider from './lib/AppContext'
+import ErrorHandler from './lib/ErrorHandler'
 
 export const theme = createTheme({
   palette: {
@@ -40,33 +43,42 @@ export const theme = createTheme({
   },
 })
 
+// Inject error handler into Apollo Link chain
+const link = (rwlinks) =>
+  ApolloLink.from([ErrorHandler, ...rwlinks.map((l) => l.link)])
+
 const App = () => (
   <React.Fragment>
     <CssBaseline />
     <FatalErrorBoundary page={FatalErrorPage}>
-      <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
-        <ThemeProvider theme={theme}>
-          <AuthProvider>
-            <RedwoodApolloProvider useAuth={useAuth}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <ConfirmProvider
-                  defaultOptions={{
-                    confirmationButtonProps: {
-                      variant: 'contained',
-                      color: 'secondary',
-                    },
-                    cancellationButtonProps: { variant: 'outlined' },
-                  }}
-                >
-                  <SnackBarProvider>
-                    <Routes />
-                  </SnackBarProvider>
-                </ConfirmProvider>
-              </LocalizationProvider>
-            </RedwoodApolloProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </RedwoodProvider>
+      <SnackBarProvider>
+        <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
+          <ThemeProvider theme={theme}>
+            <AuthProvider>
+              <RedwoodApolloProvider
+                useAuth={useAuth}
+                graphQLClientConfig={{ link }}
+              >
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <ConfirmProvider
+                    defaultOptions={{
+                      confirmationButtonProps: {
+                        variant: 'contained',
+                        color: 'secondary',
+                      },
+                      cancellationButtonProps: { variant: 'outlined' },
+                    }}
+                  >
+                    <AppProvider>
+                      <Routes />
+                    </AppProvider>
+                  </ConfirmProvider>
+                </LocalizationProvider>
+              </RedwoodApolloProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </RedwoodProvider>
+      </SnackBarProvider>
     </FatalErrorBoundary>
   </React.Fragment>
 )
