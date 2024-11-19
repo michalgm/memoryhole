@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { validate } from '@redwoodjs/api'
+import { validate, validateUniqueness } from '@redwoodjs/api'
 
 import { requireAuth } from 'src/lib/auth'
 import { initUser, onboardUser } from 'src/lib/authHelpers'
@@ -22,16 +22,22 @@ export const createUser = async ({ input }) => {
 
   const { data, token } = initUser(input)
 
-  const user = await db.user.create({
-    data,
-  })
+  return await validateUniqueness(
+    'user',
+    { email: input.email },
+    async (db) => {
+      const user = await db.user.create({
+        data,
+      })
 
-  await onboardUser(user, token)
+      await onboardUser(user, token)
 
-  return user
+      return user
+    }
+  )
 }
 
-export const updateUser = ({ id, input }) => {
+export const updateUser = async ({ id, input }) => {
   if (input.email || input.role) {
     requireAdmin()
   }
@@ -57,10 +63,16 @@ export const updateUser = ({ id, input }) => {
   if (input.arrest_date_max) {
     input.arrest_date_max = dayjs(input.arrest_date_max).endOf('day')
   }
-  return db.user.update({
-    data: input,
-    where: { id },
-  })
+  return await validateUniqueness(
+    'user',
+    { email: input.email, $self: { id } },
+    (db) => {
+      return db.user.update({
+        data: input,
+        where: { id },
+      })
+    }
+  )
 }
 
 export const bulkUpdateUsers = async ({ ids, input }) => {
