@@ -30,8 +30,15 @@ export const theme = createTheme({
     success: { main: '#392e3d' },
     error: { main: '#FF5449' },
   },
+  typography: {
+    h1: { fontSize: '2.25rem' },
+    h2: { fontSize: '1.625rem' },
+    h3: { fontSize: '1.25rem' },
+    h4: { fontSize: '1.125rem' },
+    h5: { fontSize: '0.875rem' },
+    h6: { fontSize: '0.875rem' },
+  },
 })
-// console.log({ theme })
 
 const App = () => (
   <React.Fragment>
