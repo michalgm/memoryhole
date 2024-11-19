@@ -7,6 +7,7 @@ import { sendReset, tokenExpireHours } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
 
 const login_expire_hours = 6
+// const login_expire_hours = 1 / 60 / 10
 
 export const handler = async (event, context) => {
   const forgotPasswordOptions = {
@@ -35,7 +36,7 @@ export const handler = async (event, context) => {
       // for security reasons you may want to be vague here rather than expose
       // the fact that the email address wasn't found (prevents fishing for
       // valid email addresses)
-      usernameNotFound: 'Username not found',
+      usernameNotFound: 'User not found',
       // if the user somehow gets around client validation
       usernameRequired: 'Username is required',
     },
@@ -70,13 +71,13 @@ export const handler = async (event, context) => {
     },
 
     errors: {
-      usernameOrPasswordMissing: 'Both username and password are required',
-      usernameNotFound: 'Username ${username} not found',
+      usernameOrPasswordMissing: 'Both email and password are required',
+      usernameNotFound: 'Login failed - check email and password',
       // For security reasons you may want to make this the same as the
       // usernameNotFound error so that a malicious user can't use the error
       // to narrow down if it's the username or password that's incorrect
       // incorrectPassword: "Incorrect password for ${username}",
-      incorrectPassword: 'Username ${username} not found',
+      incorrectPassword: 'Login failed - check email and password',
     },
 
     // How long a user will remain logged in, in seconds
