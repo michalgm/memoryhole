@@ -36,6 +36,7 @@ const ActionsPage = () => {
       columnPinning: {
         left: ['mrt-row-select', 'name'],
       },
+      sorting: [{ id: 'start_date', desc: true }],
     },
   }
 
