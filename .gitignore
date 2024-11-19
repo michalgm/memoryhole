@@ -23,3 +23,5 @@ api/src/lib/generateGraphiQLHeader.*
 !.yarn/versions
 tryouts/
 deploy.toml
+deployment/nginx.conf
+deployment/linode.txt
