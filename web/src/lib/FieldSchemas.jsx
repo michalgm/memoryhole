@@ -1,7 +1,7 @@
 import { fromPairs, sortBy, toPairs } from 'lodash'
 
 import dayjs from '../../../api/src/lib/day'
-import { formatLabel } from '../components/utils/Field'
+import { formatLabel } from '../components/utils/BaseField'
 
 const usStates = [
   'Alabama',
@@ -68,6 +68,38 @@ const release_types = [
   'Unknown Released',
   'Guilty Plea',
   'Out With No Complaint',
+]
+
+const cities = [
+  'Oakland',
+  'San Francisco',
+  'Berkeley',
+  'Emeryville',
+  'Dublin',
+  'Hayward',
+  'Richmond',
+  'San Jose',
+  'San Leandro',
+  'San Mateo',
+  'Santa Cruz',
+  'Walnut Creek',
+  'Other',
+]
+
+const jurisdictions = [
+  'San Francisco',
+  'Alameda',
+  'Federal',
+  'Contra Costa',
+  'San Mateo',
+  'Santa Clara',
+  'Santa Cruz',
+  'Marin',
+  'Yolo',
+  'Humboldt',
+  'Solano',
+  'Sonoma',
+  'Napa',
 ]
 
 const ArrestFields = [
@@ -157,7 +189,6 @@ const ArrestFields = [
   {
     title: 'Arrest Info',
     fields: [
-      // ['action', { type: 'number', field_type: 'action_chooser', span: 12 }],
       [
         'date',
         {
@@ -167,26 +198,13 @@ const ArrestFields = [
           required: true,
         },
       ],
+      ['action', { type: 'number', field_type: 'action_chooser', span: 12 }],
       ['location'],
       [
         'arrest_city',
         {
           field_type: 'select',
-          options: [
-            'Oakland',
-            'San Francisco',
-            'Berkeley',
-            'Emeryville',
-            'Dublin',
-            'Hayward',
-            'Richmond',
-            'San Jose',
-            'San Leandro',
-            'San Mateo',
-            'Santa Cruz',
-            'Walnut Creek',
-            'Other',
-          ],
+          options: cities,
           required: true,
         },
       ],
@@ -270,21 +288,7 @@ const ArrestFields = [
         'jurisdiction',
         {
           field_type: 'select',
-          options: [
-            'San Francisco',
-            'Alameda',
-            'Federal',
-            'Contra Costa',
-            'San Mateo',
-            'Santa Clara',
-            'Santa Cruz',
-            'Marin',
-            'Yolo',
-            'Humboldt',
-            'Solano',
-            'Sonoma',
-            'Napa',
-          ],
+          options: jurisdictions,
         },
       ],
       [
@@ -510,10 +514,26 @@ export const ActionFields = [
     fields: [
       ['name', { required: true }],
       ['description', { field_type: 'richtext' }],
-      ['start_date', { field_type: 'date-time' }],
+      ['start_date', { field_type: 'date-time', required: true }],
       ['end_date', { field_type: 'date-time' }],
-      ['jurisdiction'],
-      ['city'],
+      [
+        'jurisdiction',
+        {
+          field_type: 'select',
+          options: jurisdictions,
+          helperText:
+            'Sets the default jurisdiction for new arrests created in this action',
+        },
+      ],
+      [
+        'city',
+        {
+          field_type: 'select',
+          options: cities,
+          helperText:
+            'Sets the default city for new arrests created in this action',
+        },
+      ],
     ],
   },
 ]

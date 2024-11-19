@@ -1,8 +1,14 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
-import { debounce } from 'lodash'
-import { AutocompleteElement, useFormContext } from 'react-hook-form-mui'
+import {
+  CircularProgress,
+  InputAdornment,
+  Autocomplete as MUIAutocomplete,
+  TextField,
+} from '@mui/material'
+import { debounce, merge } from 'lodash'
+import { AutocompleteElement } from 'react-hook-form-mui'
 
 import { useDisplayError } from '../utils/SnackBar'
 
@@ -20,10 +26,14 @@ const Autocomplete = ({
   autocompleteProps: defaultAutocompleteProps,
   storeFullObject = false,
   query,
+  value,
+  onChange,
+  helperText,
+  isRHF = false,
+  transformOptions,
   ...props
 }) => {
-  const { setValue, getValues } = useFormContext()
-  const currentValue = getValues(name)
+  const currentValue = value
   const displayError = useDisplayError()
   const [options, setOptions] = useState(() => {
     if (currentValue && !staticOptions) {
@@ -34,15 +44,17 @@ const Autocomplete = ({
         },
       ]
     }
-    return staticOptions || []
+    const initialOptions = staticOptions || []
+
+    return transformOptions ? transformOptions(initialOptions) : initialOptions
   })
-  const [searchQuery] = useLazyQuery(DYNAMIC_QUERY, { onError: displayError })
-  // console.log(query, currentValue, options)
+  const [searchQuery, { loading }] = useLazyQuery(DYNAMIC_QUERY, {
+    onError: displayError,
+  })
 
   const handleSearch = useCallback(
     async (searchTerm) => {
       if (!query || staticOptions) return
-
       const { select, orderBy, model, searchField, take = 10 } = query
       const params = {
         where: {
@@ -61,50 +73,86 @@ const Autocomplete = ({
       })
 
       const options = result.data?.dynamicModelQuery || []
+      const transformedOptions = transformOptions
+        ? transformOptions(options.map((o) => ({ ...o, label: o.name })))
+        : options.map((o) => ({ ...o, label: o.name }))
 
-      setOptions(options.map((o) => ({ ...o, label: o.name })))
+      setOptions(transformedOptions)
     },
-    [query, staticOptions, searchQuery]
+    [query, staticOptions, searchQuery, transformOptions]
   )
-
-  useEffect(() => {
-    if (!query || staticOptions) return
-
-    handleSearch()
-  }, [query, staticOptions, handleSearch])
 
   const debouncedSearch = useMemo(
     () => debounce((searchTerm) => handleSearch(searchTerm), 300),
     [handleSearch]
   )
 
+  useEffect(() => {
+    debouncedSearch()
+  }, [debouncedSearch])
+
   const autocompleteProps = {
-    ...textFieldProps,
     isOptionEqualToValue: (option = {}, value) => {
       return option.id === value || option.id === value?.id
     },
     getOptionLabel: (option) => option.label || '',
     onChange: (e, value) => {
-      setValue(name, storeFullObject ? value : value?.id || null)
+      onChange(storeFullObject ? value : value?.id || null)
     },
 
     onInputChange: (_, value, reason) => {
-      if (reason === 'input' && value?.length > 2) {
+      if (reason === 'input') {
         debouncedSearch(value)
       }
     },
+    size: textFieldProps?.size || 'small',
     ...defaultAutocompleteProps,
   }
   delete autocompleteProps.inputProps
   delete autocompleteProps.helperText
-  // console.log(name, options, currentValue)
+  if (isRHF) {
+    return (
+      <AutocompleteElement
+        name={name}
+        label={label}
+        options={options}
+        textFieldProps={textFieldProps}
+        autocompleteProps={autocompleteProps}
+        helperText={helperText}
+        loading={loading}
+        {...props}
+      />
+    )
+  }
+
   return (
-    <AutocompleteElement
+    <MUIAutocomplete
       name={name}
       label={label}
       options={options}
-      textFieldProps={textFieldProps}
-      autocompleteProps={autocompleteProps}
+      value={currentValue}
+      renderInput={(params) => {
+        const mergedProps = merge(params, textFieldProps)
+        if (loading) {
+          mergedProps.InputProps = {
+            ...mergedProps.InputProps,
+            startAdornment: (
+              <InputAdornment position="start">
+                <CircularProgress color="inherit" size={20} />
+              </InputAdornment>
+            ),
+          }
+        }
+        return (
+          <TextField
+            {...params}
+            {...mergedProps}
+            error={props.error}
+            helperText={helperText}
+          />
+        )
+      }}
+      {...autocompleteProps}
       {...props}
     />
   )

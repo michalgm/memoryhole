@@ -17,7 +17,9 @@ export const QUERY = gql`
       arrest_date_max
       arrest_date_min
       expiresAt
-      action_ids
+      actions {
+        name
+      }
     }
   }
 `
@@ -33,7 +35,7 @@ const BULK_UPDATE_USERS = gql`
 export const Success = ({ users, queryResult: { refetch } }) => {
   const [bulkUpdateRows, setBulkUpdateRows] = useState(null)
 
-  const displayColumns = ['email', 'role', 'expiresAt']
+  const displayColumns = ['email', 'role', 'expiresAt', 'actions']
 
   const tableProps = {
     enableColumnFilterModes: true,
@@ -66,16 +68,27 @@ export const Success = ({ users, queryResult: { refetch } }) => {
     },
   ]
 
+  const customFields = {
+    actions: {
+      type: 'array',
+      label: 'Actions',
+    },
+  }
+
   return (
     <>
       <DataTable
-        data={users}
+        data={users.map((user) => ({
+          ...user,
+          actions: user.actions.map((action) => action.name),
+        }))}
         displayColumns={displayColumns}
         tableProps={tableProps}
         refetch={refetch}
         bulkUpdate={bulkUpdate}
         schema={userSchema}
         preColumns={preColumns}
+        customFields={customFields}
         // manageViews
         type="users"
         name="user"

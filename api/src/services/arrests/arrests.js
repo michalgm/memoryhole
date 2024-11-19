@@ -117,8 +117,12 @@ export const filterArrests = ({ filters = [] }) => {
 
   return db.arrest.findMany({
     where: filterAccess(where),
+    orderBy: {
+      date: 'desc',
+    },
   })
 }
+
 export const arrest = async ({ id }) => {
   const arrest = await db.arrest.findUnique({
     where: { id },

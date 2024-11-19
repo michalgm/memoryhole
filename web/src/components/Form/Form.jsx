@@ -9,7 +9,6 @@ const Form = ({
   children,
   loading,
   submitText = 'Save',
-  error,
 }) => {
   return (
     <FormContainer

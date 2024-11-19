@@ -8,7 +8,6 @@ import {
   InputAdornment,
   TextField,
   Typography,
-  alpha,
 } from '@mui/material'
 
 import { navigate, routes } from '@redwoodjs/router'
@@ -93,23 +92,25 @@ function QuickSearch() {
         renderInput={(params) => (
           <TextField
             {...params}
+            variant="standard"
             sx={{
-              // borderRadius: 5,
-              backgroundColor: alpha('#fff', 0.45),
-              '&:hover': {
-                backgroundColor: alpha('#fff', 0.65),
+              borderRadius: 1,
+              backgroundColor: 'primary.light',
+              input: { color: '#fff' }, // Text color for readability
+              '& .MuiSvgIcon-root': {
+                color: '#fff !important',
               },
             }}
             InputProps={{
+              disableUnderline: true,
               ...params.InputProps,
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment position="start" color="#fff">
                   <Search />
                 </InputAdornment>
               ),
             }}
             placeholder="Search arrests..."
-            variant="outlined"
           />
         )}
       />

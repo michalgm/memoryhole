@@ -1,7 +1,10 @@
 import { navigate, routes } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
+
+import ArresteeLogsDrawer from 'src/components/ArresteeLogs/ArresteeLogsDrawer'
 import FormContainer from 'src/components/utils/FormContainer'
 import { useDisplayError } from 'src/components/utils/SnackBar'
+import { useApp } from 'src/lib/AppContext'
 import ArrestFields from 'src/lib/FieldSchemas'
 
 export const QUERY = gql`
@@ -122,13 +125,29 @@ export const DELETE_ARREST_MUTATION = gql`
 `
 
 const ArresteeArrestPage = ({ id }) => {
+  const { currentAction } = useApp()
   const displayError = useDisplayError()
+  const isCreate = !id || id === 'new'
 
-  const { data, loading, error } = useQuery(QUERY, {
+  const {
+    data: { arresteeArrest: arrest = { arrestee: {} } } = {},
+    loading,
+    error,
+  } = useQuery(QUERY, {
     variables: { id: parseInt(id) },
-    skip: !id || id === 'new',
+    skip: isCreate,
     onError: displayError,
   })
+
+  if (isCreate && arrest && !arrest?.action) {
+    arrest.action = currentAction
+    if (currentAction.city) {
+      arrest.arrest_city = currentAction.city
+    }
+    if (currentAction.jurisdiction) {
+      arrest.jurisdiction = currentAction.jurisdiction
+    }
+  }
 
   const transformInput = (input) => {
     ;[
@@ -156,10 +175,10 @@ const ArresteeArrestPage = ({ id }) => {
     <>
       <FormContainer
         fields={ArrestFields}
-        entity={data?.arresteeArrest}
+        entity={arrest}
         displayConfig={{
           type: 'Arrest',
-          name: data?.arresteeArrest?.arrestee?.display_field,
+          name: arrest?.arrestee?.display_field,
         }}
         loading={loading}
         fetchQuery={QUERY}
@@ -172,6 +191,9 @@ const ArresteeArrestPage = ({ id }) => {
           navigate(routes.arrest({ id: data.createArrest.id }))
         }
       />
+      {arrest?.arrestee?.id && (
+        <ArresteeLogsDrawer arrestee_id={arrest?.arrestee?.id} />
+      )}
     </>
   )
 }

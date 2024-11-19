@@ -12,6 +12,8 @@ export const dynamicQuery = async (model, params) => {
   })
 }
 
-export const dynamicModelQuery = ({ model, params }) => {
+export const dynamicModelQuery = async ({ model, params }) => {
+  // await new Promise((resolve) => setTimeout(resolve, 4000))
+
   return dynamicQuery(model, params)
 }

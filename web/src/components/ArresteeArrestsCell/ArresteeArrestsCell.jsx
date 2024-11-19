@@ -44,6 +44,11 @@ export const QUERY = gql`
         zip
         custom_fields
       }
+      action {
+        id
+        name
+        start_date
+      }
       created_at
       created_by {
         name
@@ -170,7 +175,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
 
     initialState: {
       showGlobalFilter: true,
-      sorting: [{ id: 'date', desc: false }],
+      sorting: [{ id: 'date', desc: true }],
       columnPinning: {
         left: ['mrt-row-select', 'arrestee.display_field'],
       },

@@ -2,12 +2,23 @@ import { Add } from '@mui/icons-material'
 import { Button } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 
-import { Link, navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
 
 import ArresteeArrestsCell from 'src/components/ArresteeArrestsCell'
 
+import { useApp } from '../../lib/AppContext'
+
 const HomePage = () => {
+  const { currentAction } = useApp()
+  const filters = []
+  if (currentAction?.id && currentAction.id !== -1) {
+    filters.push({
+      field: 'action_id',
+      operator: 'equals',
+      value: currentAction.id,
+    })
+  }
   return (
     <>
       <MetaTags title="Home" description="Home page" />
@@ -23,7 +34,7 @@ const HomePage = () => {
           </Button>
         </Grid>
         <Grid xs={12}>
-          <ArresteeArrestsCell />
+          <ArresteeArrestsCell filters={filters} />
         </Grid>
       </Grid>
     </>

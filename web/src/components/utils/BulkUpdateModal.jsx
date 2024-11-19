@@ -20,8 +20,7 @@ import { FormContainer } from 'react-hook-form-mui'
 import { useMutation } from '@redwoodjs/web'
 // import { schema } from 'src/lib/FieldSchemas'
 
-import { Field } from '../utils/Field'
-
+import { Field } from './Field'
 import { useSnackbar, useDisplayError } from './SnackBar'
 
 const BulkUpdateModal = ({

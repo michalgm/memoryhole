@@ -1,7 +1,7 @@
 export const schema = gql`
   input GenericFilterInput {
     field: String!
-    value: String!
+    value: JSON!
     operator: String # e.g., "eq", "ne", "lt", "gt", etc.
   }
 
