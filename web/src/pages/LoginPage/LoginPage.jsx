@@ -1,3 +1,5 @@
+import { useEffect, useCallback, useRef, useState } from 'react'
+
 import {
   FieldError,
   Form,
@@ -6,22 +8,40 @@ import {
   Submit,
   TextField,
 } from '@redwoodjs/forms'
-import { Link, navigate, routes } from '@redwoodjs/router'
-import { Toaster, toast } from '@redwoodjs/web/toast'
-
+import { Link, navigate, routes, useLocation } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
+
 import { useAuth } from 'src/auth'
-import { useEffect } from 'react'
-import { useRef } from 'react'
+import { useDisplayError } from 'src/components/utils/SnackBar'
 
 const LoginPage = () => {
-  const { isAuthenticated, logIn } = useAuth()
+  const { isAuthenticated, logIn, logOut, getCurrentUser } = useAuth()
+  const { search } = useLocation()
+  const [checkedAuth, setCheckedAuth] = useState(false)
+  const displayError = useDisplayError()
 
-  useEffect(() => {
-    if (isAuthenticated) {
+  const redirectAfterAuth = useCallback(() => {
+    const params = new URLSearchParams(search)
+    if (params.get('redirectTo')) {
+      navigate(params.get('redirectTo'))
+    } else {
       navigate(routes.home())
     }
-  }, [isAuthenticated])
+  }, [search])
+
+  useEffect(() => {
+    ;(async () => {
+      if (!checkedAuth && isAuthenticated) {
+        try {
+          await getCurrentUser()
+          redirectAfterAuth()
+        } catch {
+          logOut()
+        }
+        setCheckedAuth(true)
+      }
+    })()
+  }, [isAuthenticated, redirectAfterAuth, getCurrentUser, logOut, checkedAuth])
 
   const emailRef = useRef(null)
   useEffect(() => {
@@ -33,24 +53,20 @@ const LoginPage = () => {
       username: data.email,
       password: data.password,
     })
-
-    if (response.message) {
-      toast(response.message)
-    } else if (response.error) {
-      toast.error(response.error)
+    if (response.error || response.errors) {
+      displayError(response.error || response.errors)
     } else {
-      toast.success('Welcome back!')
+      redirectAfterAuth()
     }
   }
 
   return (
     <>
       <MetaTags title="Login" />
-      <header className='rw-text-center'>
+      <header className="rw-text-center">
         <h2>Welcome to the Memoryhole!</h2>
       </header>
       <main className="rw-main">
-        <Toaster toastOptions={{ className: 'rw-toast', duration: 6000 }} />
         <div className="rw-scaffold rw-login-container">
           <div className="rw-segment">
             <header className="rw-segment-header">
