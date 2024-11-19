@@ -1,16 +1,18 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
-import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material'
+import { Box, Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { get, merge, sortBy } from 'lodash'
-import { difference } from 'lodash'
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
-import { getDefaultColumnFilterFn } from 'material-react-table'
+import { get, merge, sortBy, difference } from 'lodash'
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+  getDefaultColumnFilterFn,
+} from 'material-react-table'
 import pluralize from 'pluralize'
 
 import dayjs from '../../../../api/src/lib/day'
-import { formatLabel } from '../utils/Field'
+import { formatLabel } from '../utils/BaseField'
 
 import ManageViews from './ManageViews'
 
@@ -18,14 +20,23 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 })
 
-export const defineColumns = (schema, displayColumns, visibleColumns) => {
+export const defineColumns = (
+  schema,
+  displayColumns,
+  visibleColumns,
+  customFields = {}
+) => {
+  const mergedSchema = { ...schema, ...customFields }
   const columnNames = sortBy(
-    difference(Object.keys(schema), [...displayColumns, ...visibleColumns]),
-    (k) => schema[k]?.props.label || formatLabel(k)
+    difference(Object.keys(mergedSchema), [
+      ...displayColumns,
+      ...visibleColumns,
+    ]),
+    (k) => mergedSchema[k]?.props.label || formatLabel(k)
   )
 
   const columns = [...displayColumns, ...columnNames].map((field) => {
-    const fieldDef = schema[field]
+    const fieldDef = mergedSchema[field]
     const type = fieldDef.type
 
     const col = {
@@ -56,118 +67,70 @@ export const defineColumns = (schema, displayColumns, visibleColumns) => {
     } else if (type === 'select') {
       col.filterVariant = 'multi-select'
       col.filterSelectOptions = fieldDef.props.options
+    } else if (type === 'action_chooser') {
+      col.accessorFn = (originalRow) => {
+        return get(originalRow, field)?.name
+      }
+    } else if (type === 'array') {
+      col.accessorFn = (originalRow) => {
+        const val = get(originalRow, field)
+        if (!val || val.length == 0) return null
+        return val.join('|')
+      }
+      col.Cell = ({ row }) => {
+        const val = row.original[field]
+        if (val && val.length > 0) {
+          return (
+            <Stack direction="row" spacing={1}>
+              {val.map((item) => (
+                <Chip size="small" key={item} label={item} />
+              ))}
+            </Stack>
+          )
+        }
+      }
     }
     return col
   })
   return columns
 }
 
-const DataTable = ({
-  data,
-  schema,
-  displayColumns = [],
-  tableProps,
-  refetch,
-  disableDownload,
-  preColumns = [],
-  postColumns = [],
-  actionButtons,
-  bulkUpdate,
-  bulkDelete,
-  manageViews = false,
-  type = '',
-  name = '',
-  persistState = false,
-}) => {
-  const visibleColumns = [
-    ...displayColumns,
-    ...[...preColumns, ...postColumns].map((c) => c.accessorKey),
-  ]
-  const columns = useMemo(
-    () => [
-      ...preColumns,
-      ...defineColumns(schema, displayColumns, visibleColumns),
-      ...postColumns,
-    ],
-    [preColumns, postColumns, displayColumns, schema]
-  )
-
-  const initialState = merge(
-    {
-      columnVisibility: Object.keys(schema).reduce((acc, f) => {
-        acc[f] = visibleColumns.includes(f)
-        return acc
-      }, {}),
-      density: 'compact',
-      enableDensityToggle: false,
-      columnFilters: [],
-      columnOrder: [{ id: 'date', desc: true }],
-      sorting: [],
-      globalFilter: '',
-      pagination: { pageSize: 50, pageIndex: 0 },
-      columnFilterFns: columns.reduce((acc, column) => {
-        acc[column.accessorKey] = getDefaultColumnFilterFn(column)
-        return acc
-      }, {}),
-    },
-    tableProps.initialState
-  )
-  delete tableProps.initialState
-
+const useTableState = (initialState, type, persistState) => {
   const [localState, setLocalState] = useState({})
   const [stateLoaded, setStateLoaded] = useState(false)
 
   useEffect(() => {
-    let sessionState = initialState
-    if (type) {
-      const storageState = JSON.parse(
-        sessionStorage.getItem(`${type}_table_state`)
-      )
-      sessionState = merge(sessionState, storageState)
-    }
-    loadState(sessionState)
-  }, [type, persistState])
-
-  const getDefault = (key) => localState[key] || initialState[key]
-
-  const [columnFilters, setColumnFilters] = useState(
-    getDefault('columnFilters')
-  )
-  const [columnVisibility, setColumnVisibility] = useState(
-    getDefault('columnVisibility')
-  )
-
-  const [globalFilter, setGlobalFilter] = useState(getDefault('globalFilter '))
-  const [sorting, setSorting] = useState(getDefault('sorting'))
-  const [columnOrder, setColumnOrder] = useState(getDefault('columnOrder'))
-  const [pagination, setPagination] = useState(getDefault('pagination'))
-  const [columnFilterFns, setColumnFilterFns] = useState(
-    getDefault('columnFilterFns')
-  )
-
-  const loadState = (state) => {
-    state.columnFilters = (state.columnFilters || []).reduce(
-      (acc, { id, value }) => {
-        const colDef = columns.find((c) => c.id === id)
-        if (colDef?.fieldType === 'date' || colDef?.fieldType === 'date-time') {
-          value = dayjs(value)
-        }
-        acc.push({ id, value })
-        return acc
-      },
-      []
-    )
-    setColumnFilters(state.columnFilters)
-    setGlobalFilter(state.globalFilter)
-    setColumnOrder(state.columnOrder)
-    setColumnVisibility(state.columnVisibility)
-    setSorting(state.sorting)
-    setPagination(state.pagination)
-    setColumnFilterFns(state.columnFilterFns)
-    setLocalState(state)
+    const storedState = type
+      ? JSON.parse(sessionStorage.getItem(`${type}_table_state`))
+      : null
+    const mergedState = merge(initialState, storedState)
+    setLocalState(mergedState)
     setStateLoaded(true)
-  }
+  }, [type, initialState])
 
+  const saveState = useCallback(
+    (state) => {
+      if (persistState && type) {
+        sessionStorage.setItem(`${type}_table_state`, JSON.stringify(state))
+      }
+    },
+    [persistState, type]
+  )
+
+  return { localState, stateLoaded, setLocalState, saveState }
+}
+
+const ToolbarActions = ({
+  table,
+  refetch,
+  disableDownload,
+  manageViews,
+  state,
+  loadState,
+  initialState,
+  actionButtons,
+  columnOrder,
+}) => {
   const handleExportRows = (data) => {
     const columns = table
       .getVisibleFlatColumns()
@@ -197,6 +160,138 @@ const DataTable = ({
     const csv = generateCsv(csvConfig)(rows)
     download(csvConfig)(csv)
   }
+  return (
+    <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+      {refetch && (
+        <Tooltip title="Refresh Data">
+          <IconButton onClick={() => refetch()}>
+            <Refresh />
+          </IconButton>
+        </Tooltip>
+      )}
+      {!disableDownload && (
+        <Tooltip title="Save as spreadsheet (CSV)">
+          <span>
+            <IconButton
+              disabled={table.getPrePaginationRowModel().rows.length === 0}
+              onClick={() =>
+                handleExportRows(table.getPrePaginationRowModel().rows)
+              }
+            >
+              <FileDownload />
+            </IconButton>
+          </span>
+        </Tooltip>
+      )}
+      {manageViews && (
+        <ManageViews
+          tableState={state}
+          setTableState={loadState}
+          defaultState={initialState}
+        />
+      )}
+      {actionButtons && actionButtons(table)}
+    </Box>
+  )
+}
+
+const DataTable = ({
+  data,
+  schema,
+  displayColumns = [],
+  tableProps,
+  refetch,
+  disableDownload,
+  preColumns = [],
+  postColumns = [],
+  actionButtons,
+  bulkUpdate,
+  bulkDelete,
+  manageViews = false,
+  type = '',
+  name = '',
+  persistState = false,
+  customFields = {},
+}) => {
+  const visibleColumns = [
+    ...displayColumns,
+    ...[...preColumns, ...postColumns].map((c) => c.accessorKey),
+  ]
+
+  const columns = [
+    ...preColumns,
+    ...defineColumns(schema, displayColumns, visibleColumns, customFields),
+    ...postColumns,
+  ]
+  const columnsRef = useRef(columns)
+  const initialStateRef = useRef(
+    merge(
+      {
+        columnVisibility: Object.keys(schema).reduce((acc, f) => {
+          acc[f] = visibleColumns.includes(f)
+          return acc
+        }, {}),
+        density: 'compact',
+        enableDensityToggle: false,
+        columnFilters: [],
+        columnOrder: [],
+        sorting: [],
+        globalFilter: '',
+        pagination: { pageSize: 50, pageIndex: 0 },
+        columnFilterFns: columns.reduce((acc, column) => {
+          acc[column.accessorKey] = getDefaultColumnFilterFn(column)
+          return acc
+        }, {}),
+      },
+      tableProps.initialState
+    )
+  )
+  const initialState = initialStateRef.current
+  const { localState, stateLoaded, setLocalState, saveState } = useTableState(
+    initialState,
+    type,
+    persistState
+  )
+
+  const loadState = (state) => {
+    state.columnFilters = (state.columnFilters || []).reduce(
+      (acc, { id, value }) => {
+        const colDef = columnsRef.current.find((c) => c.id === id)
+        if (colDef?.fieldType === 'date' || colDef?.fieldType === 'date-time') {
+          value = dayjs(value)
+        }
+        acc.push({ id, value })
+        return acc
+      },
+      []
+    )
+    setColumnFilters(state.columnFilters)
+    setGlobalFilter(state.globalFilter)
+    setColumnOrder(state.columnOrder)
+    setColumnVisibility(state.columnVisibility)
+    if (state.pagination) {
+      setPagination(state.pagination)
+    }
+    setSorting(state.sorting)
+    setColumnFilterFns(state.columnFilterFns)
+    setLocalState(state)
+  }
+
+  const getDefault = (key) => localState[key] || initialState[key]
+  const [columnFilters, setColumnFilters] = useState(
+    getDefault('columnFilters')
+  )
+  const [columnVisibility, setColumnVisibility] = useState(
+    getDefault('columnVisibility')
+  )
+
+  const [globalFilter, setGlobalFilter] = useState(getDefault('globalFilter '))
+  const [sorting, setSorting] = useState(getDefault('sorting'))
+  const [columnOrder, setColumnOrder] = useState(getDefault('columnOrder'))
+  const [pagination, setPagination] = useState(getDefault('pagination'))
+  const [columnFilterFns, setColumnFilterFns] = useState(
+    getDefault('columnFilterFns')
+  )
 
   const state = {
     columnFilters,
@@ -209,21 +304,17 @@ const DataTable = ({
   }
 
   useEffect(() => {
-    if (persistState && stateLoaded && type) {
-      sessionStorage.setItem(
-        `${type}_table_state`,
-        JSON.stringify({
-          columnFilters,
-          columnVisibility,
-          globalFilter,
-          sorting,
-          columnOrder,
-          pagination,
-          columnFilterFns,
-        })
-      )
-    }
+    saveState({
+      columnFilters,
+      columnVisibility,
+      globalFilter,
+      sorting,
+      columnOrder,
+      pagination,
+      columnFilterFns,
+    })
   }, [
+    saveState,
     columnFilters,
     columnVisibility,
     globalFilter,
@@ -232,12 +323,10 @@ const DataTable = ({
     stateLoaded,
     pagination,
     columnFilterFns,
-    type,
-    persistState,
   ])
 
   const defaultProps = {
-    columns,
+    columns: columnsRef.current,
     data,
     enableDensityToggle: false,
     enableStickyHeader: true,
@@ -252,49 +341,27 @@ const DataTable = ({
     muiTableBodyProps: {
       sx: {
         backgroundColor: '#fff',
-        '& tr:nth-of-type(odd) > td': {
-          backgroundColor: '#f5f5f5',
-        },
+        '& tr:nth-of-type(odd) > td, & tr:nth-of-type(odd) > td[data-pinned="true"]:before':
+          {
+            backgroundColor: '#f5f5f5',
+          },
       },
     },
+    muiSearchTextFieldProps: {
+      placeholder: 'Search All Fields',
+    },
     renderTopToolbarCustomActions: ({ table }) => (
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-        }}
-      >
-        {refetch && (
-          <Tooltip title="Refresh Data">
-            <IconButton onClick={() => refetch()}>
-              <Refresh />
-            </IconButton>
-          </Tooltip>
-        )}
-        {!disableDownload && (
-          <Tooltip title="Save as spreadsheet (CSV)">
-            <span>
-              <IconButton
-                disabled={table.getPrePaginationRowModel().rows.length === 0}
-                onClick={() =>
-                  //export all rows, including from the next page, (still respects filtering and sorting)
-                  handleExportRows(table.getPrePaginationRowModel().rows)
-                }
-              >
-                <FileDownload />
-              </IconButton>
-            </span>
-          </Tooltip>
-        )}
-        {manageViews && (
-          <ManageViews
-            tableState={state}
-            setTableState={loadState}
-            defaultState={initialState}
-          />
-        )}
-        {actionButtons && actionButtons(table)}
-      </Box>
+      <ToolbarActions
+        table={table}
+        refetch={refetch}
+        disableDownload={disableDownload}
+        manageViews={manageViews}
+        state={state}
+        loadState={loadState}
+        initialState={initialState}
+        actionButtons={actionButtons}
+        columnOrder={columnOrder}
+      />
     ),
   }
 
@@ -349,11 +416,9 @@ const DataTable = ({
   const properties = merge(defaultProps, tableProps)
   properties.data = stateLoaded ? data : []
   properties.state = state
+  delete properties.state.initialState
 
   const table = useMaterialReactTable(properties)
-  // const currentTableState = table.getState()
-  // console.log('live', currentTableState.sorting[0])
-  // console.log(state.columnFilterFns) // console.log(columns, { columnFilterFns })
   return <MaterialReactTable table={table} />
 }
 

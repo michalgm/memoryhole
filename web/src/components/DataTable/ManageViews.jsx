@@ -1,4 +1,6 @@
-import { Add, AddBox, Delete, Edit, Redo, Save } from '@mui/icons-material'
+import { useRef, useState } from 'react'
+
+import { Add, Delete, Edit, Save } from '@mui/icons-material'
 import {
   Button,
   ButtonGroup,
@@ -10,10 +12,9 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material'
-import { useMutation, useQuery } from '@redwoodjs/web'
-
 import { useConfirm } from 'material-ui-confirm'
-import { useState } from 'react'
+
+import { useMutation, useQuery } from '@redwoodjs/web'
 
 const CREATE_TABLE_VIEW_MUTATION = gql`
   mutation CreateTableViewMutation($input: CreateTableViewInput!) {
@@ -53,11 +54,12 @@ const FETCH_TABLE_VIEWS = gql`
 `
 
 const ManageViews = ({ tableState, setTableState, defaultState }) => {
-  const defaultView = {
+  const defaultView = useRef({
     id: 0,
     name: 'Default',
     state: JSON.stringify(defaultState),
-  }
+  })
+
   const [name, setName] = useState('')
   const [tableViews, setTableViews] = useState([])
   const [currentView, setCurrentView] = useState('')
@@ -178,7 +180,7 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
             <TextField
               label="View Name"
               size="small"
-              autoFocus
+              autoFocus // eslint-disable-line jsx-a11y/no-autofocus
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => {
@@ -216,7 +218,7 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
               },
             }}
           >
-            <MenuItem key="__blank" value={defaultView}>
+            <MenuItem key="__blank" value={defaultView.current}>
               Default
             </MenuItem>
             {tableViews.map((view) => {
