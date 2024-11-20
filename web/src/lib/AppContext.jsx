@@ -1,10 +1,12 @@
 import { createContext, useState, useContext, useEffect } from 'react'
 const AppContext = createContext()
 
+export const defaultAction = { id: -1, name: 'All Actions', start_date: null }
+
 const AppProvider = ({ children }) => {
   const [currentAction, setCurrentAction] = useState(() => {
     const stored = localStorage.getItem('currentAction')
-    return stored ? JSON.parse(stored) : null
+    return stored ? JSON.parse(stored) : defaultAction
   })
   const [userPreferences, setUserPreferences] = useState({})
   // const [themeMode, setThemeMode] = useState('light')

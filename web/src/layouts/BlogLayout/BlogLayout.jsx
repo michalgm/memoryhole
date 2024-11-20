@@ -15,7 +15,7 @@ import { theme } from 'src/App'
 import { useAuth } from 'src/auth'
 import { BaseField } from 'src/components/utils/BaseField'
 import QuickSearch from 'src/components/utils/QuickSearch'
-import { useApp } from 'src/lib/AppContext'
+import { useApp, defaultAction } from 'src/lib/AppContext'
 
 const NavLink = ({ to, ...rest }) => {
   const matchInfo = useMatch(to, { matchSubPaths: true })
@@ -100,10 +100,7 @@ const BlogLayout = ({ children }) => {
                     autoHighlight
                     autoComplete
                     placeholder="Type to search"
-                    transformOptions={(options) => [
-                      { id: -1, name: 'All Actions', start_date: null },
-                      ...options,
-                    ]}
+                    transformOptions={(options) => [defaultAction, ...options]}
                     // openOnFocus
                     // selectOnFocus={false}
                     textFieldProps={{
