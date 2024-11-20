@@ -70,32 +70,20 @@ const formatError = (error) => {
       ? error
       : error?.message || error?.[0]?.message || 'Unknown error'
 
+  const errors = [
+    ...(error.graphQLErrors || []),
+    ...(error.networkError?.result?.errors || []),
+  ]
   const errorMessage = (
     <>
       <AlertTitle>Error</AlertTitle>
       <Typography gutterBottom>{message || 'Unknown error'}</Typography>
-      {(error.graphQLErrors?.length > 0 ||
-        error.networkError?.result?.errors?.length > 0) && (
+      {errors.length > 0 && (
         <Accordion sx={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body2">Details</Typography>
           </AccordionSummary>
-
-          <AccordionDetails>
-            {error.graphQLErrors?.length > 0 && (
-              <>
-                <Typography variant="subtitle2">GraphQL Errors:</Typography>
-                {errorList(error.graphQLErrors)}
-              </>
-            )}
-
-            {error.networkError?.result?.errors?.length > 0 && (
-              <>
-                <Typography variant="subtitle2">Network Errors:</Typography>
-                {errorList(error.networkError.result.errors)}
-              </>
-            )}
-          </AccordionDetails>
+          <AccordionDetails>{errorList(errors)}</AccordionDetails>
         </Accordion>
       )}
     </>
