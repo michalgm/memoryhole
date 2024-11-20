@@ -91,7 +91,8 @@ export const arrests = () => {
   })
 }
 
-export const filterArrests = ({ filters = [] }) => {
+export const filterArrests = async ({ filters = [] }) => {
+  // await new Promise((resolve) => setTimeout(resolve, 5000))
   const where = {}
   filters.forEach((filter) => {
     let { field, operator, value } = filter
