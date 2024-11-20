@@ -9,6 +9,13 @@ import { db } from 'src/lib/db'
 const login_expire_hours = 6
 // const login_expire_hours = 1 / 60 / 10
 
+const validateUser = (user) => {
+  if (user.expiresAt && new Date(user.expiresAt) < Date.now()) {
+    return false
+  }
+  return user
+}
+
 export const handler = async (event, context) => {
   const forgotPasswordOptions = {
     // handler() is invoked after verifying that a user was found with the given
@@ -55,11 +62,14 @@ export const handler = async (event, context) => {
     // by the `logIn()` function from `useAuth()` in the form of:
     // `{ message: 'Error message' }`
     handler: (user) => {
-      const requestOrigin = event.headers['x-forwarded-for'] || event.clientIp
-      // Ensure the login attempt is from localhost
-      if (user.expiresAt && user.expiresAt < Date.now()) {
-        throw Error('Login expired')
+      if (!validateUser(user)) {
+        throw Error(
+          'Your account has expired. Please contact an administrator to reactivate your account.'
+        )
       }
+
+      // Ensure the login attempt is from localhost
+      const requestOrigin = event.headers['x-forwarded-for'] || event.clientIp
       if (
         user.name.match(/^svc-/) &&
         requestOrigin !== '127.0.0.1' &&
@@ -89,12 +99,17 @@ export const handler = async (event, context) => {
     // the database. Returning anything truthy will automatically log the user
     // in. Return `false` otherwise, and in the Reset Password page redirect the
     // user to the login page.
-    handler: (_user) => {
-      return true
+    handler: (user) => {
+      if (!validateUser(user)) {
+        throw Error(
+          'Your password has been reset successfully. However, your account has expired. Please contact an administrator to reactivate your account.'
+        )
+      }
+      return user
     },
 
     // If `false` then the new password MUST be different from the current one
-    allowReusedPassword: true,
+    allowReusedPassword: false,
 
     errors: {
       // the resetToken is valid, but expired
@@ -104,7 +119,7 @@ export const handler = async (event, context) => {
       // the resetToken was not present in the URL
       resetTokenRequired: 'resetToken is required',
       // new password is the same as the old password (apparently they did not forget it)
-      reusedPassword: 'Must choose a new password',
+      reusedPassword: 'You must choose a new password',
     },
   }
 
@@ -143,7 +158,9 @@ export const handler = async (event, context) => {
     // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.
     passwordValidation: (_password) => {
       if (_password.length < 8) {
-        throw PasswordValidationError('Password must be at least 8 characters')
+        throw new PasswordValidationError(
+          'Password must be at least 8 characters'
+        )
       }
       return true
     },
@@ -162,7 +179,16 @@ export const handler = async (event, context) => {
     // The name of the property you'd call on `db` to access your user table.
     // i.e. if your Prisma model is named `User` this value would be `user`, as in `db.user`
     authModelAccessor: 'user',
-    allowedUserFields: ['id', 'email'],
+    allowedUserFields: [
+      'id',
+      'email',
+      'name',
+      'role',
+      'action_ids',
+      'arrest_date_max',
+      'arrest_date_min',
+      'expiresAt',
+    ],
     // A map of what dbAuth calls a field to what your database calls it.
     // `id` is whatever column you use to uniquely identify a user (probably
     // something like `id` or `userId` or even `email`)

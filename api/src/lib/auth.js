@@ -34,6 +34,7 @@ export const getCurrentUser = async (session) => {
       action_ids: true,
       arrest_date_max: true,
       arrest_date_min: true,
+      expiresAt: true,
     },
   })
   return {
