@@ -122,7 +122,7 @@ const useTableState = (initialState, type, persistState) => {
 
 const ToolbarActions = ({
   table,
-  refetch,
+  reload,
   disableDownload,
   manageViews,
   state,
@@ -162,9 +162,9 @@ const ToolbarActions = ({
   }
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-      {refetch && (
+      {reload && (
         <Tooltip title="Refresh Data">
-          <IconButton onClick={() => refetch()}>
+          <IconButton onClick={() => reload()}>
             <Refresh />
           </IconButton>
         </Tooltip>
@@ -212,11 +212,20 @@ const DataTable = ({
   name = '',
   persistState = false,
   customFields = {},
+  loading = false,
 }) => {
+  const [reloading, setReloading] = useState(false)
+
   const visibleColumns = [
     ...displayColumns,
     ...[...preColumns, ...postColumns].map((c) => c.accessorKey),
   ]
+
+  const reload = async () => {
+    setReloading(true)
+    await refetch()
+    setReloading(false)
+  }
 
   const columns = [
     ...preColumns,
@@ -301,6 +310,10 @@ const DataTable = ({
     columnOrder,
     pagination,
     columnFilterFns,
+    showGlobalFilter: globalFilter,
+    showColumnFilters: columnFilters.length > 0,
+    showProgressBars: reloading,
+    isLoading: loading,
   }
 
   useEffect(() => {
@@ -350,10 +363,13 @@ const DataTable = ({
     muiSearchTextFieldProps: {
       placeholder: 'Search All Fields',
     },
+    muiSkeletonProps: {
+      animation: 'wave',
+    },
     renderTopToolbarCustomActions: ({ table }) => (
       <ToolbarActions
         table={table}
-        refetch={refetch}
+        reload={refetch && reload}
         disableDownload={disableDownload}
         manageViews={manageViews}
         state={state}
@@ -404,13 +420,6 @@ const DataTable = ({
         </Stack>
       ),
     }
-  }
-
-  if (globalFilter) {
-    state.showGlobalFilter = true
-  }
-  if (state.columnFilters.length) {
-    state.showColumnFilters = true
   }
 
   const properties = merge(defaultProps, tableProps)

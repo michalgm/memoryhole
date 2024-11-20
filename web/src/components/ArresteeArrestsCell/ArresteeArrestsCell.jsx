@@ -76,7 +76,25 @@ const BULK_UPDATE_ARRESTS = gql`
   }
 `
 
-export const Loading = () => <div>Loading...</div>
+export const Loading = () => (
+  <div>
+    <DataTable
+      data={[]}
+      schema={schema}
+      displayColumns={displayColumns}
+      tableProps={tableProps}
+      // refetch={refetch}
+      preColumns={preColumns}
+      // bulkUpdate={bulkUpdate}
+      // bulkDelete={bulkDelete}
+      manageViews
+      type="arrestees"
+      name="arrest"
+      // persistState
+      loading
+    />
+  </div>
+)
 
 // export const Empty = () => <div>Empty</div>
 
@@ -88,12 +106,6 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
   const [bulkUpdateRows, setBulkUpdateRows] = useState(null)
   const { openSnackbar } = useSnackbar()
 
-  const [displayColumns] = useState([
-    'date',
-    'custom_fields.custody_status',
-    'custom_fields.disposition',
-    'custom_fields.release_type',
-  ])
   const confirm = useConfirm()
   const [bulkDeleteArrests] = useMutation(BULK_DELETE_ARRESTS, {
     onCompleted: () => {
@@ -101,18 +113,6 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
       refetch()
     },
   })
-
-  const preColumns = [
-    {
-      accessorKey: 'arrestee.display_field',
-      header: 'Name',
-      Cell: ({ row, renderedCellValue }) => (
-        <Link color="secondary" to={routes.arrest({ id: row.original.id })}>
-          {renderedCellValue}
-        </Link>
-      ),
-    },
-  ]
 
   const data = arresteeArrests
 
@@ -165,23 +165,6 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
     }
   }
 
-  const tableProps = {
-    enableColumnFilterModes: true,
-    muiTableContainerProps: { sx: { maxHeight: 'calc(100vh - 320px)' } },
-    enableColumnPinning: true,
-    enableRowSelection: true,
-    enableColumnOrdering: true,
-    selectAllMode: 'all',
-
-    initialState: {
-      showGlobalFilter: true,
-      sorting: [{ id: 'date', desc: true }],
-      columnPinning: {
-        left: ['mrt-row-select', 'arrestee.display_field'],
-      },
-    },
-  }
-
   return (
     <>
       <DataTable
@@ -211,3 +194,39 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
     </>
   )
 }
+
+const tableProps = {
+  enableColumnFilterModes: true,
+  muiTableContainerProps: { sx: { maxHeight: 'calc(100vh - 320px)' } },
+  enableColumnPinning: true,
+  enableRowSelection: true,
+  enableColumnOrdering: true,
+  selectAllMode: 'all',
+
+  initialState: {
+    showGlobalFilter: true,
+    sorting: [{ id: 'date', desc: true }],
+    columnPinning: {
+      left: ['mrt-row-select', 'arrestee.display_field'],
+    },
+  },
+}
+
+const displayColumns = [
+  'date',
+  'custom_fields.custody_status',
+  'custom_fields.disposition',
+  'custom_fields.release_type',
+]
+
+const preColumns = [
+  {
+    accessorKey: 'arrestee.display_field',
+    header: 'Name',
+    Cell: ({ row, renderedCellValue }) => (
+      <Link color="secondary" to={routes.arrest({ id: row.original.id })}>
+        {renderedCellValue}
+      </Link>
+    ),
+  },
+]
