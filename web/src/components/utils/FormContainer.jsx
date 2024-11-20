@@ -66,6 +66,7 @@ const FormContainer = ({
   onDelete,
   onUpdate,
   loading,
+  autoComplete = 'off',
 }) => {
   const confirm = useConfirm()
   const { openSnackbar } = useSnackbar()
@@ -190,7 +191,13 @@ const FormContainer = ({
     <Box>
       <Metadata title={title} description={title} />
 
-      <RHFFormContainer defaultValues={values} onSuccess={onSave}>
+      <RHFFormContainer
+        defaultValues={values}
+        onSuccess={onSave}
+        FormProps={{
+          autoComplete,
+        }}
+      >
         <Grid
           sx={{ pb: 8 }}
           container
