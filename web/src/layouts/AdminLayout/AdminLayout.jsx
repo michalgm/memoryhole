@@ -1,5 +1,6 @@
 import { Add, NavigateNext } from '@mui/icons-material'
 import { Breadcrumbs, Button } from '@mui/material'
+import { Box } from '@mui/system'
 
 import { navigate, routes, useParams, useLocation } from '@redwoodjs/router'
 
@@ -10,7 +11,7 @@ const AdminLayout = ({ title, titleTo, buttonLabel, buttonTo, children }) => {
 
   return (
     <div className="admin-view">
-      <header className="rw-header">
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between' }}>
         <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
           <Link to={routes.admin()} className="rw-link">
             Admin
@@ -31,19 +32,10 @@ const AdminLayout = ({ title, titleTo, buttonLabel, buttonTo, children }) => {
             {buttonLabel}
           </Button>
         )}
-        {/* <Button
-          onClick={() => navigate(routes[buttonTo]())}
-          variant="contained"
-          color="secondary"
-          startIcon={<Add />}
-        >
-          {buttonLabel}
-        </Button> */}
-        {/* <Link to={routes[buttonTo]()} className="rw-button rw-button-green">
-          <div className="rw-button-icon">+</div> {buttonLabel}
-        </Link> */}
-      </header>
-      <main className="rw-main">{children}</main>
+      </Box>
+      <main>
+        <Box sx={{}}>{children}</Box>
+      </main>
     </div>
   )
 }
