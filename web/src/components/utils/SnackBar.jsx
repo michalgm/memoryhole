@@ -105,13 +105,17 @@ const formatError = (error) => {
 
 export const useDisplayError = () => {
   const { openSnackbar } = useSnackbar() // Access openSnackbar from your snackbar hook
-  useEffect(() => {
-    setGlobalDisplayError((error) => {
+  const displayError = useCallback(
+    (error) => {
       openSnackbar(formatError(error), 'error')
-    })
-  }, [openSnackbar])
+    },
+    [openSnackbar]
+  )
+  useEffect(() => {
+    setGlobalDisplayError(displayError)
+  }, [displayError])
 
-  return globalDisplayError
+  return displayError
 }
 
 export const SnackBarProvider = ({ children }) => {
@@ -119,10 +123,11 @@ export const SnackBarProvider = ({ children }) => {
     open: false,
     message: '',
     severity: 'success',
+    duration: 4000,
   })
 
-  const openSnackbar = (message, severity = 'success') => {
-    setSnackbar({ open: true, message, severity })
+  const openSnackbar = (message, severity = 'success', duration = 4000) => {
+    setSnackbar({ open: true, message, severity, duration })
   }
 
   const closeSnackbar = (event, reason) => {
@@ -131,8 +136,7 @@ export const SnackBarProvider = ({ children }) => {
     }
   }
 
-  const duration = snackbar.severity === 'success' ? 4000 : null
-
+  const duration = snackbar.severity === 'success' ? snackbar.duration : null
   return (
     <SnackbarContext.Provider value={{ openSnackbar, closeSnackbar }}>
       <Snackbar
