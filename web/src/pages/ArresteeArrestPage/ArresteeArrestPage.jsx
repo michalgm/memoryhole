@@ -139,7 +139,13 @@ const ArresteeArrestPage = ({ id }) => {
     onError: displayError,
   })
 
-  if (isCreate && arrest && !arrest?.action) {
+  if (
+    isCreate &&
+    currentAction &&
+    currentAction.id != -1 &&
+    arrest &&
+    !arrest?.action
+  ) {
     arrest.action = currentAction
     if (currentAction.city) {
       arrest.arrest_city = currentAction.city
