@@ -1,93 +1,41 @@
-import { useEffect, useRef } from 'react'
-
-import { FieldError, Form, Label, Submit, TextField } from '@redwoodjs/forms'
-import { navigate, routes } from '@redwoodjs/router'
-import { MetaTags } from '@redwoodjs/web'
-import { Toaster, toast } from '@redwoodjs/web/toast'
+import { TextFieldElement } from 'react-hook-form-mui'
 
 import { useAuth } from 'src/auth'
 
+import { AuthManage } from '../LoginPage/LoginPage'
+
 const ForgotPasswordPage = () => {
-  const { isAuthenticated, forgotPassword } = useAuth()
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(routes.home())
-    }
-  }, [isAuthenticated])
-
-  const emailRef = useRef(null)
-  useEffect(() => {
-    emailRef?.current?.focus()
-  }, [])
-
-  const onSubmit = async (data) => {
-    const response = await forgotPassword(data.email)
-
-    if (response.error) {
-      toast.error(response.error)
-    } else {
-      // The function `forgotPassword.handler` in api/src/functions/auth.js has
-      // been invoked, let the user know how to get the link to reset their
-      // password (sent in email, perhaps?)
-      toast.success(
-        'A link to reset your password was sent to ' + response.email
-      )
-      // navigate(routes.login())
-    }
-  }
+  const { forgotPassword } = useAuth()
+  const action = (data) => forgotPassword(data.email)
 
   return (
-    <>
-      <MetaTags title="Forgot Password" />
-
-      <main className="rw-main">
-        <Toaster toastOptions={{ className: 'rw-toast', duration: 6000 }} />
-        <div className="rw-scaffold rw-login-container">
-          <div className="rw-segment">
-            <header className="rw-segment-header">
-              <h2 className="rw-heading rw-heading-secondary">
-                Forgot Password
-              </h2>
-            </header>
-
-            <div className="rw-segment-main">
-              <div className="rw-form-wrapper">
-                <Form onSubmit={onSubmit} className="rw-form-wrapper">
-                  <div className="text-left">
-                    <Label
-                      name="email"
-                      className="rw-label"
-                      errorClassName="rw-label rw-label-error"
-                    >
-                      Email
-                    </Label>
-                    <TextField
-                      name="email"
-                      className="rw-input"
-                      errorClassName="rw-input rw-input-error"
-                      ref={emailRef}
-                      validation={{
-                        required: {
-                          value: true,
-                          message: 'Email is required',
-                        },
-                      }}
-                    />
-
-                    <FieldError name="email" className="rw-field-error" />
-                  </div>
-
-                  <div className="rw-button-group">
-                    <Submit className="rw-button rw-button-blue">Submit</Submit>
-                  </div>
-                </Form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </>
+    <AuthManage
+      title="Forgot Password"
+      action={action}
+      onSuccess={({ response, openSnackbar }) => {
+        return openSnackbar(
+          `A link to reset your password was sent to ${response.email}`,
+          'success',
+          null
+        )
+      }}
+    >
+      <TextFieldElement
+        fullWidth
+        name="email"
+        label="Email"
+        id="email"
+        autoComplete="username"
+        autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+        validation={{
+          required: 'Email is required',
+          validate: (value) =>
+            !value ||
+            /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value) ||
+            'Email must be formatted like an email',
+        }}
+      />
+    </AuthManage>
   )
 }
 

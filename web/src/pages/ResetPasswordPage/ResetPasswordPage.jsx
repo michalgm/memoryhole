@@ -1,119 +1,67 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 
-import {
-  Form,
-  Label,
-  PasswordField,
-  Submit,
-  FieldError,
-} from '@redwoodjs/forms'
+import { TextFieldElement } from 'react-hook-form-mui'
+
 import { navigate, routes } from '@redwoodjs/router'
-import { MetaTags } from '@redwoodjs/web'
-import { toast, Toaster } from '@redwoodjs/web/toast'
 
 import { useAuth } from 'src/auth'
+import { useDisplayError } from 'src/components/utils/SnackBar'
+
+import { AuthManage } from '../LoginPage/LoginPage'
 
 const ResetPasswordPage = ({ resetToken }) => {
-  const { isAuthenticated, reauthenticate, validateResetToken, resetPassword } =
-    useAuth()
-  const [enabled, setEnabled] = useState(true)
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(routes.home())
-    }
-  }, [isAuthenticated])
+  const { reauthenticate, validateResetToken, resetPassword } = useAuth()
+  const displayError = useDisplayError()
 
   useEffect(() => {
     const validateToken = async () => {
       const response = await validateResetToken(resetToken)
       if (response.error) {
-        setEnabled(false)
-        toast.error(response.error)
-      } else {
-        setEnabled(true)
+        displayError(response.error)
       }
     }
     validateToken()
-  }, [resetToken, validateResetToken])
+  }, [resetToken, validateResetToken, displayError])
 
-  const passwordRef = useRef(null)
-  useEffect(() => {
-    passwordRef.current?.focus()
-  }, [])
-
-  const onSubmit = async (data) => {
-    const response = await resetPassword({
+  const action = (data) =>
+    resetPassword({
       resetToken,
       password: data.password,
     })
 
-    if (response.error) {
-      toast.error(response.error)
-    } else {
-      toast.success('Password changed!')
-      await reauthenticate()
-      navigate(routes.login())
-    }
-  }
-
   return (
     <>
-      <MetaTags title="Reset Password" />
-
-      <main className="rw-main">
-        <Toaster toastOptions={{ className: 'rw-toast', duration: 6000 }} />
-        <div className="rw-scaffold rw-login-container">
-          <div className="rw-segment">
-            <header className="rw-segment-header">
-              <h2 className="rw-heading rw-heading-secondary">
-                Reset Password
-              </h2>
-            </header>
-
-            <div className="rw-segment-main">
-              <div className="rw-form-wrapper">
-                <Form onSubmit={onSubmit} className="rw-form-wrapper">
-                  <div className="text-left">
-                    <Label
-                      name="password"
-                      className="rw-label"
-                      errorClassName="rw-label rw-label-error"
-                    >
-                      New Password
-                    </Label>
-                    <PasswordField
-                      name="password"
-                      autoComplete="new-password"
-                      className="rw-input"
-                      errorClassName="rw-input rw-input-error"
-                      disabled={!enabled}
-                      ref={passwordRef}
-                      validation={{
-                        required: {
-                          value: true,
-                          message: 'New Password is required',
-                        },
-                      }}
-                    />
-
-                    <FieldError name="password" className="rw-field-error" />
-                  </div>
-
-                  <div className="rw-button-group">
-                    <Submit
-                      className="rw-button rw-button-blue"
-                      disabled={!enabled}
-                    >
-                      Submit
-                    </Submit>
-                  </div>
-                </Form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+      <AuthManage
+        title="Reset Password"
+        action={action}
+        onSuccess={async ({ response, openSnackbar }) => {
+          console.log({ response })
+          openSnackbar('Password changed!')
+          try {
+            await reauthenticate()
+          } catch (e) {
+            displayError(e)
+          }
+          navigate(routes.login())
+        }}
+      >
+        <TextFieldElement
+          fullWidth
+          sx={{ pb: 2 }}
+          id="password"
+          name="password"
+          label="New Password"
+          type="password"
+          autoComplete="new-password"
+          validation={{
+            required: 'Password is required',
+            minLength: {
+              value: 8,
+              message: 'Password must be at least 8 characters',
+            },
+          }}
+        />
+      </AuthManage>
     </>
   )
 }
