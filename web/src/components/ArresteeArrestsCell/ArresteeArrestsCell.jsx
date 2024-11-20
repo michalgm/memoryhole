@@ -13,7 +13,7 @@ import { schema } from 'src/lib/FieldSchemas'
 import DataTable from '../DataTable/DataTable'
 import BulkUpdateModal from '../utils/BulkUpdateModal'
 import Link from '../utils/Link'
-import { useSnackbar } from '../utils/SnackBar'
+import { useDisplayError, useSnackbar } from '../utils/SnackBar'
 
 // import schema from '../../types/graphql'
 
@@ -106,6 +106,8 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
   const [bulkUpdateRows, setBulkUpdateRows] = useState(null)
   const { openSnackbar } = useSnackbar()
 
+  const displayError = useDisplayError()
+
   const confirm = useConfirm()
   const [bulkDeleteArrests] = useMutation(BULK_DELETE_ARRESTS, {
     onCompleted: () => {
@@ -161,7 +163,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
       table.resetRowSelection()
       refetch()
     } catch (error) {
-      openSnackbar(`Update failed: ${error}`, 'error')
+      displayError(error)
     }
   }
 

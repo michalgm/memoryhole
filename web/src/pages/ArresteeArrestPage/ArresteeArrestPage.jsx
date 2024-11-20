@@ -123,6 +123,25 @@ export const DELETE_ARREST_MUTATION = gql`
     }
   }
 `
+export const transformInput = (input) => {
+  ;[
+    'updated_at',
+    'updated_by',
+    'created_by',
+    'created_at',
+    'search_field',
+    'display_field',
+    'id',
+  ].forEach((k) => delete input[k])
+  if (!input.date) {
+    delete input.date
+  }
+  if (input.action?.id) {
+    input.action_id = input.action.id
+  }
+  delete input.action
+  return input
+}
 
 const ArresteeArrestPage = ({ id }) => {
   const { currentAction } = useApp()
@@ -153,26 +172,6 @@ const ArresteeArrestPage = ({ id }) => {
     if (currentAction.jurisdiction) {
       arrest.jurisdiction = currentAction.jurisdiction
     }
-  }
-
-  const transformInput = (input) => {
-    ;[
-      'updated_at',
-      'updated_by',
-      'created_by',
-      'created_at',
-      'search_field',
-      'display_field',
-      'id',
-    ].forEach((k) => delete input[k])
-    if (!input.date) {
-      delete input.date
-    }
-    if (input.action?.id) {
-      input.action_id = input.action.id
-    }
-    delete input.action
-    return input
   }
 
   if (error) return null

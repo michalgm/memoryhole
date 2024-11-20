@@ -66,6 +66,16 @@ export const DELETE_USER_MUTATION = gql`
   }
 `
 
+export const transformInput = (input) => {
+  const fieldsToRemove = ['id', '__typename']
+  fieldsToRemove.forEach((k) => delete input[k])
+  if (input.actions) {
+    input.action_ids = input.actions.map(({ id }) => id)
+    delete input.actions
+  }
+  return input
+}
+
 const UserPage = ({ id }) => {
   const displayError = useDisplayError()
 
@@ -74,16 +84,6 @@ const UserPage = ({ id }) => {
     skip: !id || id === 'new',
     onError: displayError,
   })
-
-  const transformInput = (input) => {
-    const fieldsToRemove = ['id', '__typename']
-    fieldsToRemove.forEach((k) => delete input[k])
-    if (input.actions) {
-      input.action_ids = input.actions.map(({ id }) => id)
-      delete input.actions
-    }
-    return input
-  }
 
   if (error) return null
 

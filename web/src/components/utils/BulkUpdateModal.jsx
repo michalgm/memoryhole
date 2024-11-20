@@ -18,10 +18,18 @@ import { set, useFieldArray, useForm } from 'react-hook-form'
 import { FormContainer } from 'react-hook-form-mui'
 
 import { useMutation } from '@redwoodjs/web'
+
+import { transformInput as ArrestTransform } from 'src/pages/ArresteeArrestPage/ArresteeArrestPage'
+import { transformInput as UserTransform } from 'src/pages/User/UserPage/UserPage'
 // import { schema } from 'src/lib/FieldSchemas'
 
 import { Field } from './Field'
 import { useSnackbar, useDisplayError } from './SnackBar'
+
+const transforms = {
+  arrest: ArrestTransform,
+  user: UserTransform,
+}
 
 const BulkUpdateModal = ({
   bulkUpdateRows,
@@ -63,7 +71,7 @@ const BulkUpdateModal = ({
             } else if (dayjs.isDayjs(value)) {
               value = dayjs(value).format('L hh:mm A')
             } else if (typeof value === 'object') {
-              value = 'ERROR - unknown type'
+              value = value.name || value.label || 'ERROR - unknown type'
             }
             return (
               <Typography key={field_name}>
@@ -75,7 +83,7 @@ const BulkUpdateModal = ({
       ),
     })
     try {
-      const input = getValues().fields.reduce(
+      const valueMap = getValues().fields.reduce(
         (acc, { field_name, field_value }) => {
           if (field_name) {
             set(acc, field_name, field_value)
@@ -84,10 +92,10 @@ const BulkUpdateModal = ({
         },
         {}
       )
-      if (!Object.keys(input).length) {
+      if (!Object.keys(valueMap).length) {
         throw new Error('No fields set')
       }
-
+      const input = transforms[name] ? transforms[name](valueMap) : valueMap
       const ids = bulkUpdateRows.map(({ id }) => id)
 
       const {
@@ -100,7 +108,7 @@ const BulkUpdateModal = ({
       closeModal()
       onSuccess()
     } catch (error) {
-      displayError(`Update failed: ${error}`, 'error')
+      displayError(error)
     }
   }
   const watchFieldArray = watch('fields')

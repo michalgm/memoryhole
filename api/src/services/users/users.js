@@ -37,7 +37,7 @@ export const createUser = async ({ input }) => {
   )
 }
 
-export const updateUser = async ({ id, input }) => {
+const validateUserUpdate = ({ id, input }) => {
   if (input.email || input.role) {
     requireAdmin()
   }
@@ -63,7 +63,12 @@ export const updateUser = async ({ id, input }) => {
   if (input.arrest_date_max) {
     input.arrest_date_max = dayjs(input.arrest_date_max).endOf('day')
   }
-  return await validateUniqueness(
+}
+
+export const updateUser = ({ id, input }) => {
+  validateUserUpdate({ id, input })
+
+  return validateUniqueness(
     'user',
     { email: input.email, $self: { id } },
     (db) => {
@@ -76,29 +81,21 @@ export const updateUser = async ({ id, input }) => {
 }
 
 export const bulkUpdateUsers = async ({ ids, input }) => {
+  if (input.email) {
+    throw new Error('Cannot bulk update user emails')
+  }
   const users = await db.user.findMany({
     where: {
       id: { in: ids },
     },
   })
   const res = await db.$transaction(
-    users.map(({ id, ..._user }) => {
-      // ;[
-      //   'id',
-      //   'arrestee_id',
-      //   'created_by_id',
-      //   'updated_by_id',
-      //   'updated_at',
-      //   'created_at',
-      // ].forEach((key) => {
-      //   delete arrest[key]
-      //   delete arrest.arrestee[key]
-      // })
-      // const arrest_input = merge(arrest, input)
+    users.map(({ id }) => {
+      validateUserUpdate({ id, input })
 
-      return updateUser({
-        id,
-        input,
+      return db.user.update({
+        data: input,
+        where: { id },
       })
     })
   )
@@ -113,43 +110,6 @@ export const deleteUser = ({ id }) => {
 }
 
 export const User = {
-  created_arrests: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).created_arrests()
-  },
-  updated_arrests: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).updated_arrests()
-  },
-  created_arrestees: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).created_arrestees()
-  },
-  updated_arrestees: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).updated_arrestees()
-  },
-  created_arrestee_logs: (_obj, { root }) => {
-    return db.user
-      .findUnique({ where: { id: root?.id } })
-      .created_arrestee_logs()
-  },
-  updated_arrestee_logs: (_obj, { root }) => {
-    return db.user
-      .findUnique({ where: { id: root?.id } })
-      .updated_arrestee_logs()
-  },
-  created_hotline_logs: (_obj, { root }) => {
-    return db.user
-      .findUnique({ where: { id: root?.id } })
-      .created_hotline_logs()
-  },
-  updated_hotline_logs: (_obj, { root }) => {
-    return db.user
-      .findUnique({ where: { id: root?.id } })
-      .updated_hotline_logs()
-  },
-  updated_custom_schemas: (_obj, { root }) => {
-    return db.user
-      .findUnique({ where: { id: root?.id } })
-      .updated_custom_schemas()
-  },
   actions: (_obj, { root }) => {
     return db.action.findMany({
       where: {
