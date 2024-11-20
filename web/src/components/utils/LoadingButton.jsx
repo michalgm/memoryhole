@@ -2,18 +2,29 @@ import { Button, CircularProgress } from '@mui/material'
 import { useTheme } from '@mui/material'
 import { Box } from '@mui/system'
 
-const LoadingButton = ({ loading, children, ...props }) => {
+const LoadingButton = ({
+  loading,
+  children,
+  containerProps = {},
+  color = 'primary',
+  disabled = false,
+  ...props
+}) => {
   const theme = useTheme()
 
   return (
-    <Box sx={{ position: 'relative' }}>
+    <Box
+      {...containerProps}
+      sx={{ position: 'relative', ...containerProps.sx }}
+    >
       <Button
         {...props}
+        color={color}
+        disabled={loading || disabled}
         sx={{
           '&.Mui-disabled': {
-            color: 'text.disabled',
-            bgcolor: `${props.color}.main`,
-            borderColor: `${props.color}.main`,
+            color: `${color}.light`,
+            bgcolor: `${color}.dark`,
           },
           ...props.sx,
         }}
