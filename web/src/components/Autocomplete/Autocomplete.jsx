@@ -7,7 +7,7 @@ import {
   Autocomplete as MUIAutocomplete,
   TextField,
 } from '@mui/material'
-import { debounce, merge } from 'lodash'
+import { debounce, merge } from 'lodash-es'
 import { AutocompleteElement } from 'react-hook-form-mui'
 
 import { useDisplayError } from '../utils/SnackBar'

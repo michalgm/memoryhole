@@ -11,12 +11,11 @@ import { Stack } from '@mui/system'
 
 import { Link, routes, useMatch, useRouteName } from '@redwoodjs/router'
 
+import { theme } from 'src/App'
 import { useAuth } from 'src/auth'
 import { BaseField } from 'src/components/utils/BaseField'
 import QuickSearch from 'src/components/utils/QuickSearch'
 import { useApp } from 'src/lib/AppContext'
-
-import { theme } from '../../App'
 
 const NavLink = ({ to, ...rest }) => {
   const matchInfo = useMatch(to, { matchSubPaths: true })

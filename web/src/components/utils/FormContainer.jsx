@@ -1,7 +1,7 @@
 import { Box, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
-import { startCase } from 'lodash'
+import { startCase } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
 import { FormContainer as RHFFormContainer } from 'react-hook-form-mui'
 

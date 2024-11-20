@@ -36,6 +36,7 @@
     "dayjs": "^1.11.13",
     "export-to-csv": "^1.4.0",
     "humanize-string": "2.1.0",
+    "lodash-es": "^4.17.21",
     "material-react-table": "^2.13.3",
     "material-ui-confirm": "^3.0.16",
     "mui-tiptap": "^1.13.0",

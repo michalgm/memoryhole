@@ -7,7 +7,7 @@ import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 
 import { QUERY } from '../OptionSetValuesCell/OptionSetValuesCell'
-import { Field } from '../utils/BaseField'
+import { Field } from '../utils/Field'
 import { useSnackbar } from '../utils/SnackBar'
 
 import { QUERY as QUERYLIST } from './EditOptionsCell'

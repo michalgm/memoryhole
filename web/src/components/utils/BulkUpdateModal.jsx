@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
-import { capitalize, isBoolean } from 'lodash'
+import { capitalize, isBoolean } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
 import pluralize from 'pluralize'
 import { set, useFieldArray, useForm } from 'react-hook-form'

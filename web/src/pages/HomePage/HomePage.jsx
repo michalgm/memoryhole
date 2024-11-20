@@ -6,8 +6,7 @@ import { navigate, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
 
 import ArresteeArrestsCell from 'src/components/ArresteeArrestsCell'
-
-import { useApp } from '../../lib/AppContext'
+import { useApp } from 'src/lib/AppContext'
 
 const HomePage = () => {
   const { currentAction } = useApp()

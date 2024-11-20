@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, useRef } from 'react'
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import { Box, Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { get, merge, sortBy, difference } from 'lodash'
+import { get, merge, sortBy, difference } from 'lodash-es'
 import {
   MaterialReactTable,
   useMaterialReactTable,

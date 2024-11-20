@@ -1,4 +1,4 @@
-import { fromPairs, sortBy, toPairs } from 'lodash'
+import { fromPairs, sortBy, toPairs } from 'lodash-es'
 
 import dayjs from '../../../api/src/lib/day'
 import { formatLabel } from '../components/utils/BaseField'

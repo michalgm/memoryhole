@@ -1,4 +1,4 @@
-import { get, set, flatMap, reduce } from 'lodash'
+import { get, set, flatMap, reduce } from 'lodash-es'
 
 import dayjs from '../../../api/src/lib/day'
 

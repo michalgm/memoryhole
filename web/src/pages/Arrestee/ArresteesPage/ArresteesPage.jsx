@@ -1,6 +1,5 @@
 import ArresteesCell from 'src/components/Arrestee/ArresteesCell'
-
-import { useApp } from '../../lib/AppContext'
+import { useApp } from 'src/lib/AppContext'
 
 const ArresteesPage = () => {
   const { currentAction } = useApp()

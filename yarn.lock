@@ -7660,6 +7660,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"asn1@npm:^0.2.6":
+  version: 0.2.6
+  resolution: "asn1@npm:0.2.6"
+  dependencies:
+    safer-buffer: "npm:~2.1.0"
+  checksum: 10c0/00c8a06c37e548762306bcb1488388d2f76c74c36f70c803f0c081a01d3bdf26090fc088cd812afc5e56a6d49e33765d451a5f8a68ab9c2b087eba65d2e980e0
+  languageName: node
+  linkType: hard
+
 "asn1js@npm:^3.0.5":
   version: 3.0.5
   resolution: "asn1js@npm:3.0.5"
@@ -8079,6 +8088,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bcrypt-pbkdf@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "bcrypt-pbkdf@npm:1.0.2"
+  dependencies:
+    tweetnacl: "npm:^0.14.3"
+  checksum: 10c0/ddfe85230b32df25aeebfdccfbc61d3bc493ace49c884c9c68575de1f5dcf733a5d7de9def3b0f318b786616b8d85bad50a28b1da1750c43e0012c93badcc148
+  languageName: node
+  linkType: hard
+
 "binary-extensions@npm:^2.0.0":
   version: 2.3.0
   resolution: "binary-extensions@npm:2.3.0"
@@ -8357,6 +8375,13 @@ __metadata:
     base64-js: "npm:^1.3.1"
     ieee754: "npm:^1.1.13"
   checksum: 10c0/27cac81cff434ed2876058d72e7c4789d11ff1120ef32c9de48f59eab58179b66710c488987d295ae89a228f835fc66d088652dffeb8e3ba8659f80eb091d55e
+  languageName: node
+  linkType: hard
+
+"buildcheck@npm:~0.0.6":
+  version: 0.0.6
+  resolution: "buildcheck@npm:0.0.6"
+  checksum: 10c0/8cbdb89f41bc484b8325f4828db4135b206a0dffb641eb6cdb2b7022483c45dd0e5aac6d820c9a67bdd2caab3a02c76d7ceec7bd9ec494b5a2270d2806b01a76
   languageName: node
   linkType: hard
 
@@ -9103,6 +9128,17 @@ __metadata:
     path-type: "npm:^4.0.0"
     yaml: "npm:^1.10.0"
   checksum: 10c0/b923ff6af581638128e5f074a5450ba12c0300b71302398ea38dbeabd33bbcaa0245ca9adbedfcf284a07da50f99ede5658c80bb3e39e2ce770a99d28a21ef03
+  languageName: node
+  linkType: hard
+
+"cpu-features@npm:~0.0.10":
+  version: 0.0.10
+  resolution: "cpu-features@npm:0.0.10"
+  dependencies:
+    buildcheck: "npm:~0.0.6"
+    nan: "npm:^2.19.0"
+    node-gyp: "npm:latest"
+  checksum: 10c0/0c4a12904657b22477ffbcfd2b4b2bdd45b174f283616b18d9e1ade495083f9f6098493feb09f4ae2d0b36b240f9ecd32cfb4afe210cf0d0f8f0cc257bd58e54
   languageName: node
   linkType: hard
 
@@ -13978,6 +14014,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash-es@npm:^4.17.21":
+  version: 4.17.21
+  resolution: "lodash-es@npm:4.17.21"
+  checksum: 10c0/fb407355f7e6cd523a9383e76e6b455321f0f153a6c9625e21a8827d10c54c2a2341bd2ae8d034358b60e07325e1330c14c224ff582d04612a46a4f0479ff2f2
+  languageName: node
+  linkType: hard
+
 "lodash.debounce@npm:^4.0.8":
   version: 4.0.8
   resolution: "lodash.debounce@npm:4.0.8"
@@ -14220,6 +14263,15 @@ __metadata:
     pify: "npm:^4.0.1"
     semver: "npm:^5.6.0"
   checksum: 10c0/ada869944d866229819735bee5548944caef560d7a8536ecbc6536edca28c72add47cc4f6fc39c54fb25d06b58da1f8994cf7d9df7dadea047064749efc085d8
+  languageName: node
+  linkType: hard
+
+"make-dir@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "make-dir@npm:3.1.0"
+  dependencies:
+    semver: "npm:^6.0.0"
+  checksum: 10c0/56aaafefc49c2dfef02c5c95f9b196c4eb6988040cf2c712185c7fe5c99b4091591a7fc4d4eafaaefa70ff763a26f6ab8c3ff60b9e75ea19876f49b18667ecaa
   languageName: node
   linkType: hard
 
@@ -14764,6 +14816,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nan@npm:^2.19.0, nan@npm:^2.20.0":
+  version: 2.22.0
+  resolution: "nan@npm:2.22.0"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10c0/d5d31aefdb218deba308d44867c5f432b4d3aabeb57c70a2b236d62652e9fee7044e5d5afd380d9fef022fe7ebb2f2d6c85ca3cbcac5031aaca3592c844526bb
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.3.7":
   version: 3.3.7
   resolution: "nanoid@npm:3.3.7"
@@ -14885,6 +14946,20 @@ __metadata:
   version: 2.0.18
   resolution: "node-releases@npm:2.0.18"
   checksum: 10c0/786ac9db9d7226339e1dc84bbb42007cb054a346bd9257e6aa154d294f01bc6a6cddb1348fa099f079be6580acbb470e3c048effd5f719325abd0179e566fd27
+  languageName: node
+  linkType: hard
+
+"node-ssh@npm:^13.2.0":
+  version: 13.2.0
+  resolution: "node-ssh@npm:13.2.0"
+  dependencies:
+    is-stream: "npm:^2.0.0"
+    make-dir: "npm:^3.1.0"
+    sb-promise-queue: "npm:^2.1.0"
+    sb-scandir: "npm:^3.1.0"
+    shell-escape: "npm:^0.2.0"
+    ssh2: "npm:^1.14.0"
+  checksum: 10c0/55a0f1d6fbc740625ba892ce955e8500068d1439532551047072639365e79e0e2c81a7231b64b0ef380a12fa9b5b0d882d4cab5f5382f0891be10586279b5925
   languageName: node
   linkType: hard
 
@@ -17225,6 +17300,7 @@ __metadata:
     "@redwoodjs/project-config": "npm:8.4.1"
     axios: "npm:^1.7.7"
     axios-cookiejar-support: "npm:^5.0.3"
+    node-ssh: "npm:^13.2.0"
     pm2: "npm:^5.4.3"
     tough-cookie: "npm:^4.1.4"
   languageName: unknown
@@ -17322,7 +17398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"safer-buffer@npm:>= 2.1.2 < 3, safer-buffer@npm:>= 2.1.2 < 3.0.0":
+"safer-buffer@npm:>= 2.1.2 < 3, safer-buffer@npm:>= 2.1.2 < 3.0.0, safer-buffer@npm:~2.1.0":
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
   checksum: 10c0/7e3c8b2e88a1841c9671094bbaeebd94448111dd90a81a1f606f3f67708a6ec57763b3b47f06da09fc6054193e0e6709e77325415dc8422b04497a8070fa02d4
@@ -17342,6 +17418,22 @@ __metadata:
   dependencies:
     xmlchars: "npm:^2.2.0"
   checksum: 10c0/3847b839f060ef3476eb8623d099aa502ad658f5c40fd60c105ebce86d244389b0d76fcae30f4d0c728d7705ceb2f7e9b34bb54717b6a7dbedaf5dad2d9a4b74
+  languageName: node
+  linkType: hard
+
+"sb-promise-queue@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "sb-promise-queue@npm:2.1.0"
+  checksum: 10c0/76ee74af0c7c4db89fac2acf12615c1801f2c2848fd8028a97b515d13adcc680f68f353ebb6ddc7f4253619326e62b7cf5f1afc6a675b1470d4df30b726452ed
+  languageName: node
+  linkType: hard
+
+"sb-scandir@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "sb-scandir@npm:3.1.0"
+  dependencies:
+    sb-promise-queue: "npm:^2.1.0"
+  checksum: 10c0/550ac637d8e4a5c05ab8220bd9d2978f6f69a32f7096200474450684d54245fed76182976b6d1348939365d6ac60b65c24be2a35715b5c694e3c36d93d00f41f
   languageName: node
   linkType: hard
 
@@ -17386,7 +17478,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^6.2.0, semver@npm:^6.3.0, semver@npm:^6.3.1":
+"semver@npm:^6.0.0, semver@npm:^6.2.0, semver@npm:^6.3.0, semver@npm:^6.3.1":
   version: 6.3.1
   resolution: "semver@npm:6.3.1"
   bin:
@@ -17545,6 +17637,13 @@ __metadata:
   version: 3.0.0
   resolution: "shebang-regex@npm:3.0.0"
   checksum: 10c0/1dbed0726dd0e1152a92696c76c7f06084eb32a90f0528d11acd764043aacf76994b2fb30aa1291a21bd019d6699164d048286309a278855ee7bec06cf6fb690
+  languageName: node
+  linkType: hard
+
+"shell-escape@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "shell-escape@npm:0.2.0"
+  checksum: 10c0/501616713d13fd053b3858da18b613d83bfcdc8368e62be393dc563cc9fe2550492d403f73211e9a84429f39c8b9617f1e016dabee177b0ebdcb298fa47fc612
   languageName: node
   linkType: hard
 
@@ -17814,6 +17913,23 @@ __metadata:
   version: 1.0.3
   resolution: "sprintf-js@npm:1.0.3"
   checksum: 10c0/ecadcfe4c771890140da5023d43e190b7566d9cf8b2d238600f31bec0fc653f328da4450eb04bd59a431771a8e9cc0e118f0aa3974b683a4981b4e07abc2a5bb
+  languageName: node
+  linkType: hard
+
+"ssh2@npm:^1.14.0":
+  version: 1.16.0
+  resolution: "ssh2@npm:1.16.0"
+  dependencies:
+    asn1: "npm:^0.2.6"
+    bcrypt-pbkdf: "npm:^1.0.2"
+    cpu-features: "npm:~0.0.10"
+    nan: "npm:^2.20.0"
+  dependenciesMeta:
+    cpu-features:
+      optional: true
+    nan:
+      optional: true
+  checksum: 10c0/d336a85d87501c64ba230b6c1a2901a9b0e376fe7f7a1640a7f8dbdafe674b2e1a5dc6236ffd1329969dc0cf03cd57759b28743075e61229a984065ee1d56bed
   languageName: node
   linkType: hard
 
@@ -18617,6 +18733,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tweetnacl@npm:^0.14.3":
+  version: 0.14.5
+  resolution: "tweetnacl@npm:0.14.5"
+  checksum: 10c0/4612772653512c7bc19e61923fbf42903f5e0389ec76a4a1f17195859d114671ea4aa3b734c2029ce7e1fa7e5cc8b80580f67b071ecf0b46b5636d030a0102a2
+  languageName: node
+  linkType: hard
+
 "tx2@npm:~1.0.4":
   version: 1.0.5
   resolution: "tx2@npm:1.0.5"
@@ -19289,6 +19412,7 @@ __metadata:
     dayjs: "npm:^1.11.13"
     export-to-csv: "npm:^1.4.0"
     humanize-string: "npm:2.1.0"
+    lodash-es: "npm:^4.17.21"
     material-react-table: "npm:^2.13.3"
     material-ui-confirm: "npm:^3.0.16"
     mui-tiptap: "npm:^1.13.0"

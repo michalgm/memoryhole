@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
-import { capitalize } from 'lodash'
+import { capitalize } from 'lodash-es'
 import {
   CheckboxElement,
   DatePickerElement,
