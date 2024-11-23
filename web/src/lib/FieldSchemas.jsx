@@ -108,7 +108,13 @@ const ArrestFields = [
     fields: [
       ['arrestee.first_name', { label: 'legal_first_name' }],
       ['arrestee.last_name', { label: 'legal_last_name' }],
-      ['arrestee.preferred_name'],
+      [
+        'arrestee.preferred_name',
+        {
+          helperText:
+            'Enter both first and last name if preferred last name differs from legal name',
+        },
+      ],
       ['arrestee.pronoun', { label: 'pronouns' }],
       ['arrestee.dob', { label: 'date of birth', field_type: 'date' }],
       [
@@ -486,7 +492,7 @@ export const UserFields = [
             },
           },
           helperText:
-            'User will not have access to arrests outside of these actions',
+            'User will not have access to arrests outside of these actions. If no actions are set, the user will have access to all actions.',
         },
       ],
       [
