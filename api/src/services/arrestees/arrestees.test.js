@@ -4,6 +4,7 @@ import {
   createArrestee,
   updateArrestee,
   deleteArrestee,
+  updateDisplayField,
 } from './arrestees'
 
 // Generated boilerplate tests do not account for all circumstances
@@ -27,10 +28,10 @@ describe('arrestees', () => {
 
   scenario('creates a arrestee', async () => {
     const result = await createArrestee({
-      input: { display_field: 'String', search_field: 'String' },
+      input: { first_name: 'String', search_field: 'String' },
     })
 
-    expect(result.display_field).toEqual('String')
+    expect(result.first_name).toEqual('String')
     expect(result.search_field).toEqual('String')
   })
 
@@ -40,10 +41,10 @@ describe('arrestees', () => {
     })
     const result = await updateArrestee({
       id: original.id,
-      input: { display_field: 'String2' },
+      input: { last_name: 'String2' },
     })
 
-    expect(result.display_field).toEqual('String2')
+    expect(result.last_name).toEqual('String2')
   })
 
   scenario('deletes a arrestee', async (scenario) => {
@@ -52,6 +53,86 @@ describe('arrestees', () => {
     })
     const result = await arrestee({ id: original.id })
 
-    expect(result).toEqual(null)
+    expect(result).toBe(null)
+  })
+})
+describe('updateDisplayField', () => {
+  test('updates display field with all name components', () => {
+    const arrestee = {
+      first_name: 'John',
+      last_name: 'Doe',
+      preferred_name: 'Johnny',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('Johnny (John) Doe')
+  })
+
+  test('handles missing first name', () => {
+    const arrestee = {
+      last_name: 'Doe',
+      preferred_name: 'Johnny',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('Johnny Doe')
+  })
+
+  test('handles legal name confidential flag', () => {
+    const arrestee = {
+      first_name: 'John',
+      last_name: 'Doe',
+      preferred_name: 'Johnny',
+      custom_fields: {
+        legal_name_confidential: true,
+      },
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('Johnny Doe *')
+  })
+
+  test('handles legal name confidential with preferred name containing space', () => {
+    const arrestee = {
+      first_name: 'John',
+      last_name: 'Doe',
+      preferred_name: 'Johnny Boy',
+      custom_fields: {
+        legal_name_confidential: true,
+      },
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('Johnny Boy *')
+  })
+
+  test('merges with current data', () => {
+    const current = {
+      first_name: 'John',
+      last_name: 'Doe',
+      preferred_name: 'Johnny',
+    }
+    const arrestee = {
+      last_name: 'Smith',
+    }
+    updateDisplayField(arrestee, current)
+    expect(arrestee.display_field).toEqual('Johnny (John) Smith')
+  })
+
+  test('handles extra whitespace in names', () => {
+    const arrestee = {
+      first_name: '  John  ',
+      last_name: '  Doe  ',
+      preferred_name: '  Johnny  ',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('Johnny (John) Doe')
+  })
+
+  test('does not update display field when no name fields are provided', () => {
+    const arrestee = {
+      age: 25,
+      custom_fields: {
+        other_field: 'value',
+      },
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toBeUndefined()
   })
 })

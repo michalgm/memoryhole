@@ -19,7 +19,8 @@ export const SEARCH_ARRESTS = gql`
     arrest: searchArrestNames(search: $search) {
       id
       arrestee {
-        display_field
+        id
+        search_display_field
       }
       date
       arrest_city
@@ -58,7 +59,7 @@ function QuickSearch() {
         clearOnBlur={true}
         value={value}
         open={true}
-        getOptionLabel={(option) => option.display_field || ''}
+        getOptionLabel={(option) => option.search_display_field || ''}
         onInputChange={handleInputChange}
         filterOptions={(x) => x}
         onChange={(event, value) => {
@@ -72,7 +73,7 @@ function QuickSearch() {
         }}
         renderOption={(
           props,
-          { id, arrestee: { display_field }, date, arrest_city }
+          { id, arrestee: { search_display_field }, date, arrest_city }
         ) => {
           const subtitle = `${date ? dayjs(date).format('L') : ''}${
             date && arrest_city ? ' - ' : ''
@@ -80,7 +81,7 @@ function QuickSearch() {
           return (
             <li {...props} key={id}>
               <div>
-                <Typography>{display_field}</Typography>
+                <Typography>{search_display_field}</Typography>
                 <Typography color="GrayText" variant="subtitle2">
                   {subtitle}
                 </Typography>

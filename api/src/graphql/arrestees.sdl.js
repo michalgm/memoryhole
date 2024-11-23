@@ -25,6 +25,7 @@ export const schema = gql`
     updated_by_id: Int
     arrests: [Arrest]!
     arrestee_logs: [Log]!
+    search_display_field: String
   }
 
   type Query {

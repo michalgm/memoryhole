@@ -1,13 +1,31 @@
+import { merge } from 'lodash'
+
 import { db } from 'src/lib/db'
 
 export const updateDisplayField = (arrestee, current = {}) => {
-  if (arrestee.first_name || arrestee.last_name || arrestee.preferred_name) {
-    const combined = { ...current, ...arrestee }
-    arrestee.display_field =
-      `${combined.first_name || ''} ${combined.last_name || ''}`.trim()
-    if (combined.preferred_name) {
-      arrestee.display_field = `${combined.preferred_name} (${arrestee.display_field})`
+  if (
+    'first_name' in arrestee ||
+    'last_name' in arrestee ||
+    'preferred_name' in arrestee ||
+    (arrestee.custom_fields &&
+      'legal_name_confidential' in arrestee.custom_fields)
+  ) {
+    const { first_name, last_name, preferred_name, custom_fields } = merge(
+      current,
+      arrestee
+    )
+    let fields = [
+      preferred_name,
+      first_name && `(${(first_name || '').trim()})`,
+      last_name,
+    ]
+    if (custom_fields?.legal_name_confidential) {
+      fields = [preferred_name, !preferred_name.includes(' ') && last_name, '*']
     }
+    arrestee.display_field = fields
+      .filter(Boolean)
+      .map((name) => name.trim())
+      .join(' ')
   }
 }
 
@@ -57,10 +75,13 @@ export const Arrestee = {
   arrestee_logs: (_obj, { root }) => {
     return db.arrestee.findUnique({ where: { id: root?.id } }).arrestee_logs()
   },
-  // display_field: (_obj, { root }) => {
-  //   console.log(root)
-  //   const name = `${root.first_name || ''} ${root.last_name || ''}`.trim()
-  //   console.log(name)
-  //   return root.preferred_name ? `${root.preferred_name} (${name})` : name
-  // },
+  display_field: (_obj, { root }) => {
+    updateDisplayField(root)
+    return root.display_field
+  },
+  search_display_field: (_obj, { root }) => {
+    root.custom_fields.legal_name_confidential = false
+    updateDisplayField(root)
+    return root.display_field
+  },
 }
