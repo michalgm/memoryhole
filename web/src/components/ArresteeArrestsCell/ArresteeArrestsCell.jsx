@@ -29,6 +29,7 @@ export const QUERY = gql`
       jurisdiction
       custom_fields
       arrestee {
+        id
         display_field
         first_name
         last_name
