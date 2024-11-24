@@ -10,10 +10,12 @@ export const updateDisplayField = (arrestee, current = {}) => {
     (arrestee.custom_fields &&
       'legal_name_confidential' in arrestee.custom_fields)
   ) {
-    const { first_name, last_name, preferred_name, custom_fields } = merge(
-      current,
-      arrestee
-    )
+    const {
+      first_name,
+      last_name,
+      preferred_name,
+      custom_fields = {},
+    } = merge(current, arrestee)
     let fields = [
       preferred_name,
       first_name && `(${(first_name || '').trim()})`,
