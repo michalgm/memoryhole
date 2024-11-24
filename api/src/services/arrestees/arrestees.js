@@ -80,6 +80,7 @@ export const Arrestee = {
     return root.display_field
   },
   search_display_field: (_obj, { root }) => {
+    root.custom_fields = root.custom_fields || {}
     root.custom_fields.legal_name_confidential = false
     updateDisplayField(root)
     return root.display_field
