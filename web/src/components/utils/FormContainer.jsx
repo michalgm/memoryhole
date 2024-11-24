@@ -205,44 +205,50 @@ const FormContainer = ({
           sx={{ pb: 8 }}
           className="content-container"
         >
-          {fields.map(({ fields: sectionFields, title }, groupIndex) => {
-            const { columns, fullSpan } = fieldsToColumns(
-              sectionFields,
-              columnCount
-            )
-            return (
-              <FormSection key={groupIndex} title={title}>
-                <Grid container sx={{ alignItems: 'start' }} xs={12}>
-                  {columns.map((fieldSet, columnIndex) => (
-                    <Grid key={columnIndex} xs={12 / columnCount} container>
-                      {fieldSet.map(([key, options = {}], index) => (
+          {fields.map(
+            ({ fields: sectionFields, title, sectionActions }, groupIndex) => {
+              const { columns, fullSpan } = fieldsToColumns(
+                sectionFields,
+                columnCount
+              )
+              return (
+                <FormSection
+                  key={groupIndex}
+                  title={title}
+                  sectionActions={sectionActions}
+                >
+                  <Grid container sx={{ alignItems: 'start' }} xs={12}>
+                    {columns.map((fieldSet, columnIndex) => (
+                      <Grid key={columnIndex} xs={12 / columnCount} container>
+                        {fieldSet.map(([key, options = {}], index) => (
+                          <Grid key={key} xs={12}>
+                            <Field
+                              tabIndex={100 * (groupIndex + 1) + index}
+                              name={key}
+                              {...options}
+                            />
+                          </Grid>
+                        ))}
+                      </Grid>
+                    ))}
+                    <Grid xs={12} container>
+                      {fullSpan.map(([key, options = {}], index) => (
                         <Grid key={key} xs={12}>
                           <Field
-                            tabIndex={100 * (groupIndex + 1) + index}
+                            tabIndex={
+                              100 * (groupIndex + 1) + columns.length + index
+                            }
                             name={key}
                             {...options}
                           />
                         </Grid>
                       ))}
                     </Grid>
-                  ))}
-                  <Grid xs={12} container>
-                    {fullSpan.map(([key, options = {}], index) => (
-                      <Grid key={key} xs={12}>
-                        <Field
-                          tabIndex={
-                            100 * (groupIndex + 1) + columns.length + index
-                          }
-                          name={key}
-                          {...options}
-                        />
-                      </Grid>
-                    ))}
                   </Grid>
-                </Grid>
-              </FormSection>
-            )
-          })}
+                </FormSection>
+              )
+            }
+          )}
         </Grid>
         {footer}
       </RHFFormContainer>
