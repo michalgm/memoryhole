@@ -63,7 +63,7 @@ const BulkUpdateModal = ({
             {bulkUpdateRows.length} {pluralize(name, bulkUpdateRows.length)}?
           </Typography>
 
-          {...getValues().fields.map(({ field_name, field_value }) => {
+          {getValues().fields.map(({ field_name, field_value }) => {
             let value = field_value
 
             if (isBoolean(value)) {

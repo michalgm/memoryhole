@@ -196,10 +196,10 @@ const ToolbarActions = ({
 }
 
 const DataTable = ({
-  data,
-  schema,
+  data = [],
+  schema = {},
   displayColumns = [],
-  tableProps,
+  tableProps = {},
   refetch,
   disableDownload,
   preColumns = [],

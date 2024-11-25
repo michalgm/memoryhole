@@ -70,8 +70,8 @@ export const hasRole = (roles) => {
     return false
   }
 
-  const currentUserRoles = context.currentUser?.roles
-
+  const currentUserRoles =
+    context.currentUser?.roles || context.currentUser?.role
   if (typeof roles === 'string') {
     if (typeof currentUserRoles === 'string') {
       // roles to check is a string, currentUser.roles is a string

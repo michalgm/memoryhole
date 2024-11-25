@@ -28,7 +28,7 @@ export const optionSet = ({ id }) => {
   })
 }
 
-export const createOptionSet = ({ input: { values, ...input } }) => {
+export const createOptionSet = ({ input: { values = [], ...input } }) => {
   return db.$transaction(async (db) => {
     const optionSet = await db.optionSet.create({
       data: input,
@@ -41,7 +41,7 @@ export const createOptionSet = ({ input: { values, ...input } }) => {
   })
 }
 
-export const updateOptionSet = ({ id, input: { values, ...input } }) => {
+export const updateOptionSet = ({ id, input: { values = [], ...input } }) => {
   return db.$transaction(async (db) => {
     const res = await db.optionSet.update({
       data: input,

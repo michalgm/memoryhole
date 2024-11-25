@@ -19,27 +19,33 @@ describe('users', () => {
     expect(result).toEqual(scenario.user.one)
   })
 
-  scenario('creates a user', async () => {
+  scenario('creates a user', async (scenario) => {
+    mockCurrentUser(scenario.user.one)
+
     const result = await createUser({
-      input: { email: 'String1106863', name: 'String', action_ids: 9659194 },
+      input: { email: 'foo@you.com', name: 'String', action_ids: [9659194] },
     })
 
-    expect(result.email).toEqual('String1106863')
+    expect(result.email).toEqual('foo@you.com')
     expect(result.name).toEqual('String')
-    expect(result.action_ids).toEqual(9659194)
+    expect(result.action_ids).toEqual([9659194])
   })
 
   scenario('updates a user', async (scenario) => {
+    mockCurrentUser(scenario.user.one)
+
     const original = await user({ id: scenario.user.one.id })
     const result = await updateUser({
       id: original.id,
-      input: { email: 'String69691522' },
+      input: { email: 'foo@you.com' },
     })
 
-    expect(result.email).toEqual('String69691522')
+    expect(result.email).toEqual('foo@you.com')
   })
 
   scenario('deletes a user', async (scenario) => {
+    mockCurrentUser(scenario.user.one)
+
     const original = await deleteUser({ id: scenario.user.one.id })
     const result = await user({ id: original.id })
 

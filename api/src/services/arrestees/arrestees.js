@@ -10,17 +10,17 @@ export const updateDisplayField = (arrestee, current = {}) => {
     (arrestee.custom_fields &&
       'legal_name_confidential' in arrestee.custom_fields)
   ) {
-    let {
-      first_name = '',
-      last_name = '',
-      preferred_name = '',
-      custom_fields = {},
-    } = merge(current, arrestee)
-    first_name = first_name ?? ''
-    last_name = last_name ?? ''
-    preferred_name = preferred_name ?? ''
+    const merged = merge(current, arrestee)
+    const first_name = merged.first_name ?? ''
+    const last_name = merged.last_name ?? ''
+    const preferred_name = merged.preferred_name ?? ''
+    const custom_fields = merged.custom_fields ?? {}
 
-    let fields = [preferred_name, `(${first_name.trim()})`, last_name]
+    let fields = [
+      preferred_name,
+      first_name ? `(${first_name.trim()})` : '',
+      last_name,
+    ]
     if (custom_fields?.legal_name_confidential) {
       fields = [preferred_name, !preferred_name.includes(' ') && last_name, '*']
     }

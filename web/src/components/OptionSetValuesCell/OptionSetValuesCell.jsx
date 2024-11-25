@@ -22,7 +22,7 @@ export const Failure = ({ error }) => (
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
 )
 
-export const Success = ({ optionSet: { id, name, values } }) => {
+export const Success = ({ optionSet: { id, name, values } = {} }) => {
   return <EditOptionsForm optionsSet={{ id, name, values }} />
 }
 

@@ -1,4 +1,7 @@
 import { render } from '@redwoodjs/testing/web'
+
+import { SnackBarProvider } from '../utils/SnackBar'
+
 import { Loading, Empty, Failure, Success } from './ArresteeArrestsCell'
 import { standard } from './ArresteeArrestsCell.mock'
 
@@ -35,7 +38,11 @@ describe('ArresteeArrestsCell', () => {
 
   it('renders Success successfully', async () => {
     expect(() => {
-      render(<Success arresteeArrests={standard().arresteeArrests} />)
+      render(
+        <SnackBarProvider>
+          <Success arresteeArrests={standard().arresteeArrests} />
+        </SnackBarProvider>
+      )
     }).not.toThrow()
   })
 })

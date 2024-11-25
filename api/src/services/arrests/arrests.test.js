@@ -14,18 +14,24 @@ import {
 
 describe('arrests', () => {
   scenario('returns all arrests', async (scenario) => {
+    mockCurrentUser({ name: 'Rob' })
+
     const result = await arrests()
 
     expect(result.length).toEqual(Object.keys(scenario.arrest).length)
   })
 
   scenario('returns a single arrest', async (scenario) => {
+    mockCurrentUser({ name: 'Rob' })
+
     const result = await arrest({ id: scenario.arrest.one.id })
 
     expect(result).toEqual(scenario.arrest.one)
   })
 
   scenario('creates a arrest', async () => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+
     const result = await createArrest({
       input: { display_field: 'String', search_field: 'String' },
     })
@@ -35,6 +41,8 @@ describe('arrests', () => {
   })
 
   scenario('updates a arrest', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+
     const original = await arrest({ id: scenario.arrest.one.id })
     const result = await updateArrest({
       id: original.id,
@@ -45,6 +53,8 @@ describe('arrests', () => {
   })
 
   scenario('deletes a arrest', async (scenario) => {
+    mockCurrentUser({ name: 'Rob' })
+
     const original = await deleteArrest({
       id: scenario.arrest.one.id,
     })

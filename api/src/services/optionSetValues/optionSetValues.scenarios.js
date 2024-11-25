@@ -1,18 +1,25 @@
 export const standard = defineScenario({
+  optionSet: {
+    one: { data: { name: 'SetA' } },
+  },
   optionSetValue: {
-    one: {
+    one: (scenario) => ({
       data: {
         label: 'String',
         value: 'String',
-        option_set_details: { create: { name: 'String3899745' } },
+        option_set_details: {
+          connect: scenario.optionSet.one,
+        },
       },
-    },
-    two: {
+    }),
+    two: (scenario) => ({
       data: {
-        label: 'String',
-        value: 'String',
-        option_set_details: { create: { name: 'String2848784' } },
+        label: 'String2',
+        value: 'String2',
+        option_set_details: {
+          connect: scenario.optionSet.one,
+        },
       },
-    },
+    }),
   },
 })

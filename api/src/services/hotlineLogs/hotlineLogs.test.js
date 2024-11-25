@@ -25,7 +25,9 @@ describe('hotlineLogs', () => {
     expect(result).toEqual(scenario.hotlineLog.one)
   })
 
-  scenario('creates a hotlineLog', async () => {
+  scenario('creates a hotlineLog', async (scenario) => {
+    mockCurrentUser(scenario.user.one)
+
     const result = await createHotlineLog({
       input: {
         start_time: '2023-11-08T20:43:16.860Z',
@@ -38,6 +40,8 @@ describe('hotlineLogs', () => {
   })
 
   scenario('updates a hotlineLog', async (scenario) => {
+    mockCurrentUser(scenario.user.one)
+
     const original = await hotlineLog({
       id: scenario.hotlineLog.one.id,
     })
@@ -50,6 +54,8 @@ describe('hotlineLogs', () => {
   })
 
   scenario('deletes a hotlineLog', async (scenario) => {
+    mockCurrentUser(scenario.user.one)
+
     const original = await deleteHotlineLog({
       id: scenario.hotlineLog.one.id,
     })

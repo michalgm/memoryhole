@@ -48,7 +48,7 @@ export const Failure = ({ error }) => (
 
 export const Success = ({
   docketSheet,
-  queryResult: { refetch },
+  queryResult: { refetch } = {},
 
   include_contact,
 }) => {

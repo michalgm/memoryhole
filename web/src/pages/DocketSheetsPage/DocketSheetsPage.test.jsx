@@ -1,4 +1,9 @@
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+
 import { render } from '@redwoodjs/testing/web'
+
+import { SnackBarProvider } from 'src/components/utils/SnackBar'
 
 import DocketSheetsPage from './DocketSheetsPage'
 
@@ -8,7 +13,13 @@ import DocketSheetsPage from './DocketSheetsPage'
 describe('DocketSheetsPage', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<DocketSheetsPage />)
+      render(
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <SnackBarProvider>
+            <DocketSheetsPage />
+          </SnackBarProvider>
+        </LocalizationProvider>
+      )
     }).not.toThrow()
   })
 })

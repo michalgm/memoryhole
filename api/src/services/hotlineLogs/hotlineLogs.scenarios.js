@@ -13,4 +13,13 @@ export const standard = defineScenario({
       },
     },
   },
+  user: {
+    one: {
+      data: {
+        email: 'foo@you.com',
+        name: 'Test',
+        role: 'User',
+      },
+    },
+  },
 })

@@ -29,7 +29,7 @@ const LoadingButton = ({
           ...props.sx,
         }}
       >
-        {...children}
+        {children}
       </Button>
       {loading && (
         <CircularProgress

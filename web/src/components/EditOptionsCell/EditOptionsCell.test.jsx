@@ -1,4 +1,7 @@
 import { render } from '@redwoodjs/testing/web'
+
+import { SnackBarProvider } from '../utils/SnackBar'
+
 import { Loading, Empty, Failure, Success } from './EditOptionsCell'
 import { standard } from './EditOptionsCell.mock'
 
@@ -35,7 +38,11 @@ describe('EditOptionsCell', () => {
 
   it('renders Success successfully', async () => {
     expect(() => {
-      render(<Success editOptions={standard().editOptions} />)
+      render(
+        <SnackBarProvider>
+          <Success editOptions={standard().editOptions} />
+        </SnackBarProvider>
+      )
     }).not.toThrow()
   })
 })

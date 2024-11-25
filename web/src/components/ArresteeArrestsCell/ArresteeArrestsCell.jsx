@@ -97,13 +97,13 @@ export const Loading = () => (
   </div>
 )
 
-// export const Empty = () => <div>Empty</div>
+export const Empty = () => <div>Empty</div>
 
 export const Failure = ({ error }) => (
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
 )
 
-export const Success = ({ arresteeArrests, queryResult: { refetch } }) => {
+export const Success = ({ arresteeArrests, queryResult: { refetch } = {} }) => {
   const [bulkUpdateRows, setBulkUpdateRows] = useState(null)
   const { openSnackbar } = useSnackbar()
 

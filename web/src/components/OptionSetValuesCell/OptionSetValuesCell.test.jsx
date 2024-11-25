@@ -1,4 +1,7 @@
 import { render } from '@redwoodjs/testing/web'
+
+import { SnackBarProvider } from '../utils/SnackBar'
+
 import { Loading, Empty, Failure, Success } from './OptionSetValuesCell'
 import { standard } from './OptionSetValuesCell.mock'
 
@@ -35,7 +38,11 @@ describe('OptionSetValuesCell', () => {
 
   it('renders Success successfully', async () => {
     expect(() => {
-      render(<Success optionSetValues={standard().optionSetValues} />)
+      render(
+        <SnackBarProvider>
+          <Success optionSetValues={standard().optionSetValues} />
+        </SnackBarProvider>
+      )
     }).not.toThrow()
   })
 })

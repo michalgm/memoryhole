@@ -31,16 +31,16 @@ describe('optionSetValues', () => {
     const result = await createOptionSetValue({
       input: {
         option_set_id: scenario.optionSetValue.two.option_set_id,
-        label: 'String',
-        value: 'String',
+        label: 'String3',
+        value: 'String3',
       },
     })
 
     expect(result.option_set_id).toEqual(
       scenario.optionSetValue.two.option_set_id
     )
-    expect(result.label).toEqual('String')
-    expect(result.value).toEqual('String')
+    expect(result.label).toEqual('String3')
+    expect(result.value).toEqual('String3')
   })
 
   scenario('updates a optionSetValue', async (scenario) => {

@@ -22,7 +22,7 @@ describe('optionSets', () => {
   scenario('returns a single optionSet', async (scenario) => {
     const result = await optionSet({ id: scenario.optionSet.one.id })
 
-    expect(result).toEqual(scenario.optionSet.one)
+    expect(result).toEqual({ ...scenario.optionSet.one, values: [] })
   })
 
   scenario('creates a optionSet', async () => {

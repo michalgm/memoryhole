@@ -7,9 +7,11 @@ interface Options {
   html: string
 }
 
-export async function sendEmail({ to, subject, text, html }: Options) {
-  if (process.env.NODE_ENV === 'development') {
-    console.log({ to, subject, text })
+export async function sendEmail({ to, subject, text }: Options) {
+  if (['test', 'development'].includes(process.env.NODE_ENV)) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log({ to, subject, text })
+    }
     return
   }
   // create reusable transporter object using SendInBlue for SMTP
