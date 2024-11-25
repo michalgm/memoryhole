@@ -310,9 +310,6 @@ const DataTable = ({
     columnOrder,
     pagination,
     columnFilterFns,
-    showGlobalFilter: globalFilter,
-    showColumnFilters: columnFilters.length > 0,
-    showProgressBars: reloading,
     isLoading: loading,
   }
 
@@ -422,6 +419,15 @@ const DataTable = ({
     }
   }
 
+  if (state.columnFilters.length) {
+    state.showColumnFilters = true
+  }
+  if (globalFilter) {
+    state.showGlobalFilter = true
+  }
+  if (reloading) {
+    state.showProgressBars = true
+  }
   const properties = merge(defaultProps, tableProps)
   properties.data = stateLoaded ? data : []
   properties.state = state
