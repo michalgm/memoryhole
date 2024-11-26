@@ -14,6 +14,8 @@ Arrests:
   ☐ Interface to manage arrestee w/ multiple arrests
   ☐ Check mod time before save
   ☐ Auto-handle cities->jurisdiction?
+  ✔ add test on displayname to check if preferred name == first name @done(24-11-26 14:53)
+  ✔ fix display name to not add parens to first name all the time @done(24-11-26 14:53)
 
 Lawyers:
   ☐ Add lawyers table
@@ -25,16 +27,11 @@ Users:
 Deployment:
   ☐ Linode encrypted volume
 
-autoComplete disabled not working
-add tooltip to update resctrictions button
-make role change set defaults on new user
 
-create roles for operator and coordinator, service
-
-add note to explain asterisk in arrests table
-
-add test on displayname to check if preferred name == first name
-fix display name to not add parens to first name all the time
-add a field to denote that
-
-add rolling minumum access date
+Misc:
+☐ autoComplete disabled not working
+☐ add tooltip to update resctrictions button
+☐ make role change set defaults on new user
+☐ create roles for operator and coordinator, service
+☐ add note to explain asterisk in arrests table
+☐ add rolling minumum access date
