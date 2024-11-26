@@ -204,7 +204,7 @@ const ArrestFields = [
           required: true,
         },
       ],
-      ['action', { type: 'number', field_type: 'action_chooser', span: 12 }],
+      ['action', { field_type: 'action_chooser', span: 12 }],
       ['location'],
       [
         'arrest_city',
