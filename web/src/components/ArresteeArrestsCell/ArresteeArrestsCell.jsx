@@ -225,6 +225,7 @@ const displayColumns = [
 const preColumns = [
   {
     accessorKey: 'arrestee.display_field',
+    id: 'arrestee.display_field',
     header: 'Name',
     Cell: ({ row, renderedCellValue }) => (
       <Link color="secondary" to={routes.arrest({ id: row.original.id })}>

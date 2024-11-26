@@ -132,7 +132,16 @@ export const arrest = async ({ id }) => {
   return arrest
 }
 
-export const searchArrestNames = ({ search }) => {
+export const searchArrestNames = (
+  { search = '' },
+  {
+    where: inputWhere,
+    orderBy = { updated_at: 'desc' },
+    select,
+    take = 20,
+    skip = 0,
+  }
+) => {
   const where = {
     OR: search.split(/\s+/).map((term) => ({
       arrestee: {
@@ -142,9 +151,14 @@ export const searchArrestNames = ({ search }) => {
         },
       },
     })),
+    ...inputWhere,
   }
   return db.arrest.findMany({
+    select,
     where: filterAccess(where),
+    take,
+    orderBy,
+    skip,
   })
 }
 

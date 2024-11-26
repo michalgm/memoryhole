@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
+import { memo } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
 import {
@@ -18,6 +19,20 @@ const DYNAMIC_QUERY = gql`
   }
 `
 
+const ARRESTEE_QUERY = gql`
+  query lookupArrestNames($search: String!, $params: QueryParams!) {
+    searchArrestNames(search: $search, params: $params) {
+      id
+      arrestee {
+        id
+        search_display_field
+      }
+      date
+      arrest_city
+    }
+  }
+`
+
 const Autocomplete = ({
   name,
   label,
@@ -25,7 +40,7 @@ const Autocomplete = ({
   options: staticOptions,
   autocompleteProps: defaultAutocompleteProps,
   storeFullObject = false,
-  query,
+  query: inputQuery,
   value,
   onChange,
   helperText,
@@ -33,6 +48,25 @@ const Autocomplete = ({
   transformOptions,
   ...props
 }) => {
+  const query = useMemo(
+    () => ({
+      model: inputQuery?.model,
+      searchField: inputQuery?.searchField,
+      select: inputQuery?.select,
+      orderBy: inputQuery?.orderBy,
+      take: inputQuery?.take,
+    }),
+    [
+      inputQuery?.model,
+      inputQuery?.searchField,
+      inputQuery?.select,
+      inputQuery?.orderBy,
+      inputQuery?.take,
+    ]
+  )
+
+  const gqlQuery = query?.model === 'arrest' ? ARRESTEE_QUERY : DYNAMIC_QUERY
+
   const currentValue = value
   const displayError = useDisplayError()
   const [options, setOptions] = useState(() => {
@@ -48,31 +82,43 @@ const Autocomplete = ({
 
     return transformOptions ? transformOptions(initialOptions) : initialOptions
   })
-  const [searchQuery, { loading }] = useLazyQuery(DYNAMIC_QUERY, {
+  const [searchQuery, { loading }] = useLazyQuery(gqlQuery, {
     onError: displayError,
   })
 
   const handleSearch = useCallback(
-    async (searchTerm) => {
+    async (searchTerm = '') => {
       if (!query || staticOptions) return
+
       const { select, orderBy, model, searchField, take = 10 } = query
       const params = {
-        where: {
-          [searchField]: {
-            contains: searchTerm,
-            mode: 'insensitive',
-          },
-        },
         orderBy,
         select,
         take,
       }
-
+      const variables =
+        query.model === 'arrest'
+          ? { search: searchTerm, params }
+          : {
+              model,
+              params: {
+                ...params,
+                where: {
+                  [searchField]: {
+                    contains: searchTerm,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            }
       const result = await searchQuery({
-        variables: { model, params },
+        variables,
       })
 
-      const options = result.data?.dynamicModelQuery || []
+      const options =
+        result.data[
+          query.model === 'arrest' ? 'searchArrestNames' : 'dynamicModelQuery'
+        ] || []
       const transformedOptions = transformOptions
         ? transformOptions(options.map((o) => ({ ...o, label: o.name })))
         : options.map((o) => ({ ...o, label: o.name }))
@@ -158,4 +204,4 @@ const Autocomplete = ({
   )
 }
 
-export default Autocomplete
+export default memo(Autocomplete)

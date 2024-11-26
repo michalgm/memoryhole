@@ -4,8 +4,6 @@ import {
   FormGroup,
   FormHelperText,
   FormLabel,
-  ListItemText,
-  Typography,
   TextField,
   Checkbox,
 } from '@mui/material'
@@ -20,7 +18,7 @@ import {
   TextFieldElement,
 } from 'react-hook-form-mui'
 
-import dayjs from '../../../../api/src/lib/day'
+import ActionChooser from '../Autocomplete/ActionChooser'
 import Autocomplete from '../Autocomplete/Autocomplete'
 
 import RichTextInput from './RichTextInput'
@@ -140,48 +138,13 @@ export const BaseField = ({
 
   const renderActionChooser = () => {
     return (
-      <Autocomplete
+      <ActionChooser
         name={name}
-        label={props.label}
         helperText={helperText}
-        query={{
-          model: 'action',
-          orderBy: {
-            start_date: 'desc',
-          },
-          searchField: 'name',
-        }}
         isRHF={isRHF}
         onChange={onChange}
         value={value}
-        storeFullObject
         textFieldProps={textFieldProps}
-        autocompleteProps={{
-          getOptionLabel: (option) => {
-            return option.name
-            // const date = dayjs(option.start_date).format('L LT')
-            // return `${option.name} (${date})`
-          },
-
-          renderOption: ({ key, ...props }, option) => (
-            <li key={key} {...props}>
-              <ListItemText
-                primary={
-                  <Typography variant="body1" component="span">
-                    {option.name}
-                  </Typography>
-                }
-                secondary={
-                  option.start_date && (
-                    <Typography variant="body2" color="textSecondary">
-                      {dayjs(option.start_date).format('L LT')}
-                    </Typography>
-                  )
-                }
-              />
-            </li>
-          ),
-        }}
         {...props}
       />
     )
@@ -262,6 +225,8 @@ export const BaseField = ({
       return renderRichTextField()
     case 'action_chooser':
       return renderActionChooser()
+    case 'autocomplete':
+      return renderAutocomplete()
     case 'textarea':
     default:
       return renderTextField()

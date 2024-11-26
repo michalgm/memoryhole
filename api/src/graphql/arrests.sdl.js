@@ -31,7 +31,8 @@ export const schema = gql`
   type Query {
     arrests: [Arrest!]! @requireAuth
     arrest(id: Int!): Arrest @requireAuth
-    searchArrestNames(search: String!): [Arrest!]! @requireAuth
+    searchArrestNames(search: String, params: QueryParams): [Arrest!]!
+      @requireAuth
     filterArrests(filters: [GenericFilterInput]): [Arrest]! @requireAuth
     docketSheetSearch(
       date: DateTime!
