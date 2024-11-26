@@ -172,8 +172,14 @@ const importRecord = async (data) => {
       const path = fieldMap[key]
       if (path) {
         if (key === 'arrest_date') {
+          if (data.arrest_time === 'Invalid date') {
+            data.arrest_time = '12:00AM'
+          }
           val = combineDateTime(data.arrest_date, data.arrest_time)
         } else if (key == 'court_date') {
+          if (data.court_time === 'Invalid date') {
+            data.court_time = '12:00AM'
+          }
           val = combineDateTime(data.court_date, data.court_time)
         } else if (key == 'birth_date') {
           val = dayjs(val, 'YYYY-MM-DD').format()
