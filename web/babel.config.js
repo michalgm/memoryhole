@@ -12,4 +12,7 @@ const plugins = [
   ],
 ]
 
-module.exports = { plugins }
+module.exports = {
+  plugins,
+  presets: ['@babel/preset-react'],
+}
