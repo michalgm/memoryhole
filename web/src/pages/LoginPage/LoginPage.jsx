@@ -201,7 +201,7 @@ export const AuthManage = ({
             >
               {title}
             </LoadingButton>
-            {...postButtonElements}
+            {postButtonElements}
           </ModalCard>
         </FormContainer>
       </main>
