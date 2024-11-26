@@ -67,6 +67,61 @@ describe('updateDisplayField', () => {
     expect(arrestee.display_field).toEqual('Johnny (John) Doe')
   })
 
+  test('handles no preferred name', () => {
+    const arrestee = {
+      last_name: 'Doe',
+      first_name: 'John',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('John Doe')
+  })
+
+  test('handle first name ==  preferred name', () => {
+    const arrestee = {
+      last_name: 'Doe',
+      first_name: 'John',
+      preferred_name: 'John',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('John Doe')
+  })
+
+  test('handle first name + last_name ==  preferred name', () => {
+    const arrestee = {
+      last_name: 'Doe',
+      first_name: 'John',
+      preferred_name: 'John Doe',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('John Doe')
+  })
+
+  test('handle first name ==  preferred name with confidential', () => {
+    const arrestee = {
+      last_name: 'Doe',
+      first_name: 'John',
+      preferred_name: 'John',
+      custom_fields: {
+        legal_name_confidential: true,
+      },
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('John Doe *')
+  })
+
+  test('handle first name + last_name ==  preferred name with confidential', () => {
+    const arrestee = {
+      last_name: 'Doe',
+      first_name: 'John',
+      preferred_name: 'John Doe',
+      custom_fields: {
+        legal_name_confidential: true,
+      },
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('John Doe *')
+  })
+
   test('handles missing first name', () => {
     const arrestee = {
       last_name: 'Doe',
