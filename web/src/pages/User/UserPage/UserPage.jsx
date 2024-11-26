@@ -95,10 +95,10 @@ const UserPage = ({ id }) => {
   const restrictionDefaults = {
     default: {
       arrest_date_min: dayjs().subtract(1, 'week'),
-      expiresAt: dayjs().add(1, 'week').endOf('day'),
+      expiresAt: dayjs().add(1, 'day').endOf('day'),
     },
     Admin: {
-      arrest_date_min: null,
+      arrest_date_min: dayjs().subtract(6, 'month'),
       expiresAt: dayjs().add(6, 'month').endOf('day'),
     },
   }
