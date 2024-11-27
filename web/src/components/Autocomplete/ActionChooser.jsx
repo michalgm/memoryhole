@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Typography, ListItemText } from '@mui/material'
+import { ListItemText, Typography } from '@mui/material'
 
 import dayjs from '../../../../api/src/lib/day'
 
@@ -19,11 +19,11 @@ const autocompleteProps = {
           </Typography>
         }
         secondary={
-          option.start_date && (
-            <Typography variant="body2" color="textSecondary">
-              {dayjs(option.start_date).format('L LT')}
-            </Typography>
-          )
+          <Typography variant="body2" color="textSecondary">
+            {option.start_date && dayjs(option.start_date).format('L LT')}
+            <br />
+            {option.city || option.jurisdiction}
+          </Typography>
         }
       />
     </li>
