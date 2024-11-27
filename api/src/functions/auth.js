@@ -113,9 +113,11 @@ export const handler = async (event, context) => {
 
     errors: {
       // the resetToken is valid, but expired
-      resetTokenExpired: 'resetToken is expired',
+      resetTokenExpired:
+        'resetToken is expired. Please begin the password reset process again.',
       // no user was found with the given resetToken
-      resetTokenInvalid: 'resetToken is invalid',
+      resetTokenInvalid:
+        'resetToken is invalid. Please begin the password reset process again.',
       // the resetToken was not present in the URL
       resetTokenRequired: 'resetToken is required',
       // new password is the same as the old password (apparently they did not forget it)
