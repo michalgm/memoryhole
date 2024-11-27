@@ -1,8 +1,10 @@
 ArrestsTable:
-  ☐ allow save/restore of queries
+  ✔ allow save/restore of queries @done(24-11-26 14:57)
+  ☐ allow update of existing stored view
   ☐ PDF export?
-  ☐ Allow re-order of fields
-  ☐ Bulk updates
+  ✔ Allow re-order of fields @done(24-11-26 14:57)
+  ✔ Bulk updates @done(24-11-26 14:57)
+  ☐ add note to explain asterisk in arrests table
 
 General:
   ☐ custom fields via UI
@@ -21,8 +23,13 @@ Lawyers:
   ☐ Add lawyers table
 
 Users:
-  ☐ improve user management UI
+  ✔ improve user management UI @done(24-11-26 14:54)
   ☐ allow admin to reset user password UI?
+  ☐ add rolling minumum access date
+  ✔ add tooltip to update resctrictions button @done(24-11-26 17:15)
+  ✔ make role change set defaults on new user @done(24-11-26 16:43)
+  ☐ create roles for operator and coordinator, service
+  ☐ remove user delete, switch to disable (to preserve record associations)
 
 Deployment:
   ☐ Linode encrypted volume
@@ -30,8 +37,3 @@ Deployment:
 
 Misc:
 ☐ autoComplete disabled not working
-☐ add tooltip to update resctrictions button
-☐ make role change set defaults on new user
-☐ create roles for operator and coordinator, service
-☐ add note to explain asterisk in arrests table
-☐ add rolling minumum access date
