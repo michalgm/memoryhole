@@ -189,12 +189,12 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } = {} }) => {
           footerNotes={
             <Stack spacing={0} direction="column">
               <Typography variant="caption">
-                When a preferred name is specified, the legal name is shown in
-                ()
+                If a preferred name is provided, the legal first name appears in
+                parentheses.
               </Typography>
               <Typography variant="caption">
-                * means the name shown is the preferred name, and the legal name
-                is confidential
+                * indicates the displayed name is the preferred name, and the
+                legal name is confidential.
               </Typography>
             </Stack>
           }
