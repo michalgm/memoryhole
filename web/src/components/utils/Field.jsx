@@ -13,13 +13,18 @@ export const Field = (props) => {
       onChange={(...args) => {
         const inputType = args[0]?.target?.type
         let value
-        if (['text', 'textarea'].includes(inputType)) {
-          value = args[0].target.value
-        } else if (inputType) {
+        if (['checkbox', 'switch'].includes(inputType)) {
           value = args[1]
+        } else if (inputType) {
+          if (inputType === 'number') {
+            value = Number(args[0].target.value)
+          } else {
+            value = args[0].target.value
+          }
         } else {
           value = args[0]
         }
+
         if (props.onChange) {
           props.onChange(value, { setValue, getValues, ...context })
         }
