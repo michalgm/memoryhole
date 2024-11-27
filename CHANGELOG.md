@@ -1,5 +1,11 @@
 
 
+## [0.1.7](https://github.com/michalgm/memoryhole/compare/v0.1.6...v0.1.7) (2024-11-27)
+
+### Features
+
+* **Form:** Add confirmation when navigating away from dirty form ([46794b6](https://github.com/michalgm/memoryhole/commit/46794b689a677127c11a141d7c53fab7519fbd72))
+
 ## [0.1.6](https://github.com/michalgm/memoryhole/compare/v0.1.5...v0.1.6) (2024-11-27)
 
 ### Features
