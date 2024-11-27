@@ -35,5 +35,12 @@
     "axios-cookiejar-support": "^5.0.3",
     "pm2": "^5.4.3",
     "tough-cookie": "^4.1.4"
+  },
+  "release-it": {
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "angular"
+      }
+    }
   }
 }
