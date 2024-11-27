@@ -13,5 +13,6 @@
   "[dotenv]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
-  "cSpell.words": ["Memoryhole", "redwoodjs"]
+  "cSpell.words": ["Memoryhole", "redwoodjs"],
+  "conventionalCommits.scopes": ["Form", "UI"]
 }
