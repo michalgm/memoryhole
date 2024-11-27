@@ -1,3 +1,11 @@
+
+
+## [0.1.6](https://github.com/michalgm/memoryhole/compare/v0.1.5...v0.1.6) (2024-11-27)
+
+### Features
+
+* update (backdate) changelog ([109af37](https://github.com/michalgm/memoryhole/commit/109af37211a3835982a551f2010219e8e6df43d5))
+
 ## [0.1.5](https://github.com/michalgm/memoryhole/compare/0.1.4...v0.1.5) (2024-11-27)
 
 ### Features
