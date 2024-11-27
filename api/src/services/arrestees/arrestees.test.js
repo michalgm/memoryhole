@@ -1,9 +1,9 @@
 import {
-  arrestees,
   arrestee,
+  arrestees,
   createArrestee,
-  updateArrestee,
   deleteArrestee,
+  updateArrestee,
   updateDisplayField,
 } from './arrestees'
 
@@ -178,6 +178,14 @@ describe('updateDisplayField', () => {
     }
     updateDisplayField(arrestee)
     expect(arrestee.display_field).toEqual('Johnny (John) Doe')
+  })
+
+  test('returns "no name entered" when blank', () => {
+    const arrestee = {
+      first_name: '',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('NO NAME ENTERED')
   })
 
   test('does not update display field when no name fields are provided', () => {

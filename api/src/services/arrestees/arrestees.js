@@ -33,10 +33,11 @@ export const updateDisplayField = (arrestee, current = {}) => {
     if (custom_fields?.legal_name_confidential) {
       fields = [preferred_name, !preferred_name.includes(' ') && last_name, '*']
     }
-    arrestee.display_field = fields
-      .filter(Boolean)
-      .map((name) => name.trim())
-      .join(' ')
+    arrestee.display_field =
+      fields
+        .filter(Boolean)
+        .map((name) => name.trim())
+        .join(' ') || 'NO NAME ENTERED'
   }
 }
 
