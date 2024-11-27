@@ -10,6 +10,7 @@
   "devDependencies": {
     "@redwoodjs/core": "8.4.1",
     "@redwoodjs/project-config": "8.4.1",
+    "@release-it/conventional-changelog": "^9.0.3",
     "node-ssh": "^13.2.0",
     "release-it": "^17.10.0"
   },
