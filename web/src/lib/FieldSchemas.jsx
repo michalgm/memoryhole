@@ -450,7 +450,14 @@ export const UserFields = [
     title: 'User Details',
     fields: [
       ['name', { required: true }],
-      ['email', { required: true }],
+      [
+        'email',
+        {
+          required: true,
+          helperText:
+            'Password emails will be sent from a Proton Mail account. To ensure end-to-end encryption, it is strongly recommended to use a Proton Mail account for logins.',
+        },
+      ],
       [
         'role',
         {

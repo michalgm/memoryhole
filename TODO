@@ -15,9 +15,11 @@ Arrests:
     ☐ display court data in arrest view
   ☐ Interface to manage arrestee w/ multiple arrests
   ☐ Check mod time before save
+  ☐ check dirty form before nav
   ☐ Auto-handle cities->jurisdiction?
   ✔ add test on displayname to check if preferred name == first name @done(24-11-26 14:53)
   ✔ fix display name to not add parens to first name all the time @done(24-11-26 14:53)
+  ☐ Handle blank display name
 
 Lawyers:
   ☐ Add lawyers table
@@ -30,6 +32,9 @@ Users:
   ✔ make role change set defaults on new user @done(24-11-26 16:43)
   ☐ create roles for operator and coordinator, service
   ☐ remove user delete, switch to disable (to preserve record associations)
+  ✔ suggest protonmail for email @done(24-11-26 19:07)
+  ☐ check if access expires during login session
+  ☐ Add some sort of notification about access expiring
 
 Deployment:
   ☐ Linode encrypted volume
