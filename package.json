@@ -10,10 +10,8 @@
   "devDependencies": {
     "@redwoodjs/core": "8.4.1",
     "@redwoodjs/project-config": "8.4.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
     "node-ssh": "^13.2.0",
-    "semantic-release": "^24.2.0"
+    "release-it": "^17.10.0"
   },
   "eslintConfig": {
     "extends": "@redwoodjs/eslint-config",
