@@ -15,7 +15,7 @@ const AdminPage = () => {
   const admin_routes = [
     // 'users',
     // 'hotlineLogs',
-    'customSchemata',
+    // 'customSchemata',
     'logs',
     'tableViews',
     // 'actions',

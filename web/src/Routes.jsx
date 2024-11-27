@@ -77,7 +77,7 @@ const Routes = () => {
             <Route path="/actions/{id:Int}" page={ActionActionPage} name="action" />
           </Set>
           <Route path="/docs" page={DocumentationPage} name="docsHome" />
-          <Route path="/docs/{page:String?home}" page={DocumentationPage} name="docs" />
+          <Route path="/docs/{page:String}" page={DocumentationPage} name="docs" />
         </Set>
       </PrivateSet>
       <Route notfound page={NotFoundPage} />
