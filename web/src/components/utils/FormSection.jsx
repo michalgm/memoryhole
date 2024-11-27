@@ -4,6 +4,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
@@ -38,18 +39,20 @@ const FormSection = ({ title, sectionActions = [], children }) => {
             <Typography variant="h3">{title}</Typography>
             {sectionActions.map((action) => (
               <Box key={action.label}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    action.onClick(e, context)
-                  }}
-                  sx={{ my: -10 }}
-                >
-                  {action.label}
-                </Button>
+                <Tooltip title={action.tooltip}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      action.onClick(e, context)
+                    }}
+                    sx={{ my: -10 }}
+                  >
+                    {action.label}
+                  </Button>
+                </Tooltip>
               </Box>
             ))}
           </Stack>

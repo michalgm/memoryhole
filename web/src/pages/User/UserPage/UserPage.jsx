@@ -1,4 +1,8 @@
+import { Typography } from '@mui/material'
+import { Box } from '@mui/system'
 import dayjs from 'dayjs'
+import { upperCase } from 'lodash-es'
+import pluralize from 'pluralize'
 
 import { navigate, routes } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
@@ -94,20 +98,60 @@ const UserPage = ({ id }) => {
   const user = { ...data?.user }
   const restrictionDefaults = {
     default: {
-      arrest_date_min: dayjs().subtract(1, 'week'),
-      expiresAt: dayjs().add(1, 'day').endOf('day'),
+      arrest_date_min: [1, 'week'],
+      expiresAt: [1, 'day'],
     },
     Admin: {
-      arrest_date_min: dayjs().subtract(6, 'month'),
-      expiresAt: dayjs().add(6, 'month').endOf('day'),
+      arrest_date_min: ['6', 'month'],
+      expiresAt: ['6', 'month'],
     },
   }
 
-  if (!id) {
-    user.role = 'User'
-    user.arrest_date_min = restrictionDefaults.default.arrest_date_min
-    user.expiresAt = restrictionDefaults.default.expiresAt
+  const updateDefaults = (role, context) => {
+    const defaults = restrictionDefaults[role === 'Admin' ? 'Admin' : 'default']
+    context.setValue('arrest_date_min', dayjs().subtract(...defaults.expiresAt))
+    context.setValue(
+      'expiresAt',
+      dayjs()
+        .add(...defaults.expiresAt)
+        .endOf('day')
+    )
   }
+
+  if (!id) {
+    //FIXME DRY setting dates
+    user.role = 'User'
+    user.arrest_date_min = dayjs().add(
+      ...restrictionDefaults.default.arrest_date_min
+    )
+    user.expiresAt = dayjs()
+      .subtract(...restrictionDefaults.default.expiresAt)
+      .endOf('day')
+  }
+
+  const formatDefaultValue = ([amount, unit]) =>
+    `${amount} ${pluralize(unit, amount)}`
+  const tooltip = (
+    <Box>
+      {Object.entries(restrictionDefaults).map(([role, values]) => {
+        return (
+          <Box key={role}>
+            <Typography variant="subtitle2">{upperCase(role)}:</Typography>
+            <Box pl={2}>
+              <Typography>
+                Arrest min: -{formatDefaultValue(values.arrest_date_min)} from
+                now
+              </Typography>
+              <Typography>
+                Expires: +{formatDefaultValue(values.expiresAt)} from now
+              </Typography>
+            </Box>
+          </Box>
+        )
+      })}
+    </Box>
+  )
+
   UserFields.forEach((section) => {
     if (section.title === 'Restrict Access') {
       section.fields.forEach((field) => {
@@ -118,14 +162,19 @@ const UserPage = ({ id }) => {
           label: 'Update Restrictions to Defaults',
           onClick: (_e, context) => {
             const role = context.getValues('role')
-            const defaults =
-              restrictionDefaults[role === 'Admin' ? 'Admin' : 'default']
-            context.setValue('arrest_date_min', defaults.arrest_date_min)
-            context.setValue('expiresAt', defaults.expiresAt)
+            updateDefaults(role, context)
           },
+          tooltip,
         },
       ]
     }
+    section.fields.forEach((field) => {
+      if (field[0] === 'role') {
+        field[1].onChange = (value, context) => {
+          updateDefaults(value, context)
+        }
+      }
+    })
   })
   if (error) return null
 
