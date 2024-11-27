@@ -83,6 +83,7 @@ const cities = [
   'San Mateo',
   'Santa Cruz',
   'Walnut Creek',
+  'Sacramento',
   'Other',
 ]
 
@@ -97,6 +98,7 @@ const jurisdictions = [
   'Marin',
   'Yolo',
   'Humboldt',
+  'Sacramento',
   'Solano',
   'Sonoma',
   'Napa',
