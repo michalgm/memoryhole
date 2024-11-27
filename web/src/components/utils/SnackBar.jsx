@@ -1,9 +1,9 @@
 import {
   createContext,
-  useContext,
-  useState,
-  useEffect,
   useCallback,
+  useContext,
+  useEffect,
+  useState,
 } from 'react'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -106,23 +106,28 @@ export const useDisplayError = () => {
   return displayError
 }
 
+const DEFAULT_SNACKBAR_STATE = {
+  open: false,
+  message: '',
+  severity: 'success',
+  duration: 4000,
+}
+
 export const SnackBarProvider = ({ children }) => {
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success',
-    duration: 4000,
-  })
+  const [snackbar, setSnackbar] = useState(DEFAULT_SNACKBAR_STATE)
 
-  const openSnackbar = (message, severity = 'success', duration = 4000) => {
-    setSnackbar({ open: true, message, severity, duration })
-  }
+  const openSnackbar = useCallback(
+    (message, severity = 'success', duration = 4000) => {
+      setSnackbar({ open: true, message, severity, duration })
+    },
+    []
+  )
 
-  const closeSnackbar = (event, reason) => {
+  const closeSnackbar = useCallback((event, reason) => {
     if (reason !== 'clickaway' && reason !== 'escapeKeyDown') {
-      setSnackbar({ ...snackbar, open: false })
+      setSnackbar(DEFAULT_SNACKBAR_STATE)
     }
-  }
+  }, [])
 
   const duration = snackbar.severity === 'success' ? snackbar.duration : null
   return (
