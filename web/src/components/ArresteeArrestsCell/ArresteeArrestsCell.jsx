@@ -1,6 +1,8 @@
 import { useState } from 'react'
 
+import { Typography } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import { Stack } from '@mui/system'
 import dayjs from 'dayjs'
 import { useConfirm } from 'material-ui-confirm'
 
@@ -170,20 +172,29 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } = {} }) => {
 
   return (
     <>
-      <DataTable
-        data={data}
-        schema={schema}
-        displayColumns={displayColumns}
-        tableProps={tableProps}
-        refetch={refetch}
-        preColumns={preColumns}
-        bulkUpdate={bulkUpdate}
-        bulkDelete={bulkDelete}
-        manageViews
-        type="arrestees"
-        name="arrest"
-        persistState
-      />
+      <Stack spacing={0} direction="column">
+        <DataTable
+          data={data}
+          schema={schema}
+          displayColumns={displayColumns}
+          tableProps={tableProps}
+          refetch={refetch}
+          preColumns={preColumns}
+          bulkUpdate={bulkUpdate}
+          bulkDelete={bulkDelete}
+          manageViews
+          type="arrestees"
+          name="arrest"
+          persistState
+        />
+        <Typography variant="caption" gutterBottom>
+          When a preferred name is specified, the legal name is shown in ()
+        </Typography>
+        <Typography variant="caption">
+          * means the name shown is the preferred name, and the legal name is
+          confidential
+        </Typography>
+      </Stack>
       <BulkUpdateModal
         bulkUpdateRows={bulkUpdateRows}
         setBulkUpdateRows={setBulkUpdateRows}
