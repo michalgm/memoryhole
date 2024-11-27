@@ -96,41 +96,46 @@ const UserPage = ({ id }) => {
     onError: displayError,
   })
   const user = { ...data?.user }
+
   const restrictionDefaults = {
     default: {
-      arrest_date_min: [1, 'week'],
-      expiresAt: [1, 'day'],
+      arrest_date_min: ['subtract', 1, 'week'],
+      expiresAt: ['add', 1, 'day', 'endOf'],
     },
     Admin: {
-      arrest_date_min: ['6', 'month'],
-      expiresAt: ['6', 'month'],
+      arrest_date_min: ['subtract', 6, 'month'],
+      expiresAt: ['add', 6, 'month', 'endOf'],
     },
   }
 
-  const updateDefaults = (role, context) => {
+  const applyDateOperation = (date, [operation, amount, unit, modifier]) => {
+    date = date[operation](amount, unit)
+    if (modifier) {
+      date = date[modifier]('day')
+    }
+    return date
+  }
+
+  const applyDefaults = (role, target) => {
     const defaults = restrictionDefaults[role === 'Admin' ? 'Admin' : 'default']
-    context.setValue('arrest_date_min', dayjs().subtract(...defaults.expiresAt))
-    context.setValue(
-      'expiresAt',
-      dayjs()
-        .add(...defaults.expiresAt)
-        .endOf('day')
-    )
+    Object.entries(defaults).forEach(([field, operations]) => {
+      const value = applyDateOperation(dayjs(), operations)
+      if (target.setValue) {
+        target.setValue(field, value)
+      } else {
+        target[field] = value
+      }
+    })
   }
 
   if (!id) {
-    //FIXME DRY setting dates
     user.role = 'User'
-    user.arrest_date_min = dayjs().add(
-      ...restrictionDefaults.default.arrest_date_min
-    )
-    user.expiresAt = dayjs()
-      .subtract(...restrictionDefaults.default.expiresAt)
-      .endOf('day')
+    applyDefaults('User', user)
   }
 
-  const formatDefaultValue = ([amount, unit]) =>
-    `${amount} ${pluralize(unit, amount)}`
+  const formatDefaultValue = ([operator, amount, unit]) =>
+    `${operator == 'add' ? '+' : '-'}${amount} ${pluralize(unit, amount)}`
+
   const tooltip = (
     <Box>
       {Object.entries(restrictionDefaults).map(([role, values]) => {
@@ -139,11 +144,11 @@ const UserPage = ({ id }) => {
             <Typography variant="subtitle2">{upperCase(role)}:</Typography>
             <Box pl={2}>
               <Typography>
-                Arrest min: -{formatDefaultValue(values.arrest_date_min)} from
+                Arrest min: {formatDefaultValue(values.arrest_date_min)} from
                 now
               </Typography>
               <Typography>
-                Expires: +{formatDefaultValue(values.expiresAt)} from now
+                Expires: {formatDefaultValue(values.expiresAt)} from now
               </Typography>
             </Box>
           </Box>
@@ -162,7 +167,7 @@ const UserPage = ({ id }) => {
           label: 'Update Restrictions to Defaults',
           onClick: (_e, context) => {
             const role = context.getValues('role')
-            updateDefaults(role, context)
+            applyDefaults(role, context)
           },
           tooltip,
         },
@@ -171,7 +176,7 @@ const UserPage = ({ id }) => {
     section.fields.forEach((field) => {
       if (field[0] === 'role') {
         field[1].onChange = (value, context) => {
-          updateDefaults(value, context)
+          applyDefaults(value, context)
         }
       }
     })

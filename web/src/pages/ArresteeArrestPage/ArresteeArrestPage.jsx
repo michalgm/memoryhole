@@ -143,6 +143,11 @@ export const transformInput = (input) => {
   return input
 }
 
+const ACTION_TO_ARREST_FIELDS = {
+  city: 'arrest_city',
+  jurisdiction: 'jurisdiction',
+}
+
 const ArresteeArrestPage = ({ id }) => {
   const { currentAction } = useApp()
   const displayError = useDisplayError()
@@ -158,21 +163,35 @@ const ArresteeArrestPage = ({ id }) => {
     onError: displayError,
   })
 
-  if (
-    isCreate &&
-    currentAction &&
-    currentAction.id != -1 &&
-    arrest &&
-    !arrest?.action
-  ) {
-    arrest.action = currentAction
-    if (currentAction.city) {
-      arrest.arrest_city = currentAction.city
-    }
-    if (currentAction.jurisdiction) {
-      arrest.jurisdiction = currentAction.jurisdiction
-    }
+  const applyActionDefaults = (action, target) => {
+    if (!action || action.id === -1) return
+
+    Object.entries(ACTION_TO_ARREST_FIELDS).forEach(
+      ([actionField, arrestField]) => {
+        if (action[actionField]) {
+          if (target.setValue) {
+            target.setValue(arrestField, action[actionField])
+          } else {
+            target[arrestField] = action[actionField]
+          }
+        }
+      }
+    )
   }
+  if (isCreate && currentAction && arrest && !arrest?.action) {
+    arrest.action = currentAction
+    applyActionDefaults(currentAction, arrest)
+  }
+
+  ArrestFields.forEach((section) => {
+    section.fields.forEach((field) => {
+      if (field[0] == 'action') {
+        field[1].onChange = (value, context) => {
+          applyActionDefaults(value, context)
+        }
+      }
+    })
+  })
 
   if (error) return null
 
