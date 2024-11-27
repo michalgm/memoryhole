@@ -4,19 +4,19 @@ import { render } from '@redwoodjs/testing/web'
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
 
-import BlogLayout from './BlogLayout'
-// import mockUser from './BlogLayout.mock'
+import MainLayout from './MainLayout'
+// import mockUser from './MainLayout.mock'
 //   Improve this test with help from the Redwood Testing Doc:
 //   https://redwoodjs.com/docs/testing#testing-pages-layouts
 
-describe('BlogLayout', () => {
+describe('MainLayout', () => {
   it('renders successfully', () => {
     expect(async () => {
       render(
         <AppProvider>
           <SnackBarProvider>
             <RouterContextProvider>
-              <BlogLayout />
+              <MainLayout />
             </RouterContextProvider>
           </SnackBarProvider>
         </AppProvider>

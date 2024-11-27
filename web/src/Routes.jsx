@@ -1,10 +1,10 @@
 import { PrivateSet, Route, Router, Set } from '@redwoodjs/router'
 
-import BlogLayout from 'src/layouts/BlogLayout'
+import MainLayout from 'src/layouts/MainLayout/MainLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
 
 import { useAuth } from './auth'
-import AdminLayout from './layouts/AdminLayout/AdminLayout'
+import ModelLayout from './layouts/ModelLayout/ModelLayout'
 import DocumentationPage from './pages/Documentation/DocumentationPage'
 
 // In this file, all Page components from 'src/pages` are auto-imported. Nested
@@ -23,12 +23,12 @@ const Routes = () => {
       <Route path="/forgot-password" page={ForgotPasswordPage} name="forgotPassword" />
       <Route path="/reset-password" page={ResetPasswordPage} name="resetPassword" />
       <PrivateSet unauthenticated="login">
-        <Set wrap={BlogLayout}>
+        <Set wrap={MainLayout}>
           <PrivateSet unauthenticated="login" roles="Admin">
-            <Set wrap={AdminLayout}>
+            <Set wrap={ModelLayout}>
               <Route path="/admin" page={AdminPage} name="admin" />
             </Set>
-            <Set wrap={AdminLayout} title="Docket Sheets" titleTo="docketSheets">
+            <Set wrap={ModelLayout} title="Docket Sheets" titleTo="docketSheets">
               <Route path="/admin/docket-sheets" page={DocketSheetsPage} name="docketSheets" />
             </Set>
             <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
@@ -41,7 +41,7 @@ const Routes = () => {
               <Route path="/table-views/{id:Int}" page={TableViewTableViewPage} name="tableView" />
               <Route path="/table-views" page={TableViewTableViewsPage} name="tableViews" />
             </Set>
-            <Set wrap={AdminLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
+            <Set wrap={ModelLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
               <Route path="/admin/users/new" page={UserUserPage} name="newUser" />
               <Route path="/admin/users/{id:Int}" page={UserUserPage} name="user" />
               <Route path="/admin/users" page={UserUsersPage} name="users" />
@@ -58,20 +58,20 @@ const Routes = () => {
               <Route path="/admin/logs/{id:Int}" page={LogLogPage} name="log" />
               <Route path="/admin/logs" page={LogLogsPage} name="logs" />
             </Set>
-            <Set wrap={AdminLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
+            <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
               <Route path="/admin/actions/new" page={ActionActionPage} name="newAdminAction" />
               <Route path="/admin/actions/{id:Int}" page={ActionActionPage} name="AdminAction" />
               <Route path="/admin/actions" page={ActionActionsPage} name="AdminActions" />
             </Set>
           </PrivateSet>
-          <Set wrap={AdminLayout} title="Arrests" titleTo="home" buttonLabel="New Arrest" buttonTo="newArresteeArrest">
+          <Set wrap={ModelLayout} title="Arrests" titleTo="home" buttonLabel="New Arrest" buttonTo="newArresteeArrest">
             <Route path="/arrests/new" page={ArresteeArrestPage} name="newArresteeArrest" />
             <Route path="/arrests/{id:Int}" page={ArresteeArrestPage} name="arrest" />
             <Route path="/arrests" page={HomePage} name="arrests" />
             <Route path="/" page={HomePage} name="home" />
           </Set>
           <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" />
-          <Set wrap={AdminLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
+          <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
             <Route path="/actions" page={ActionActionsPage} name="actions" />
             <Route path="/actions/new" page={ActionActionPage} name="newAction" />
             <Route path="/actions/{id:Int}" page={ActionActionPage} name="action" />

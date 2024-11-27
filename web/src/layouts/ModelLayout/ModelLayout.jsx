@@ -6,7 +6,7 @@ import { navigate, routes, useLocation, useParams } from '@redwoodjs/router'
 
 import Breadcrumbs from 'src/components/Breadcrumbs/Breadcrumbs'
 
-const AdminLayout = ({ title, titleTo, buttonLabel, buttonTo, children }) => {
+const ModelLayout = ({ title, titleTo, buttonLabel, buttonTo, children }) => {
   const { id } = useParams()
   const { pathname } = useLocation()
   const isNew = pathname.endsWith('/new')
@@ -42,4 +42,4 @@ const AdminLayout = ({ title, titleTo, buttonLabel, buttonTo, children }) => {
   )
 }
 
-export default AdminLayout
+export default ModelLayout

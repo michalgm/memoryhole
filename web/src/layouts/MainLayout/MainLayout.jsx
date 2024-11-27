@@ -195,7 +195,7 @@ const NavBar = () => {
     </header>
   )
 }
-const BlogLayout = ({ children }) => {
+const MainLayout = ({ children }) => {
   const routeName = useRouteName()
   // const [logsOpen, setLogsOpen] = useState(false)
   // const DRAWER_WIDTH = 400
@@ -243,4 +243,4 @@ const BlogLayout = ({ children }) => {
   )
 }
 
-export default BlogLayout
+export default MainLayout
