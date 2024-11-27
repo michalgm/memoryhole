@@ -1,5 +1,7 @@
 ## [0.1.5](https://github.com/michalgm/memoryhole/compare/0.1.4...v0.1.5) (2024-11-27)
 
+### Features
+
 - chore: release 0.1.5 ([d2826f4](https://github.com/michalgm/memoryhole/commit/d2826f4))
 - add changelog plugin ([74d2383](https://github.com/michalgm/memoryhole/commit/74d2383))
 - configure release-it ([46a8438](https://github.com/michalgm/memoryhole/commit/46a8438))
