@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 
-import { Flag, Person } from '@mui/icons-material'
-import { Container, InputAdornment, Tooltip } from '@mui/material'
+import { Flag, Help, Person } from '@mui/icons-material'
+import { Container, IconButton, InputAdornment, Tooltip } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -80,7 +80,7 @@ const textFieldProps = {
 }
 
 const NavBar = () => {
-  const { isAuthenticated, currentUser, logOut } = useAuth()
+  const { currentUser, logOut } = useAuth()
   const { currentAction, setCurrentAction } = useApp()
 
   const pages = [
@@ -103,7 +103,7 @@ const NavBar = () => {
         <AppBar position="fixed" enableColorOnDark>
           <Toolbar className="navbar" variant="dense">
             <Typography
-              variant="h3"
+              variant="h4"
               noWrap
               component={Link}
               to={routes.home()}
@@ -151,16 +151,43 @@ const NavBar = () => {
                   textFieldProps={textFieldProps}
                 />
               </Box>
-              {isAuthenticated && currentUser && (
-                <Stack direction="row" alignItems={'center'}>
-                  <Tooltip title={`Logged in as ${currentUser.name}`}>
-                    <Person />
-                  </Tooltip>
-                  <Button color="inherit" onClick={logOut}>
+              <Stack
+                direction="row"
+                alignItems={'center'}
+                spacing={2}
+                sx={{ ml: 'auto' }}
+              >
+                <Tooltip title="Help">
+                  {/* <span>
+                    <StyledLink
+                      to={routes.docsHome()}
+                      color="inherit"
+                      sx={{ display: 'flex', alignItems: 'center', mx: 1 }}
+                    > */}
+                  <IconButton
+                    component={Link}
+                    to={routes.docsHome()}
+                    color="inherit"
+                  >
+                    <Help />
+                  </IconButton>
+                  {/* </StyledLink>
+                  </span> */}
+                </Tooltip>
+                <Tooltip title={`Logged in as ${currentUser.name}`}>
+                  <Button
+                    startIcon={<Person />}
+                    color="inherit"
+                    onClick={logOut}
+                    sx={{
+                      border: '1px solid rgba(255, 255, 255, 0.3)', // Subtle border
+                      textTransform: 'none', // Keep text normal-case
+                    }}
+                  >
                     Logout
                   </Button>
-                </Stack>
-              )}
+                </Tooltip>
+              </Stack>
             </Stack>
           </Toolbar>
         </AppBar>

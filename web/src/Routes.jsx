@@ -5,6 +5,7 @@ import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
 
 import { useAuth } from './auth'
 import AdminLayout from './layouts/AdminLayout/AdminLayout'
+import DocumentationPage from './pages/Documentation/DocumentationPage'
 
 // In this file, all Page components from 'src/pages` are auto-imported. Nested
 // directories are supported, and should be uppercase. Each subdirectory will be
@@ -77,6 +78,8 @@ const Routes = () => {
           <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" />
           <Route path="/docket-sheets" page={DocketSheetsPage} name="docketSheets" />
           <Route path="/arrests" page={HomePage} name="arrests" />
+          <Route path="/docs" page={DocumentationPage} name="docsHome" />
+          <Route path="/docs/{page:String?home}" page={DocumentationPage} name="docs" />
           <Route path="/" page={HomePage} name="home" />
         </Set>
       </PrivateSet>
