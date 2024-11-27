@@ -12,11 +12,13 @@ import {
 
 import { navigate, routes } from '@redwoodjs/router'
 
+import { useApp } from 'src/lib/AppContext'
+
 import dayjs from '../../../../api/src/lib/day'
 
 export const SEARCH_ARRESTS = gql`
-  query searchArrestNames($search: String!) {
-    arrest: searchArrestNames(search: $search) {
+  query searchArrestNames($search: String!, $params: QueryParams!) {
+    arrest: searchArrestNames(search: $search, params: $params) {
       id
       arrestee {
         id
@@ -31,17 +33,21 @@ function QuickSearch() {
   const [searchValue, setSearchValue] = useState('')
   const [value, setValue] = useState('')
   const [results, setResults] = useState([])
+  const { currentAction } = useApp()
 
   const [searchArrests, { loading }] = useLazyQuery(SEARCH_ARRESTS, {
     onCompleted: (data) => {
       setResults(data.arrest)
     },
   })
+  const action_id = currentAction?.id !== -1 ? currentAction.id : null
 
   const handleInputChange = (event, value) => {
     setSearchValue(value)
     if (value.length) {
-      searchArrests({ variables: { search: value } })
+      searchArrests({
+        variables: { search: value, params: { where: { action_id } } },
+      })
     } else {
       setResults([])
     }

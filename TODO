@@ -4,7 +4,7 @@ ArrestsTable:
   ☐ PDF export?
   ✔ Allow re-order of fields @done(24-11-26 14:57)
   ✔ Bulk updates @done(24-11-26 14:57)
-  ☐ add note to explain asterisk in arrests table
+  ✔ add note to explain asterisk in arrests table @done(24-11-26 19:20)
 
 General:
   ☐ custom fields via UI
@@ -19,7 +19,7 @@ Arrests:
   ☐ Auto-handle cities->jurisdiction?
   ✔ add test on displayname to check if preferred name == first name @done(24-11-26 14:53)
   ✔ fix display name to not add parens to first name all the time @done(24-11-26 14:53)
-  ☐ Handle blank display name
+  ✔ Handle blank display name @done(24-11-26 19:20)
 
 Lawyers:
   ☐ Add lawyers table

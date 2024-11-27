@@ -132,16 +132,16 @@ export const arrest = async ({ id }) => {
   return arrest
 }
 
-export const searchArrestNames = (
-  { search = '' },
-  {
+export const searchArrestNames = ({
+  search = '',
+  params: {
     where: inputWhere,
     orderBy = { updated_at: 'desc' },
     select,
     take = 20,
     skip = 0,
-  }
-) => {
+  },
+}) => {
   const where = {
     OR: search.split(/\s+/).map((term) => ({
       arrestee: {
@@ -175,22 +175,6 @@ export const docketSheetSearch = async ({
     jurisdiction,
   }
 
-  // 'arrestee.last_name',
-  // 'arrestee.first_name',
-  // 'arrestee.preferred_name',
-  // 'arrestee.pronoun',
-  // 'date',
-  // 'citation_number',
-  // 'custom_fields.booking_number',
-  // 'custom_fields.docket_number',
-  // 'arrestee.dob',
-  // 'custom_fields.next_court_date',
-  // 'charges',
-  // 'custom_fields.lawyer',
-  // 'custom_fields.bail',
-  // 'custom_fields.case_status',
-  // 'custom_fields.release_type',
-
   if (report_type === 'arrest_date') {
     where.date = {
       gte: date,
@@ -201,16 +185,7 @@ export const docketSheetSearch = async ({
       lte: dateLimit,
     }
   }
-  // const select = {
-  //   arrestee: {
-  //     select: {
-  //       first_name: true,
-  //       last_name: true,
-  //       preferred_name: true,
-  //       pronoun: true
-  //     }
 
-  // }
   const records = await db.arrest.findMany({
     where,
   })
