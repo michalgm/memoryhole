@@ -8,14 +8,12 @@ import Link from 'src/components/utils/Link'
 
 const AdminPage = () => {
   const admin_routes = [
-    'arrests',
-    'users',
-    'arrestees',
+    // 'users',
     // 'hotlineLogs',
     'customSchemata',
     'logs',
     'tableViews',
-    'actions',
+    // 'actions',
   ]
 
   const route_links = [

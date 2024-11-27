@@ -32,12 +32,6 @@ const Routes = () => {
             <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
             <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
             {/* <Route path="/admin/users/{id:Int}" page={UserPage} name="user" /> */}
-
-            <Set wrap={ScaffoldLayout} title="Arrests" titleTo="arrests" buttonLabel="New Arrest" buttonTo="newArrest">
-              <Route path="/admin/arrests/new" page={ArrestNewArrestPage} name="newArrest" />
-              <Route path="/admin/arrests/{id:Int}/edit" page={ArrestEditArrestPage} name="editArrest" />
-              {/* <Route path="/admin/arrests" page={ArrestArrestsPage} name="arrests" /> */}
-            </Set>
             <Set wrap={ScaffoldLayout} title="TableViews" titleTo="tableViews" buttonLabel="New TableView" buttonTo="newTableView">
               <Route path="/table-views/new" page={TableViewNewTableViewPage} name="newTableView" />
               <Route path="/table-views/{id:Int}/edit" page={TableViewEditTableViewPage} name="editTableView" />
@@ -48,12 +42,6 @@ const Routes = () => {
               <Route path="/admin/users/new" page={UserUserPage} name="newUser" />
               <Route path="/admin/users/{id:Int}" page={UserUserPage} name="user" />
               <Route path="/admin/users" page={UserUsersPage} name="users" />
-            </Set>
-            <Set wrap={ScaffoldLayout} title="Arrestees" titleTo="arrestees" buttonLabel="New Arrestee" buttonTo="newArrestee">
-              <Route path="/admin/arrestees/new" page={ArresteeNewArresteePage} name="newArrestee" />
-              <Route path="/admin/arrestees/{id:Int}/edit" page={ArresteeEditArresteePage} name="editArrestee" />
-              <Route path="/admin/arrestees/{id:Int}" page={ArresteeArresteePage} name="arrestee" />
-              <Route path="/admin/arrestees" page={ArresteeArresteesPage} name="arrestees" />
             </Set>
             <Set wrap={ScaffoldLayout} title="CustomSchemata" titleTo="customSchemata" buttonLabel="New CustomSchema" buttonTo="newCustomSchema">
               <Route path="/admin/custom-schemata/new" page={CustomSchemaNewCustomSchemaPage} name="newCustomSchema" />
