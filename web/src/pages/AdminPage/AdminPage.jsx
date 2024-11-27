@@ -1,8 +1,13 @@
-import { Flag, People } from '@mui/icons-material'
-import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
+import { Flag, Gavel, People } from '@mui/icons-material'
+import {
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material'
 
 import { routes } from '@redwoodjs/router'
-import { MetaTags } from '@redwoodjs/web'
 
 import Link from 'src/components/utils/Link'
 
@@ -27,12 +32,15 @@ const AdminPage = () => {
       label: 'Manage Actions',
       icon: <Flag />,
     },
+    {
+      to: routes.docketSheets(),
+      label: 'Create Docket Sheets',
+      icon: <Gavel />,
+    },
   ]
   return (
     <>
-      <MetaTags title="Admin" description="Admin page" />
-      {/* <h1>Memoryhole Admin Page</h1> */}
-      <List dense>
+      <List>
         {route_links.map((route) => (
           <Link key={route.to} to={route.to}>
             <ListItemButton>
@@ -44,6 +52,7 @@ const AdminPage = () => {
       </List>
       {/* <Link to={routes.editOptions()}>Edit Options</Link> */}
 
+      <Divider />
       <ul>
         {admin_routes.map((route) => (
           <li key={route}>

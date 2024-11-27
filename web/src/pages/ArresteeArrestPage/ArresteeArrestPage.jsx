@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { navigate, routes } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
 
@@ -149,7 +151,7 @@ const ACTION_TO_ARREST_FIELDS = {
 }
 
 const ArresteeArrestPage = ({ id }) => {
-  const { currentAction } = useApp()
+  const { currentAction, setPageTitle } = useApp()
   const displayError = useDisplayError()
   const isCreate = !id || id === 'new'
 
@@ -162,6 +164,10 @@ const ArresteeArrestPage = ({ id }) => {
     skip: isCreate,
     onError: displayError,
   })
+
+  useEffect(() => {
+    setPageTitle(isCreate ? 'New Arrest' : arrest.arrestee.display_field)
+  }, [isCreate, arrest, setPageTitle])
 
   const applyActionDefaults = (action, target) => {
     if (!action || action.id === -1) return

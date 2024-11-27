@@ -1,5 +1,6 @@
-import { Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { useEffect } from 'react'
+
+import { Box, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 import { upperCase } from 'lodash-es'
 import pluralize from 'pluralize'
@@ -10,6 +11,7 @@ import { useQuery } from '@redwoodjs/web'
 import { useAuth } from 'src/auth'
 import FormContainer from 'src/components/utils/FormContainer'
 import { useDisplayError } from 'src/components/utils/SnackBar'
+import { useApp } from 'src/lib/AppContext'
 import { UserFields } from 'src/lib/FieldSchemas'
 
 export const QUERY = gql`
@@ -85,6 +87,7 @@ export const transformInput = (input) => {
 
 const UserPage = ({ id }) => {
   const displayError = useDisplayError()
+  const { setPageTitle } = useApp()
   const { currentUser } = useAuth()
   const {
     data = {},
@@ -97,6 +100,10 @@ const UserPage = ({ id }) => {
   })
   const user = { ...data?.user }
 
+  useEffect(() => {
+    setPageTitle(user?.name)
+  }, [user?.name, setPageTitle])
+
   const restrictionDefaults = {
     default: {
       arrest_date_min: ['subtract', 1, 'week'],
@@ -108,7 +115,10 @@ const UserPage = ({ id }) => {
     },
   }
 
-  const applyDateOperation = (date, [operation, amount, unit, modifier]) => {
+  const applyDateOperation = (
+    date,
+    [operation, amount, unit, modifier = '']
+  ) => {
     date = date[operation](amount, unit)
     if (modifier) {
       date = date[modifier]('day')
@@ -144,11 +154,20 @@ const UserPage = ({ id }) => {
             <Typography variant="subtitle2">{upperCase(role)}:</Typography>
             <Box pl={2}>
               <Typography>
-                Arrest min: {formatDefaultValue(values.arrest_date_min)} from
-                now
+                Arrest min:{' '}
+                {formatDefaultValue(
+                  // @ts-ignore
+                  values.arrest_date_min
+                )}{' '}
+                from now
               </Typography>
               <Typography>
-                Expires: {formatDefaultValue(values.expiresAt)} from now
+                Expires:{' '}
+                {formatDefaultValue(
+                  // @ts-ignore
+                  values.expiresAt
+                )}{' '}
+                from now
               </Typography>
             </Box>
           </Box>

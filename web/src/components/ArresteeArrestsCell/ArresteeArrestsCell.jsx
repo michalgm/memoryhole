@@ -216,7 +216,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } = {} }) => {
 
 const tableProps = {
   enableColumnFilterModes: true,
-  muiTableContainerProps: { sx: { maxHeight: 'calc(100vh - 320px)' } },
+  muiTableContainerProps: { sx: { maxHeight: 'calc(100vh - 283px)' } },
   enableColumnPinning: true,
   enableRowSelection: true,
   enableColumnOrdering: true,

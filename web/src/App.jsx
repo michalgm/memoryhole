@@ -2,8 +2,8 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
-import './scaffold.css'
 import './index.css'
+import './scaffold.css'
 
 import * as React from 'react'
 
@@ -22,7 +22,6 @@ import Routes from 'src/Routes'
 
 import { AuthProvider, useAuth } from './auth'
 import { SnackBarProvider } from './components/utils/SnackBar'
-import AppProvider from './lib/AppContext'
 import ErrorHandler from './lib/ErrorHandler'
 
 export const theme = createTheme({
@@ -69,9 +68,7 @@ const App = () => (
                       cancellationButtonProps: { variant: 'outlined' },
                     }}
                   >
-                    <AppProvider>
-                      <Routes />
-                    </AppProvider>
+                    <Routes />
                   </ConfirmProvider>
                 </LocalizationProvider>
               </RedwoodApolloProvider>

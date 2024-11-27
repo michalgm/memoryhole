@@ -1,11 +1,12 @@
 import { Box, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
+import { Stack } from '@mui/system'
 import dayjs from 'dayjs'
 import { startCase } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
 import { FormContainer as RHFFormContainer } from 'react-hook-form-mui'
 
-import { Metadata, useMutation } from '@redwoodjs/web'
+import { useMutation } from '@redwoodjs/web'
 
 import Loading from 'src/components/Loading/Loading'
 import { transformData } from 'src/lib/transforms'
@@ -130,7 +131,7 @@ const FormContainer = ({
       return createEntity({ variables: { input: transformedInput } })
     }
   }
-  const title = `${entity?.id ? 'Edit' : 'Create'} ${displayConfig.type}`
+
   const disabled = loading || loadingCreate || loadingDelete || loadingUpdate
   const footer = (
     <Footer>
@@ -189,8 +190,6 @@ const FormContainer = ({
 
   return (
     <Box>
-      <Metadata title={title} description={title} />
-
       <RHFFormContainer
         defaultValues={values}
         onSuccess={onSave}
@@ -198,13 +197,7 @@ const FormContainer = ({
           autoComplete,
         }}
       >
-        <Grid
-          xs={12}
-          container
-          spacing={4}
-          sx={{ pb: 8 }}
-          className="content-container"
-        >
+        <Stack spacing={4} sx={{ pb: 8 }} className="content-container">
           {fields.map(
             ({ fields: sectionFields, title, sectionActions }, groupIndex) => {
               const { columns, fullSpan } = fieldsToColumns(
@@ -249,7 +242,7 @@ const FormContainer = ({
               )
             }
           )}
-        </Grid>
+        </Stack>
         {footer}
       </RHFFormContainer>
     </Box>

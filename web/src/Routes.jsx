@@ -28,6 +28,9 @@ const Routes = () => {
             <Set wrap={AdminLayout}>
               <Route path="/admin" page={AdminPage} name="admin" />
             </Set>
+            <Set wrap={AdminLayout} title="Docket Sheets" titleTo="docketSheets">
+              <Route path="/admin/docket-sheets" page={DocketSheetsPage} name="docketSheets" />
+            </Set>
             <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
             <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
             <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
@@ -56,19 +59,25 @@ const Routes = () => {
               <Route path="/admin/logs" page={LogLogsPage} name="logs" />
             </Set>
             <Set wrap={AdminLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
-              <Route path="/admin/actions/new" page={ActionActionPage} name="newAction" />
-              <Route path="/admin/actions/{id:Int}" page={ActionActionPage} name="action" />
-              <Route path="/admin/actions" page={ActionActionsPage} name="actions" />
+              <Route path="/admin/actions/new" page={ActionActionPage} name="newAdminAction" />
+              <Route path="/admin/actions/{id:Int}" page={ActionActionPage} name="AdminAction" />
+              <Route path="/admin/actions" page={ActionActionsPage} name="AdminActions" />
             </Set>
           </PrivateSet>
-          <Route path="/arrests/new" page={ArresteeArrestPage} name="newArresteeArrest" />
-          <Route path="/arrests/{id:Int}" page={ArresteeArrestPage} name="arrest" />
+          <Set wrap={AdminLayout} title="Arrests" titleTo="home" buttonLabel="New Arrest" buttonTo="newArresteeArrest">
+            <Route path="/arrests/new" page={ArresteeArrestPage} name="newArresteeArrest" />
+            <Route path="/arrests/{id:Int}" page={ArresteeArrestPage} name="arrest" />
+            <Route path="/arrests" page={HomePage} name="arrests" />
+            <Route path="/" page={HomePage} name="home" />
+          </Set>
           <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" />
-          <Route path="/docket-sheets" page={DocketSheetsPage} name="docketSheets" />
-          <Route path="/arrests" page={HomePage} name="arrests" />
+          <Set wrap={AdminLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
+            <Route path="/actions" page={ActionActionsPage} name="actions" />
+            <Route path="/actions/new" page={ActionActionPage} name="newAction" />
+            <Route path="/actions/{id:Int}" page={ActionActionPage} name="action" />
+          </Set>
           <Route path="/docs" page={DocumentationPage} name="docsHome" />
           <Route path="/docs/{page:String?home}" page={DocumentationPage} name="docs" />
-          <Route path="/" page={HomePage} name="home" />
         </Set>
       </PrivateSet>
       <Route notfound page={NotFoundPage} />

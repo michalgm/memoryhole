@@ -1,8 +1,11 @@
+import { useEffect } from 'react'
+
 import { navigate, routes } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
 
 import FormContainer from 'src/components/utils/FormContainer'
 import { useDisplayError } from 'src/components/utils/SnackBar'
+import { useApp } from 'src/lib/AppContext'
 import { ActionFields } from 'src/lib/FieldSchemas'
 
 export const QUERY = gql`
@@ -56,6 +59,8 @@ export const DELETE_MUTATION = gql`
 `
 
 const ActionPage = ({ id }) => {
+  const { setPageTitle } = useApp()
+
   const displayError = useDisplayError()
 
   const { data, loading, error } = useQuery(QUERY, {
@@ -63,6 +68,12 @@ const ActionPage = ({ id }) => {
     skip: !id || id === 'new',
     onError: displayError,
   })
+
+  useEffect(() => {
+    if (data?.action?.name) {
+      setPageTitle(data?.action?.name)
+    }
+  }, [data?.action?.name, setPageTitle])
 
   const transformInput = (input) => {
     const fieldsToRemove = ['id', '__typename']

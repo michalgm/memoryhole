@@ -3,8 +3,6 @@ import { useState } from 'react'
 import { Paper, Typography } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 
-import { MetaTags } from '@redwoodjs/web'
-
 import DocketSheetCell from 'src/components/DocketSheetCell/DocketSheetCell'
 import Form from 'src/components/Form/Form'
 import { Field } from 'src/components/utils/Field'
@@ -27,7 +25,6 @@ const DocketSheetsPage = () => {
   const jurisdictions = schema['jurisdiction'].props.options
   return (
     <>
-      <MetaTags title="DocketSheets" description="DocketSheets page" />
       <Paper sx={{ mb: 6, p: 2 }}>
         <Typography variant="h4" gutterBottom>
           Docket Sheets

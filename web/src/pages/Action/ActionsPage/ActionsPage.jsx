@@ -38,6 +38,7 @@ const ActionsPage = () => {
       },
       sorting: [{ id: 'start_date', desc: true }],
     },
+    muiTableContainerProps: { sx: { maxHeight: 'calc(100vh - 320px)' } },
   }
 
   const preColumns = [

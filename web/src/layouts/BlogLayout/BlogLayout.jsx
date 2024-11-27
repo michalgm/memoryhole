@@ -16,7 +16,7 @@ import { useAuth } from 'src/auth'
 // import ArresteeLogsDrawer from 'src/components/ArresteeLogs/ArresteeLogsDrawer'
 import { BaseField } from 'src/components/utils/BaseField'
 import QuickSearch from 'src/components/utils/QuickSearch'
-import { defaultAction, useApp } from 'src/lib/AppContext'
+import AppProvider, { defaultAction, useApp } from 'src/lib/AppContext'
 
 const NavLink = ({ to, ...rest }) => {
   const matchInfo = useMatch(to, { matchSubPaths: true })
@@ -85,8 +85,8 @@ const NavBar = () => {
 
   const pages = [
     ['home', 'Arrests'],
+    ['actions', 'Actions'],
     ['hotlineLogs', 'Hotline Logs'],
-    ['docketSheets', 'Docket Sheets'],
   ]
   if (currentUser && currentUser.roles.includes('Admin')) {
     pages.push(['admin', 'Admin'])
@@ -202,14 +202,15 @@ const BlogLayout = ({ children }) => {
 
   return (
     <>
-      <NavBar />
-      <Box component="main" sx={{ p: 3, mt: 8 }}>
-        <Container
-          id="container"
-          maxWidth={routeName === 'home' ? false : 'lg'}
-        >
-          {children}
-          {/* <Box
+      <AppProvider>
+        <NavBar />
+        <Box component="main" sx={{ p: 3, mt: 6 }}>
+          <Container
+            id="container"
+            maxWidth={routeName === 'home' ? false : 'lg'}
+          >
+            {children}
+            {/* <Box
             sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
           >
             <Box
@@ -235,8 +236,9 @@ const BlogLayout = ({ children }) => {
               />
             </Box>
           </Box> */}
-        </Container>
-      </Box>
+          </Container>
+        </Box>
+      </AppProvider>
     </>
   )
 }
