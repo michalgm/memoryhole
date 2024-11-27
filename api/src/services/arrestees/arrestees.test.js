@@ -188,6 +188,17 @@ describe('updateDisplayField', () => {
     expect(arrestee.display_field).toEqual('NO NAME ENTERED')
   })
 
+  test('returns "no name entered" when blank', () => {
+    const arrestee = {
+      first_name: '',
+      custom_fields: {
+        legal_name_confidential: true,
+      },
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('NO NAME ENTERED *')
+  })
+
   test('does not update display field when no name fields are provided', () => {
     const arrestee = {
       age: 25,
