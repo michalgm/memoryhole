@@ -1,11 +1,17 @@
+import { useEffect, useState } from 'react'
+
 import { Box, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { Stack } from '@mui/system'
 import dayjs from 'dayjs'
 import { startCase } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
-import { FormContainer as RHFFormContainer } from 'react-hook-form-mui'
+import {
+  FormContainer as RHFFormContainer,
+  useFormContext,
+} from 'react-hook-form-mui'
 
+import { useBlocker } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 
 import Loading from 'src/components/Loading/Loading'
@@ -52,6 +58,40 @@ const ModTime = ({ time, stats, entity }) => (
     by <b>{entity[`${time}_by`]?.name}</b>
   </Typography>
 )
+
+// New component to handle form state
+const FormStateHandler = () => {
+  const {
+    formState: { isDirty },
+  } = useFormContext()
+  const blocker = useBlocker({ when: isDirty })
+  const confirm = useConfirm()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  useEffect(() => {
+    const handleNav = async () => {
+      if (isDialogOpen) return
+
+      setIsDialogOpen(true)
+      try {
+        await confirm({
+          title:
+            'You have unsaved changes. Are you sure you want to leave this page? Changes you made will be lost if you navigate away.',
+        })
+        blocker.confirm()
+      } catch (e) {
+        blocker.abort()
+      } finally {
+        setIsDialogOpen(false)
+      }
+    }
+    if (blocker.state === 'BLOCKED') {
+      handleNav()
+    }
+  }, [blocker, confirm, isDialogOpen])
+
+  return null // This component doesn't render anything
+}
 
 const FormContainer = ({
   fields,
@@ -197,6 +237,7 @@ const FormContainer = ({
           autoComplete,
         }}
       >
+        <FormStateHandler />
         <Stack spacing={4} sx={{ pb: 8 }} className="content-container">
           {fields.map(
             ({ fields: sectionFields, title, sectionActions }, groupIndex) => {
