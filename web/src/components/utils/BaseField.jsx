@@ -1,11 +1,11 @@
 import {
+  Checkbox,
   FormControl,
   FormControlLabel,
   FormGroup,
   FormHelperText,
   FormLabel,
   TextField,
-  Checkbox,
 } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
@@ -83,6 +83,7 @@ export const BaseField = ({
       <Component
         {...props}
         name={name}
+        onChange={onChange}
         inputProps={textFieldProps}
         timeSteps={{ minutes: 1 }}
         slotProps={{
@@ -133,7 +134,14 @@ export const BaseField = ({
       field_type === 'textarea'
         ? { multiline: true, minRows: props.minRows || 3 }
         : {}
-    return <Component {...textFieldProps} {...textFieldOptions} {...props} />
+    return (
+      <Component
+        {...textFieldProps}
+        {...textFieldOptions}
+        {...props}
+        onChange={onChange}
+      />
+    )
   }
 
   const renderActionChooser = () => {
@@ -158,6 +166,7 @@ export const BaseField = ({
       <RadioButtonGroup
         name={name}
         {...props}
+        onChange={onChange}
         options={options}
         labelProps={{
           className: 'radio-label',
@@ -170,7 +179,12 @@ export const BaseField = ({
     const Component = isRHF ? CheckboxElement : Checkbox
     return (
       <Grid container spacing={2}>
-        <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+        <FormControl
+          sx={{ m: 3 }}
+          component="fieldset"
+          variant="standard"
+          onChange={onChange}
+        >
           <FormLabel component="legend">{props.label}</FormLabel>
           <FormGroup>
             {defaultOptions.map((option) => (
@@ -196,6 +210,7 @@ export const BaseField = ({
           name={`${name}`}
           sx={{ p: 0, pr: 1, pl: 1 }}
           label={props.label}
+          onChange={onChange}
         />
         <FormHelperText>{helperText}</FormHelperText>
       </FormGroup>
