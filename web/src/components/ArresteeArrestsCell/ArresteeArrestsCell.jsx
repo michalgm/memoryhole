@@ -186,14 +186,19 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } = {} }) => {
           type="arrestees"
           name="arrest"
           persistState
+          footerNotes={
+            <Stack spacing={0} direction="column">
+              <Typography variant="caption">
+                When a preferred name is specified, the legal name is shown in
+                ()
+              </Typography>
+              <Typography variant="caption">
+                * means the name shown is the preferred name, and the legal name
+                is confidential
+              </Typography>
+            </Stack>
+          }
         />
-        <Typography variant="caption" gutterBottom>
-          When a preferred name is specified, the legal name is shown in ()
-        </Typography>
-        <Typography variant="caption">
-          * means the name shown is the preferred name, and the legal name is
-          confidential
-        </Typography>
       </Stack>
       <BulkUpdateModal
         bulkUpdateRows={bulkUpdateRows}

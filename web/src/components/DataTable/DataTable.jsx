@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import { Box, Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { get, merge, sortBy, difference } from 'lodash-es'
+import { difference, get, merge, sortBy } from 'lodash-es'
 import {
+  getDefaultColumnFilterFn,
   MaterialReactTable,
   useMaterialReactTable,
-  getDefaultColumnFilterFn,
 } from 'material-react-table'
 import pluralize from 'pluralize'
 
@@ -213,6 +213,7 @@ const DataTable = ({
   persistState = false,
   customFields = {},
   loading = false,
+  footerNotes,
 }) => {
   const [reloading, setReloading] = useState(false)
 
@@ -376,6 +377,12 @@ const DataTable = ({
         columnOrder={columnOrder}
       />
     ),
+  }
+
+  if (footerNotes) {
+    defaultProps.renderBottomToolbarCustomActions = () => {
+      return footerNotes
+    }
   }
 
   if (bulkUpdate || bulkDelete) {
