@@ -125,7 +125,7 @@ export const SnackBarProvider = ({ children }) => {
 
   const closeSnackbar = useCallback((event, reason) => {
     if (reason !== 'clickaway' && reason !== 'escapeKeyDown') {
-      setSnackbar(DEFAULT_SNACKBAR_STATE)
+      setSnackbar((current) => ({ ...current, open: false }))
     }
   }, [])
 
