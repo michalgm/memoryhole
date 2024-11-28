@@ -81,7 +81,7 @@ export const BaseField = ({
 
     return (
       <Component
-        {...props}
+        label={props.label}
         name={name}
         onChange={onChange}
         inputProps={textFieldProps}
@@ -89,6 +89,7 @@ export const BaseField = ({
         slotProps={{
           field: { clearable: true },
         }}
+        {...(props.disabled ? { disabled: props.disabled } : {})}
       />
     )
   }

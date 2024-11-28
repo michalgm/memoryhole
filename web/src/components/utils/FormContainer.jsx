@@ -6,10 +6,7 @@ import { Stack } from '@mui/system'
 import dayjs from 'dayjs'
 import { startCase } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
-import {
-  FormContainer as RHFFormContainer,
-  useFormContext,
-} from 'react-hook-form-mui'
+import { FormContainer as RHFFormContainer, useForm } from 'react-hook-form-mui'
 
 import { useBlocker } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
@@ -60,10 +57,8 @@ const ModTime = ({ time, stats, entity }) => (
 )
 
 // New component to handle form state
-const FormStateHandler = ({ defaultValues }) => {
-  const {
-    formState: { isDirty },
-  } = useFormContext({ defaultValues })
+const FormStateHandler = ({ formState }) => {
+  const { isDirty } = formState
   const blocker = useBlocker({ when: isDirty })
   const confirm = useConfirm()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -89,8 +84,7 @@ const FormStateHandler = ({ defaultValues }) => {
       handleNav()
     }
   }, [blocker, confirm, isDialogOpen])
-
-  return null // This component doesn't render anything
+  return null
 }
 
 const FormContainer = ({
@@ -112,12 +106,21 @@ const FormContainer = ({
   const confirm = useConfirm()
   const { openSnackbar } = useSnackbar()
   const displayError = useDisplayError()
-  const values = transformData(entity, fields)
+  const context = useForm({ defaultValues: {} })
+  const { formState } = context
+
+  useEffect(() => {
+    if (!loading) {
+      const values = transformData(entity, fields)
+      context.reset(values)
+    }
+  }, [context, loading, entity, fields])
 
   const stats = {
     created: dayjs(entity?.created_at),
     updated: dayjs(entity?.updated_at),
   }
+
   const [deleteEntity, { loading: loadingDelete }] = useMutation(
     deleteMutation,
     {
@@ -161,8 +164,27 @@ const FormContainer = ({
     await deleteEntity({ variables: { id: entity.id } })
   }
 
+  const getChangedFields = (input, dirtyFields) => {
+    const changed = {}
+    for (const key in dirtyFields) {
+      if (typeof dirtyFields[key] === 'object' && dirtyFields[key] !== null) {
+        changed[key] = getChangedFields(input[key], dirtyFields[key])
+      } else {
+        changed[key] = input[key]
+      }
+    }
+
+    return changed
+  }
+
   const onSave = async (input) => {
-    const transformedInput = await transformInput(input)
+    const { dirtyFields } = formState
+    const changedFields = getChangedFields(input, dirtyFields)
+    if (Object.keys(dirtyFields).length === 0) {
+      displayError('No changes to save')
+      return
+    }
+    const transformedInput = await transformInput(changedFields)
     if (entity?.id) {
       return updateEntity({
         variables: { id: entity.id, input: transformedInput },
@@ -231,13 +253,13 @@ const FormContainer = ({
   return (
     <Box>
       <RHFFormContainer
-        defaultValues={values}
         onSuccess={onSave}
         FormProps={{
           autoComplete,
         }}
+        formContext={context}
       >
-        <FormStateHandler defaultValues={values} />
+        <FormStateHandler formState={formState} />
         <Stack spacing={4} sx={{ pb: 8 }} className="content-container">
           {fields.map(
             ({ fields: sectionFields, title, sectionActions }, groupIndex) => {
