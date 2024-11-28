@@ -57,6 +57,9 @@ const errorList = (errors) => {
 }
 
 const formatError = (error) => {
+  if (React.isValidElement(error)) {
+    return error
+  }
   if (
     error?.graphQLErrors?.[0]?.extensions?.originalError?.message ===
       INVALID_AUTH_HEADER_ERROR ||
@@ -137,6 +140,7 @@ export const SnackBarProvider = ({ children }) => {
         autoHideDuration={duration}
         onClose={closeSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{ maxWidth: 700 }}
       >
         <Alert
           severity={snackbar.severity}
