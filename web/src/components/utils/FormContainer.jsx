@@ -60,10 +60,10 @@ const ModTime = ({ time, stats, entity }) => (
 )
 
 // New component to handle form state
-const FormStateHandler = () => {
+const FormStateHandler = ({ defaultValues }) => {
   const {
     formState: { isDirty },
-  } = useFormContext()
+  } = useFormContext({ defaultValues })
   const blocker = useBlocker({ when: isDirty })
   const confirm = useConfirm()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -237,7 +237,7 @@ const FormContainer = ({
           autoComplete,
         }}
       >
-        <FormStateHandler />
+        <FormStateHandler defaultValues={values} />
         <Stack spacing={4} sx={{ pb: 8 }} className="content-container">
           {fields.map(
             ({ fields: sectionFields, title, sectionActions }, groupIndex) => {

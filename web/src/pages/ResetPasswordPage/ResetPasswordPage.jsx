@@ -34,7 +34,7 @@ const ResetPasswordPage = ({ resetToken }) => {
       <AuthManage
         title="Reset Password"
         action={action}
-        onSuccess={async ({ response, openSnackbar }) => {
+        onSuccess={async ({ openSnackbar }) => {
           openSnackbar('Password changed!')
           try {
             await reauthenticate()

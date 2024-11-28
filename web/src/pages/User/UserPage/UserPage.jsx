@@ -85,6 +85,17 @@ export const transformInput = (input) => {
   return input
 }
 
+const restrictionDefaults = {
+  default: {
+    arrest_date_min: ['subtract', 1, 'week'],
+    expiresAt: ['add', 1, 'day', 'endOf'],
+  },
+  Admin: {
+    arrest_date_min: ['subtract', 6, 'month'],
+    expiresAt: ['add', 6, 'month', 'endOf'],
+  },
+}
+
 const UserPage = ({ id }) => {
   const displayError = useDisplayError()
   const { setPageTitle } = useApp()
@@ -103,17 +114,6 @@ const UserPage = ({ id }) => {
   useEffect(() => {
     setPageTitle(user?.name)
   }, [user?.name, setPageTitle])
-
-  const restrictionDefaults = {
-    default: {
-      arrest_date_min: ['subtract', 1, 'week'],
-      expiresAt: ['add', 1, 'day', 'endOf'],
-    },
-    Admin: {
-      arrest_date_min: ['subtract', 6, 'month'],
-      expiresAt: ['add', 6, 'month', 'endOf'],
-    },
-  }
 
   const applyDateOperation = (
     date,
@@ -154,20 +154,11 @@ const UserPage = ({ id }) => {
             <Typography variant="subtitle2">{upperCase(role)}:</Typography>
             <Box pl={2}>
               <Typography>
-                Arrest min:{' '}
-                {formatDefaultValue(
-                  // @ts-ignore
-                  values.arrest_date_min
-                )}{' '}
-                from now
+                Arrest min: {formatDefaultValue(values.arrest_date_min)} from
+                now
               </Typography>
               <Typography>
-                Expires:{' '}
-                {formatDefaultValue(
-                  // @ts-ignore
-                  values.expiresAt
-                )}{' '}
-                from now
+                Expires: {formatDefaultValue(values.expiresAt)} from now
               </Typography>
             </Box>
           </Box>
