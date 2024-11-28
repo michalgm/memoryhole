@@ -157,6 +157,7 @@ const importRecord = async (data) => {
       release_type: 'Unknown Released',
       disposition: 'Open',
       needs_review: true,
+      has_completed_outtake_form: true,
       case_status: 'Unknown',
     },
     arrestee: {
