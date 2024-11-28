@@ -35,7 +35,6 @@ const ResetPasswordPage = ({ resetToken }) => {
         title="Reset Password"
         action={action}
         onSuccess={async ({ response, openSnackbar }) => {
-          console.log({ response })
           openSnackbar('Password changed!')
           try {
             await reauthenticate()

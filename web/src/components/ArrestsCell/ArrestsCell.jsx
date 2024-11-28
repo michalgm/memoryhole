@@ -20,8 +20,8 @@ import { useDisplayError, useSnackbar } from '../utils/SnackBar'
 // import schema from '../../types/graphql'
 
 export const QUERY = gql`
-  query ArresteeArrestsQuery($filters: [GenericFilterInput]) {
-    arresteeArrests: filterArrests(filters: $filters) {
+  query ArrestsQuery($filters: [GenericFilterInput]) {
+    arrests: filterArrests(filters: $filters) {
       id
       date
       location
@@ -105,7 +105,7 @@ export const Failure = ({ error }) => (
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
 )
 
-export const Success = ({ arresteeArrests, queryResult: { refetch } = {} }) => {
+export const Success = ({ arrests, queryResult: { refetch } = {} }) => {
   const [bulkUpdateRows, setBulkUpdateRows] = useState(null)
   const { openSnackbar } = useSnackbar()
 
@@ -119,7 +119,7 @@ export const Success = ({ arresteeArrests, queryResult: { refetch } = {} }) => {
     },
   })
 
-  const data = arresteeArrests
+  const data = arrests
 
   const bulkUpdate = (table) => {
     setBulkUpdateRows(table.getSelectedRowModel().rows)

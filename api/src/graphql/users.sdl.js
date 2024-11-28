@@ -68,6 +68,6 @@ export const schema = gql`
     deleteUser(id: Int!): User! @requireAuth
     bulkUpdateUsers(ids: [Int]!, input: UpdateUserInput): BatchPayload
       @requireAuth
-    emailUser(id: String!): User! @requireAuth
+    # emailUser(id: String!): User! @requireAuth
   }
 `

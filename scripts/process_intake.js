@@ -54,7 +54,7 @@ const fieldMap = {
   notes: 'arrestee.custom_fields.arrestee_notes',
 }
 
-const query = `mutation CreateArresteeArrestMutation($input: CreateArrestInput!) {
+const query = `mutation CreateArrestMutation($input: CreateArrestInput!) {
     createArrest(input: $input) {
       id
       arrestee {
@@ -193,7 +193,7 @@ const importRecord = async (data) => {
   // console.log(arrest)
 
   await apiRequest(`${apiHost}/.redwood/functions/graphql`, {
-    operationName: 'CreateArresteeArrestMutation',
+    operationName: 'CreateArrestMutation',
     query,
     variables: { input: arrest },
   })

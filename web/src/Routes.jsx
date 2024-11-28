@@ -5,7 +5,7 @@ import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
 
 import { useAuth } from './auth'
 import ModelLayout from './layouts/ModelLayout/ModelLayout'
-import DocumentationPage from './pages/Documentation/DocumentationPage'
+// import DocumentationPage from './pages/Documentation/DocumentationPage'
 
 // In this file, all Page components from 'src/pages` are auto-imported. Nested
 // directories are supported, and should be uppercase. Each subdirectory will be
@@ -13,7 +13,7 @@ import DocumentationPage from './pages/Documentation/DocumentationPage'
 //
 // Examples:
 //
-// 'src/pages/HomePage/HomePage.js'         -> HomePage
+// 'src/pages/ArrestsPage/ArrestsPage.js'         -> ArrestsPage
 // 'src/pages/Admin/BooksPage/BooksPage.js' -> AdminBooksPage
 
 const Routes = () => {
@@ -64,11 +64,11 @@ const Routes = () => {
               <Route path="/admin/actions" page={ActionActionsPage} name="AdminActions" />
             </Set>
           </PrivateSet>
-          <Set wrap={ModelLayout} title="Arrests" titleTo="home" buttonLabel="New Arrest" buttonTo="newArresteeArrest">
-            <Route path="/arrests/new" page={ArresteeArrestPage} name="newArresteeArrest" />
-            <Route path="/arrests/{id:Int}" page={ArresteeArrestPage} name="arrest" />
-            <Route path="/arrests" page={HomePage} name="arrests" />
-            <Route path="/" page={HomePage} name="home" />
+          <Set wrap={ModelLayout} title="Arrests" titleTo="home" buttonLabel="New Arrest" buttonTo="newArrest">
+            <Route path="/arrests/new" page={ArrestArrestPage} name="newArrest" />
+            <Route path="/arrests/{id:Int}" page={ArrestArrestPage} name="arrest" />
+            <Route path="/arrests" page={ArrestArrestsPage} name="arrests" />
+            <Route path="/" page={ArrestArrestsPage} name="home" />
           </Set>
           <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" />
           <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">

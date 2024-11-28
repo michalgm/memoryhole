@@ -5,7 +5,7 @@ const custom_fields = {
   release_type: 'Bond',
 }
 export const standard = (/* vars, { ctx, req } */) => ({
-  arresteeArrests: [
+  arrests: [
     {
       id: 42,
       custom_fields,

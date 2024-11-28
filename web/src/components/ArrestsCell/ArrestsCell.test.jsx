@@ -2,8 +2,8 @@ import { render } from '@redwoodjs/testing/web'
 
 import { SnackBarProvider } from '../utils/SnackBar'
 
-import { Empty, Failure, Loading, Success } from './ArresteeArrestsCell'
-import { standard } from './ArresteeArrestsCell.mock'
+import { Empty, Failure, Loading, Success } from './ArrestsCell'
+import { standard } from './ArrestsCell.mock'
 
 jest.mock('@redwoodjs/router', () => ({
   ...jest.requireActual('@redwoodjs/router'),
@@ -17,7 +17,7 @@ jest.mock('@redwoodjs/router', () => ({
 //        https://redwoodjs.com/docs/testing#testing-cells
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
-describe('ArresteeArrestsCell', () => {
+describe('ArrestsCell', () => {
   it('renders Loading successfully', () => {
     expect(() => {
       render(<Loading />)
@@ -46,7 +46,7 @@ describe('ArresteeArrestsCell', () => {
     expect(() => {
       render(
         <SnackBarProvider>
-          <Success arresteeArrests={standard().arresteeArrests} />
+          <Success arrests={standard().arrests} />
         </SnackBarProvider>
       )
     }).not.toThrow()

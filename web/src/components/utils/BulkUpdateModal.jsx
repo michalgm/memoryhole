@@ -19,12 +19,12 @@ import { FormContainer } from 'react-hook-form-mui'
 
 import { useMutation } from '@redwoodjs/web'
 
-import { transformInput as ArrestTransform } from 'src/pages/ArresteeArrestPage/ArresteeArrestPage'
+import { transformInput as ArrestTransform } from 'src/pages/Arrest/ArrestPage/ArrestPage'
 import { transformInput as UserTransform } from 'src/pages/User/UserPage/UserPage'
 // import { schema } from 'src/lib/FieldSchemas'
 
 import { Field } from './Field'
-import { useSnackbar, useDisplayError } from './SnackBar'
+import { useDisplayError, useSnackbar } from './SnackBar'
 
 const transforms = {
   arrest: ArrestTransform,

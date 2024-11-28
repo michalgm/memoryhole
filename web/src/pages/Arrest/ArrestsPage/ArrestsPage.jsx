@@ -1,4 +1,4 @@
-import ArresteeArrestCell from 'src/components/ArresteeArrestsCell/'
+import ArrestsCell from 'src/components/ArrestsCell/ArrestsCell'
 import { useApp } from 'src/lib/AppContext'
 
 const HomePage = () => {
@@ -13,7 +13,7 @@ const HomePage = () => {
   }
   return (
     <>
-      <ArresteeArrestCell filters={filters} />
+      <ArrestsCell filters={filters} />
     </>
   )
 }

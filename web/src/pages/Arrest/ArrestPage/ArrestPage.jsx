@@ -10,8 +10,8 @@ import { useApp } from 'src/lib/AppContext'
 import ArrestFields from 'src/lib/FieldSchemas'
 
 export const QUERY = gql`
-  query EditArresteeArrestById($id: Int!) {
-    arresteeArrest: arrest(id: $id) {
+  query EditArrestById($id: Int!) {
+    arrest: arrest(id: $id) {
       id
       date
       location
@@ -71,7 +71,7 @@ export const QUERY = gql`
 `
 
 const UPDATE_ARREST_MUTATION = gql`
-  mutation UpdateArresteeArrestMutation($id: Int!, $input: UpdateArrestInput!) {
+  mutation UpdateArrestMutation($id: Int!, $input: UpdateArrestInput!) {
     updateArrest(id: $id, input: $input) {
       id
       date
@@ -108,7 +108,7 @@ const UPDATE_ARREST_MUTATION = gql`
 `
 
 const CREATE_ARREST_MUTATION = gql`
-  mutation CreateArresteeArrestMutation($input: CreateArrestInput!) {
+  mutation CreateArrestMutation($input: CreateArrestInput!) {
     createArrest(input: $input) {
       id
       arrestee {
@@ -119,7 +119,7 @@ const CREATE_ARREST_MUTATION = gql`
 `
 
 export const DELETE_ARREST_MUTATION = gql`
-  mutation deleteArrestee($id: Int!) {
+  mutation deleteArrest($id: Int!) {
     deleteArrestee(id: $id) {
       id
     }
@@ -150,13 +150,13 @@ const ACTION_TO_ARREST_FIELDS = {
   jurisdiction: 'jurisdiction',
 }
 
-const ArresteeArrestPage = ({ id }) => {
+const ArrestPage = ({ id }) => {
   const { currentAction, setPageTitle } = useApp()
   const displayError = useDisplayError()
   const isCreate = !id || id === 'new'
 
   const {
-    data: { arresteeArrest: arrest = { arrestee: {} } } = {},
+    data: { arrest = { arrestee: {} } } = {},
     loading,
     error,
   } = useQuery(QUERY, {
@@ -171,7 +171,6 @@ const ArresteeArrestPage = ({ id }) => {
 
   const applyActionDefaults = (action, target) => {
     if (!action || action.id === -1) return
-
     Object.entries(ACTION_TO_ARREST_FIELDS).forEach(
       ([actionField, arrestField]) => {
         if (action[actionField]) {
@@ -228,4 +227,4 @@ const ArresteeArrestPage = ({ id }) => {
   )
 }
 
-export default ArresteeArrestPage
+export default ArrestPage

@@ -1,4 +1,4 @@
-import HomePage from './HomePage'
+import HomePage from './ArrestsPage'
 
 const meta = {
   component: HomePage,
