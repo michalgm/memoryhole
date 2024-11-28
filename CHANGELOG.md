@@ -1,5 +1,19 @@
 
 
+## [0.2.0](https://github.com/michalgm/memoryhole/compare/v0.1.7...v0.2.0) (2024-11-28)
+
+### Features
+
+* **Form:** Before saving a record, check the database to see if the current updated_at value is greater than what was initially fetched - if so, display an error and prevent the save ([b4c9a85](https://github.com/michalgm/memoryhole/commit/b4c9a8551aa444e550a6116a6316f4da46f9b3b1))
+* **Form:** only submit changed fields ([4ed9b87](https://github.com/michalgm/memoryhole/commit/4ed9b872b461073df9b01cd3d8565d55fc9a6844))
+* **UI:** allow showing react components in displayError ([87c6ba8](https://github.com/michalgm/memoryhole/commit/87c6ba8c8d1096f542c3ebbbd6e5983a25036283))
+* **UI:** include city || jurisdiction in action lookup results ([6e9c5b2](https://github.com/michalgm/memoryhole/commit/6e9c5b237bb5069ca3225d999f720c17d3049956))
+
+### Bug Fixes
+
+* **UI:** fix handling of bad dates ([92f37f9](https://github.com/michalgm/memoryhole/commit/92f37f9c486c3ded4fc6386c21bf1b5beeac6e01))
+* **UI:** fix snackbar from flashing success on close ([6039705](https://github.com/michalgm/memoryhole/commit/60397053d5c86a40aa6bd01d4f96929ce2a64089))
+
 ## [0.1.7](https://github.com/michalgm/memoryhole/compare/v0.1.6...v0.1.7) (2024-11-27)
 
 ### Features
