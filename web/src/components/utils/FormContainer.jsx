@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import { useLazyQuery } from '@apollo/client'
 import { Box, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { Stack } from '@mui/system'
@@ -108,10 +109,12 @@ const FormContainer = ({
   const displayError = useDisplayError()
   const context = useForm({ defaultValues: {} })
   const { formState } = context
+  const [retrieveTime, setRetrieveTime] = useState(null)
 
   useEffect(() => {
     if (!loading) {
       const values = transformData(entity, fields)
+      setRetrieveTime(dayjs(values.created_at))
       context.reset(values)
     }
   }, [context, loading, entity, fields])
@@ -156,6 +159,11 @@ const FormContainer = ({
     }
   )
 
+  const [fetchEntity, { loading: loadingFetch }] = useLazyQuery(fetchQuery, {
+    onError: displayError,
+    fetchPolicy: 'no-cache',
+  })
+
   const confirmDelete = async () => {
     await confirm({
       title: 'Confirm Delete',
@@ -186,6 +194,25 @@ const FormContainer = ({
     }
     const transformedInput = await transformInput(changedFields)
     if (entity?.id) {
+      const { data: currentRecord } = await fetchEntity({
+        variables: { id: entity.id },
+      })
+      const { updated_at, updated_by } =
+        currentRecord[Object.keys(currentRecord)[0]]
+
+      const current_time = dayjs(updated_at)
+
+      if (current_time > retrieveTime) {
+        displayError(
+          <span>
+            Unable to save your changes. This record was updated by{' '}
+            <b>{updated_by.name}</b> on <b>{current_time.format('LLLL')}</b>{' '}
+            after you began editing. Please refresh the page to view the latest
+            version and manually reapply your changes.
+          </span>
+        )
+        return false
+      }
       return updateEntity({
         variables: { id: entity.id, input: transformedInput },
       })
@@ -194,7 +221,8 @@ const FormContainer = ({
     }
   }
 
-  const disabled = loading || loadingCreate || loadingDelete || loadingUpdate
+  const disabled =
+    loading || loadingCreate || loadingDelete || loadingUpdate || loadingFetch
   const footer = (
     <Footer>
       <Grid xs>

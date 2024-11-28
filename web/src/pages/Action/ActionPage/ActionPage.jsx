@@ -66,6 +66,7 @@ const ActionPage = ({ id }) => {
   const { data, loading, error } = useQuery(QUERY, {
     variables: { id: parseInt(id) },
     skip: !id || id === 'new',
+    fetchPolicy: 'no-cache',
     onError: displayError,
   })
 

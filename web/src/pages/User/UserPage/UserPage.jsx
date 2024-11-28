@@ -107,6 +107,7 @@ const UserPage = ({ id }) => {
   } = useQuery(QUERY, {
     variables: { id: parseInt(id) },
     skip: !id || id === 'new',
+    fetchPolicy: 'no-cache',
     onError: displayError,
   })
   const user = { ...data?.user }

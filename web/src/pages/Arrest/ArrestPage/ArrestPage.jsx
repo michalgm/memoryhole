@@ -163,6 +163,7 @@ const ArrestPage = ({ id }) => {
     variables: { id: parseInt(id) },
     skip: isCreate,
     onError: displayError,
+    fetchPolicy: 'no-cache',
   })
 
   useEffect(() => {
