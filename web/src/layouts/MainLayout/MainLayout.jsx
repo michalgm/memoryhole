@@ -1,6 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { Flag, Help, Person } from '@mui/icons-material'
+import { Error, Flag, Help, Person } from '@mui/icons-material'
 import { Container, IconButton, InputAdornment, Tooltip } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -8,6 +8,7 @@ import Button from '@mui/material/Button'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { Stack } from '@mui/system'
+import dayjs from 'dayjs'
 
 import { Link, routes, useMatch, useRouteName } from '@redwoodjs/router'
 
@@ -82,6 +83,7 @@ const textFieldProps = {
 const NavBar = () => {
   const { currentUser, logOut } = useAuth()
   const { currentAction, setCurrentAction } = useApp()
+  const [expires, setExpires] = useState({})
 
   const pages = [
     ['home', 'Arrests'],
@@ -96,6 +98,19 @@ const NavBar = () => {
     (options) => [defaultAction, ...options],
     []
   )
+  const {
+    expiresAt,
+    roles: [role],
+  } = currentUser
+
+  useEffect(() => {
+    if (expiresAt) {
+      setExpires({
+        expiring: `Your access will expire on ${dayjs(expiresAt).format('lll')}`,
+        expiring_soon: dayjs(expiresAt).isBefore(dayjs().add(1, 'week')),
+      })
+    }
+  }, [expiresAt, setExpires])
 
   return (
     <header>
@@ -174,9 +189,22 @@ const NavBar = () => {
                   {/* </StyledLink>
                   </span> */}
                 </Tooltip>
-                <Tooltip title={`Logged in as ${currentUser.name}`}>
+                <Tooltip
+                  title={
+                    <Stack>
+                      <span>Logged in as {currentUser.name}</span>
+                      {<span>{expires.expiring}</span>}
+                    </Stack>
+                  }
+                >
                   <Button
-                    startIcon={<Person />}
+                    startIcon={
+                      expires.expiring_soon && role !== 'User' ? (
+                        <Error color="error" />
+                      ) : (
+                        <Person />
+                      )
+                    }
                     color="inherit"
                     onClick={logOut}
                     sx={{
