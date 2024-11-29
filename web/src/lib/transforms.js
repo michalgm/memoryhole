@@ -25,13 +25,13 @@ export const transformData = (data, fields) => {
         if ((value === undefined || value == null) && params.default) {
           value = params.default
         }
-        // if ( (value !== undefined && value !== null)) {
-        const transformer = transformers[params.field_type]
-        if (transformer) {
-          value = transformer(value)
+        if (value !== undefined && value !== null) {
+          const transformer = transformers[params.field_type]
+          if (transformer) {
+            value = transformer(value)
+          }
+          set(result, path, value)
         }
-        set(result, path, value)
-        // }
         return result
       },
       {}
