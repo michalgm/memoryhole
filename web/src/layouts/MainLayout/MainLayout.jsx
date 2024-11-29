@@ -117,21 +117,23 @@ const NavBar = () => {
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="fixed" enableColorOnDark>
           <Toolbar className="navbar" variant="dense">
-            <Typography
-              variant="h4"
-              noWrap
-              component={Link}
-              to={routes.home()}
-              sx={{
-                color: 'white',
-                mr: 2,
-                flexGrow: 0,
-                fontFamily: 'monospace',
-                textDecoration: 'none',
-              }}
-            >
-              memoryhole
-            </Typography>
+            <Tooltip title={`Version: ${import.meta.env.APP_VERSION}`}>
+              <Typography
+                variant="h4"
+                noWrap
+                component={Link}
+                to={routes.home()}
+                sx={{
+                  color: 'white',
+                  mr: 2,
+                  flexGrow: 0,
+                  fontFamily: 'monospace',
+                  textDecoration: 'none',
+                }}
+              >
+                memoryhole
+              </Typography>
+            </Tooltip>
             <Box sx={{ flexGrow: 2 }}>
               {pages.map(([route, label]) => (
                 <NavLink key={route} to={routes[route]()}>
