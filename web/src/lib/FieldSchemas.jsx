@@ -108,13 +108,40 @@ const ArrestFields = [
   {
     title: 'Arrestee',
     fields: [
-      ['arrestee.first_name', { label: 'legal_first_name' }],
+      [
+        'arrestee.first_name',
+        {
+          label: 'legal_first_name',
+          validation: {
+            validate: (value, formValues) =>
+              value || formValues.arrestee.preferred_name
+                ? null
+                : 'Either first or preferred name must be entered',
+          },
+          onChange: (value, { trigger, formState: { errors } }) => {
+            if (value && errors?.arrestee?.preferred_name) {
+              trigger(['arrestee.preferred_name'])
+            }
+          },
+        },
+      ],
       ['arrestee.last_name', { label: 'legal_last_name' }],
       [
         'arrestee.preferred_name',
         {
           helperText:
             'Enter both first and last name if preferred last name differs from legal name',
+          validation: {
+            validate: (value, formValues) =>
+              value || formValues.arrestee.first_name
+                ? null
+                : 'Either first or preferred name must be entered',
+          },
+          onChange: (value, { trigger, formState: { errors } }) => {
+            if (value && errors?.arrestee?.first_name) {
+              trigger(['arrestee.first_name'])
+            }
+          },
         },
       ],
       ['arrestee.pronoun', { label: 'pronouns' }],
