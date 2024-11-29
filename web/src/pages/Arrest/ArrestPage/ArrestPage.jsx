@@ -136,7 +136,7 @@ const ArrestPage = ({ id }) => {
   })
 
   useEffect(() => {
-    setPageTitle(isCreate ? 'New Arrest' : arrest.arrestee.display_field)
+    setPageTitle(isCreate ? 'New Arrest' : arrest?.arrestee?.display_field)
   }, [isCreate, arrest, setPageTitle])
 
   const applyActionDefaults = (action, target) => {

@@ -131,10 +131,10 @@ export const Success = ({ arrests, queryResult: { refetch } = {} }) => {
     const list = rows.map((row) => {
       return [
         <Grid2 key={`${row.id}-name`} xs={8}>
-          {`${row.original.arrestee.display_field}`}
+          {`${row.original?.arrestee?.display_field}`}
         </Grid2>,
         <Grid2 key={`${row.id}-date`} xs={4}>
-          {`${dayjs(row.original.date).format('L hh:mm A')}`}
+          {`${dayjs(row.original?.date).format('L hh:mm A')}`}
         </Grid2>,
       ]
     })
