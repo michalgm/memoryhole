@@ -68,16 +68,20 @@ const validateUserUpdate = ({ id, input }) => {
 export const updateUser = ({ id, input }) => {
   validateUserUpdate({ id, input })
 
-  return validateUniqueness(
-    'user',
-    { email: input.email, $self: { id } },
-    (db) => {
-      return db.user.update({
-        data: input,
-        where: { id },
-      })
-    }
-  )
+  const doUserUpdate = async (db) => {
+    return db.user.update({
+      data: input,
+      where: { id },
+    })
+  }
+  if (input.email) {
+    return validateUniqueness(
+      'user',
+      { email: input.email, $self: { id } },
+      doUserUpdate
+    )
+  }
+  return doUserUpdate(db)
 }
 
 export const bulkUpdateUsers = async ({ ids, input }) => {
