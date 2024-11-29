@@ -78,9 +78,11 @@ export const BaseField = ({
       : field_type === 'date-time'
         ? DateTimePicker
         : DatePicker
-
+    const disabled = Boolean(props.disabled)
+    delete props.disabled
     return (
       <Component
+        {...props}
         label={props.label}
         name={name}
         onChange={onChange}
@@ -89,7 +91,7 @@ export const BaseField = ({
         slotProps={{
           field: { clearable: true },
         }}
-        {...(props.disabled ? { disabled: props.disabled } : {})}
+        {...(disabled ? { disabled } : {})}
       />
     )
   }
