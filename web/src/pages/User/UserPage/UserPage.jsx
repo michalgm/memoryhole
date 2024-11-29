@@ -14,57 +14,50 @@ import { useDisplayError } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import { UserFields } from 'src/lib/FieldSchemas'
 
+const USER_FIELDS = gql`
+  fragment UserFields on User {
+    id
+    email
+    name
+    expiresAt
+    role
+    custom_fields
+    arrest_date_max
+    arrest_date_min
+    action_ids
+    actions {
+      id
+      name
+      start_date
+    }
+  }
+`
+
 export const QUERY = gql`
   query EditUser($id: Int!) {
     user: user(id: $id) {
-      id
-      email
-      name
-      expiresAt
-      role
-      custom_fields
-      arrest_date_max
-      arrest_date_min
-      action_ids
-      actions {
-        id
-        name
-        start_date
-      }
+      ...UserFields
     }
   }
+  ${USER_FIELDS}
 `
 
 const UPDATE_USER_MUTATION = gql`
   mutation UpdateUser($id: Int!, $input: UpdateUserInput!) {
     updateUser(id: $id, input: $input) {
-      id
-      email
-      name
-      expiresAt
-      arrest_date_max
-      arrest_date_min
-      role
-      action_ids
-      custom_fields
+      ...UserFields
     }
   }
+  ${USER_FIELDS}
 `
 
 const CREATE_USER_MUTATION = gql`
   mutation CreateUser($input: CreateUserInput!) {
     createUser(input: $input) {
-      id
-      email
-      name
-      expiresAt
-      arrest_date_max
-      arrest_date_min
-      role
-      action_ids
-      custom_fields
+      ...UserFields
     }
   }
+  ${USER_FIELDS}
 `
 
 export const DELETE_USER_MUTATION = gql`
@@ -206,12 +199,13 @@ const UserPage = ({ id }) => {
         loading={loading}
         fetchQuery={QUERY}
         columnCount={1}
+        skipUpdatedCheck
         createMutation={CREATE_USER_MUTATION}
         updateMutation={UPDATE_USER_MUTATION}
         deleteMutation={DELETE_USER_MUTATION}
         transformInput={transformInput}
         onDelete={() => navigate(routes.users())}
-        onCreate={(data) => navigate(routes.user({ id: data.createUser.id }))}
+        onCreate={(data) => navigate(routes.user({ id: data.id }))}
       />
     </>
   )

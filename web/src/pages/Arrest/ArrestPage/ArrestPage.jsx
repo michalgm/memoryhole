@@ -9,113 +9,82 @@ import { useDisplayError } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import ArrestFields from 'src/lib/FieldSchemas'
 
-export const QUERY = gql`
-  query EditArrestById($id: Int!) {
-    arrest: arrest(id: $id) {
+const ARREST_FIELDS = gql`
+  fragment ArrestFields on Arrest {
+    id
+    date
+    location
+    display_field
+    search_field
+    date
+    charges
+    arrest_city
+    jurisdiction
+    citation_number
+    arrestee_id
+    action_id
+    action {
       id
-      date
-      location
+      name
+      start_date
+    }
+    custom_fields
+    created_at
+    created_by {
+      name
+    }
+    updated_at
+    updated_by {
+      name
+    }
+    arrestee {
+      id
       display_field
-      search_field
-      date
-      charges
-      arrest_city
-      jurisdiction
-      citation_number
-      arrestee_id
-      action_id
-      action {
-        id
-        name
-        start_date
-      }
+      first_name
+      last_name
+      preferred_name
+      pronoun
+      dob
+      email
+      phone_1
+      phone_2
+      address
+      city
+      state
+      zip
       custom_fields
-      created_at
-      created_by {
-        name
-      }
-      updated_at
-      updated_by {
-        name
-      }
-      arrestee {
+      arrests {
         id
-        display_field
-        first_name
-        last_name
-        preferred_name
-        pronoun
-        dob
-        email
-        phone_1
-        phone_2
-        address
-        city
-        state
-        zip
-        custom_fields
-        # logs {
-        #   id
-        #   time
-        #   type
-        #   notes
-        #   needs_followup
-
-        # }
-        arrests {
-          id
-        }
       }
     }
   }
+`
+
+export const QUERY = gql`
+  query EditArrestById($id: Int!) {
+    arrest: arrest(id: $id) {
+      ...ArrestFields
+    }
+  }
+  ${ARREST_FIELDS}
 `
 
 const UPDATE_ARREST_MUTATION = gql`
   mutation UpdateArrestMutation($id: Int!, $input: UpdateArrestInput!) {
     updateArrest(id: $id, input: $input) {
-      id
-      date
-      location
-      date
-      charges
-      arrest_city
-      jurisdiction
-      citation_number
-      arrestee_id
-      action_id
-      custom_fields
-      arrestee {
-        id
-        first_name
-        last_name
-        preferred_name
-        pronoun
-        dob
-        email
-        phone_1
-        phone_2
-        address
-        city
-        state
-        zip
-        custom_fields
-        arrests {
-          id
-        }
-      }
+      ...ArrestFields
     }
   }
+  ${ARREST_FIELDS}
 `
 
 const CREATE_ARREST_MUTATION = gql`
   mutation CreateArrestMutation($input: CreateArrestInput!) {
     createArrest(input: $input) {
-      id
-      arrestee {
-        id
-      }
+      ...ArrestFields
     }
   }
+  ${ARREST_FIELDS}
 `
 
 export const DELETE_ARREST_MUTATION = gql`
@@ -217,9 +186,7 @@ const ArrestPage = ({ id }) => {
         deleteMutation={DELETE_ARREST_MUTATION}
         transformInput={transformInput}
         onDelete={() => navigate(routes.arrests())}
-        onCreate={(data) =>
-          navigate(routes.arrest({ id: data.createArrest.id }))
-        }
+        onCreate={(data) => navigate(routes.arrest({ id: data.id }))}
       />
       {arrest?.arrestee?.id && (
         <ArresteeLogsDrawer arrestee_id={arrest?.arrestee?.id} />

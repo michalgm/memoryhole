@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
 import { Box, Tooltip, Typography } from '@mui/material'
@@ -47,13 +47,13 @@ function fieldsToColumns(fields, columnCount = 2) {
   return { columns, fullSpan }
 }
 
-const ModTime = ({ time, stats, entity }) => (
+const ModTime = ({ time, stats, formData }) => (
   <Typography variant="overline">
     {startCase(time)}{' '}
     <Tooltip title={stats[time].format('LLLL')}>
       <b>{stats[time].calendar()}</b>
     </Tooltip>{' '}
-    by <b>{entity[`${time}_by`]?.name}</b>
+    by <b>{formData[`${time}_by`]?.name}</b>
   </Typography>
 )
 
@@ -102,26 +102,43 @@ const FormContainer = ({
   onDelete,
   onUpdate,
   loading,
+  skipUpdatedCheck,
   autoComplete = 'off',
 }) => {
   const confirm = useConfirm()
   const { openSnackbar } = useSnackbar()
   const displayError = useDisplayError()
   const context = useForm({ defaultValues: {} })
-  const { formState } = context
+  const { formState, reset } = context
   const [retrieveTime, setRetrieveTime] = useState(null)
+  const [[formData, dataLoaded], setFormData] = useState([entity, false])
+
+  const resetForm = useCallback(
+    async (data) => {
+      setFormData([data, true])
+      const values = transformData(data, fields)
+      setRetrieveTime(dayjs(values.created_at))
+      reset(values)
+      setTimeout(() => {
+        reset(values) // Force recalculation
+      }, 0)
+    },
+    [fields, reset]
+  )
 
   useEffect(() => {
-    if (!loading) {
-      const values = transformData(entity, fields)
-      setRetrieveTime(dayjs(values.created_at))
-      context.reset(values)
+    if (!loading && !dataLoaded) {
+      resetForm(entity)
     }
-  }, [context, loading, entity, fields])
+  }, [loading, entity, resetForm, dataLoaded])
 
   const stats = {
-    created: dayjs(entity?.created_at),
-    updated: dayjs(entity?.updated_at),
+    created: dayjs(formData?.created_at),
+    updated: dayjs(formData?.updated_at),
+  }
+
+  const dataFromResult = (result) => {
+    return result[Object.keys(result)[0]]
   }
 
   const [deleteEntity, { loading: loadingDelete }] = useMutation(
@@ -129,6 +146,7 @@ const FormContainer = ({
     {
       onCompleted: async () => {
         openSnackbar(`${displayConfig.type} "${displayConfig.name}" deleted`)
+        await new Promise((resolve) => setTimeout(resolve, 0))
         onDelete && (await onDelete())
       },
       onError: displayError,
@@ -138,8 +156,11 @@ const FormContainer = ({
   const [createEntity, { loading: loadingCreate }] = useMutation(
     createMutation,
     {
-      onCompleted: async (data) => {
+      onCompleted: async (result) => {
         openSnackbar(`${displayConfig.type} created`)
+        const data = dataFromResult(result)
+        resetForm(data)
+        await new Promise((resolve) => setTimeout(resolve, 0))
         onCreate && (await onCreate(data))
       },
       onError: displayError,
@@ -149,11 +170,20 @@ const FormContainer = ({
   const [updateEntity, { loading: loadingUpdate }] = useMutation(
     updateMutation,
     {
-      onCompleted: async () => {
+      onCompleted: async (result) => {
         openSnackbar(`${displayConfig.type} updated`)
-        onUpdate && (await onUpdate())
+        const data = dataFromResult(result)
+        resetForm(data)
+        await new Promise((resolve) => setTimeout(resolve, 0))
+        onUpdate && (await onUpdate(data))
       },
-      refetchQueries: [{ query: fetchQuery, variables: { id: entity?.id } }],
+      refetchQueries: [
+        {
+          query: fetchQuery,
+          fetchPolicy: 'no-cache',
+          variables: { id: formData?.id },
+        },
+      ],
       awaitRefetchQueries: true,
       onError: displayError,
     }
@@ -169,7 +199,7 @@ const FormContainer = ({
       title: 'Confirm Delete',
       description: `Are you sure you want to delete the ${displayConfig.type} "${displayConfig.name}"?`,
     })
-    await deleteEntity({ variables: { id: entity.id } })
+    await deleteEntity({ variables: { id: formData.id } })
   }
 
   const getChangedFields = (input, dirtyFields) => {
@@ -187,38 +217,43 @@ const FormContainer = ({
 
   const onSave = async (input) => {
     const { dirtyFields } = formState
-    const changedFields = getChangedFields(input, dirtyFields)
+    const changedFields = formData.id
+      ? getChangedFields(input, dirtyFields)
+      : input
     if (Object.keys(dirtyFields).length === 0) {
       displayError('No changes to save')
       return
     }
     const transformedInput = await transformInput(changedFields)
-    if (entity?.id) {
-      const { data: currentRecord } = await fetchEntity({
-        variables: { id: entity.id },
-      })
-      const { updated_at, updated_by } =
-        currentRecord[Object.keys(currentRecord)[0]]
+    if (formData?.id) {
+      if (!skipUpdatedCheck) {
+        const { data: currentRecord } = await fetchEntity({
+          variables: { id: formData.id },
+        })
+        const { updated_at, updated_by } =
+          currentRecord[Object.keys(currentRecord)[0]]
 
-      const current_time = dayjs(updated_at)
+        const current_time = dayjs(updated_at)
 
-      if (current_time > retrieveTime) {
-        displayError(
-          <span>
-            Unable to save your changes. This record was updated by{' '}
-            <b>{updated_by.name}</b> on <b>{current_time.format('LLLL')}</b>{' '}
-            after you began editing. Please refresh the page to view the latest
-            version and manually reapply your changes.
-          </span>
-        )
-        return false
+        if (current_time > retrieveTime) {
+          displayError(
+            <span>
+              Unable to save your changes. This record was updated by{' '}
+              <b>{updated_by?.name}</b> on <b>{current_time?.format('LLLL')}</b>{' '}
+              after you began editing. Please refresh the page to view the
+              latest version and manually reapply your changes.
+            </span>
+          )
+          return false
+        }
       }
-      return updateEntity({
-        variables: { id: entity.id, input: transformedInput },
+      await updateEntity({
+        variables: { id: formData.id, input: transformedInput },
       })
     } else {
-      return createEntity({ variables: { input: transformedInput } })
+      await createEntity({ variables: { input: transformedInput } })
     }
+    return true
   }
 
   const disabled =
@@ -226,13 +261,13 @@ const FormContainer = ({
   const footer = (
     <Footer>
       <Grid xs>
-        {entity?.created_at && entity?.id && (
-          <ModTime time="created" stats={stats} entity={entity} />
+        {formData?.created_at && formData?.id && (
+          <ModTime time="created" stats={stats} formData={formData} />
         )}
       </Grid>
       <Grid xs>
-        {entity?.updated_at && entity?.id && (
-          <ModTime time="updated" stats={stats} entity={entity} />
+        {formData?.updated_at && formData?.id && (
+          <ModTime time="updated" stats={stats} formData={formData} />
         )}
       </Grid>
       <Grid
@@ -244,7 +279,7 @@ const FormContainer = ({
           gap: 2,
         }}
       >
-        {entity?.id && deleteMutation && (
+        {formData?.id && deleteMutation && (
           <LoadingButton
             variant="outlined"
             color="inherit"

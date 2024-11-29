@@ -8,46 +8,43 @@ import { useDisplayError } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import { ActionFields } from 'src/lib/FieldSchemas'
 
+const ACTION_FIELDS = gql`
+  fragment ActionFields on Action {
+    id
+    name
+    description
+    start_date
+    end_date
+    jurisdiction
+    city
+  }
+`
+
 export const QUERY = gql`
   query EditAction($id: Int!) {
     action: action(id: $id) {
-      id
-      name
-      description
-      start_date
-      end_date
-      jurisdiction
-      city
+      ...ActionFields
     }
   }
+  ${ACTION_FIELDS}
 `
 
 const UPDATE_MUTATION = gql`
   mutation UpdateAction($id: Int!, $input: UpdateActionInput!) {
     updateAction(id: $id, input: $input) {
-      id
-      name
-      description
-      start_date
-      end_date
-      jurisdiction
-      city
+      ...ActionFields
     }
   }
+  ${ACTION_FIELDS}
 `
 
 const CREATE_MUTATION = gql`
   mutation CreateAction($input: CreateActionInput!) {
     createAction(input: $input) {
-      id
-      name
-      description
-      start_date
-      end_date
-      jurisdiction
-      city
+      ...ActionFields
     }
   }
+  ${ACTION_FIELDS}
 `
 
 export const DELETE_MUTATION = gql`
@@ -105,9 +102,7 @@ const ActionPage = ({ id }) => {
         deleteMutation={DELETE_MUTATION}
         transformInput={transformInput}
         onDelete={() => navigate(routes.actions())}
-        onCreate={(data) =>
-          navigate(routes.action({ id: data.createAction.id }))
-        }
+        onCreate={(data) => navigate(routes.action({ id: data.id }))}
       />
     </>
   )
