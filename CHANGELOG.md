@@ -1,5 +1,21 @@
 
 
+## [0.3.0](https://github.com/michalgm/memoryhole/compare/v0.2.0...v0.3.0) (2024-11-29)
+
+### Features
+
+* **Form:** require one of  first_name OR preferred_name on arrestee ([0dc7bc0](https://github.com/michalgm/memoryhole/commit/0dc7bc0ce323128aa18dcf53818b9f4edeb529dc))
+* **import_script:** Set has_completed_outtake_form on records imported from online outtake ([540ab6c](https://github.com/michalgm/memoryhole/commit/540ab6caa22fad0c90f4a55296a8dffef551e8d3))
+* **UI:** Add a tooltip + icon in navbar showing account expiration info ([0223aa5](https://github.com/michalgm/memoryhole/commit/0223aa565f21342e1cb217782dfb78d0e6a591cc))
+* **UI:** Display version in tooltip ([daed0a5](https://github.com/michalgm/memoryhole/commit/daed0a5490be87da6630dcce2ad2946970cb602e))
+
+### Bug Fixes
+
+* **API:** don't valid uniquq email on update if email was not changed ([5d64c22](https://github.com/michalgm/memoryhole/commit/5d64c228582bef3ad5ab807bd69bddf4c7dee24a))
+* **Form:** fix dates not getting full props (allow dates to be required) ([47ff6b9](https://github.com/michalgm/memoryhole/commit/47ff6b9de5d4bafb6f99ac52be92f671210be5aa))
+* **Form:** FIx new dates being set to now() ([c331298](https://github.com/michalgm/memoryhole/commit/c3312989ef37cdd71c32a46a97db26382b48c05d))
+* **Form:** More attempts at taming form states ([eeca008](https://github.com/michalgm/memoryhole/commit/eeca008d5f26f288e84ba059f5f9fa4201a32eb6))
+
 ## [0.2.0](https://github.com/michalgm/memoryhole/compare/v0.1.7...v0.2.0) (2024-11-28)
 
 ### Features
