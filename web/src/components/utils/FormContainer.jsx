@@ -97,7 +97,7 @@ const FormContainer = ({
   updateMutation,
   deleteMutation,
   fetchQuery,
-  transformInput,
+  transformInput = (input) => input,
   onCreate,
   onDelete,
   onUpdate,
@@ -116,8 +116,8 @@ const FormContainer = ({
   const resetForm = useCallback(
     async (data) => {
       setFormData([data, true])
+      setRetrieveTime(dayjs(data.updated_at))
       const values = transformData(data, fields)
-      setRetrieveTime(dayjs(values.created_at))
       reset(values)
       setTimeout(() => {
         reset(values) // Force recalculation
@@ -144,10 +144,10 @@ const FormContainer = ({
   const [deleteEntity, { loading: loadingDelete }] = useMutation(
     deleteMutation,
     {
-      onCompleted: async () => {
+      onCompleted: async (data) => {
         openSnackbar(`${displayConfig.type} "${displayConfig.name}" deleted`)
         await new Promise((resolve) => setTimeout(resolve, 0))
-        onDelete && (await onDelete())
+        onDelete && (await onDelete(data))
       },
       onError: displayError,
     }
@@ -177,14 +177,6 @@ const FormContainer = ({
         await new Promise((resolve) => setTimeout(resolve, 0))
         onUpdate && (await onUpdate(data))
       },
-      refetchQueries: [
-        {
-          query: fetchQuery,
-          fetchPolicy: 'no-cache',
-          variables: { id: formData?.id },
-        },
-      ],
-      awaitRefetchQueries: true,
       onError: displayError,
     }
   )
@@ -227,19 +219,18 @@ const FormContainer = ({
     const transformedInput = await transformInput(changedFields)
     if (formData?.id) {
       if (!skipUpdatedCheck) {
-        const { data: currentRecord } = await fetchEntity({
+        const { data: currentRecord = {} } = await fetchEntity({
           variables: { id: formData.id },
         })
         const { updated_at, updated_by } =
           currentRecord[Object.keys(currentRecord)[0]]
+        const currentTime = dayjs(updated_at)
 
-        const current_time = dayjs(updated_at)
-
-        if (current_time > retrieveTime) {
+        if (currentTime > retrieveTime) {
           displayError(
             <span>
               Unable to save your changes. This record was updated by{' '}
-              <b>{updated_by?.name}</b> on <b>{current_time?.format('LLLL')}</b>{' '}
+              <b>{updated_by?.name}</b> on <b>{currentTime?.format('LLLL')}</b>{' '}
               after you began editing. Please refresh the page to view the
               latest version and manually reapply your changes.
             </span>
