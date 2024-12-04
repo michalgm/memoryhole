@@ -1,0 +1,638 @@
+import React from 'react'
+
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import userEvent from '@testing-library/user-event'
+import { ConfirmProvider } from 'material-ui-confirm'
+import { setupServer } from 'msw/node'
+
+import { navigate } from '@redwoodjs/router'
+import {
+  mockGraphQLMutation,
+  mockGraphQLQuery,
+  render,
+  screen,
+  waitFor,
+} from '@redwoodjs/testing/web'
+
+import FormContainer from './FormContainer'
+import { SnackBarProvider } from './SnackBar'
+
+const theme = createTheme({
+  palette: {
+    contrastThreshold: 4.5,
+    primary: { main: '#37474f' },
+    secondary: { main: '#ad1457' },
+    success: { main: '#392e3d' },
+    error: { main: '#FF5449' },
+  },
+})
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+beforeEach(() => server.resetHandlers())
+const WrappedFormContainer = (props) => {
+  return (
+    <ThemeProvider theme={theme}>
+      <ConfirmProvider>
+        <SnackBarProvider>
+          <FormContainer {...props} />
+        </SnackBarProvider>
+      </ConfirmProvider>
+    </ThemeProvider>
+  )
+}
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
+afterEach(async () => {
+  await waitFor(() => {
+    // Wait for any pending state updates or async operations
+  })
+})
+
+afterAll(async () => {
+  await waitFor(() => {
+    // Wait for any pending state updates or async operations
+  })
+})
+
+const transformInputMock = jest.fn((input) => input)
+
+jest.mock('src/components/utils/SnackBar', () => {
+  const displayErrorMock = jest.fn()
+  return {
+    ...jest.requireActual('src/components/utils/SnackBar'),
+    useDisplayError: () => displayErrorMock,
+    _getMockDisplayError: () => displayErrorMock,
+  }
+})
+
+// Sample fields configuration
+const fields = [
+  {
+    title: 'Personal Information',
+    fields: [
+      [
+        'arrestee.first_name',
+        {
+          label: 'First Name',
+          placeholder: 'Enter first name',
+          validation: {
+            required: 'First name is required',
+          },
+        },
+      ],
+      [
+        'arrestee.last_name',
+        {
+          label: 'Last Name',
+          placeholder: 'Enter last name',
+        },
+      ],
+      [
+        'arrestee.email',
+        {
+          label: 'Email',
+          placeholder: 'Enter email',
+          validation: {
+            validate: (value) =>
+              !value ||
+              /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value) ||
+              'Email must be formatted like an email',
+          },
+        },
+      ],
+    ],
+  },
+]
+
+expect.extend({
+  toContainText(received, text) {
+    const containsText = (element, searchText) => {
+      if (typeof element === 'string') {
+        return element.includes(searchText)
+      }
+      if (element.props && element.props.children) {
+        if (Array.isArray(element.props.children)) {
+          return element.props.children.some((child) =>
+            containsText(child, searchText)
+          )
+        }
+        return containsText(element.props.children, searchText)
+      }
+      return false
+    }
+
+    return {
+      pass: containsText(received, text),
+      message: () => `expected ${received} to contain text "${text}"`,
+    }
+  },
+})
+
+// Sample entity data
+const entity = {
+  id: 1,
+  arrestee: {
+    first_name: 'John',
+    last_name: 'Doe',
+    email: 'john.doe@example.com',
+  },
+  updated_at: '2023-11-10T12:00:00Z',
+  updated_by: { name: 'Admin' },
+  created_at: '2023-11-10T10:00:00Z',
+  created_by: { name: 'Admin' },
+}
+
+// Display configuration
+const displayConfig = {
+  type: 'User',
+  name: 'John Doe',
+}
+
+const ENTITY_FIELDS = gql`
+  fragment EntityFields on Arrest {
+    id
+    arrestee {
+      first_name
+      last_name
+      email
+    }
+    updated_at
+    updated_by {
+      name
+    }
+  }
+`
+
+// Sample mutation and query
+const UPDATE_ENTITY_MUTATION = gql`
+  mutation UpdateEntity($id: Int!, $input: UpdateArrestInput!) {
+    updateArrest(id: $id, input: $input) {
+      ...EntityFields
+    }
+  }
+  ${ENTITY_FIELDS}
+`
+const CREATE_ENTITY_MUTATION = gql`
+  mutation CreateEntity($input: CreateArrestInput!) {
+    createArrest(input: $input) {
+      ...EntityFields
+    }
+  }
+  ${ENTITY_FIELDS}
+`
+const DELETE_ENTITY_MUTATION = gql`
+  mutation DeleteEntity($id: Int!) {
+    deleteArrest(id: $id) {
+      id
+    }
+  }
+  ${ENTITY_FIELDS}
+`
+
+const FETCH_ENTITY_QUERY = gql`
+  query FetchEntity($id: Int!) {
+    arrest(id: $id) {
+      ...EntityFields
+    }
+  }
+  ${ENTITY_FIELDS}
+`
+
+test('renders form fields correctly', () => {
+  render(
+    <SnackBarProvider>
+      <FormContainer
+        fields={fields}
+        entity={entity}
+        displayConfig={displayConfig}
+        createMutation={CREATE_ENTITY_MUTATION}
+        updateMutation={UPDATE_ENTITY_MUTATION}
+        deleteMutation={DELETE_ENTITY_MUTATION}
+        fetchQuery={FETCH_ENTITY_QUERY}
+      />
+    </SnackBarProvider>
+  )
+
+  expect(screen.getByLabelText('First Name')).toHaveValue('John')
+  expect(screen.getByLabelText('Last Name')).toHaveValue('Doe')
+  expect(screen.getByLabelText('Email')).toHaveValue('john.doe@example.com')
+})
+
+test('submits only changed fields', async () => {
+  const user = userEvent.setup()
+
+  let fetchCalled = false
+  let updateCalled = false
+  mockGraphQLQuery('FetchEntity', () => {
+    fetchCalled = true
+
+    return {
+      arrest: {
+        id: 1,
+        updated_at: '2023-11-10T12:00:00Z',
+        updated_by: { name: 'Tester' },
+      },
+    }
+  })
+
+  mockGraphQLMutation('UpdateEntity', (vars) => {
+    updateCalled = true
+    expect(vars).toEqual({
+      id: 1,
+      input: {
+        arrestee: {
+          first_name: 'Jane',
+        },
+      },
+    })
+    return {
+      updateArrest: {
+        id: 1,
+        arrestee: {
+          first_name: 'Jane',
+          last_name: 'Doe',
+          email: 'john.doe@example.com',
+        },
+        updated_at: '2023-11-10T12:00:00Z',
+        updated_by: { name: 'Tester' },
+      },
+    }
+  })
+
+  render(
+    <WrappedFormContainer
+      fields={fields}
+      entity={entity}
+      displayConfig={displayConfig}
+      createMutation={CREATE_ENTITY_MUTATION}
+      updateMutation={UPDATE_ENTITY_MUTATION}
+      deleteMutation={DELETE_ENTITY_MUTATION}
+      fetchQuery={FETCH_ENTITY_QUERY}
+      transformInput={transformInputMock}
+    />
+  )
+
+  // Change the first name field
+  const nameField = screen.getByLabelText('First Name')
+  await waitFor(() => user.click(nameField))
+  await waitFor(() => user.clear(nameField))
+  await waitFor(() => user.type(nameField, 'Jane'))
+  expect(nameField).toHaveValue('Jane')
+
+  await waitFor(() =>
+    user.click(screen.getByRole('button', { name: /save user/i }))
+  )
+
+  const expectedInput = {
+    arrestee: {
+      first_name: 'Jane',
+    },
+  }
+  await waitFor(() => {
+    expect(transformInputMock).toHaveBeenCalledWith(expectedInput)
+  })
+
+  await waitFor(() => {
+    expect(fetchCalled).toBe(true)
+  })
+  await waitFor(() => {
+    expect(updateCalled).toBe(true)
+  })
+})
+
+test('prevents submission if record has been updated by another user', async () => {
+  const { _getMockDisplayError } = require('src/components/utils/SnackBar')
+  const displayErrorMock = _getMockDisplayError()
+
+  mockGraphQLQuery('FetchEntity', {
+    arrest: {
+      id: 1,
+      updated_at: '2026-11-10T12:00:00Z', //Newer date
+      updated_by: { name: 'Tester' },
+    },
+  })
+
+  mockGraphQLMutation('UpdateEntity', () => {
+    console.error('We should not see this')
+    expect(true).toBe(false) // This will fail if the mutation is called
+  })
+
+  render(
+    <WrappedFormContainer
+      fields={fields}
+      entity={entity}
+      displayConfig={displayConfig}
+      createMutation={CREATE_ENTITY_MUTATION}
+      updateMutation={UPDATE_ENTITY_MUTATION}
+      deleteMutation={DELETE_ENTITY_MUTATION}
+      fetchQuery={FETCH_ENTITY_QUERY}
+      transformInput={transformInputMock}
+    />
+  )
+
+  const nameField = screen.getByLabelText('First Name')
+  await waitFor(() => userEvent.click(nameField))
+  await waitFor(() => userEvent.clear(nameField))
+  await waitFor(() => userEvent.type(nameField, 'Jane'))
+
+  // Submit the form
+  await waitFor(() =>
+    userEvent.click(screen.getByRole('button', { name: /save user/i }))
+  )
+
+  await waitFor(() =>
+    // Check that the error is displayed
+    expect(displayErrorMock).toHaveBeenCalledWith(
+      expect.toContainText('Unable to save your changes')
+    )
+  )
+})
+
+test('shows warning when navigating away with unsaved changes', async () => {
+  const user = userEvent.setup()
+
+  mockGraphQLQuery('FetchEntity', {
+    arrest: {
+      id: 1,
+      updated_at: '2024-11-10T12:00:00Z',
+      updated_by: { name: 'Tester' },
+    },
+  })
+
+  render(
+    <WrappedFormContainer
+      fields={fields}
+      entity={entity}
+      displayConfig={displayConfig}
+      createMutation={CREATE_ENTITY_MUTATION}
+      updateMutation={UPDATE_ENTITY_MUTATION}
+      deleteMutation={DELETE_ENTITY_MUTATION}
+      fetchQuery={FETCH_ENTITY_QUERY}
+      transformInput={transformInputMock}
+    />
+  )
+
+  const nameField = screen.getByLabelText('First Name')
+  await waitFor(() => user.click(nameField))
+  await waitFor(() => user.clear(nameField))
+  await waitFor(() => user.type(nameField, 'Jane'))
+  expect(nameField).toHaveValue('Jane')
+
+  const dialog = await screen.queryByText(/are you sure/i, {
+    selector: '.MuiTypography-root',
+  })
+  expect(dialog).not.toBeInTheDocument()
+
+  // Simulate navigation
+  await waitFor(() => {
+    return navigate('/some-other-route')
+  })
+
+  expect(
+    await screen.findByText(/are you sure/i, {
+      selector: '.MuiTypography-root',
+    })
+  ).toBeInTheDocument()
+
+  await waitFor(async () => {
+    await user.click(screen.getByRole('button', { name: /cancel/i }))
+  })
+
+  // make sure we can dismiss the dialog
+  await waitFor(() => user.click(nameField))
+  await waitFor(() => user.clear(nameField))
+  await waitFor(() => user.type(nameField, 'Joe'))
+  expect(nameField).toHaveValue('Joe')
+})
+
+test('shows confirmation dialog when deleting entity', async () => {
+  // const { useConfirm, _getMockConfirm } = require('material-ui-confirm')
+  const user = userEvent.setup()
+
+  mockGraphQLMutation('DeleteEntity', (vars) => {
+    expect(vars.id).toBe(1)
+    return {
+      deleteArrest: {
+        id: vars.id,
+      },
+    }
+  })
+
+  const onDeleteMock = jest.fn()
+
+  render(
+    <WrappedFormContainer
+      fields={fields}
+      entity={entity}
+      displayConfig={displayConfig}
+      createMutation={CREATE_ENTITY_MUTATION}
+      updateMutation={UPDATE_ENTITY_MUTATION}
+      deleteMutation={DELETE_ENTITY_MUTATION}
+      fetchQuery={FETCH_ENTITY_QUERY}
+      onDelete={onDeleteMock}
+      transformInput={transformInputMock}
+    />
+  )
+
+  // Click the delete button
+  await waitFor(() =>
+    user.click(screen.getByRole('button', { name: /delete user/i }))
+  )
+
+  // Ensure the confirmation dialog was called with the correct message
+  expect(
+    await screen.findByText(/Are you sure you want to delete the User/i, {
+      selector: '.MuiTypography-root',
+    })
+  ).toBeInTheDocument()
+
+  // Click the confirm button
+  await waitFor(async () => {
+    await user.click(screen.getByRole('button', { name: /ok/i }))
+  })
+  // Ensure the onDelete callback was called with the correct arguments
+  await waitFor(() => {
+    expect(onDeleteMock).toHaveBeenCalledWith({ deleteArrest: { id: 1 } })
+  })
+})
+
+test('shows validation errors for invalid fields', async () => {
+  const user = userEvent.setup()
+
+  render(
+    <WrappedFormContainer
+      fields={fields}
+      entity={entity}
+      displayConfig={displayConfig}
+      createMutation={CREATE_ENTITY_MUTATION}
+      updateMutation={UPDATE_ENTITY_MUTATION}
+      deleteMutation={DELETE_ENTITY_MUTATION}
+      fetchQuery={FETCH_ENTITY_QUERY}
+    />
+  )
+  const firstNameInput = screen.getByLabelText('First Name')
+
+  // Clear the first name field to trigger required field validation
+  await waitFor(async () => {
+    await user.click(firstNameInput)
+    await user.clear(firstNameInput)
+    firstNameInput.blur()
+    await user.tab() // Triggers blur event
+  })
+
+  // Submit the form
+  await waitFor(async () => {
+    await user.click(screen.getByRole('button', { name: /save user/i }))
+  })
+
+  expect(
+    await screen.findByText('First name is required', {
+      selector: '.MuiFormHelperText-root',
+    })
+  ).toBeInTheDocument()
+
+  // Enter an invalid email to trigger email validation
+  await waitFor(() => user.clear(screen.getByLabelText('Email')))
+  await waitFor(() =>
+    user.type(screen.getByLabelText('Email'), 'invalid-email')
+  )
+
+  // Submit the form again
+  await waitFor(() =>
+    user.click(screen.getByRole('button', { name: /save user/i }))
+  )
+
+  // Expect an email validation error message
+  expect(
+    await screen.findByText(/email must be formatted/i, {
+      selector: '.MuiFormHelperText-root',
+    })
+  ).toBeInTheDocument()
+})
+
+test('resets form state after successful save', async () => {
+  const user = userEvent.setup()
+  mockGraphQLQuery('FetchEntity', () => {
+    return {
+      arrest: {
+        id: 1,
+        updated_at: '2023-11-10T12:00:00Z',
+        updated_by: { name: 'Tester' },
+      },
+    }
+  })
+
+  mockGraphQLMutation('UpdateEntity', () => {
+    return {
+      updateArrest: {
+        id: 1,
+        arrestee: {
+          first_name: 'Jane',
+          last_name: 'Doe',
+          email: 'jane@example.com',
+        },
+        updated_at: '2023-11-12T12:00:00Z',
+        updated_by: { name: 'Tester' },
+      },
+    }
+  })
+
+  render(
+    <WrappedFormContainer
+      fields={fields}
+      entity={entity}
+      displayConfig={displayConfig}
+      createMutation={CREATE_ENTITY_MUTATION}
+      updateMutation={UPDATE_ENTITY_MUTATION}
+      deleteMutation={DELETE_ENTITY_MUTATION}
+      fetchQuery={FETCH_ENTITY_QUERY}
+      transformInput={transformInputMock}
+    />
+  )
+
+  // Make changes to fields
+  const nameField = screen.getByLabelText('First Name')
+  await waitFor(() => user.click(nameField))
+  await waitFor(() => user.clear(nameField))
+  await waitFor(() => user.type(nameField, 'Jane'))
+  expect(nameField).toHaveValue('Jane')
+
+  // Save the form
+  await waitFor(() =>
+    user.click(screen.getByRole('button', { name: /save user/i }))
+  )
+
+  const expectedInput = {
+    arrestee: {
+      first_name: 'Jane',
+    },
+  }
+
+  await waitFor(() => {
+    expect(transformInputMock).toHaveBeenCalledWith(expectedInput)
+  })
+
+  await waitFor(() => {
+    expect(screen.getByLabelText('First Name')).toHaveValue('Jane')
+    expect(screen.getByLabelText('Last Name')).toHaveValue('Doe')
+    expect(screen.getByLabelText('Email')).toHaveValue('jane@example.com')
+  })
+  // Verify form values match the server response
+})
+
+// test.only('form reset restores initial values', async () => {
+//   // const user = userEvent.setup()
+
+//   const { debug } = render(
+//     <WrappedFormContainer
+//       fields={fields}
+//       entity={entity}
+//       displayConfig={displayConfig}
+//       createMutation={CREATE_ENTITY_MUTATION}
+//       updateMutation={UPDATE_ENTITY_MUTATION}
+//       deleteMutation={DELETE_ENTITY_MUTATION}
+//       fetchQuery={FETCH_ENTITY_QUERY}
+//     />
+//   )
+
+//   const nameField = screen.getByLabelText('First Name')
+//   const emailField = screen.getByLabelText('Email')
+//   console.log('Initial value:', nameField.value)
+
+//   await waitFor(() => userEvent.click(nameField))
+//   console.log('After click:', nameField.value)
+
+//   await waitFor(() => userEvent.clear(nameField))
+//   await waitFor(() => userEvent.click(nameField))
+//   console.log('After clear:', nameField.value)
+//   await waitFor(async () => {
+//     await userEvent.type(nameField, 'Jane')
+//   })
+//   expect(nameField).toHaveValue('Jane')
+
+//   debug(nameField)
+//   await waitFor(() => {
+//     expect(nameField).toHaveValue('Jane')
+//   })
+//   await waitFor(() => userEvent.click(emailField))
+//   await waitFor(() => userEvent.clear(emailField))
+//   await waitFor(() => userEvent.type(emailField, 'jane@example.com'))
+
+//   // Reset the form
+//   // await waitFor(() =>
+//   //   userEvent.click(screen.getByRole('button', { name: /reset/i }))
+//   // )
+
+//   // Verify original values are restored
+//   expect(nameField).toHaveValue('John')
+//   expect(emailField).toHaveValue('john.doe@example.com')
+
+//   // Form should be clean after reset
+//   expect(screen.queryByText('You have unsaved changes')).toBeInTheDocument()
+// })
