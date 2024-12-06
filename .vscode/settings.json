@@ -14,7 +14,14 @@
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
   "cSpell.words": ["Memoryhole", "redwoodjs"],
-  "conventionalCommits.scopes": ["Form", "UI", "import_script", "API"],
+  "conventionalCommits.scopes": [
+    "Form",
+    "UI",
+    "import_script",
+    "API",
+    "Tests",
+    "DataTable"
+  ],
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   }
