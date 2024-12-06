@@ -1,11 +1,9 @@
-import { useEffect } from 'react'
+import { useCallback } from 'react'
 
 import { navigate, routes } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
 
 import ArresteeLogsDrawer from 'src/components/ArresteeLogs/ArresteeLogsDrawer'
 import FormContainer from 'src/components/utils/FormContainer'
-import { useDisplayError } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import ArrestFields from 'src/lib/FieldSchemas'
 
@@ -121,23 +119,7 @@ const ACTION_TO_ARREST_FIELDS = {
 
 const ArrestPage = ({ id }) => {
   const { currentAction, setPageTitle } = useApp()
-  const displayError = useDisplayError()
   const isCreate = !id || id === 'new'
-
-  const {
-    data: { arrest = { arrestee: {} } } = {},
-    loading,
-    error,
-  } = useQuery(QUERY, {
-    variables: { id: parseInt(id) },
-    skip: isCreate,
-    onError: displayError,
-    fetchPolicy: 'no-cache',
-  })
-
-  useEffect(() => {
-    setPageTitle(isCreate ? 'New Arrest' : arrest?.arrestee?.display_field)
-  }, [isCreate, arrest, setPageTitle])
 
   const applyActionDefaults = (action, target) => {
     if (!action || action.id === -1) return
@@ -153,10 +135,6 @@ const ArrestPage = ({ id }) => {
       }
     )
   }
-  if (isCreate && currentAction && arrest && !arrest?.action) {
-    arrest.action = currentAction
-    applyActionDefaults(currentAction, arrest)
-  }
 
   ArrestFields.forEach((section) => {
     section.fields.forEach((field) => {
@@ -168,29 +146,42 @@ const ArrestPage = ({ id }) => {
     })
   })
 
-  if (error) return null
+  const onFetch = useCallback(
+    (arrest) => {
+      setPageTitle(isCreate ? 'New Arrest' : arrest?.arrestee?.display_field)
+      if (isCreate && currentAction && arrest && !arrest?.action) {
+        arrest.action = currentAction
+        applyActionDefaults(currentAction, arrest)
+      }
+      return arrest
+    },
+    [currentAction, isCreate, setPageTitle]
+  )
+  const onDelete = useCallback(() => navigate(routes.arrests()), [])
+  const onCreate = useCallback(
+    (data) => navigate(routes.arrest({ id: data.id })),
+    []
+  )
 
   return (
     <>
       <FormContainer
         fields={ArrestFields}
-        entity={arrest}
+        id={id === 'new' ? null : id}
         displayConfig={{
           type: 'Arrest',
-          name: arrest?.arrestee?.display_field,
+          namePath: 'arrestee.display_field',
         }}
-        loading={loading}
         fetchQuery={QUERY}
         createMutation={CREATE_ARREST_MUTATION}
         updateMutation={UPDATE_ARREST_MUTATION}
         deleteMutation={DELETE_ARREST_MUTATION}
         transformInput={transformInput}
-        onDelete={() => navigate(routes.arrests())}
-        onCreate={(data) => navigate(routes.arrest({ id: data.id }))}
+        onDelete={onDelete}
+        onCreate={onCreate}
+        onFetch={onFetch}
       />
-      {arrest?.arrestee?.id && (
-        <ArresteeLogsDrawer arrestee_id={arrest?.arrestee?.id} />
-      )}
+      {!isCreate && <ArresteeLogsDrawer arrestee_id={id} />}
     </>
   )
 }

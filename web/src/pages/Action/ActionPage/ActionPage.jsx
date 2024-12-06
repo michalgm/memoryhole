@@ -1,10 +1,8 @@
-import { useEffect } from 'react'
+import { useCallback } from 'react'
 
 import { navigate, routes } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
 
 import FormContainer from 'src/components/utils/FormContainer'
-import { useDisplayError } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import { ActionFields } from 'src/lib/FieldSchemas'
 
@@ -58,21 +56,6 @@ export const DELETE_MUTATION = gql`
 const ActionPage = ({ id }) => {
   const { setPageTitle } = useApp()
 
-  const displayError = useDisplayError()
-
-  const { data, loading, error } = useQuery(QUERY, {
-    variables: { id: parseInt(id) },
-    skip: !id || id === 'new',
-    fetchPolicy: 'no-cache',
-    onError: displayError,
-  })
-
-  useEffect(() => {
-    if (data?.action?.name) {
-      setPageTitle(data?.action?.name)
-    }
-  }, [data?.action?.name, setPageTitle])
-
   const transformInput = (input) => {
     const fieldsToRemove = ['id', '__typename']
     fieldsToRemove.forEach((k) => delete input[k])
@@ -83,26 +66,38 @@ const ActionPage = ({ id }) => {
     return input
   }
 
-  if (error) return null
+  const onFetch = useCallback((action) => {
+    if (action?.name) {
+      setPageTitle(action?.name)
+    }
+    return action
+  }, [])
+
+  const onDelete = useCallback(() => navigate(routes.actions()), [])
+
+  const onCreate = useCallback(
+    (data) => navigate(routes.action({ id: data.id })),
+    []
+  )
 
   return (
     <>
       <FormContainer
         fields={ActionFields}
-        entity={data?.action}
+        id={id === 'new' ? null : id}
         displayConfig={{
           type: 'Action',
-          name: data?.action?.name,
         }}
-        loading={loading}
-        fetchQuery={QUERY}
         columnCount={1}
+        skipUpdatedCheck
         createMutation={CREATE_MUTATION}
         updateMutation={UPDATE_MUTATION}
         deleteMutation={DELETE_MUTATION}
+        fetchQuery={QUERY}
         transformInput={transformInput}
-        onDelete={() => navigate(routes.actions())}
-        onCreate={(data) => navigate(routes.action({ id: data.id }))}
+        onDelete={onDelete}
+        onCreate={onCreate}
+        onFetch={onFetch}
       />
     </>
   )

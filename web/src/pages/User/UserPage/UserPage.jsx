@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback } from 'react'
 
 import { Box, Typography } from '@mui/material'
 import dayjs from 'dayjs'
@@ -6,11 +6,9 @@ import { upperCase } from 'lodash-es'
 import pluralize from 'pluralize'
 
 import { navigate, routes } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
 
 import { useAuth } from 'src/auth'
 import FormContainer from 'src/components/utils/FormContainer'
-import { useDisplayError } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import { UserFields } from 'src/lib/FieldSchemas'
 
@@ -90,24 +88,10 @@ const restrictionDefaults = {
 }
 
 const UserPage = ({ id }) => {
-  const displayError = useDisplayError()
   const { setPageTitle } = useApp()
   const { currentUser } = useAuth()
-  const {
-    data = {},
-    loading,
-    error,
-  } = useQuery(QUERY, {
-    variables: { id: parseInt(id) },
-    skip: !id || id === 'new',
-    fetchPolicy: 'no-cache',
-    onError: displayError,
-  })
-  const user = { ...data?.user }
 
-  useEffect(() => {
-    setPageTitle(user?.name)
-  }, [user?.name, setPageTitle])
+  const isCreate = !id || id === 'new'
 
   const applyDateOperation = (
     date,
@@ -130,11 +114,6 @@ const UserPage = ({ id }) => {
         target[field] = value
       }
     })
-  }
-
-  if (!id) {
-    user.role = 'User'
-    applyDefaults('User', user)
   }
 
   const formatDefaultValue = ([operator, amount, unit]) =>
@@ -185,27 +164,43 @@ const UserPage = ({ id }) => {
       }
     })
   })
-  if (error) return null
+
+  const onFetch = useCallback((user) => {
+    setPageTitle(isCreate ? 'New User' : user?.name)
+    if (isCreate) {
+      user.role = 'User'
+      applyDefaults(user.role, user)
+    }
+    return user
+  }, [])
+
+  const onDelete = useCallback(() => {
+    navigate(routes.users())
+  }, [])
+
+  const onCreate = useCallback((data) => {
+    navigate(routes.user({ id: data.id }))
+  }, [])
 
   return (
     <>
       <FormContainer
         fields={UserFields}
-        entity={user}
+        id={id === 'new' ? null : id}
         displayConfig={{
           type: 'User',
-          name: user?.name,
+          name: 'name',
         }}
-        loading={loading}
-        fetchQuery={QUERY}
         columnCount={1}
         skipUpdatedCheck
+        fetchQuery={QUERY}
         createMutation={CREATE_USER_MUTATION}
         updateMutation={UPDATE_USER_MUTATION}
         deleteMutation={DELETE_USER_MUTATION}
         transformInput={transformInput}
-        onDelete={() => navigate(routes.users())}
-        onCreate={(data) => navigate(routes.user({ id: data.id }))}
+        onDelete={onDelete}
+        onCreate={onCreate}
+        onFetch={onFetch}
       />
     </>
   )

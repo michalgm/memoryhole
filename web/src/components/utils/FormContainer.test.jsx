@@ -151,7 +151,7 @@ const entity = {
 // Display configuration
 const displayConfig = {
   type: 'User',
-  name: 'John Doe',
+  namePath: 'arrestee.first_name',
 }
 
 const ENTITY_FIELDS = gql`
@@ -204,12 +204,18 @@ const FETCH_ENTITY_QUERY = gql`
   ${ENTITY_FIELDS}
 `
 
-test('renders form fields correctly', () => {
+test('renders form fields correctly', async () => {
+  mockGraphQLQuery('FetchEntity', () => {
+    return {
+      arrest: entity,
+    }
+  })
+
   render(
     <SnackBarProvider>
       <FormContainer
         fields={fields}
-        entity={entity}
+        id={1}
         displayConfig={displayConfig}
         createMutation={CREATE_ENTITY_MUTATION}
         updateMutation={UPDATE_ENTITY_MUTATION}
@@ -218,10 +224,11 @@ test('renders form fields correctly', () => {
       />
     </SnackBarProvider>
   )
-
-  expect(screen.getByLabelText('First Name')).toHaveValue('John')
-  expect(screen.getByLabelText('Last Name')).toHaveValue('Doe')
-  expect(screen.getByLabelText('Email')).toHaveValue('john.doe@example.com')
+  await waitFor(() => {
+    expect(screen.getByLabelText('First Name')).toHaveValue('John')
+    expect(screen.getByLabelText('Last Name')).toHaveValue('Doe')
+    expect(screen.getByLabelText('Email')).toHaveValue('john.doe@example.com')
+  })
 })
 
 test('submits only changed fields', async () => {
@@ -229,16 +236,28 @@ test('submits only changed fields', async () => {
 
   let fetchCalled = false
   let updateCalled = false
-  mockGraphQLQuery('FetchEntity', () => {
-    fetchCalled = true
 
-    return {
-      arrest: {
-        id: 1,
-        updated_at: '2023-11-10T12:00:00Z',
-        updated_by: { name: 'Tester' },
+  let callCount = 0
+
+  mockGraphQLQuery('FetchEntity', () => {
+    const responses = [
+      {
+        arrest: entity,
       },
+      {
+        arrest: {
+          id: 1,
+          updated_at: '2023-11-10T12:00:00Z', //Newer date
+          updated_by: { name: 'Tester' },
+        },
+      },
+    ]
+    const response = responses[callCount]
+    if (callCount === 1) {
+      fetchCalled = true
     }
+    callCount++
+    return response
   })
 
   mockGraphQLMutation('UpdateEntity', (vars) => {
@@ -268,7 +287,7 @@ test('submits only changed fields', async () => {
   render(
     <WrappedFormContainer
       fields={fields}
-      entity={entity}
+      id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
       updateMutation={UPDATE_ENTITY_MUTATION}
@@ -279,7 +298,8 @@ test('submits only changed fields', async () => {
   )
 
   // Change the first name field
-  const nameField = screen.getByLabelText('First Name')
+  const nameField = await screen.findByLabelText('First Name')
+
   await waitFor(() => user.click(nameField))
   await waitFor(() => user.clear(nameField))
   await waitFor(() => user.type(nameField, 'Jane'))
@@ -309,13 +329,24 @@ test('submits only changed fields', async () => {
 test('prevents submission if record has been updated by another user', async () => {
   const { _getMockDisplayError } = require('src/components/utils/SnackBar')
   const displayErrorMock = _getMockDisplayError()
+  let callCount = 0
 
-  mockGraphQLQuery('FetchEntity', {
-    arrest: {
-      id: 1,
-      updated_at: '2026-11-10T12:00:00Z', //Newer date
-      updated_by: { name: 'Tester' },
-    },
+  mockGraphQLQuery('FetchEntity', () => {
+    const responses = [
+      {
+        arrest: entity,
+      },
+      {
+        arrest: {
+          id: 1,
+          updated_at: '2026-11-10T12:00:00Z', //Newer date
+          updated_by: { name: 'Tester' },
+        },
+      },
+    ]
+    const response = responses[callCount]
+    callCount++
+    return response
   })
 
   mockGraphQLMutation('UpdateEntity', () => {
@@ -326,7 +357,7 @@ test('prevents submission if record has been updated by another user', async () 
   render(
     <WrappedFormContainer
       fields={fields}
-      entity={entity}
+      id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
       updateMutation={UPDATE_ENTITY_MUTATION}
@@ -336,7 +367,8 @@ test('prevents submission if record has been updated by another user', async () 
     />
   )
 
-  const nameField = screen.getByLabelText('First Name')
+  const nameField = await screen.findByLabelText('First Name')
+
   await waitFor(() => userEvent.click(nameField))
   await waitFor(() => userEvent.clear(nameField))
   await waitFor(() => userEvent.type(nameField, 'Jane'))
@@ -356,19 +388,30 @@ test('prevents submission if record has been updated by another user', async () 
 
 test('shows warning when navigating away with unsaved changes', async () => {
   const user = userEvent.setup()
+  let callCount = 0
 
-  mockGraphQLQuery('FetchEntity', {
-    arrest: {
-      id: 1,
-      updated_at: '2024-11-10T12:00:00Z',
-      updated_by: { name: 'Tester' },
-    },
+  mockGraphQLQuery('FetchEntity', () => {
+    const responses = [
+      {
+        arrest: entity,
+      },
+      {
+        arrest: {
+          id: 1,
+          updated_at: '2023-11-10T12:00:00Z',
+          updated_by: { name: 'Tester' },
+        },
+      },
+    ]
+    const response = responses[callCount]
+    callCount++
+    return response
   })
 
   render(
     <WrappedFormContainer
       fields={fields}
-      entity={entity}
+      id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
       updateMutation={UPDATE_ENTITY_MUTATION}
@@ -378,7 +421,8 @@ test('shows warning when navigating away with unsaved changes', async () => {
     />
   )
 
-  const nameField = screen.getByLabelText('First Name')
+  const nameField = await screen.findByLabelText('First Name')
+
   await waitFor(() => user.click(nameField))
   await waitFor(() => user.clear(nameField))
   await waitFor(() => user.type(nameField, 'Jane'))
@@ -411,9 +455,71 @@ test('shows warning when navigating away with unsaved changes', async () => {
   expect(nameField).toHaveValue('Joe')
 })
 
-test('shows confirmation dialog when deleting entity', async () => {
-  // const { useConfirm, _getMockConfirm } = require('material-ui-confirm')
+test('does not warn on nav from new entry', async () => {
   const user = userEvent.setup()
+
+  const createEntity = {
+    ...entity,
+    id: 2,
+    updated_at: '2023-11-10T12:00:00Z',
+    updated_by: { name: 'Tester' },
+  }
+
+  mockGraphQLMutation('CreateEntity', () => {
+    return {
+      createArrest: createEntity,
+    }
+  })
+
+  const onCreateMock = jest.fn((input) => input)
+  render(
+    <WrappedFormContainer
+      fields={fields}
+      displayConfig={displayConfig}
+      createMutation={CREATE_ENTITY_MUTATION}
+      updateMutation={UPDATE_ENTITY_MUTATION}
+      deleteMutation={DELETE_ENTITY_MUTATION}
+      fetchQuery={FETCH_ENTITY_QUERY}
+      onCreate={onCreateMock}
+      transformInput={transformInputMock}
+    />
+  )
+
+  const nameField = await screen.findByLabelText('First Name')
+
+  await waitFor(() => user.click(nameField))
+  await waitFor(() => user.clear(nameField))
+  await waitFor(() => user.type(nameField, 'Jane'))
+  expect(nameField).toHaveValue('Jane')
+
+  const dialog = await screen.queryByText(/are you sure/i, {
+    selector: '.MuiTypography-root',
+  })
+  expect(dialog).not.toBeInTheDocument()
+
+  await waitFor(async () => {
+    await user.click(screen.getByRole('button', { name: /save user/i }))
+  })
+  expect(
+    await screen.queryByText(/are you sure/i, {
+      selector: '.MuiTypography-root',
+    })
+  ).not.toBeInTheDocument()
+
+  await waitFor(() => {
+    expect(onCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining(createEntity)
+    )
+  })
+})
+
+test('shows confirmation dialog when deleting entity', async () => {
+  const user = userEvent.setup()
+  mockGraphQLQuery('FetchEntity', () => {
+    return {
+      arrest: entity,
+    }
+  })
 
   mockGraphQLMutation('DeleteEntity', (vars) => {
     expect(vars.id).toBe(1)
@@ -429,7 +535,7 @@ test('shows confirmation dialog when deleting entity', async () => {
   render(
     <WrappedFormContainer
       fields={fields}
-      entity={entity}
+      id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
       updateMutation={UPDATE_ENTITY_MUTATION}
@@ -440,17 +546,20 @@ test('shows confirmation dialog when deleting entity', async () => {
     />
   )
 
-  // Click the delete button
-  await waitFor(() =>
-    user.click(screen.getByRole('button', { name: /delete user/i }))
-  )
-
+  await waitFor(async () => {
+    const button = await screen.findByRole('button', { name: /delete user/i })
+    expect(button).toBeInTheDocument()
+    await user.click(button)
+    expect(button).toBeInTheDocument()
+  })
+  await waitFor(async () => {
+    expect(
+      await screen.findByText(/Are you sure you want to delete the user/i, {
+        selector: '.MuiTypography-root',
+      })
+    ).toBeInTheDocument()
+  })
   // Ensure the confirmation dialog was called with the correct message
-  expect(
-    await screen.findByText(/Are you sure you want to delete the User/i, {
-      selector: '.MuiTypography-root',
-    })
-  ).toBeInTheDocument()
 
   // Click the confirm button
   await waitFor(async () => {
@@ -464,11 +573,15 @@ test('shows confirmation dialog when deleting entity', async () => {
 
 test('shows validation errors for invalid fields', async () => {
   const user = userEvent.setup()
-
+  mockGraphQLQuery('FetchEntity', () => {
+    return {
+      arrest: entity,
+    }
+  })
   render(
     <WrappedFormContainer
       fields={fields}
-      entity={entity}
+      id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
       updateMutation={UPDATE_ENTITY_MUTATION}
@@ -476,7 +589,7 @@ test('shows validation errors for invalid fields', async () => {
       fetchQuery={FETCH_ENTITY_QUERY}
     />
   )
-  const firstNameInput = screen.getByLabelText('First Name')
+  const firstNameInput = await screen.findByLabelText('First Name')
 
   // Clear the first name field to trigger required field validation
   await waitFor(async () => {
@@ -490,7 +603,7 @@ test('shows validation errors for invalid fields', async () => {
   await waitFor(async () => {
     await user.click(screen.getByRole('button', { name: /save user/i }))
   })
-
+  await waitFor(async () => {})
   expect(
     await screen.findByText('First name is required', {
       selector: '.MuiFormHelperText-root',
@@ -518,14 +631,25 @@ test('shows validation errors for invalid fields', async () => {
 
 test('resets form state after successful save', async () => {
   const user = userEvent.setup()
+
+  let callCount = 0
+
   mockGraphQLQuery('FetchEntity', () => {
-    return {
-      arrest: {
-        id: 1,
-        updated_at: '2023-11-10T12:00:00Z',
-        updated_by: { name: 'Tester' },
+    const responses = [
+      {
+        arrest: entity,
       },
-    }
+      {
+        arrest: {
+          id: 1,
+          updated_at: '2023-11-10T12:00:00Z',
+          updated_by: { name: 'Tester' },
+        },
+      },
+    ]
+    const response = responses[callCount]
+    callCount++
+    return response
   })
 
   mockGraphQLMutation('UpdateEntity', () => {
@@ -545,8 +669,8 @@ test('resets form state after successful save', async () => {
 
   render(
     <WrappedFormContainer
+      id={entity.id}
       fields={fields}
-      entity={entity}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
       updateMutation={UPDATE_ENTITY_MUTATION}
@@ -557,7 +681,7 @@ test('resets form state after successful save', async () => {
   )
 
   // Make changes to fields
-  const nameField = screen.getByLabelText('First Name')
+  const nameField = await screen.findByLabelText('First Name')
   await waitFor(() => user.click(nameField))
   await waitFor(() => user.clear(nameField))
   await waitFor(() => user.type(nameField, 'Jane'))
@@ -601,7 +725,8 @@ test('resets form state after successful save', async () => {
 //     />
 //   )
 
-//   const nameField = screen.getByLabelText('First Name')
+//     const nameField = await screen.findByLabelText('First Name')
+
 //   const emailField = screen.getByLabelText('Email')
 //   console.log('Initial value:', nameField.value)
 

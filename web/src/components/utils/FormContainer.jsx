@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
 import { Box, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { Stack } from '@mui/system'
 import dayjs from 'dayjs'
-import { startCase } from 'lodash-es'
+import { get, startCase } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
 import { FormContainer as RHFFormContainer, useForm } from 'react-hook-form-mui'
 
@@ -90,7 +90,6 @@ const FormStateHandler = ({ formState }) => {
 
 const FormContainer = ({
   fields,
-  entity,
   displayConfig,
   columnCount = 2,
   createMutation,
@@ -101,41 +100,58 @@ const FormContainer = ({
   onCreate,
   onDelete,
   onUpdate,
-  loading,
+  onFetch,
+  id,
   skipUpdatedCheck,
   autoComplete = 'off',
 }) => {
   const confirm = useConfirm()
   const { openSnackbar } = useSnackbar()
   const displayError = useDisplayError()
-  const context = useForm({ defaultValues: {} })
+  const context = useForm({ defaultValues: transformData({}, fields) })
   const { formState, reset } = context
   const [retrieveTime, setRetrieveTime] = useState(null)
-  const [[formData, dataLoaded], setFormData] = useState([entity, false])
+  const [formData, setFormData] = useState({})
+  const resetPromiseRef = useRef(null)
+  const display_name = get(formData, displayConfig?.namePath || 'name')
 
   const resetForm = useCallback(
-    async (data) => {
-      setFormData([data, true])
-      setRetrieveTime(dayjs(data.updated_at))
+    async (result) => {
+      const result_data = result ? dataFromResult(result) : {}
+      const data = onFetch ? await onFetch(result_data) : result_data
+      setFormData(data)
+      setRetrieveTime(dayjs(data?.updated_at))
       const values = transformData(data, fields)
+
       reset(values)
-      setTimeout(() => {
-        reset(values) // Force recalculation
-      }, 0)
+
+      // Create a Promise that resolves when formState.isDirty becomes false
+      const waitForReset = new Promise((resolve) => {
+        resetPromiseRef.current = resolve
+      })
+
+      // Await the Promise
+      await waitForReset
+
+      return data
     },
-    [fields, reset]
+    [fields, onFetch, reset]
   )
 
   useEffect(() => {
-    if (!loading && !dataLoaded) {
-      resetForm(entity)
+    if (!formState.isDirty && resetPromiseRef.current) {
+      resetPromiseRef.current()
+      resetPromiseRef.current = null
     }
-  }, [loading, entity, resetForm, dataLoaded])
+  }, [formState.isDirty])
 
-  const stats = {
-    created: dayjs(formData?.created_at),
-    updated: dayjs(formData?.updated_at),
-  }
+  const stats = useMemo(
+    () => ({
+      created: dayjs(formData?.created_at),
+      updated: dayjs(formData?.updated_at),
+    }),
+    [formData?.created_at, formData?.updated_at]
+  )
 
   const dataFromResult = (result) => {
     return result[Object.keys(result)[0]]
@@ -145,8 +161,8 @@ const FormContainer = ({
     deleteMutation,
     {
       onCompleted: async (data) => {
-        openSnackbar(`${displayConfig.type} "${displayConfig.name}" deleted`)
-        await new Promise((resolve) => setTimeout(resolve, 0))
+        openSnackbar(`${displayConfig.type} "${display_name}" deleted`)
+        // await new Promise((resolve) => setTimeout(resolve, 0))
         onDelete && (await onDelete(data))
       },
       onError: displayError,
@@ -158,9 +174,7 @@ const FormContainer = ({
     {
       onCompleted: async (result) => {
         openSnackbar(`${displayConfig.type} created`)
-        const data = dataFromResult(result)
-        resetForm(data)
-        await new Promise((resolve) => setTimeout(resolve, 0))
+        const data = await resetForm(result)
         onCreate && (await onCreate(data))
       },
       onError: displayError,
@@ -172,9 +186,7 @@ const FormContainer = ({
     {
       onCompleted: async (result) => {
         openSnackbar(`${displayConfig.type} updated`)
-        const data = dataFromResult(result)
-        resetForm(data)
-        await new Promise((resolve) => setTimeout(resolve, 0))
+        const data = await resetForm(result)
         onUpdate && (await onUpdate(data))
       },
       onError: displayError,
@@ -186,46 +198,62 @@ const FormContainer = ({
     fetchPolicy: 'no-cache',
   })
 
+  useEffect(() => {
+    const updateData = async () => {
+      const { data } = id
+        ? await fetchEntity({
+            variables: { id },
+          })
+        : { data: null }
+      return resetForm(data)
+    }
+    updateData()
+  }, [id, fetchEntity, resetForm, onFetch])
+
   const confirmDelete = async () => {
     await confirm({
       title: 'Confirm Delete',
-      description: `Are you sure you want to delete the ${displayConfig.type} "${displayConfig.name}"?`,
+      description: `Are you sure you want to delete the ${displayConfig.type.toLowerCase()} "${display_name}"?`,
     })
-    await deleteEntity({ variables: { id: formData.id } })
+    await deleteEntity({ variables: { id } })
   }
 
   const getChangedFields = (input, dirtyFields) => {
-    const changed = {}
-    for (const key in dirtyFields) {
-      if (typeof dirtyFields[key] === 'object' && dirtyFields[key] !== null) {
-        changed[key] = getChangedFields(input[key], dirtyFields[key])
-      } else {
-        changed[key] = input[key]
-      }
+    if (!dirtyFields || typeof dirtyFields !== 'object') {
+      return input
     }
 
-    return changed
+    return Object.keys(dirtyFields).reduce((acc, key) => {
+      if (dirtyFields[key] === true) {
+        acc[key] = input[key]
+      } else {
+        acc[key] = getChangedFields(input[key], dirtyFields[key])
+      }
+      return acc
+    }, {})
   }
 
   const onSave = async (input) => {
     const { dirtyFields } = formState
-    const changedFields = formData.id
-      ? getChangedFields(input, dirtyFields)
-      : input
+    if (!id && Object.keys(input).length === 0) {
+      displayError('No data to save')
+      return
+    }
+    const changedFields = id ? getChangedFields(input, dirtyFields) : input
     if (Object.keys(dirtyFields).length === 0) {
       displayError('No changes to save')
       return
     }
     const transformedInput = await transformInput(changedFields)
-    if (formData?.id) {
+    if (id) {
       if (!skipUpdatedCheck) {
         const { data: currentRecord = {} } = await fetchEntity({
-          variables: { id: formData.id },
+          variables: { id: id },
         })
         const { updated_at, updated_by } =
           currentRecord[Object.keys(currentRecord)[0]]
         const currentTime = dayjs(updated_at)
-
+        // console.log(currentTime.format(), retrieveTime.format())
         if (currentTime > retrieveTime) {
           displayError(
             <span>
@@ -239,7 +267,7 @@ const FormContainer = ({
         }
       }
       await updateEntity({
-        variables: { id: formData.id, input: transformedInput },
+        variables: { id: id, input: transformedInput },
       })
     } else {
       await createEntity({ variables: { input: transformedInput } })
@@ -248,16 +276,16 @@ const FormContainer = ({
   }
 
   const disabled =
-    loading || loadingCreate || loadingDelete || loadingUpdate || loadingFetch
+    loadingCreate || loadingDelete || loadingUpdate || loadingFetch
   const footer = (
     <Footer>
       <Grid xs>
-        {formData?.created_at && formData?.id && (
+        {formData?.created_at && id && (
           <ModTime time="created" stats={stats} formData={formData} />
         )}
       </Grid>
       <Grid xs>
-        {formData?.updated_at && formData?.id && (
+        {formData?.updated_at && id && (
           <ModTime time="updated" stats={stats} formData={formData} />
         )}
       </Grid>
@@ -270,7 +298,7 @@ const FormContainer = ({
           gap: 2,
         }}
       >
-        {formData?.id && deleteMutation && (
+        {id && deleteMutation && (
           <LoadingButton
             variant="outlined"
             color="inherit"
@@ -296,10 +324,10 @@ const FormContainer = ({
     </Footer>
   )
 
-  if (loading)
+  if (loadingFetch || !retrieveTime)
     return (
       <Box>
-        <Loading />
+        <Loading loading />
         {footer}
       </Box>
     )
