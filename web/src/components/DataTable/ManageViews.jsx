@@ -52,6 +52,7 @@ const FETCH_TABLE_VIEWS = gql`
     }
   }
 `
+// FIXME = type is hardcoded to arrests
 
 const ManageViews = ({ tableState, setTableState, defaultState }) => {
   const defaultView = useRef({
@@ -68,7 +69,13 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
   const confirm = useConfirm()
 
   const { refetch } = useQuery(FETCH_TABLE_VIEWS, {
-    onCompleted: ({ tableViews }) => setTableViews(tableViews),
+    onCompleted: ({ tableViews }) => {
+      setTableViews(tableViews)
+      if (currentView.id) {
+        const updated = tableViews.find((view) => view.id === currentView.id)
+        setCurrentView(updated)
+      }
+    },
   })
 
   const [deleteTableView] = useMutation(DELETE_TABLE_VIEW_MUTATION, {
@@ -109,12 +116,26 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
     }
   }
 
+  const replaceView = async () => {
+    await confirm({
+      title: `Are you sure you want to update the view "${currentView.name}" with your current table settings?`,
+    })
+    const view = await updateTableView({
+      variables: {
+        id: currentView.id,
+        input: {
+          state: JSON.stringify(tableState),
+        },
+      },
+    })
+  }
+
   const deleteView = async () => {
     await confirm({
-      title: `Are you sure you want to delete the view '${currentView.name}'?`,
+      title: `Are you sure you want to delete the view "${currentView.name}"?`,
     })
     deleteTableView({ variables: { id: currentView.id } })
-    setName('Default')
+    loadView({ target: { value: defaultView.current } })
   }
 
   const loadView = (event) => {
@@ -201,7 +222,7 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
         <ButtonGroup
           variant="outlined"
           size="small"
-          disabled={currentView?.name === 'Default'}
+          disabled={currentView?.name === 'Default' || !currentView?.name}
         >
           <TextField
             label="Load View"
@@ -232,6 +253,11 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
           <Button onClick={openEdit('rename')}>
             <Tooltip title="Rename Current View">
               <Edit />
+            </Tooltip>
+          </Button>
+          <Button onClick={() => replaceView()}>
+            <Tooltip title="Update Current View">
+              <Save />
             </Tooltip>
           </Button>
           <Button onClick={() => deleteView()}>

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import { Box, Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { difference, get, merge, sortBy } from 'lodash-es'
+import { cloneDeepWith, difference, get, merge, set, sortBy } from 'lodash-es'
 import {
   getDefaultColumnFilterFn,
   MaterialReactTable,
@@ -151,7 +151,7 @@ const ToolbarActions = ({
             }
             value = ''
           }
-          acc[header] = value === null ? '' : value
+          acc[header] = value === null || value === undefined ? '' : value
           return acc
         },
         {}
@@ -196,7 +196,7 @@ const ToolbarActions = ({
 }
 
 const DataTable = ({
-  data = [],
+  data: inputData = [],
   schema = {},
   displayColumns = [],
   tableProps = {},
@@ -234,6 +234,20 @@ const DataTable = ({
     ...postColumns,
   ]
   const columnsRef = useRef(columns)
+
+  const data = useMemo(() => {
+    const data = inputData.map((row) => {
+      const new_row = { id: row.id }
+      columns.forEach((col) => {
+        const value = get(row, col.accessorKey)
+        set(new_row, col.accessorKey, value === undefined ? null : value)
+      })
+      return new_row
+    })
+
+    return data
+  }, [inputData])
+
   const initialStateRef = useRef(
     merge(
       {
@@ -275,6 +289,7 @@ const DataTable = ({
       },
       []
     )
+
     setColumnFilters(state.columnFilters)
     setGlobalFilter(state.globalFilter)
     setColumnOrder(state.columnOrder)
@@ -349,6 +364,12 @@ const DataTable = ({
     onSortingChange: setSorting,
     onColumnOrderChange: setColumnOrder,
     onPaginationChange: setPagination,
+    muiFilterTextFieldProps: {
+      placeholder: '',
+    },
+    muiFilterCheckboxProps: {
+      title: '',
+    },
     muiTableBodyProps: {
       sx: {
         backgroundColor: '#fff',
@@ -361,9 +382,18 @@ const DataTable = ({
     muiSearchTextFieldProps: {
       placeholder: 'Search All Fields',
     },
+
     muiSkeletonProps: {
       animation: 'wave',
     },
+    muiTableHeadCellProps: {
+      sx: {
+        '.Mui-TableHeadCell-Content-Wrapper': {
+          whiteSpace: 'nowrap',
+        },
+      },
+    },
+
     renderTopToolbarCustomActions: ({ table }) => (
       <ToolbarActions
         table={table}
