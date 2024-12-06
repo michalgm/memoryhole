@@ -10,6 +10,7 @@ import {
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import { capitalize } from 'lodash-es'
+import { Controller } from 'react-hook-form'
 import {
   CheckboxElement,
   DatePickerElement,
@@ -44,6 +45,7 @@ export const BaseField = ({
   value,
   onChange,
   isRHF,
+  control,
   textFieldProps: defaultTextFieldProps,
   ...props
 }) => {
@@ -76,8 +78,8 @@ export const BaseField = ({
         ? DateTimePickerElement
         : DatePickerElement
       : field_type === 'date-time'
-        ? DateTimePicker
-        : DatePicker
+      ? DateTimePicker
+      : DatePicker
     const disabled = Boolean(props.disabled)
     delete props.disabled
     return (
@@ -125,9 +127,26 @@ export const BaseField = ({
       content: value,
       onChange,
     }
-    return (
-      <RichTextInput {...textFieldProps} {...textFieldOptions} {...props} />
+    const RichText = (extraProps) => (
+      <RichTextInput
+        {...textFieldProps}
+        {...textFieldOptions}
+        {...props}
+        {...extraProps}
+      />
     )
+    if (isRHF) {
+      return (
+        <Controller
+          name={name}
+          control={control}
+          render={({ field }) => (
+            <RichText content={field.value} onChange={field.onChange} />
+          )}
+        />
+      )
+    }
+    return RichText
   }
 
   const renderTextField = () => {

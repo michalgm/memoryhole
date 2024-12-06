@@ -29,17 +29,18 @@ import {
 } from 'mui-tiptap'
 
 const RichTextInput = (props) => {
-  const { content, onChange, editable = true } = props
+  const { content, onChange, editable = true, disabled = false } = props
   const rteRef = useRef(null)
   const Component = editable ? RichTextEditor : RichTextReadOnly
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth disabled={disabled}>
       <InputLabel
         sx={{
           backgroundColor: 'white',
           zIndex: 10,
           px: 0.5,
         }}
+        shrink
       >
         {props.label}
       </InputLabel>
@@ -69,28 +70,31 @@ const RichTextInput = (props) => {
           onUpdate={({ editor }) => {
             onChange(editor.getHTML())
           }}
+          editable={!disabled}
           // Optionally include `renderControls` for a menu-bar atop the editor:
-          renderControls={() => (
-            <MenuControlsContainer>
-              <MenuSelectHeading />
-              <MenuDivider />
-              <MenuButtonBold />
-              <MenuButtonItalic />
-              <MenuButtonUnderline />
-              <MenuDivider />
-              <MenuButtonAlignLeft />
-              <MenuButtonAlignCenter />
-              <MenuButtonAlignRight />
-              <MenuDivider />
-              <MenuButtonEditLink />
-              <MenuDivider />
-              <MenuButtonBulletedList />
-              <MenuButtonOrderedList />
-              <MenuButtonTaskList />
-              <MenuDivider />
-              <MenuButtonHorizontalRule />
-            </MenuControlsContainer>
-          )}
+          renderControls={() =>
+            !disabled && (
+              <MenuControlsContainer>
+                <MenuSelectHeading />
+                <MenuDivider />
+                <MenuButtonBold />
+                <MenuButtonItalic />
+                <MenuButtonUnderline />
+                <MenuDivider />
+                <MenuButtonAlignLeft />
+                <MenuButtonAlignCenter />
+                <MenuButtonAlignRight />
+                <MenuDivider />
+                <MenuButtonEditLink />
+                <MenuDivider />
+                <MenuButtonBulletedList />
+                <MenuButtonOrderedList />
+                <MenuButtonTaskList />
+                <MenuDivider />
+                <MenuButtonHorizontalRule />
+              </MenuControlsContainer>
+            )
+          }
         >
           {() => (
             <>

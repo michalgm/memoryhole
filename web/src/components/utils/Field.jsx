@@ -3,12 +3,14 @@ import { useFormContext } from 'react-hook-form-mui'
 import { BaseField } from './BaseField'
 
 export const Field = (props) => {
-  const { setValue, getValues, ...context } = useFormContext()
+  const context = useFormContext()
+  const { setValue, getValues, control } = useFormContext()
 
   return (
     <BaseField
       {...props}
       value={getValues(props.name)}
+      control={control}
       isRHF
       onChange={(...args) => {
         const inputType = args[0]?.target?.type
@@ -26,7 +28,7 @@ export const Field = (props) => {
         }
 
         if (props.onChange) {
-          props.onChange(value, { setValue, getValues, ...context })
+          props.onChange(value, context)
         }
         setValue(props.name, value)
       }}
