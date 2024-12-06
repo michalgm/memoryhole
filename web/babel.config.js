@@ -10,6 +10,8 @@ const plugins = [
       },
     },
   ],
+  'babel-plugin-transform-vite-meta-env',
+  '@babel/plugin-proposal-class-properties'
 ]
 
 module.exports = {
