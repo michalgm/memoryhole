@@ -2,15 +2,15 @@ import { flatMap, get, reduce, set } from 'lodash-es'
 
 import dayjs from '../../../api/src/lib/day'
 
+const dateTransformer = (value) => {
+  if (!value) return null
+  const date = dayjs(value)
+  return date.isValid() ? date : null
+}
+
 const transformers = {
-  date: (value) => {
-    const date = dayjs(value)
-    return date.isValid() ? date : null
-  },
-  'date-time': (value) => {
-    const dateTime = dayjs(value)
-    return dateTime.isValid() ? dateTime : null
-  },
+  date: dateTransformer,
+  'date-time': dateTransformer,
 }
 
 export const transformData = (data, fields) => {
@@ -25,13 +25,11 @@ export const transformData = (data, fields) => {
         if ((value === undefined || value == null) && params.default) {
           value = params.default
         }
-        if (value !== undefined && value !== null) {
-          const transformer = transformers[params.field_type]
-          if (transformer) {
-            value = transformer(value)
-          }
-          set(result, path, value)
+        const transformer = transformers[params.field_type]
+        if (transformer) {
+          value = transformer(value)
         }
+        set(result, path, value)
         return result
       },
       {}
