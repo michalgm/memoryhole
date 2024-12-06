@@ -1,5 +1,4 @@
-import { useMemo, useState, useEffect, useCallback } from 'react'
-import { memo } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
 import {
@@ -71,6 +70,9 @@ const Autocomplete = ({
   const displayError = useDisplayError()
   const [options, setOptions] = useState(() => {
     if (currentValue && !staticOptions) {
+      if (props.multiple && Array.isArray(currentValue)) {
+        return currentValue
+      }
       return [
         {
           ...(currentValue.id ? currentValue : { id: currentValue }),
