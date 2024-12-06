@@ -2,7 +2,7 @@ import { render } from '@redwoodjs/testing/web'
 
 import AppProvider from 'src/lib/AppContext'
 
-import ArrestsPage from '.'
+import ArrestsPage from './ArrestsPage'
 jest.mock('@redwoodjs/router', () => ({
   ...jest.requireActual('@redwoodjs/router'),
   routes: {

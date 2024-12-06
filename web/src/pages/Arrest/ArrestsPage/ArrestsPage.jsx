@@ -1,7 +1,7 @@
 import ArrestsCell from 'src/components/ArrestsCell/ArrestsCell'
 import { useApp } from 'src/lib/AppContext'
 
-const HomePage = () => {
+const ArrestsPage = () => {
   const { currentAction } = useApp()
   const filters = []
   if (currentAction?.id && currentAction.id !== -1) {
@@ -18,4 +18,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage
+export default ArrestsPage
