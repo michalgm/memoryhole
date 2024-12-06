@@ -71,6 +71,11 @@ const RichTextInput = (props) => {
             onChange(editor.getHTML())
           }}
           editable={!disabled}
+          editorProps={{
+            attributes: {
+              tabindex: props?.inputProps?.tabIndex,
+            },
+          }}
           // Optionally include `renderControls` for a menu-bar atop the editor:
           renderControls={() =>
             !disabled && (
