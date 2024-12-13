@@ -38,6 +38,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { alpha, Stack, styled, useMediaQuery } from '@mui/system'
 import dayjs from 'dayjs'
+import { useConfirm } from 'material-ui-confirm'
 
 import { Link, routes, useMatch, useRouteName } from '@redwoodjs/router'
 
@@ -211,6 +212,7 @@ const Main = styled('main', {
 const NavDrawer = ({ navOpen }) => {
   const { currentUser, logOut } = useAuth()
   const [expires, setExpires] = useState({})
+  const confirm = useConfirm()
 
   const pages = [
     ['arrests', 'Arrests', <People key="arrests" />],
@@ -280,8 +282,16 @@ const NavDrawer = ({ navOpen }) => {
         >
           <span>
             <NavMenuItem
-              onClick={() => logOut()}
-              label="Logout"
+              onClick={async () => {
+                await confirm({
+                  title: 'Are you sure you want to sign out?',
+                  confirmationText: 'Sign out',
+                })
+                if (confirm) {
+                  logOut()
+                }
+              }}
+              label="Sign out"
               Icon={LogoutIcon}
             />
           </span>
