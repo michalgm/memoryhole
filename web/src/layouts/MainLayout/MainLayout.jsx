@@ -333,13 +333,12 @@ const NavMenuItem = ({ route, label, Icon, ...props }) => {
   )
 }
 
-const MainLayout = ({ children }) => {
+const Layout = ({ children }) => {
   const routeName = useRouteName()
-  const [logsOpen, setLogsOpen] = useState(false)
-  const [navOpen, setNavOpen] = useState(true)
+  const { logsOpen, setLogsOpen, navOpen, setNavOpen } = useApp()
 
   return (
-    <AppProvider>
+    <>
       <NavBar
         navOpen={navOpen}
         setNavOpen={setNavOpen}
@@ -365,6 +364,14 @@ const MainLayout = ({ children }) => {
           width={DRAWER_WIDTH}
         />
       </Box>
+    </>
+  )
+}
+
+const MainLayout = ({ children }) => {
+  return (
+    <AppProvider>
+      <Layout>{children}</Layout>
     </AppProvider>
   )
 }

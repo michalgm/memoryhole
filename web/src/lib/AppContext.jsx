@@ -13,6 +13,8 @@ const AppProvider = ({ children }) => {
   })
   const [userPreferences, setUserPreferences] = useState({})
   const [pageTitle, setPageTitle] = useState('')
+  const [navOpen, setNavOpen] = useState(true)
+  const [logsOpen, setLogsOpen] = useState(false)
   const { id } = useParams() // Get the current location
 
   useEffect(() => {
@@ -32,6 +34,10 @@ const AppProvider = ({ children }) => {
     setUserPreferences,
     pageTitle,
     setPageTitle,
+    navOpen,
+    setNavOpen,
+    logsOpen,
+    setLogsOpen,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
