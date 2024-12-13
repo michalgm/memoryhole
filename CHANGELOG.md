@@ -1,5 +1,7 @@
 
 
+## [0.4.1](https://github.com/michalgm/memoryhole/compare/v0.4.0...v0.4.1) (2024-12-13)
+
 ## [0.4.0](https://github.com/michalgm/memoryhole/compare/v0.3.0...v0.4.0) (2024-12-13)
 
 ### Features
