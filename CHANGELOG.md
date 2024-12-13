@@ -1,5 +1,25 @@
 
 
+## [0.4.0](https://github.com/michalgm/memoryhole/compare/v0.3.0...v0.4.0) (2024-12-13)
+
+### Features
+
+* **DataTable:** Add UI to update views, fix some table bugs ([d86b608](https://github.com/michalgm/memoryhole/commit/d86b608b2e0bec65d7785fae22e09299c1d496a8))
+* **Form:** Add Action, User, and Arrest autocomplete fields ([be8e869](https://github.com/michalgm/memoryhole/commit/be8e869a86b85c307d39fc322b7cd7c5db464bdd))
+* **UI:** Add Logs management ([5fc4aab](https://github.com/michalgm/memoryhole/commit/5fc4aabb4d772702b6db7c2e0c006141b8e961d0))
+
+### Bug Fixes
+
+* **Form:** base stale data check on updated_at, not created_at ([62cf77b](https://github.com/michalgm/memoryhole/commit/62cf77ba899f27b5b2f180bdbab9fd85f040fc1f))
+* **Form:** fix richtextfield not setting dirty ([c640e9d](https://github.com/michalgm/memoryhole/commit/c640e9d5102c726fbb50a5fb494087c6ec3d85ef))
+* **Form:** fix tabindex on richtext ([83b01be](https://github.com/michalgm/memoryhole/commit/83b01bed695ef655ee71eacb65867ec0dfbfd415))
+* **Form:** handle default value on multilple autocomplete ([c524875](https://github.com/michalgm/memoryhole/commit/c524875fb80f56cd3ebe5deee039c4882ad41ab0))
+* **Form:** Improve form default behavior ([8d0d734](https://github.com/michalgm/memoryhole/commit/8d0d734e1e710516b57b28e3b781d58da594533e))
+* **Form:** Refactor form to be more stable ([235d913](https://github.com/michalgm/memoryhole/commit/235d913bd086960404cf99bab195a5e86ce5000e))
+* **Form:** transform fixes for form ([2b84e1c](https://github.com/michalgm/memoryhole/commit/2b84e1ca5a9a8a8ae616989dc07f1d386f311b43))
+* **UI:** fix loading component ([a7ef430](https://github.com/michalgm/memoryhole/commit/a7ef4304d8d0af60c5ac2378c8f871cfcecf7778))
+* **UI:** handle missing display_field ([b7f7f0b](https://github.com/michalgm/memoryhole/commit/b7f7f0b9ac05edccb9f30577062949b467e5527a))
+
 ## [0.3.0](https://github.com/michalgm/memoryhole/compare/v0.2.0...v0.3.0) (2024-11-29)
 
 ### Features
