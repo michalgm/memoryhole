@@ -158,6 +158,7 @@ const Autocomplete = ({
   }
   delete autocompleteProps.inputProps
   delete autocompleteProps.helperText
+
   if (isRHF) {
     return (
       <AutocompleteElement
@@ -172,7 +173,6 @@ const Autocomplete = ({
       />
     )
   }
-
   return (
     <MUIAutocomplete
       name={name}

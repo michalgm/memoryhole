@@ -7,38 +7,31 @@ import dayjs from '../../../../api/src/lib/day'
 import Autocomplete from './Autocomplete'
 
 const autocompleteProps = {
-  getOptionLabel: (option) => {
-    return option.name
-  },
-  renderOption: ({ key, ...props }, option) => {
-    const date = option.start_date && dayjs(option.start_date).format('L LT')
-    const location = option.city || option.jurisdiction
+  getOptionLabel: (option) => option?.arrestee?.search_display_field || '',
+  renderOption: (
+    props,
+    { id, arrestee: { search_display_field }, date, arrest_city }
+  ) => {
+    const subtitle = `${date ? dayjs(date).format('L') : ''}${
+      date && arrest_city ? ' - ' : ''
+    }${arrest_city ? arrest_city : ''}`
     return (
-      <li key={key} {...props}>
-        <ListItemText
-          primary={option.name}
-          secondary={
-            <>
-              {date}
-              {date && location && <br />}
-              {location}
-            </>
-          }
-        />
+      <li {...props} key={id}>
+        <ListItemText primary={search_display_field} secondary={subtitle} />
       </li>
     )
   },
 }
 
 const query = {
-  model: 'action',
+  model: 'arrest',
   orderBy: {
-    start_date: 'desc',
+    updated_at: 'desc',
   },
-  searchField: 'name',
+  take: 10,
 }
 
-const ActionChooser = ({
+const ArrestChooser = ({
   name,
   helperText,
   isRHF,
@@ -50,6 +43,7 @@ const ActionChooser = ({
   return (
     <Autocomplete
       name={name}
+      model="arrest"
       label={props.label}
       helperText={helperText}
       query={query}
@@ -64,4 +58,4 @@ const ActionChooser = ({
   )
 }
 
-export default ActionChooser
+export default ArrestChooser

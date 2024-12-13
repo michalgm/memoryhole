@@ -20,7 +20,9 @@ import {
 } from 'react-hook-form-mui'
 
 import ActionChooser from '../Autocomplete/ActionChooser'
+import ArrestChooser from '../Autocomplete/ArrestChooser'
 import Autocomplete from '../Autocomplete/Autocomplete'
+import UserChooser from '../Autocomplete/UserChooser'
 
 import RichTextInput from './RichTextInput'
 
@@ -98,7 +100,7 @@ export const BaseField = ({
     )
   }
 
-  const renderAutocomplete = () => {
+  const renderAutocomplete = (extraProps = {}) => {
     const options = defaultOptions
       ? [...(defaultOptions || [])].map((opt) =>
           opt.label ? opt : { id: opt, label: opt }
@@ -115,6 +117,27 @@ export const BaseField = ({
         isRHF={isRHF}
         onChange={onChange}
         value={value}
+        {...props}
+        {...extraProps}
+      />
+    )
+  }
+
+  const renderChooser = () => {
+    const components = {
+      action_chooser: ActionChooser,
+      arrest_chooser: ArrestChooser,
+      user_chooser: UserChooser,
+    }
+    const Component = components[field_type] || Autocomplete
+    return (
+      <Component
+        name={name}
+        helperText={helperText}
+        isRHF={isRHF}
+        onChange={onChange}
+        value={value}
+        textFieldProps={textFieldProps}
         {...props}
       />
     )
@@ -162,20 +185,6 @@ export const BaseField = ({
         {...textFieldOptions}
         {...props}
         onChange={onChange}
-      />
-    )
-  }
-
-  const renderActionChooser = () => {
-    return (
-      <ActionChooser
-        name={name}
-        helperText={helperText}
-        isRHF={isRHF}
-        onChange={onChange}
-        value={value}
-        textFieldProps={textFieldProps}
-        {...props}
       />
     )
   }
@@ -260,10 +269,12 @@ export const BaseField = ({
       return renderAutocomplete()
     case 'richtext':
       return renderRichTextField()
-    case 'action_chooser':
-      return renderActionChooser()
     case 'autocomplete':
       return renderAutocomplete()
+    case 'action_chooser':
+    case 'arrest_chooser':
+    case 'user_chooser':
+      return renderChooser()
     case 'textarea':
     default:
       return renderTextField()
