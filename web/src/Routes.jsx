@@ -19,7 +19,8 @@ import ModelLayout from './layouts/ModelLayout/ModelLayout'
 const Routes = () => {
   return (
     <Router useAuth={useAuth}>
-      <Route path="/login" page={LoginPage} name="login" />
+      <Route path="/login" redirect="/sign-in" />
+      <Route path="/sign-in" page={LoginPage} name="login" />
       <Route path="/forgot-password" page={ForgotPasswordPage} name="forgotPassword" />
       <Route path="/reset-password" page={ResetPasswordPage} name="resetPassword" />
       <PrivateSet unauthenticated="login">

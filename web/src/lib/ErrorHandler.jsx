@@ -17,11 +17,11 @@ const checkAuthExpired = ({ graphQLErrors, networkError }) => {
       location.pathname + encodeURIComponent(location.search)
     const params = new URLSearchParams(location.search)
 
-    if (currentLocation.startsWith('/login') || params.get('redirectTo')) {
+    if (currentLocation.startsWith('/sign-in') || params.get('redirectTo')) {
       return
     }
     globalDisplayError('Your session has expired. Please log in again.')
-    navigate(`/login?redirectTo=${currentLocation}`)
+    navigate(`/sign-in?redirectTo=${currentLocation}`)
     return true
   }
 }
