@@ -19,3 +19,7 @@
   # open = true
 [notifications]
   versionUpdates = ["latest"]
+[studio.graphiql.authImpersonation]
+  authProvider = "dbAuth"
+  email = "greg@primate.net"
+  userId = "1"
