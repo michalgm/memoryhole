@@ -6,6 +6,7 @@ const config = {
   transformIgnorePatterns: [
     '/node_modules/(?!(@mui|lodash-es|export-to-csv|material-ui-confirm))',
   ],
+  setupFilesAfterEnv: ['<rootDir>/web/src/setupTests.js'],
   moduleNameMapper: {
     'material-ui-confirm':
       'material-ui-confirm/dist/material-ui-confirm.esm.js',

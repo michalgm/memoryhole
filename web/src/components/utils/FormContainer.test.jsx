@@ -150,7 +150,7 @@ const entity = {
 
 // Display configuration
 const displayConfig = {
-  type: 'User',
+  type: 'Arrest',
   namePath: 'arrestee.first_name',
 }
 
@@ -306,7 +306,7 @@ test('submits only changed fields', async () => {
   expect(nameField).toHaveValue('Jane')
 
   await waitFor(() =>
-    user.click(screen.getByRole('button', { name: /save user/i }))
+    user.click(screen.getByRole('button', { name: /save arrest/i }))
   )
 
   const expectedInput = {
@@ -375,7 +375,7 @@ test('prevents submission if record has been updated by another user', async () 
 
   // Submit the form
   await waitFor(() =>
-    userEvent.click(screen.getByRole('button', { name: /save user/i }))
+    userEvent.click(screen.getByRole('button', { name: /save arrest/i }))
   )
 
   await waitFor(() =>
@@ -498,7 +498,7 @@ test('does not warn on nav from new entry', async () => {
   expect(dialog).not.toBeInTheDocument()
 
   await waitFor(async () => {
-    await user.click(screen.getByRole('button', { name: /save user/i }))
+    await user.click(screen.getByRole('button', { name: /save arrest/i }))
   })
   expect(
     await screen.queryByText(/are you sure/i, {
@@ -547,14 +547,14 @@ test('shows confirmation dialog when deleting entity', async () => {
   )
 
   await waitFor(async () => {
-    const button = await screen.findByRole('button', { name: /delete user/i })
+    const button = await screen.findByRole('button', { name: /delete arrest/i })
     expect(button).toBeInTheDocument()
     await user.click(button)
     expect(button).toBeInTheDocument()
   })
   await waitFor(async () => {
     expect(
-      await screen.findByText(/Are you sure you want to delete the user/i, {
+      await screen.findByText(/Are you sure you want to delete the arrest/i, {
         selector: '.MuiTypography-root',
       })
     ).toBeInTheDocument()
@@ -601,7 +601,7 @@ test('shows validation errors for invalid fields', async () => {
 
   // Submit the form
   await waitFor(async () => {
-    await user.click(screen.getByRole('button', { name: /save user/i }))
+    await user.click(screen.getByRole('button', { name: /save arrest/i }))
   })
   await waitFor(async () => {})
   expect(
@@ -618,7 +618,7 @@ test('shows validation errors for invalid fields', async () => {
 
   // Submit the form again
   await waitFor(() =>
-    user.click(screen.getByRole('button', { name: /save user/i }))
+    user.click(screen.getByRole('button', { name: /save arrest/i }))
   )
 
   // Expect an email validation error message
@@ -689,7 +689,7 @@ test('resets form state after successful save', async () => {
 
   // Save the form
   await waitFor(() =>
-    user.click(screen.getByRole('button', { name: /save user/i }))
+    user.click(screen.getByRole('button', { name: /save arrest/i }))
   )
 
   const expectedInput = {

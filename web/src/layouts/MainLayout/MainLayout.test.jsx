@@ -1,3 +1,6 @@
+import { ThemeProvider } from '@mui/material'
+import { createTheme } from '@mui/material/styles'
+
 import { RouterContextProvider } from '@redwoodjs/router/dist/router-context'
 import { render } from '@redwoodjs/testing/web'
 
@@ -6,6 +9,7 @@ import AppProvider from 'src/lib/AppContext'
 
 import MainLayout from './MainLayout'
 
+const theme = createTheme()
 jest.mock('@redwoodjs/router', () => ({
   ...jest.requireActual('@redwoodjs/router'),
   routes: {
@@ -28,9 +32,11 @@ describe('MainLayout', () => {
       render(
         <AppProvider>
           <SnackBarProvider>
-            <RouterContextProvider>
-              <MainLayout />
-            </RouterContextProvider>
+            <ThemeProvider theme={theme}>
+              <RouterContextProvider>
+                <MainLayout />
+              </RouterContextProvider>
+            </ThemeProvider>
           </SnackBarProvider>
         </AppProvider>
       )

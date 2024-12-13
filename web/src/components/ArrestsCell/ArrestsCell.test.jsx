@@ -18,6 +18,22 @@ jest.mock('@redwoodjs/router', () => ({
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('ArrestsCell', () => {
+  mockGraphQLQuery('FindTableViews', () => {
+    return {
+      tableViews: [
+        {
+          id: '1',
+          name: 'Test View',
+          updated_by_id: 1,
+          updated_at: '2023-11-10T12:00:00Z',
+          created_at: '2023-11-10T12:00:00Z',
+          created_by_id: 1,
+          state: '',
+          type: 'table',
+        },
+      ],
+    }
+  })
   it('renders Loading successfully', () => {
     expect(() => {
       render(<Loading />)
