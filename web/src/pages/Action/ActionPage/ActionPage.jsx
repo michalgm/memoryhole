@@ -66,12 +66,15 @@ const ActionPage = ({ id }) => {
     return input
   }
 
-  const onFetch = useCallback((action) => {
-    if (action?.name) {
-      setPageTitle(action?.name)
-    }
-    return action
-  }, [])
+  const onFetch = useCallback(
+    (action) => {
+      if (action?.name) {
+        setPageTitle(action?.name)
+      }
+      return action
+    },
+    [setPageTitle]
+  )
 
   const onDelete = useCallback(() => navigate(routes.actions()), [])
 

@@ -100,7 +100,7 @@ const components = {
   hr: () => <Divider sx={{ my: 2 }} />,
   nav: ({ children }) => (
     <nav>
-      <Accordion sx={{ mt: 2, bgcolor: '#f6f6f6' }} defaultExpanded>
+      <Accordion sx={{ mt: 2, bgcolor: 'divider' }} defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography variant="h2">Table of Contents</Typography>
         </AccordionSummary>

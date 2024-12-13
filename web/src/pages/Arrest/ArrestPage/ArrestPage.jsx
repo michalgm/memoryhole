@@ -2,7 +2,6 @@ import { useCallback } from 'react'
 
 import { navigate, routes } from '@redwoodjs/router'
 
-import ArresteeLogsDrawer from 'src/components/ArresteeLogs/ArresteeLogsDrawer'
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
 import ArrestFields from 'src/lib/FieldSchemas'
@@ -149,7 +148,13 @@ const ArrestPage = ({ id }) => {
   const onFetch = useCallback(
     (arrest) => {
       setPageTitle(isCreate ? 'New Arrest' : arrest?.arrestee?.display_field)
-      if (isCreate && currentAction && arrest && !arrest?.action) {
+      if (
+        isCreate &&
+        currentAction &&
+        arrest &&
+        !arrest?.action &&
+        currentAction.id !== -1
+      ) {
         arrest.action = currentAction
         applyActionDefaults(currentAction, arrest)
       }
@@ -181,7 +186,6 @@ const ArrestPage = ({ id }) => {
         onCreate={onCreate}
         onFetch={onFetch}
       />
-      {!isCreate && <ArresteeLogsDrawer arrestee_id={id} />}
     </>
   )
 }

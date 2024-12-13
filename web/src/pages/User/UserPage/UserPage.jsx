@@ -87,34 +87,31 @@ const restrictionDefaults = {
   },
 }
 
+const applyDateOperation = (date, [operation, amount, unit, modifier = '']) => {
+  date = date[operation](amount, unit)
+  if (modifier) {
+    date = date[modifier]('day')
+  }
+  return date
+}
+
+const applyDefaults = (role, target) => {
+  const defaults = restrictionDefaults[role === 'Admin' ? 'Admin' : 'default']
+  Object.entries(defaults).forEach(([field, operations]) => {
+    const value = applyDateOperation(dayjs(), operations)
+    if (target.setValue) {
+      target.setValue(field, value)
+    } else {
+      target[field] = value
+    }
+  })
+}
+
 const UserPage = ({ id }) => {
   const { setPageTitle } = useApp()
   const { currentUser } = useAuth()
 
   const isCreate = !id || id === 'new'
-
-  const applyDateOperation = (
-    date,
-    [operation, amount, unit, modifier = '']
-  ) => {
-    date = date[operation](amount, unit)
-    if (modifier) {
-      date = date[modifier]('day')
-    }
-    return date
-  }
-
-  const applyDefaults = (role, target) => {
-    const defaults = restrictionDefaults[role === 'Admin' ? 'Admin' : 'default']
-    Object.entries(defaults).forEach(([field, operations]) => {
-      const value = applyDateOperation(dayjs(), operations)
-      if (target.setValue) {
-        target.setValue(field, value)
-      } else {
-        target[field] = value
-      }
-    })
-  }
 
   const formatDefaultValue = ([operator, amount, unit]) =>
     `${operator == 'add' ? '+' : '-'}${amount} ${pluralize(unit, amount)}`
@@ -165,14 +162,17 @@ const UserPage = ({ id }) => {
     })
   })
 
-  const onFetch = useCallback((user) => {
-    setPageTitle(isCreate ? 'New User' : user?.name)
-    if (isCreate) {
-      user.role = 'User'
-      applyDefaults(user.role, user)
-    }
-    return user
-  }, [])
+  const onFetch = useCallback(
+    (user) => {
+      setPageTitle(isCreate ? 'New User' : user?.name)
+      if (isCreate) {
+        user.role = 'User'
+        applyDefaults(user.role, user)
+      }
+      return user
+    },
+    [setPageTitle, isCreate]
+  )
 
   const onDelete = useCallback(() => {
     navigate(routes.users())
