@@ -34,7 +34,6 @@ const Routes = () => {
             <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
             <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
             <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
-            {/* <Route path="/admin/users/{id:Int}" page={UserPage} name="user" /> */}
             <Set wrap={ScaffoldLayout} title="TableViews" titleTo="tableViews" buttonLabel="New TableView" buttonTo="newTableView">
               <Route path="/table-views/new" page={TableViewNewTableViewPage} name="newTableView" />
               <Route path="/table-views/{id:Int}/edit" page={TableViewEditTableViewPage} name="editTableView" />
@@ -52,12 +51,6 @@ const Routes = () => {
               <Route path="/admin/custom-schemata/{id:Int}" page={CustomSchemaCustomSchemaPage} name="customSchema" />
               <Route path="/admin/custom-schemata" page={CustomSchemaCustomSchemataPage} name="customSchemata" />
             </Set>
-            <Set wrap={ScaffoldLayout} title="Logs" titleTo="logs" buttonLabel="New Log" buttonTo="newLog">
-              <Route path="/admin/logs/new" page={LogNewLogPage} name="newLog" />
-              <Route path="/admin/logs/{id:Int}/edit" page={LogEditLogPage} name="editLog" />
-              <Route path="/admin/logs/{id:Int}" page={LogLogPage} name="log" />
-              <Route path="/admin/logs" page={LogLogsPage} name="logs" />
-            </Set>
             <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
               <Route path="/admin/actions/new" page={ActionActionPage} name="newAdminAction" />
               <Route path="/admin/actions/{id:Int}" page={ActionActionPage} name="AdminAction" />
@@ -68,7 +61,7 @@ const Routes = () => {
             <Route path="/arrests/new" page={ArrestArrestPage} name="newArrest" />
             <Route path="/arrests/{id:Int}" page={ArrestArrestPage} name="arrest" />
             <Route path="/arrests" page={ArrestArrestsPage} name="arrests" />
-            <Route path="/" page={ArrestArrestsPage} name="home" />
+            <Route path="/" redirect="arrests" name="home" />
           </Set>
           <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" />
           <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
@@ -78,6 +71,9 @@ const Routes = () => {
           </Set>
           <Route path="/docs" page={DocumentationPage} name="docsHome" />
           <Route path="/docs/{page:String}" page={DocumentationPage} name="docs" />
+          <Set wrap={ModelLayout} title="Logs" titleTo="logs" buttonLabel="New Log" buttonTo="logs" buttonParams={{ new: true }}>
+            <Route path="/logs" page={LogLogsPage} name="logs" />
+          </Set>
         </Set>
       </PrivateSet>
       <Route notfound page={NotFoundPage} />

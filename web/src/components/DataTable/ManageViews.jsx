@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 
+import { useTheme } from '@emotion/react'
 import { Add, Delete, Edit, Save } from '@mui/icons-material'
 import {
   Button,
@@ -67,6 +68,9 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [editType, setEditType] = useState(null)
   const confirm = useConfirm()
+  const theme = useTheme()
+
+  const contrast = theme?.palette?.contrast ? 'contrast' : 'primary'
 
   const { refetch } = useQuery(FETCH_TABLE_VIEWS, {
     onCompleted: ({ tableViews }) => {
@@ -120,7 +124,7 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
     await confirm({
       title: `Are you sure you want to update the view "${currentView.name}" with your current table settings?`,
     })
-    const view = await updateTableView({
+    await updateTableView({
       variables: {
         id: currentView.id,
         input: {
@@ -177,6 +181,7 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
             type="button"
             variant="outlined"
             size="small"
+            color={contrast}
             onClick={(event) => openEdit('create')(event)}
             sx={{ minWidth: 40, marginRight: 1 }}
           >
@@ -222,6 +227,7 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
         <ButtonGroup
           variant="outlined"
           size="small"
+          color={contrast}
           disabled={currentView?.name === 'Default' || !currentView?.name}
         >
           <TextField

@@ -51,7 +51,6 @@ model Arrestee {
   arrests        Arrest[]
   created_by     User?     @relation("CreatedArrestee", fields: [created_by_id], references: [id])
   updated_by     User?     @relation("ModifiedArrestee", fields: [updated_by_id], references: [id])
-  arrestee_logs  Log[]
 
   @@index([search_field])
 }
@@ -73,14 +72,15 @@ model Log {
   notes          String?
   needs_followup Boolean   @default(false)
   custom_fields  Json?
-  arrestee_id    Int?
   created_at     DateTime? @default(now())
   created_by_id  Int?
   updated_at     DateTime? @updatedAt
   updated_by_id  Int?
-  arrestee       Arrestee? @relation(fields: [arrestee_id], references: [id])
   created_by     User?     @relation("CreatedLog", fields: [created_by_id], references: [id])
   updated_by     User?     @relation("ModifiedLog", fields: [updated_by_id], references: [id])
+  arrests        Arrest[]
+  action         Action?   @relation(fields: [action_id], references: [id])
+  action_id      Int?
 }
 
 model HotlineLog {
@@ -120,6 +120,7 @@ model Arrest {
   updated_by      User?     @relation("ModifiedArrest", fields: [updated_by_id], references: [id])
   action_id       Int?
   action          Action?   @relation(fields: [action_id], references: [id])
+  logs            Log[]
 
   @@index([search_field])
 }
@@ -145,8 +146,8 @@ model User {
   updated_custom_schemas CustomSchema[]
   created_hotline_logs   HotlineLog[]   @relation("CreatedHotlineLog")
   updated_hotline_logs   HotlineLog[]   @relation("ModifiedHotlineLog")
-  created_arrestee_logs  Log[]          @relation("CreatedLog")
-  updated_arrestee_logs  Log[]          @relation("ModifiedLog")
+  created_logs           Log[]          @relation("CreatedLog")
+  updated_logs           Log[]          @relation("ModifiedLog")
   created_table_views    TableView[]    @relation("CreatedTableView")
   updated_table_views    TableView[]    @relation("ModifiedTableView")
 }
@@ -174,4 +175,5 @@ model Action {
   city          String?
   custom_fields Json?
   Arrest        Arrest[]
+  Log           Log[]
 }

@@ -1,64 +1,87 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { Error, Flag, Help, Person } from '@mui/icons-material'
-import { Container, IconButton, InputAdornment, Tooltip } from '@mui/material'
+import { useTheme } from '@emotion/react'
+import {
+  ChevronLeft,
+  ChevronLeftOutlined,
+  ChevronRight,
+  EditNote,
+  Error,
+  Flag,
+  Help,
+  Logout,
+  ManageAccounts,
+  Menu,
+  MenuOpen,
+  Notes,
+  People,
+  Person,
+} from '@mui/icons-material'
+import {
+  Container,
+  Divider,
+  Drawer,
+  IconButton,
+  InputAdornment,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  SvgIcon,
+  Tooltip,
+} from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { Stack } from '@mui/system'
+import { alpha, Stack, styled, useMediaQuery } from '@mui/system'
 import dayjs from 'dayjs'
 
 import { Link, routes, useMatch, useRouteName } from '@redwoodjs/router'
 
-import { theme } from 'src/App'
 import { useAuth } from 'src/auth'
-// import ArresteeLogsDrawer from 'src/components/ArresteeLogs/ArresteeLogsDrawer'
+import LogsDrawer from 'src/components/Logs/LogsDrawer'
 import { BaseField } from 'src/components/utils/BaseField'
 import QuickSearch from 'src/components/utils/QuickSearch'
 import AppProvider, { defaultAction, useApp } from 'src/lib/AppContext'
 
-const NavLink = ({ to, ...rest }) => {
-  const matchInfo = useMatch(to, { matchSubPaths: true })
-  const isActive = matchInfo.match
-
-  const underline = {
-    textDecoration: 'underline',
-    textDecorationColor: theme.palette.secondary.main,
-    textDecorationThickness: 3,
-  }
-
-  const props = {
-    color: 'inherit',
-    sx: {
-      '&:hover': underline,
-      ...(isActive && underline),
-    },
-  }
-
-  return <Button component={Link} to={to} {...rest} {...props} />
-}
+const DRAWER_WIDTH = 450
+const LEFT_DRAWER_WIDTH = 150
+const LEFT_DRAWER_WIDTH_SMALL = 64
 
 const textFieldProps = {
   variant: 'standard',
   InputProps: {
-    // sx: {
-    //   minWidth: 200,
-    // },
+    sx: {
+      color: 'contrast.main',
+      '& .MuiButtonBase-root': {
+        color: 'inherit',
+        '.MuiSvgIcon-root': {
+          color: 'inherit',
+        },
+      },
+    },
+
     disableUnderline: true,
     startAdornment: (
-      <InputAdornment position="start">
-        <Flag />
+      <InputAdornment
+        sx={{
+          color: 'inherit',
+        }}
+        position="start"
+      >
+        <Flag color="blue" />
       </InputAdornment>
     ),
   },
   sx: {
     borderRadius: 1,
-    backgroundColor: 'primary.light',
-    input: { color: '#fff' }, // Text color for readability
+    backgroundColor: (theme) => alpha(theme.palette.common.white, 0.2), //'primary.light',
+    // input: { color: 'contrast.main' }, // Text color for readability
     '& .MuiSvgIcon-root, & .MuiCircularProgress-root ': {
-      color: '#fff !important',
+      color: 'text.primary !important',
     },
     '& .MuiInputBase-input': {
       border: 'none',
@@ -69,35 +92,136 @@ const textFieldProps = {
         border: 'none',
       },
       '&:hover fieldset': {
-        borderColor: '#ffffff', // Border color on hover
+        borderColor: 'text.primary', // Border color on hover
         border: 'none',
       },
       '&.Mui-focused fieldset': {
-        borderColor: '#ffffff', // Border color when focused
+        borderColor: 'text.primary', // Border color when focused
         border: 'none',
       },
     },
   },
 }
 
-const NavBar = () => {
-  const { currentUser, logOut } = useAuth()
+const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen }) => {
   const { currentAction, setCurrentAction } = useApp()
-  const [expires, setExpires] = useState({})
-
-  const pages = [
-    ['home', 'Arrests'],
-    ['actions', 'Actions'],
-    ['hotlineLogs', 'Hotline Logs'],
-  ]
-  if (currentUser && currentUser.roles.includes('Admin')) {
-    pages.push(['admin', 'Admin'])
-  }
 
   const transformOptions = useCallback(
     (options) => [defaultAction, ...options],
     []
   )
+  return (
+    <Box component="header" sx={{ flexGrow: 1 }}>
+      <AppBar position="fixed">
+        <Toolbar className="navbar" variant="dense" sx={{ mx: '-12px' }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{ width: '100%' }}
+            spacing={2}
+          >
+            <Tooltip title="Toggle Menu">
+              <IconButton onClick={() => setNavOpen(!navOpen)} color="inherit">
+                {navOpen ? <MenuOpen /> : <Menu />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={`Version: ${import.meta.env.APP_VERSION}`}>
+              <Typography
+                variant="h4"
+                noWrap
+                component={Link}
+                to={routes.home()}
+                sx={{
+                  color: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'secondary.light'
+                      : 'contrast.main',
+                  flexGrow: 0,
+                  fontFamily: 'monospace',
+                  textDecoration: 'none',
+                }}
+              >
+                memoryhole
+              </Typography>
+            </Tooltip>
+
+            <Box sx={{ flexGrow: 7, maxWidth: '250px', ml: 'auto !important' }}>
+              <QuickSearch />
+            </Box>
+
+            <Box sx={{ flexGrow: 5, maxWidth: '200px' }}>
+              <BaseField
+                name="action"
+                color="inherit"
+                field_type="action_chooser"
+                label="Action"
+                value={currentAction}
+                onChange={setCurrentAction}
+                disableClearable
+                autoHighlight
+                autoComplete
+                placeholder="Type to search"
+                transformOptions={transformOptions}
+                textFieldProps={textFieldProps}
+              />
+            </Box>
+            <Tooltip title="Toggle Logs Panel">
+              <Button
+                onClick={() => setLogsOpen(!logsOpen)}
+                variant="contained"
+                color="inherit"
+                sx={{
+                  color: 'var(--mui-palette-text-primary)',
+                }}
+                startIcon={logsOpen ? <ChevronRight /> : <ChevronLeft />}
+                size="small"
+              >
+                Logs
+              </Button>
+            </Tooltip>
+          </Stack>
+        </Toolbar>
+      </AppBar>
+    </Box>
+  )
+}
+
+const Main = styled('main', {
+  shouldForwardProp: (prop) => !['leftOpen', 'rightOpen'].includes(prop),
+})(({ theme, leftOpen, rightOpen }) => {
+  const small = useMediaQuery(theme.breakpoints.down('md'))
+  const leftWidth = leftOpen ? LEFT_DRAWER_WIDTH : LEFT_DRAWER_WIDTH_SMALL
+  return {
+    flexGrow: 1,
+    padding: theme.spacing(small ? 1 : 2),
+    marginTop: '48px',
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    // marginLeft: leftWidth,
+    overflowX: 'auto',
+    ...(rightOpen && {
+      marginRight: DRAWER_WIDTH,
+    }),
+    width: `calc(100% - ${leftWidth + rightOpen ? DRAWER_WIDTH : 0}px)`,
+  }
+})
+
+const NavDrawer = ({ navOpen }) => {
+  const { currentUser, logOut } = useAuth()
+  const [expires, setExpires] = useState({})
+
+  const pages = [
+    ['arrests', 'Arrests', <People key="arrests" />],
+    ['actions', 'Actions', <Flag key="actions" />],
+    ['logs', 'Logs', <EditNote key="logs" />],
+    ['docsHome', 'Help', <Help key="help" />],
+  ]
+  if (currentUser && currentUser.roles.includes('Admin')) {
+    pages.push(['admin', 'Admin', <ManageAccounts key="admin" />])
+  }
+
   const {
     expiresAt,
     roles: [role],
@@ -112,164 +236,132 @@ const NavBar = () => {
     }
   }, [expiresAt, setExpires])
 
-  return (
-    <header>
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="fixed" enableColorOnDark>
-          <Toolbar className="navbar" variant="dense">
-            <Tooltip title={`Version: ${import.meta.env.APP_VERSION}`}>
-              <Typography
-                variant="h4"
-                noWrap
-                component={Link}
-                to={routes.home()}
-                sx={{
-                  color: 'white',
-                  mr: 2,
-                  flexGrow: 0,
-                  fontFamily: 'monospace',
-                  textDecoration: 'none',
-                }}
-              >
-                memoryhole
-              </Typography>
-            </Tooltip>
-            <Box sx={{ flexGrow: 2 }}>
-              {pages.map(([route, label]) => (
-                <NavLink key={route} to={routes[route]()}>
-                  {label}
-                </NavLink>
-              ))}
-            </Box>
-            <Stack
-              direction="row"
-              spacing={2}
-              alignItems={'center'}
-              alignContent={'center'}
-              sx={{ flexGrow: 20, maxWidth: 600 }}
-            >
-              <Box sx={{ flexGrow: 7 }}>
-                <QuickSearch />
-              </Box>
-              <Box sx={{ flexGrow: 5 }}>
-                <BaseField
-                  name="action"
-                  field_type="action_chooser"
-                  label="Action"
-                  value={currentAction}
-                  onChange={setCurrentAction}
-                  disableClearable
-                  autoHighlight
-                  autoComplete
-                  placeholder="Type to search"
-                  transformOptions={transformOptions}
-                  // openOnFocus
-                  // selectOnFocus={false}
-                  textFieldProps={textFieldProps}
-                />
-              </Box>
-              <Stack
-                direction="row"
-                alignItems={'center'}
-                spacing={2}
-                sx={{ ml: 'auto' }}
-              >
-                <Tooltip title="Help">
-                  {/* <span>
-                    <StyledLink
-                      to={routes.docsHome()}
-                      color="inherit"
-                      sx={{ display: 'flex', alignItems: 'center', mx: 1 }}
-                    > */}
-                  <IconButton
-                    component={Link}
-                    to={routes.docsHome()}
-                    color="inherit"
-                  >
-                    <Help />
-                  </IconButton>
-                  {/* </StyledLink>
-                  </span> */}
-                </Tooltip>
-                <Tooltip
-                  title={
-                    <Stack>
-                      <span>Logged in as {currentUser.name}</span>
-                      {<span>{expires.expiring}</span>}
-                    </Stack>
-                  }
-                >
-                  <Button
-                    startIcon={
-                      expires.expiring_soon && role !== 'User' ? (
-                        <Error color="error" />
-                      ) : (
-                        <Person />
-                      )
-                    }
-                    color="inherit"
-                    onClick={logOut}
-                    sx={{
-                      border: '1px solid rgba(255, 255, 255, 0.3)', // Subtle border
-                      textTransform: 'none', // Keep text normal-case
-                    }}
-                  >
-                    Logout
-                  </Button>
-                </Tooltip>
-              </Stack>
-            </Stack>
-          </Toolbar>
-        </AppBar>
-      </Box>
-    </header>
-  )
-}
-const MainLayout = ({ children }) => {
-  const routeName = useRouteName()
-  // const [logsOpen, setLogsOpen] = useState(false)
-  // const DRAWER_WIDTH = 400
+  const LogoutIcon =
+    expires.expiring_soon && role !== 'User' ? (
+      <Error color="error" />
+    ) : (
+      <Logout />
+    )
+  const width = navOpen ? LEFT_DRAWER_WIDTH : LEFT_DRAWER_WIDTH_SMALL
 
   return (
-    <>
-      <AppProvider>
-        <NavBar />
-        <Box component="main" sx={{ p: 3, mt: 6 }}>
+    <Drawer
+      variant="permanent"
+      anchor="left"
+      open={navOpen}
+      sx={(theme) => ({
+        width,
+        transition: theme.transitions.create('width', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+        '& .MuiDrawer-paper': {
+          width,
+          marginTop: '48px',
+          transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+        },
+      })}
+    >
+      <List>
+        {pages.map(([route, label, Icon]) => (
+          <NavMenuItem key={route} route={route} label={label} Icon={Icon} />
+        ))}
+        <Divider component={'li'} sx={{ m: 1 }} />
+        <Tooltip
+          title={
+            <Stack>
+              <span>Logged in as {currentUser.name}</span>
+              {<span>{expires.expiring}</span>}
+            </Stack>
+          }
+        >
+          <span>
+            <NavMenuItem
+              onClick={() => logOut()}
+              label="Logout"
+              Icon={LogoutIcon}
+            />
+          </span>
+        </Tooltip>
+      </List>
+    </Drawer>
+  )
+}
+
+const NavMenuItem = ({ route, label, Icon, ...props }) => {
+  const to = route && routes[route] ? routes[route]() : 'FAKE_ROUTE'
+  const matchInfo = useMatch(to, { matchSubPaths: true })
+  const isActive = matchInfo.match
+  return (
+    <ListItem sx={{ px: 1, py: 0 }}>
+      <ListItemButton
+        selected={isActive}
+        component={Link}
+        to={route ? to : null}
+        sx={{
+          borderRadius: 2,
+          px: 'calc(1.4* 8px)',
+          height: '48px',
+          '.MuiListItemIcon-root': {
+            flexShrink: 0,
+            display: 'inline-flex',
+            minWidth: '34px',
+            marginRight: 'calc(1.3* 8px)',
+          },
+          '&.Mui-selected': {
+            '& .MuiListItemIcon-root': {
+              color: 'primary.light',
+            },
+            '& .MuiListItemText-primary': {
+              color: 'primary.light',
+            },
+          },
+        }}
+        {...props}
+      >
+        <ListItemIcon>{Icon}</ListItemIcon>
+        <ListItemText primary={label} />
+      </ListItemButton>
+    </ListItem>
+  )
+}
+
+const MainLayout = ({ children }) => {
+  const routeName = useRouteName()
+  const [logsOpen, setLogsOpen] = useState(false)
+  const [navOpen, setNavOpen] = useState(true)
+
+  return (
+    <AppProvider>
+      <NavBar
+        navOpen={navOpen}
+        setNavOpen={setNavOpen}
+        logsOpen={logsOpen}
+        setLogsOpen={setLogsOpen}
+      />
+      <Box sx={{ display: 'flex' }}>
+        <NavDrawer navOpen={navOpen} />
+        <Main id="main-content" leftOpen={navOpen} rightOpen={logsOpen}>
           <Container
             id="container"
-            maxWidth={routeName === 'home' ? false : 'lg'}
+            sx={{
+              maxWidth: routeName === 'home' ? false : 'lg',
+              minWidth: '590px',
+            }}
           >
             {children}
-            {/* <Box
-            sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                flex: 1,
-                transition: 'margin 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-                marginRight: logsOpen ? `${DRAWER_WIDTH}px` : 0,
-              }}
-            >
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  width: logsOpen ? `calc(100% - ${DRAWER_WIDTH}px)` : '100%',
-                }}
-              >
-                {children}
-              </Box>
-              <ArresteeLogsDrawer
-                open={logsOpen}
-                setOpen={setLogsOpen}
-                width={DRAWER_WIDTH}
-              />
-            </Box>
-          </Box> */}
           </Container>
-        </Box>
-      </AppProvider>
-    </>
+        </Main>
+        <LogsDrawer
+          open={logsOpen}
+          setOpen={setLogsOpen}
+          width={DRAWER_WIDTH}
+        />
+      </Box>
+    </AppProvider>
   )
 }
 

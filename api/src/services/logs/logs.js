@@ -1,15 +1,20 @@
 import { db } from 'src/lib/db'
 
-export const logs = () => {
-  return db.log.findMany()
-}
-
-export const arresteeLogs = ({ arrestee_id }) => {
-  return db.log.findMany({
-    where: { arrestee_id },
-    orderBy: {
-      created_at: 'desc',
+export const logs = (
+  {
+    params: {
+      where = {},
+      orderBy = { created_at: 'desc' },
+      take = 20,
+      skip = 0,
     },
+  } = { params: {} }
+) => {
+  return db.log.findMany({
+    where,
+    orderBy,
+    take,
+    skip,
   })
 }
 
@@ -19,33 +24,63 @@ export const log = ({ id }) => {
   })
 }
 
-export const createLog = ({ input: { arrestee_id, ...input } }) => {
-  return db.log.create({
-    data: {
-      ...input,
-      arrestee: {
-        connect: {
-          id: arrestee_id,
-        },
-      },
-      updated_by: {
-        connect: { id: context.currentUser.id }, // Assuming 1 is the ID of the user you want to connect
-      },
-      created_by: {
-        connect: { id: context.currentUser.id }, // Assuming 1 is the ID of the user you want to connect
+export const arresteeLogs = ({ arrestee_id }) => {
+  return db.log.findMany({
+    where: {
+      arrests: {
+        some: { id: arrestee_id },
       },
     },
   })
 }
 
-export const updateLog = ({ id, input }) => {
-  return db.log.update({
-    data: {
-      ...input,
-      updated_by: {
-        connect: { id: context.currentUser.id }, // Assuming 1 is the ID of the user you want to connect
-      },
+const prepareData = ({ log, arrests = [], action_id, id }) => {
+  const data = {
+    ...log,
+    updated_by: {
+      connect: { id: context.currentUser.id },
     },
+  }
+  if (arrests.length) {
+    data.arrests = {
+      connect: arrests.map((id) => ({ id })),
+    }
+  }
+  if (action_id) {
+    data.action = { connect: { id: action_id } }
+  }
+  if (!id) {
+    data.created_by = {
+      connect: { id: context.currentUser.id },
+    }
+  }
+  return data
+}
+
+export const createLog = ({ input: { arrests = [], action_id, ...input } }) => {
+  const data = prepareData({
+    log: input,
+    arrests,
+    action_id,
+  })
+  return db.log.create({
+    data,
+  })
+}
+
+export const updateLog = ({
+  id,
+  input: { arrests = [], action_id, ...input },
+}) => {
+  const data = prepareData({
+    log: input,
+    arrests,
+    action_id,
+    id,
+  })
+
+  return db.log.update({
+    data,
     where: { id },
   })
 }
@@ -57,13 +92,16 @@ export const deleteLog = ({ id }) => {
 }
 
 export const Log = {
-  arrestee: (_obj, { root }) => {
-    return db.log.findUnique({ where: { id: root?.id } }).arrestee()
-  },
   created_by: (_obj, { root }) => {
     return db.log.findUnique({ where: { id: root?.id } }).created_by()
   },
   updated_by: (_obj, { root }) => {
     return db.log.findUnique({ where: { id: root?.id } }).updated_by()
+  },
+  arrests: (_obj, { root }) => {
+    return db.log.findUnique({ where: { id: root?.id } }).arrests()
+  },
+  action: (_obj, { root }) => {
+    return db.log.findUnique({ where: { id: root?.id } }).action()
   },
 }

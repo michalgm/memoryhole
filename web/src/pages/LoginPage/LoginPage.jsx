@@ -11,7 +11,7 @@ import { Metadata } from '@redwoodjs/web'
 import { useAuth } from 'src/auth'
 import Link from 'src/components/utils/Link'
 import LoadingButton from 'src/components/utils/LoadingButton'
-import { useSnackbar, useDisplayError } from 'src/components/utils/SnackBar'
+import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
 
 export const ModalCard = ({ children, sx = {}, ...props }) => {
   return (
@@ -40,7 +40,7 @@ export const ModalCard = ({ children, sx = {}, ...props }) => {
                 sx={{
                   fontWeight: 600,
                   fontSize: `1.5rem`,
-                  color: 'primary.contrastText',
+                  color: 'contrast.main',
                 }}
               >
                 {props.title}

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import { Box, Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { cloneDeepWith, difference, get, merge, set, sortBy } from 'lodash-es'
+import { difference, get, merge, set, sortBy } from 'lodash-es'
 import {
   getDefaultColumnFilterFn,
   MaterialReactTable,
@@ -44,6 +44,8 @@ export const defineColumns = (
       header: fieldDef.props?.label || formatLabel(field),
       fieldType: type,
       enablePinning: false,
+      size: 1,
+      minSize: 1,
     }
     if (type === 'date-time' || type === 'date') {
       const format = type === 'date' ? 'L' : 'L hh:mm A'
@@ -216,6 +218,21 @@ const DataTable = ({
   footerNotes,
 }) => {
   const [reloading, setReloading] = useState(false)
+  const containerRef = useRef(null)
+  const [containerWidth, setContainerWidth] = useState(null)
+  const smallMode = containerWidth < 700
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      setContainerWidth(entries[0].contentRect.width)
+    })
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current)
+    }
+
+    return () => resizeObserver.disconnect()
+  }, [])
 
   const visibleColumns = [
     ...displayColumns,
@@ -238,7 +255,7 @@ const DataTable = ({
   const data = useMemo(() => {
     const data = inputData.map((row) => {
       const new_row = { id: row.id }
-      columns.forEach((col) => {
+      columnsRef.current.forEach((col) => {
         const value = get(row, col.accessorKey)
         set(new_row, col.accessorKey, value === undefined ? null : value)
       })
@@ -354,6 +371,7 @@ const DataTable = ({
   const defaultProps = {
     columns: columnsRef.current,
     data,
+    layoutMode: 'semantic',
     enableDensityToggle: false,
     enableStickyHeader: true,
     getRowId: (originalRow) => originalRow.id,
@@ -375,8 +393,16 @@ const DataTable = ({
         backgroundColor: '#fff',
         '& tr:nth-of-type(odd) > td, & tr:nth-of-type(odd) > td[data-pinned="true"]:before':
           {
-            backgroundColor: '#f5f5f5',
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'light'
+                ? 'action.hover'
+                : 'background.paper',
           },
+      },
+    },
+    muiTableContainerProps: {
+      sx: {
+        height: (theme) => theme?.custom?.scrollAreaHeight || 500,
       },
     },
     muiSearchTextFieldProps: {
@@ -411,7 +437,16 @@ const DataTable = ({
 
   if (footerNotes) {
     defaultProps.renderBottomToolbarCustomActions = () => {
-      return footerNotes
+      if (!smallMode) {
+        return footerNotes
+      }
+    }
+    defaultProps.muiBottomToolbarProps = {
+      sx: {
+        '& > .MuiBox-root': {
+          py: 0,
+        },
+      },
     }
   }
 
@@ -459,19 +494,27 @@ const DataTable = ({
   if (state.columnFilters.length) {
     state.showColumnFilters = true
   }
-  if (globalFilter) {
-    state.showGlobalFilter = true
-  }
+
   if (reloading) {
     state.showProgressBars = true
   }
   const properties = merge(defaultProps, tableProps)
   properties.data = stateLoaded ? data : []
+
+  if (globalFilter || tableProps?.initialState?.showGlobalFilter) {
+    properties.initialState.showGlobalFilter = false
+    state.showGlobalFilter = !smallMode
+  }
+
   properties.state = state
-  delete properties.state.initialState
 
   const table = useMaterialReactTable(properties)
-  return <MaterialReactTable table={table} />
+
+  return (
+    <div ref={containerRef}>
+      <MaterialReactTable table={table} />
+    </div>
+  )
 }
 
 export default DataTable

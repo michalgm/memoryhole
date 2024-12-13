@@ -32,25 +32,31 @@ const Breadcrumbs = ({ title, titleTo, buttonLabel }) => {
     .filter((t) => t)
     .join(' | ')
 
+  const crumbs = []
+  if (pathname.startsWith('/admin')) {
+    crumbs.push(<Link to={routes.admin()}>Admin</Link>)
+  }
+
+  if (titleTo) {
+    crumbs.push(<Link to={routes[titleTo]()}>{title}</Link>)
+  }
+  if (endCrumb) {
+    crumbs.push(endCrumb)
+  }
   return (
     <>
       <Metadata title={metaTitle} />
       <Box>
         <MUIBreadcrumbs separator={<NavigateNext fontSize="small" />}>
-          {pathname.startsWith('/admin') && (
-            <Link to={routes.admin()}>Admin</Link>
-          )}
-          {titleTo && <Link to={routes[titleTo]()}>{title}</Link>}
-          {endCrumb && (
+          {crumbs.map((crumb, i) => (
             <Typography
-              sx={{
-                fontWeight: 'bold',
-                color: 'primary.main',
-              }}
+              variant="h3"
+              fontWeight={i === crumbs.length - 1 ? 800 : 'inherit'}
+              key={i}
             >
-              {endCrumb}
+              {crumb}
             </Typography>
-          )}
+          ))}
         </MUIBreadcrumbs>
       </Box>
     </>

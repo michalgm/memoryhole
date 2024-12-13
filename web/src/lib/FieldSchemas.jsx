@@ -580,6 +580,43 @@ export const ActionFields = [
   },
 ]
 
+export const fieldSchema = Object.entries({
+  arrest: ArrestFields,
+  user: UserFields,
+  action: ActionFields,
+}).reduce((acc, [model, sections]) => {
+  const modelSchema = {}
+  sections.forEach(({ fields }) => {
+    fields.forEach(([key, params = {}]) => {
+      modelSchema[key] = params
+    })
+  })
+  acc[model] = modelSchema
+  return acc
+}, {})
+
+fieldSchema.log = {
+  type: {
+    field_type: 'select',
+    options: [
+      'Jail Call',
+      'Witness Call',
+      'Support Call',
+      'Out-of-Custody Call',
+      'Email',
+      'Other',
+    ],
+    required: true,
+  },
+  needs_followup: { field_type: 'checkbox' },
+  notes: { field_type: 'richtext', required: true },
+  action: { field_type: 'action_chooser', required: true },
+  arrests: {
+    field_type: 'arrest_chooser',
+    multiple: true,
+  },
+}
+
 export default ArrestFields
 
 export const userSchema = sortObjectKeys(getSchema(UserFields), 'props.label')

@@ -1,6 +1,6 @@
 import EditOptionsForm from './EditOptionsForm'
 
-const CreateOptionsSet = (props) => {
+const CreateOptionsSet = () => {
   return <EditOptionsForm />
 }
 

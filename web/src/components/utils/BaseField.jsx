@@ -80,8 +80,8 @@ export const BaseField = ({
         ? DateTimePickerElement
         : DatePickerElement
       : field_type === 'date-time'
-      ? DateTimePicker
-      : DatePicker
+        ? DateTimePicker
+        : DatePicker
     const disabled = Boolean(props.disabled)
     delete props.disabled
     return (
@@ -145,31 +145,34 @@ export const BaseField = ({
 
   const renderRichTextField = () => {
     const textFieldOptions = {
+      ...textFieldProps,
       multiline: true,
       minRows: props.minRows || 3,
       content: value,
       onChange,
+      ...props,
     }
-    const RichText = (extraProps) => (
-      <RichTextInput
-        {...textFieldProps}
-        {...textFieldOptions}
-        {...props}
-        {...extraProps}
-      />
-    )
     if (isRHF) {
       return (
         <Controller
+          key={name}
           name={name}
           control={control}
-          render={({ field }) => (
-            <RichText content={field.value} onChange={field.onChange} />
+          rules={{
+            required: props.required && 'This field is required',
+          }}
+          render={({ field, formState, ...rest }) => (
+            <RichTextInput
+              {...textFieldOptions}
+              content={field.value}
+              onChange={field.onChange}
+              error={formState.errors[name]}
+            />
           )}
         />
       )
     }
-    return RichText
+    return <RichTextInput {...textFieldOptions} />
   }
 
   const renderTextField = () => {
@@ -236,7 +239,7 @@ export const BaseField = ({
   const renderCheckbox = () => {
     const Component = isRHF ? CheckboxElement : Checkbox
     return (
-      <FormGroup>
+      <FormGroup {...props}>
         <Component
           name={`${name}`}
           sx={{ p: 0, pr: 1, pl: 1 }}

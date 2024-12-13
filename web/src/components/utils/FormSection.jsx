@@ -18,8 +18,10 @@ const FormSection = ({ title, sectionActions = [], children }) => {
       <Accordion xs={12} defaultExpanded disableGutters>
         <AccordionSummary
           sx={{
-            bgcolor: 'primary.light',
-            color: 'primary.contrastText',
+            bgcolor: (theme) =>
+              theme.palette.mode === 'light' ? 'primary.light' : 'action.hover',
+            color: (theme) =>
+              theme.palette?.contrast ? 'contrast.main' : 'primary.main',
             '&.Mui-expanded': {
               marginBottom: 1,
             },
@@ -27,7 +29,7 @@ const FormSection = ({ title, sectionActions = [], children }) => {
             // borderTopWidth: 6,
             // borderTopStyle: 'solid',
           }}
-          expandIcon={<ExpandMore sx={{ color: 'primary.contrastText' }} />}
+          expandIcon={<ExpandMore sx={{ color: 'contrast.main' }} />}
         >
           <Stack
             spacing={2}
@@ -36,7 +38,7 @@ const FormSection = ({ title, sectionActions = [], children }) => {
             width="100%"
             sx={{ pr: 2 }}
           >
-            <Typography variant="h3">{title}</Typography>
+            <Typography variant="h5">{title}</Typography>
             {sectionActions.map((action) => (
               <Box key={action.label}>
                 <Tooltip title={action.tooltip}>

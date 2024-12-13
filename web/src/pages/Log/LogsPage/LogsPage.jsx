@@ -1,7 +1,7 @@
-import LogsCell from 'src/components/Log/LogsCell'
+import Logs from 'src/components/Logs/Logs'
 
 const LogsPage = () => {
-  return <LogsCell />
+  return <Logs />
 }
 
 export default LogsPage

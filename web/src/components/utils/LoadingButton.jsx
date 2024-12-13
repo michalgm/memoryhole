@@ -1,5 +1,4 @@
-import { Button, CircularProgress } from '@mui/material'
-import { useTheme } from '@mui/material'
+import { Button, CircularProgress, useTheme } from '@mui/material'
 import { Box } from '@mui/system'
 
 const LoadingButton = ({
@@ -15,7 +14,11 @@ const LoadingButton = ({
   return (
     <Box
       {...containerProps}
-      sx={{ position: 'relative', ...containerProps.sx }}
+      sx={{
+        position: 'relative',
+        display: 'inline-block',
+        ...containerProps.sx,
+      }}
     >
       <Button
         {...props}
@@ -35,7 +38,12 @@ const LoadingButton = ({
         <CircularProgress
           size={24}
           sx={{
-            color: theme.palette.primary.contrastText,
+            color:
+              props?.variant === 'outlined'
+                ? color
+                : theme?.palette?.contrast?.main
+                  ? 'contrast.main'
+                  : 'primary.main',
             position: 'absolute',
             top: '50%',
             left: '50%',

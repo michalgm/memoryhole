@@ -6,7 +6,14 @@ import { navigate, routes, useLocation, useParams } from '@redwoodjs/router'
 
 import Breadcrumbs from 'src/components/Breadcrumbs/Breadcrumbs'
 
-const ModelLayout = ({ title, titleTo, buttonLabel, buttonTo, children }) => {
+const ModelLayout = ({
+  title,
+  titleTo,
+  buttonLabel,
+  buttonTo,
+  children,
+  buttonParams = {},
+}) => {
   const { id } = useParams()
   const { pathname } = useLocation()
   const isNew = pathname.endsWith('/new')
@@ -28,7 +35,7 @@ const ModelLayout = ({ title, titleTo, buttonLabel, buttonTo, children }) => {
 
         {buttonLabel && buttonTo && !id && !isNew && (
           <Button
-            onClick={() => navigate(routes[buttonTo]())}
+            onClick={() => navigate(routes[buttonTo](buttonParams))}
             variant="contained"
             color="secondary"
             startIcon={<Add />}

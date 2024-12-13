@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { gql, useLazyQuery } from '@apollo/client'
 import { Search } from '@mui/icons-material'
 import {
+  alpha,
   Autocomplete,
   Box,
   InputAdornment,
@@ -102,7 +103,8 @@ function QuickSearch() {
             variant="standard"
             sx={{
               borderRadius: 1,
-              backgroundColor: 'primary.light',
+              backgroundColor: (theme) =>
+                alpha(theme.palette.common.white, 0.2),
               input: { color: '#fff' }, // Text color for readability
               '& .MuiSvgIcon-root': {
                 color: '#fff !important',
