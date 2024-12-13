@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { useTheme } from '@emotion/react'
 import {
   ChevronLeft,
-  ChevronLeftOutlined,
   ChevronRight,
   EditNote,
   Error,
@@ -13,9 +11,7 @@ import {
   ManageAccounts,
   Menu,
   MenuOpen,
-  Notes,
   People,
-  Person,
 } from '@mui/icons-material'
 import {
   Container,
@@ -28,7 +24,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  SvgIcon,
   Tooltip,
 } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
@@ -201,7 +196,6 @@ const Main = styled('main', {
       duration: theme.transitions.duration.leavingScreen,
     }),
     // marginLeft: leftWidth,
-    overflowX: 'auto',
     ...(rightOpen && {
       marginRight: DRAWER_WIDTH,
     }),

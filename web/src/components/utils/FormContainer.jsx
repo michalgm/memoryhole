@@ -152,7 +152,7 @@ const FormContainer = ({
 
         return (
           <Box sx={{ position: 'relative', width: '100%' }}>
-            <Stack spacing={4} sx={{ pb: 8 }} className="content-container">
+            <Stack spacing={4} sx={{ pb: 2 }} className="content-container">
               {fields.map(
                 (
                   { fields: sectionFields, title, sectionActions },

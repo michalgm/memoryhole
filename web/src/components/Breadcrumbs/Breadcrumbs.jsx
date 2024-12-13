@@ -50,7 +50,7 @@ const Breadcrumbs = ({ title, titleTo, buttonLabel }) => {
         <MUIBreadcrumbs separator={<NavigateNext fontSize="small" />}>
           {crumbs.map((crumb, i) => (
             <Typography
-              variant="h3"
+              variant="h5"
               fontWeight={i === crumbs.length - 1 ? 800 : 'inherit'}
               key={i}
             >

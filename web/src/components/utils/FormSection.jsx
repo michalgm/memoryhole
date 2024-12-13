@@ -18,16 +18,16 @@ const FormSection = ({ title, sectionActions = [], children }) => {
       <Accordion xs={12} defaultExpanded disableGutters>
         <AccordionSummary
           sx={{
+            position: 'sticky',
+            top: 91,
             bgcolor: (theme) =>
-              theme.palette.mode === 'light' ? 'primary.light' : 'action.hover',
+              theme.palette.mode === 'light' ? 'primary.light' : 'grey.800',
             color: (theme) =>
               theme.palette?.contrast ? 'contrast.main' : 'primary.main',
             '&.Mui-expanded': {
               marginBottom: 1,
             },
-            // borderTopColor: 'primary.light',
-            // borderTopWidth: 6,
-            // borderTopStyle: 'solid',
+            zIndex: 9,
           }}
           expandIcon={<ExpandMore sx={{ color: 'contrast.main' }} />}
         >

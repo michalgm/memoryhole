@@ -23,8 +23,13 @@ const ModelLayout = ({
       <Box
         sx={{
           mb: 2,
+          position: 'sticky',
+          top: 47,
           display: 'flex',
           justifyContent: 'space-between',
+          zIndex: 10,
+          backgroundColor: 'background.paper',
+          py: 1,
         }}
       >
         <Breadcrumbs
@@ -39,6 +44,7 @@ const ModelLayout = ({
             variant="contained"
             color="secondary"
             startIcon={<Add />}
+            size="small"
           >
             {buttonLabel}
           </Button>
