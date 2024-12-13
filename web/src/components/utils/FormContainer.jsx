@@ -2,8 +2,10 @@ import { Box, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { Stack } from '@mui/system'
 import { startCase } from 'lodash-es'
+import { get } from 'react-hook-form'
 
 import Loading from 'src/components/Loading/Loading'
+import { fieldSchema } from 'src/lib/FieldSchemas'
 
 import { BaseForm } from './BaseForm'
 import { Field } from './Field'
@@ -64,12 +66,15 @@ const FormContainer = ({
   skipUpdatedCheck = false,
   autoComplete = 'off',
 }) => {
+  const schema = get(fieldSchema, displayConfig?.type?.toLowerCase(), {})
+
   return (
     <BaseForm
       autoComplete={autoComplete}
       formConfig={{
-        fields,
-        displayConfig,
+        schema,
+        modelType: displayConfig?.type,
+        namePath: displayConfig.namePath,
         createMutation,
         updateMutation,
         deleteMutation,
@@ -82,16 +87,22 @@ const FormContainer = ({
         id,
         skipUpdatedCheck,
       }}
+      loadingElement={
+        <Box>
+          <Loading loading />
+          {/* {footer} */}
+        </Box>
+      }
     >
       {({
         isLoading,
         confirmDelete,
         formData,
         stats,
-        retrieveTime,
         loading: { loadingDelete, loadingCreate, loadingUpdate },
       }) => {
         const disabled = isLoading
+
         const footer = (
           <Footer>
             <Grid xs>
@@ -138,16 +149,9 @@ const FormContainer = ({
             </Grid>
           </Footer>
         )
-        if (!retrieveTime)
-          return (
-            <Box>
-              <Loading loading />
-              {footer}
-            </Box>
-          )
 
         return (
-          <Box>
+          <Box sx={{ position: 'relative', width: '100%' }}>
             <Stack spacing={4} sx={{ pb: 8 }} className="content-container">
               {fields.map(
                 (

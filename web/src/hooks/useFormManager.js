@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLazyQuery, useMutation } from '@apollo/client'
 import dayjs from 'dayjs'
-import { get } from 'lodash-es'
+import { get, isEmpty } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
 import { useForm } from 'react-hook-form-mui'
 
@@ -37,8 +37,9 @@ const mockMutation = gql`
 `
 
 export function useFormManager({
-  fields,
-  displayConfig,
+  schema,
+  namePath = 'name',
+  modelType = 'record',
   createMutation,
   updateMutation,
   deleteMutation,
@@ -50,14 +51,23 @@ export function useFormManager({
   onFetch,
   id,
   skipUpdatedCheck,
-}) {
+} = {}) {
   const confirm = useConfirm()
-  const context = useForm({ defaultValues: transformData({}, fields) })
+  const context = useForm({
+    defaultValues: async () => {
+      const { data } =
+        !id || !fetchQuery
+          ? { data: {} }
+          : await fetchEntity({ variables: { id } })
+      const [defaultValues] = await processData(data)
+      return defaultValues
+    },
+  })
   const { formState, reset } = context
   const [retrieveTime, setRetrieveTime] = useState(null)
   const [formData, setFormData] = useState({})
   const resetPromiseRef = useRef(null)
-  const display_name = get(formData, displayConfig?.namePath || 'name')
+  const display_name = get(formData, namePath || 'name')
   const displayError = useDisplayError()
   const { openSnackbar } = useSnackbar()
 
@@ -71,11 +81,23 @@ export function useFormManager({
     [formData?.created_at, formData?.updated_at]
   )
 
+  const processData = useCallback(
+    async (result, init = false) => {
+      const result_data = isEmpty(result) ? result : dataFromResult(result)
+      const data = onFetch ? await onFetch(result_data) : result_data
+      setFormData(data)
+      setRetrieveTime(dayjs(data?.updated_at))
+      const transformedData = transformData(data, schema, init)
+      return [transformedData, data]
+    },
+    [onFetch, schema]
+  )
+
   const [deleteEntity, { loading: loadingDelete }] = useMutation(
     deleteMutation || mockMutation,
     {
       onCompleted: async (data) => {
-        openSnackbar(`${displayConfig.type} "${display_name}" deleted`)
+        openSnackbar(`${modelType} "${display_name}" deleted`)
         onDelete && (await onDelete(data))
       },
       onError: displayError,
@@ -85,7 +107,7 @@ export function useFormManager({
     createMutation || mockMutation,
     {
       onCompleted: async (result) => {
-        openSnackbar(`${displayConfig.type} created`)
+        openSnackbar(`${modelType} created`)
         const data = await resetForm(result)
         onCreate && (await onCreate(data))
       },
@@ -96,7 +118,7 @@ export function useFormManager({
     updateMutation || mockMutation,
     {
       onCompleted: async (result) => {
-        openSnackbar(`${displayConfig.type} updated`)
+        openSnackbar(`${modelType} updated`)
         const data = await resetForm(result)
         onUpdate && (await onUpdate(data))
       },
@@ -111,12 +133,7 @@ export function useFormManager({
   // Move all the existing form management functions here
   const resetForm = useCallback(
     async (result) => {
-      const result_data = result ? dataFromResult(result) : {}
-      const data = onFetch ? await onFetch(result_data) : result_data
-      setFormData(data)
-      setRetrieveTime(dayjs(data?.updated_at))
-      const values = transformData(data, fields)
-
+      const [values, data] = await processData(result)
       reset(values)
 
       // Create a Promise that resolves when formState.isDirty becomes false
@@ -126,10 +143,9 @@ export function useFormManager({
 
       // Await the Promise
       await waitForReset
-
       return data
     },
-    [fields, onFetch, reset]
+    [reset, processData]
   )
 
   useEffect(() => {
@@ -146,7 +162,7 @@ export function useFormManager({
 
     await confirm({
       title: 'Confirm Delete',
-      description: `Are you sure you want to delete the ${displayConfig.type.toLowerCase()} "${display_name}"?`,
+      description: `Are you sure you want to delete the ${modelType.toLowerCase()} "${display_name}"?`,
     })
     await deleteEntity({ variables: { id } })
   }
@@ -199,15 +215,17 @@ export function useFormManager({
     return true
   }
 
+  // Add this useEffect near the other hooks in useFormManager
   useEffect(() => {
     const updateData = async () => {
-      const { data } = id
-        ? await fetchEntity({ variables: { id } })
-        : { data: null }
-      return resetForm(data)
+      const { data } =
+        !id || !fetchQuery
+          ? { data: {} }
+          : await fetchEntity({ variables: { id } })
+      await resetForm(data)
     }
     updateData()
-  }, [id, fetchEntity, resetForm, onFetch])
+  }, [id, fetchEntity, resetForm, fetchQuery])
 
   return {
     formContext: context,
