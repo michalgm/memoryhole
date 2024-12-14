@@ -1,19 +1,22 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { useParams } from '@redwoodjs/router' // Import useLocation
+import { useMediaQuery } from '@mui/system'
+
+import { useParams } from '@redwoodjs/router'
 
 const AppContext = createContext()
 
 export const defaultAction = { id: -1, name: 'All Actions', start_date: null }
 
 const AppProvider = ({ children }) => {
+  const smallScreen = useMediaQuery('(max-width:900px)')
   const [currentAction, setCurrentAction] = useState(() => {
     const stored = localStorage.getItem('currentAction')
     return stored ? JSON.parse(stored) : defaultAction
   })
   const [userPreferences, setUserPreferences] = useState({})
   const [pageTitle, setPageTitle] = useState('')
-  const [navOpen, setNavOpen] = useState(true)
+  const [navOpen, setNavOpen] = useState(!smallScreen)
   const [logsOpen, setLogsOpen] = useState(false)
   const { id } = useParams() // Get the current location
 

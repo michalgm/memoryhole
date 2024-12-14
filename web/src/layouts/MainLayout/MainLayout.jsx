@@ -206,7 +206,22 @@ const Main = styled('main', {
 const NavDrawer = ({ navOpen }) => {
   const { currentUser, logOut } = useAuth()
   const [expires, setExpires] = useState({})
+  const [isHovered, setIsHovered] = useState(false)
   const confirm = useConfirm()
+
+  const effectiveNavOpen = isHovered || navOpen
+
+  const handleMouseEnter = () => {
+    if (!navOpen) {
+      setIsHovered(true)
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (!navOpen) {
+      setIsHovered(false)
+    }
+  }
 
   const pages = [
     ['arrests', 'Arrests', <People key="arrests" />],
@@ -238,19 +253,24 @@ const NavDrawer = ({ navOpen }) => {
     ) : (
       <Logout />
     )
-  const width = navOpen ? LEFT_DRAWER_WIDTH : LEFT_DRAWER_WIDTH_SMALL
+  const width = effectiveNavOpen ? LEFT_DRAWER_WIDTH : LEFT_DRAWER_WIDTH_SMALL
 
   return (
     <Drawer
       variant="permanent"
       anchor="left"
-      open={navOpen}
+      open={effectiveNavOpen}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       sx={(theme) => ({
-        width,
+        width: navOpen ? width : LEFT_DRAWER_WIDTH_SMALL,
         transition: theme.transitions.create('width', {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.enteringScreen,
         }),
+        '& .MuiTypography-root': {
+          whiteSpace: 'nowrap',
+        },
         '& .MuiDrawer-paper': {
           width,
           marginTop: '48px',
