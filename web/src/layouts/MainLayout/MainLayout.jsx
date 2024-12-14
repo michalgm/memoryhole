@@ -172,10 +172,10 @@ const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen }) => {
             >
               <Button
                 onClick={() => setLogsOpen(!logsOpen)}
-                variant="contained"
-                color="inherit"
+                variant="outlined"
+                color="secondary"
                 sx={{
-                  color: 'var(--mui-palette-text-primary)',
+                  color: 'var(--mui-palette-contrast-main)',
                 }}
                 startIcon={logsOpen ? <ChevronRight /> : <ChevronLeft />}
                 size="small"
@@ -331,8 +331,8 @@ const NavMenuItem = ({ route, label, Icon, ...props }) => {
     <ListItem sx={{ px: 1, py: 0 }}>
       <ListItemButton
         selected={isActive}
-        component={Link}
-        to={route ? to : null}
+        component={to !== 'FAKE_ROUTE' ? Link : 'div'}
+        to={route ? to : undefined}
         sx={{
           borderRadius: 2,
           px: 'calc(1.4* 8px)',
