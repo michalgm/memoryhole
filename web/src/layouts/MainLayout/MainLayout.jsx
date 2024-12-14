@@ -43,7 +43,7 @@ import { BaseField } from 'src/components/utils/BaseField'
 import QuickSearch from 'src/components/utils/QuickSearch'
 import AppProvider, { defaultAction, useApp } from 'src/lib/AppContext'
 
-const DRAWER_WIDTH = 450
+const RIGHT_DRAWER_WIDTH = 450
 const LEFT_DRAWER_WIDTH = 150
 const LEFT_DRAWER_WIDTH_SMALL = 64
 
@@ -205,9 +205,9 @@ const Main = styled('main', {
     }),
     // marginLeft: leftWidth,
     ...(rightOpen && {
-      marginRight: DRAWER_WIDTH,
+      marginRight: RIGHT_DRAWER_WIDTH,
     }),
-    width: `calc(100% - ${leftWidth + rightOpen ? DRAWER_WIDTH : 0}px)`,
+    width: `calc(100% - ${leftWidth + (rightOpen ? RIGHT_DRAWER_WIDTH : 0)}px)`,
   }
 })
 
@@ -402,7 +402,7 @@ const Layout = ({ children }) => {
         </Main>
         <LogsDrawer
           open={logsOpen}
-          width={DRAWER_WIDTH}
+          width={RIGHT_DRAWER_WIDTH}
           newLogRequested={newLogRequested}
           onNewLogComplete={() => setNewLogRequested(false)}
         />
