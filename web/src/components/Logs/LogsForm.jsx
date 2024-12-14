@@ -146,7 +146,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {} }) => {
                 />
               </Row>
               <Box>
-                <Field name="notes" {...schema.notes} />
+                <Field name="notes" {...schema.notes} focus="true" />
               </Box>
               <Row>
                 <Field name="action" {...schema.action} />

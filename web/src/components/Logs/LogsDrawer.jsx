@@ -3,7 +3,7 @@ import { Stack } from '@mui/system'
 
 import Logs from './Logs'
 
-const LogsDrawer = ({ open, width }) => {
+const LogsDrawer = ({ open, width, newLogRequested, onNewLogComplete }) => {
   return (
     <Stack
       direction="column"
@@ -34,7 +34,13 @@ const LogsDrawer = ({ open, width }) => {
         anchor="right"
         open={open}
       >
-        {open && <Logs sidebar />}
+        {open && (
+          <Logs
+            sidebar
+            newLogRequested={newLogRequested}
+            onNewLogComplete={onNewLogComplete}
+          />
+        )}
       </Drawer>
     </Stack>
   )

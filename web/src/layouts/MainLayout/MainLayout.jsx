@@ -161,7 +161,15 @@ const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen }) => {
                 textFieldProps={textFieldProps}
               />
             </Box>
-            <Tooltip title="Toggle Logs Panel">
+            <Tooltip
+              title={
+                <p>
+                  Toggle Logs Panel
+                  <br />
+                  (CTRL-L to quickly create a new log)
+                </p>
+              }
+            >
               <Button
                 onClick={() => setLogsOpen(!logsOpen)}
                 variant="contained"
@@ -356,6 +364,20 @@ const NavMenuItem = ({ route, label, Icon, ...props }) => {
 const Layout = ({ children }) => {
   const routeName = useRouteName()
   const { logsOpen, setLogsOpen, navOpen, setNavOpen } = useApp()
+  const [newLogRequested, setNewLogRequested] = useState(false)
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault()
+        setLogsOpen(true)
+        setNavOpen(false)
+        setNewLogRequested(true)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [setLogsOpen, setNavOpen])
 
   return (
     <>
@@ -380,8 +402,9 @@ const Layout = ({ children }) => {
         </Main>
         <LogsDrawer
           open={logsOpen}
-          setOpen={setLogsOpen}
           width={DRAWER_WIDTH}
+          newLogRequested={newLogRequested}
+          onNewLogComplete={() => setNewLogRequested(false)}
         />
       </Box>
     </>

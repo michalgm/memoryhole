@@ -38,30 +38,10 @@ const RichTextInput = (props) => {
     label,
     error,
     helperText,
+    focus = false,
   } = props
   const rteRef = useRef(null)
 
-  // console.log('Editor state:', {
-  //   content,
-  //   isInitialized,
-  //   editorContent: editor?.getHTML(),
-  // })
-  // // console.log('Editor:', editor)
-
-  // useEffect(() => {
-  //   console.log('Content changed:', content)
-  //   // console.log('Editor instance:', rteRef.current)
-  // }, [content])
-
-  // // console.log('Editor instance:', rteRef.current)
-  // console.log('WORKING CONTEXT:', {
-  //   content,
-  //   editor,
-  //   // formValues: form.getValues(), // if using RHF
-  //   // editorInstance: rteRef.current,
-  // })
-
-  const Component = editable ? RichTextEditor : RichTextReadOnly
   const labelRef = useRef(null)
   const [labelWidth, setLabelWidth] = useState(0)
   useEffect(() => {
@@ -70,130 +50,138 @@ const RichTextInput = (props) => {
     }
   }, [label])
 
-  return (
-    <FormControl
-      fullWidth
-      disabled={disabled}
-      variant="outlined"
-      size="small"
-      margin="dense"
-      required={required}
-      error={Boolean(error)}
-      sx={{
-        '&& .MuiTiptap-FieldContainer-notchedOutline': {
-          borderColor: error ? 'error.main' : '',
-        },
-        '& .MuiTiptap-FieldContainer-root': {
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: '0px',
-            left: '8px',
-            right: 0,
-            height: '10px',
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light' ? 'background.paper' : '#2e2e2e',
-            width: `${labelWidth + 12}px`,
-            zIndex: 5,
-            borderRadius: '0 0 2px 2px',
-            border: (theme) =>
-              theme.palette.mode === 'light' ? 'none' : '1px solid',
-            borderColor: 'action.disabled',
-            borderTop: 'none',
-          },
-          "[data-theme='light'] &::before": {
-            border: 'none',
-            backgroundColor: 'white',
-          },
-        },
-      }}
-    >
-      <InputLabel
+  if (editable) {
+    return (
+      <FormControl
+        fullWidth
+        disabled={disabled}
+        variant="outlined"
         size="small"
         margin="dense"
+        required={required}
+        error={Boolean(error)}
         sx={{
-          zIndex: 10,
-        }}
-        shrink
-        variant="outlined"
-        htmlFor={props.name}
-      >
-        <span ref={labelRef}>{label}</span>
-      </InputLabel>
-      <Box
-        sx={{
-          '&& .MuiTiptap-RichTextContent-root  a': {
-            color: 'secondary.main',
+          '&& .MuiTiptap-FieldContainer-notchedOutline': {
+            borderColor: error ? 'error.main' : '',
           },
-          '&& .ProseMirror': {
-            minHeight: props.minRows * 24,
-            overflowY: 'auto',
+          '& .MuiTiptap-FieldContainer-root': {
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: '0px',
+              left: '8px',
+              right: 0,
+              height: '10px',
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light' ? 'background.paper' : '#2e2e2e',
+              width: `${labelWidth + 12}px`,
+              zIndex: 5,
+              borderRadius: '0 0 2px 2px',
+              border: (theme) =>
+                theme.palette.mode === 'light' ? 'none' : '1px solid',
+              borderColor: 'action.disabled',
+              borderTop: 'none',
+            },
+            "[data-theme='light'] &::before": {
+              border: 'none',
+              backgroundColor: 'white',
+            },
           },
         }}
       >
-        <Component
-          innerRef={rteRef}
-          extensions={[
-            StarterKit,
-            LinkBubbleMenuHandler,
-            Link,
-            Underline,
-            TextAlign,
-            TaskList,
-            TaskItem,
-          ]} // Or any Tiptap extensions you wish!
-          content={content} // Initial content for the editor
-          onUpdate={({ editor }) => {
-            onChange(editor.getHTML())
+        <InputLabel
+          size="small"
+          margin="dense"
+          sx={{
+            zIndex: 10,
           }}
-          editable={!disabled}
-          editorProps={
-            props?.inputProps?.tabIndex
-              ? {
-                  attributes: {
-                    tabindex: props?.inputProps?.tabIndex,
-                  },
-                }
-              : null
-          }
-          renderControls={() =>
-            !disabled && (
-              <MenuControlsContainer>
-                <MenuSelectHeading />
-                <MenuDivider />
-                <MenuButtonBold />
-                <MenuButtonItalic />
-                <MenuButtonUnderline />
-                <MenuDivider />
-                <MenuButtonAlignLeft />
-                <MenuButtonAlignCenter />
-                <MenuButtonAlignRight />
-                <MenuDivider />
-                <MenuButtonEditLink />
-                <MenuDivider />
-                <MenuButtonBulletedList />
-                <MenuButtonOrderedList />
-                <MenuButtonTaskList />
-                <MenuDivider />
-                <MenuButtonHorizontalRule />
-              </MenuControlsContainer>
-            )
-          }
+          shrink
+          variant="outlined"
+          htmlFor={props.name}
         >
-          {() => (
-            <>
-              <LinkBubbleMenu />
-            </>
-          )}
-        </Component>
-      </Box>
-      {((error?.message && !disabled) || helperText) && (
-        <FormHelperText error={Boolean(error)}>
-          {error?.message && !disabled ? error.message : helperText}
-        </FormHelperText>
-      )}
-    </FormControl>
-  )
+          <span ref={labelRef}>{label}</span>
+        </InputLabel>
+        <Box
+          sx={{
+            '&& .MuiTiptap-RichTextContent-root  a': {
+              color: 'secondary.main',
+            },
+            '&& .ProseMirror': {
+              minHeight: props.minRows * 24,
+              overflowY: 'auto',
+            },
+          }}
+        >
+          <RichTextEditor
+            ref={rteRef}
+            extensions={[
+              StarterKit,
+              LinkBubbleMenuHandler,
+              Link,
+              Underline,
+              TextAlign,
+              TaskList,
+              TaskItem,
+            ]} // Or any Tiptap extensions you wish!
+            content={content} // Initial content for the editor
+            onUpdate={({ editor }) => {
+              onChange(editor.getHTML())
+            }}
+            onCreate={({ editor }) => {
+              if (focus) {
+                editor.commands.focus('end')
+              }
+            }}
+            // autofocus={focus}
+            editable={!disabled}
+            editorProps={{
+              autofocus: focus ? 'end' : false,
+              attributes: {
+                class: 'ProseMirror',
+                tabindex: props?.inputProps?.tabIndex || 0,
+              },
+            }}
+            renderControls={() =>
+              !disabled && (
+                <MenuControlsContainer>
+                  <MenuSelectHeading />
+                  <MenuDivider />
+                  <MenuButtonBold />
+                  <MenuButtonItalic />
+                  <MenuButtonUnderline />
+                  <MenuDivider />
+                  <MenuButtonAlignLeft />
+                  <MenuButtonAlignCenter />
+                  <MenuButtonAlignRight />
+                  <MenuDivider />
+                  <MenuButtonEditLink />
+                  <MenuDivider />
+                  <MenuButtonBulletedList />
+                  <MenuButtonOrderedList />
+                  <MenuButtonTaskList />
+                  <MenuDivider />
+                  <MenuButtonHorizontalRule />
+                </MenuControlsContainer>
+              )
+            }
+          >
+            {() => (
+              <>
+                <LinkBubbleMenu />
+              </>
+            )}
+          </RichTextEditor>
+        </Box>
+        {((error?.message && !disabled) || helperText) && (
+          <FormHelperText error={Boolean(error)}>
+            {error?.message && !disabled ? error.message : helperText}
+          </FormHelperText>
+        )}
+      </FormControl>
+    )
+  } else {
+    return <RichTextReadOnly content={content} extensions={[StarterKit]} />
+  }
 }
 
 export default RichTextInput
