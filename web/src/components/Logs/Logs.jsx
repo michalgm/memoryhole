@@ -1,15 +1,23 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
-import { Add, FilterList, FilterListOff, Search } from '@mui/icons-material'
+import {
+  Add,
+  FilterList,
+  FilterListOff,
+  Flag,
+  Person,
+  Search,
+} from '@mui/icons-material'
 import {
   Button,
   Card,
   CardContent,
   Collapse,
-  IconButton,
   InputAdornment,
   Paper,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from '@mui/material'
@@ -17,8 +25,9 @@ import { default as Grid2 } from '@mui/material/Unstable_Grid2/Grid2'
 import { Box, Stack } from '@mui/system'
 import { FormContainer, useForm } from 'react-hook-form-mui'
 
-import { navigate, useLocation } from '@redwoodjs/router'
+import { navigate, useLocation, useRoutePath } from '@redwoodjs/router'
 
+import { useAuth } from 'src/auth'
 import { LOG_FIELDS } from 'src/components/Logs/LogsForm'
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
@@ -47,6 +56,10 @@ const LogsFilter = ({
   loading = false,
 }) => {
   const [showFilters, setShowFilters] = useState(sidebar ? false : true)
+  const { currentAction, currentFormData } = useApp()
+  const { currentUser } = useAuth()
+  const path = useRoutePath()
+
   const filterFields = [
     ['needs_followup', { field_type: 'checkbox' }],
     ['type', { field_type: 'select', options: fieldSchema.log.type.options }],
@@ -56,6 +69,24 @@ const LogsFilter = ({
     ['arrests', { field_type: 'arrest_chooser', multiple: true }],
     ['users', { field_type: 'user_chooser', multiple: true }],
   ]
+
+  const action = context.watch('action') || {}
+  const arrests = context.watch('arrests') || []
+  const users = context.watch('users') || []
+
+  const toggles = []
+  const filterAction =
+    action?.id === currentAction.id && currentAction.id !== -1
+  const filterArrest =
+    path.includes('arrests') &&
+    arrests.filter((a) => a.id == currentFormData?.id).length > 0
+
+  const filterUser = users.filter((u) => u.id == currentUser?.id).length > 0
+  if (showFilters) toggles.push('showFilters')
+  if (filterAction) toggles.push('action')
+  if (filterArrest) toggles.push('arrest')
+  if (filterUser) toggles.push('user')
+
   return (
     <Paper variant="outlined" sx={{ p: 1 }}>
       <FormContainer
@@ -71,6 +102,7 @@ const LogsFilter = ({
               size="small"
               label="Search Logs"
               name="searchString"
+              onChange={() => context.handleSubmit(searchLogs)()}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -79,13 +111,76 @@ const LogsFilter = ({
                 ),
               }}
             />
-            <Tooltip
-              title={`${showFilters ? 'Hide' : 'Show'} Additional Filters`}
-            >
-              <IconButton onClick={() => setShowFilters(!showFilters)}>
-                {showFilters ? <FilterListOff /> : <FilterList />}
-              </IconButton>
-            </Tooltip>
+            <ToggleButtonGroup size="small" value={toggles}>
+              <Tooltip
+                title={`${filterAction ? 'Disable' : 'Enable'} Filter on Current Action`}
+              >
+                <span>
+                  <ToggleButton
+                    disabled={!currentAction.id || currentAction.id === -1}
+                    value="action"
+                    onClick={() => {
+                      context.setValue(
+                        'action',
+                        filterAction ? null : currentAction
+                      )
+                      context.handleSubmit(searchLogs)()
+                    }}
+                  >
+                    <Flag />
+                  </ToggleButton>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={`${filterArrest ? 'Disable' : 'Enable'} Filter on Current Arrest`}
+              >
+                <span>
+                  <ToggleButton
+                    value="arrest"
+                    disabled={!currentFormData?.id || !path.includes('arrests')}
+                    onClick={() => {
+                      if (filterArrest) {
+                        context.setValue('arrests', [])
+                      } else {
+                        context.setValue('arrests', [currentFormData])
+                      }
+                      context.handleSubmit(searchLogs)()
+                    }}
+                  >
+                    <Person />
+                  </ToggleButton>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={`${filterUser ? 'Disable' : 'Enable'} Filter on Current User`}
+              >
+                <span>
+                  <ToggleButton
+                    value="user"
+                    onClick={() => {
+                      if (filterUser) {
+                        context.setValue('users', [])
+                      } else {
+                        context.setValue('users', [currentUser])
+                      }
+                      context.handleSubmit(searchLogs)()
+                    }}
+                  >
+                    <Person />
+                  </ToggleButton>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={`${showFilters ? 'Hide' : 'Show'} Additional Filters`}
+              >
+                <ToggleButton
+                  value="showFilters"
+                  onClick={() => setShowFilters(!showFilters)}
+                >
+                  {showFilters ? <FilterListOff /> : <FilterList />}
+                </ToggleButton>
+              </Tooltip>
+            </ToggleButtonGroup>
           </Stack>
           <Collapse in={showFilters}>
             <Grid2
@@ -128,7 +223,7 @@ const processQuery = (values) => {
   if (values.type) {
     where.type = values.type
   }
-  if (values.arrests) {
+  if (values.arrests?.length) {
     queries.push({
       AND: values.arrests.map((arrest) => ({
         arrests: {
@@ -139,7 +234,7 @@ const processQuery = (values) => {
       })),
     })
   }
-  if (values.users) {
+  if (values.users?.length) {
     queries.push({
       OR: [
         {
