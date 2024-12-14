@@ -1,5 +1,18 @@
 
 
+## [0.5.0](https://github.com/michalgm/memoryhole/compare/v0.4.1...v0.5.0) (2024-12-14)
+
+### Features
+
+* **Form:** Convert form footer, breadcrumb row, and form section headers to use sticky ([2b496a5](https://github.com/michalgm/memoryhole/commit/2b496a5651e6ad3b688ef6c8745e64a9deba0a53))
+* **UI:** Add confirmation on signout ([f3124d2](https://github.com/michalgm/memoryhole/commit/f3124d229b55606a9f96b21c581bedb01cf1baed))
+* **UI:** Nav Menu: Default to collapsed on small screens, add hover expansion when collapsed ([2818a93](https://github.com/michalgm/memoryhole/commit/2818a93242409fe933a1cd3c3bfc6443eddbe0ed))
+* **UI:** Open + focus new log with ctrl-l ([bd59de5](https://github.com/michalgm/memoryhole/commit/bd59de57e8b0268ebc99534ee2747b960a447110))
+
+### Bug Fixes
+
+* **UI:** Handle logs missing actions ([1ed74cc](https://github.com/michalgm/memoryhole/commit/1ed74cc61596292ad9caaba02534e593f6f420e6))
+
 ## [0.4.1](https://github.com/michalgm/memoryhole/compare/v0.4.0...v0.4.1) (2024-12-13)
 
 ## [0.4.0](https://github.com/michalgm/memoryhole/compare/v0.3.0...v0.4.0) (2024-12-13)
