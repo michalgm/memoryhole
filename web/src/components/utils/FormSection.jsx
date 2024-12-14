@@ -60,7 +60,7 @@ const FormSection = ({ title, sectionActions = [], children }) => {
           </Stack>
         </AccordionSummary>
         <AccordionDetails>
-          <Grid xs={12} container spacing={2}>
+          <Grid xs={12} container spacing={2} sx={{ m: 0 }}>
             {children}
           </Grid>
         </AccordionDetails>
