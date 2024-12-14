@@ -1,5 +1,21 @@
 
 
+## [0.6.0](https://github.com/michalgm/memoryhole/compare/v0.5.0...v0.6.0) (2024-12-14)
+
+### Features
+
+* **UI:** action should not be required on logs ([d5ede09](https://github.com/michalgm/memoryhole/commit/d5ede09dfb71d58395eef3958b5c584b5e989a26))
+* **UI:** change logs toggle button color ([45e8d8f](https://github.com/michalgm/memoryhole/commit/45e8d8ff93e202eee48ef0d6be4eed3c0267dd6d))
+* **UI:** Log Form - add Link action and Link Arrest buttons ([d8b84ea](https://github.com/michalgm/memoryhole/commit/d8b84ea7461c1ebfb8bb76b19991d757a460ca48))
+* **UI:** Logs filters - add toggles for filtering by current action/arrest/user ([4b9d0b1](https://github.com/michalgm/memoryhole/commit/4b9d0b1b8ada19874b0e7e9acd04e974ed282195))
+
+### Bug Fixes
+
+* **API:** fix bug where legal_name_confidential was always getting returned as false ([48b0190](https://github.com/michalgm/memoryhole/commit/48b019065959ad8a1e18940908626fa9835b958b))
+* **Form:** don't unneccesarily refetch blank forms ([0a1b328](https://github.com/michalgm/memoryhole/commit/0a1b32857a6691fea03b0bb4fafe6757b02bf664))
+* **Form:** fix form section margins ([5d749dc](https://github.com/michalgm/memoryhole/commit/5d749dcb9c8d77190d815fa5d20d7a9aac1379de))
+* **Form:** handle array values better ([db9df70](https://github.com/michalgm/memoryhole/commit/db9df7062afc8ab5a2164f885928607e9c23233e))
+
 ## [0.5.0](https://github.com/michalgm/memoryhole/compare/v0.4.1...v0.5.0) (2024-12-14)
 
 ### Features
