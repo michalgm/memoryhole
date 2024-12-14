@@ -610,7 +610,7 @@ fieldSchema.log = {
   },
   needs_followup: { field_type: 'checkbox' },
   notes: { field_type: 'richtext', required: true },
-  action: { field_type: 'action_chooser', required: true },
+  action: { field_type: 'action_chooser' },
   arrests: {
     field_type: 'arrest_chooser',
     multiple: true,
