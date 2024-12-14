@@ -25,7 +25,12 @@ export const transformData = (data, schema = {}) => {
       (result, params = {}, path) => {
         const transformer = transformers[params.field_type]
         const value = get(originalData, path, params.default ?? undefined)
-        set(result, path, transformer ? transformer(value) : value)
+        let transformedValue = transformer ? transformer(value) : value
+        if (params.multiple && !value) {
+          transformedValue = []
+        }
+        set(result, path, transformedValue)
+
         return result
       },
       {}
