@@ -6,6 +6,7 @@ import { Box, Stack } from '@mui/system'
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
 
+import { useParams, useRoutePath } from '@redwoodjs/router'
 import { BaseForm } from '../utils/BaseForm'
 import { Field } from '../utils/Field'
 import LoadingButton from '../utils/LoadingButton'
@@ -100,7 +101,9 @@ const transformInput = (input) => {
 }
 
 const LogsForm = ({ callback, log: { id: log_id } = {} }) => {
-  const { currentAction } = useApp()
+  const { currentAction, currentFormData } = useApp()
+  const path = useRoutePath()
+  const { id } = useParams()
   const schema = fieldSchema.log
 
   return (
@@ -130,9 +133,36 @@ const LogsForm = ({ callback, log: { id: log_id } = {} }) => {
           isLoading,
           loading: { loadingCreate, loadingUpdate, loadingDelete },
           confirmDelete,
+          formContext: { getValues, setValue },
         }) => {
           const disabled = isLoading
+          const enableArrestLink =
+            id &&
+            path.includes('arrests') &&
+            !(getValues().arrests || []).map((a) => a.id).includes(id)
 
+          let enableActionLink =
+            currentAction?.id &&
+            currentAction.id !== -1 &&
+            !getValues().action?.id
+
+          const linkAction = () => {
+            setValue('action', currentAction)
+            enableActionLink = false
+          }
+
+          const linkArrest = () => {
+            const {
+              id,
+              arrestee: { search_display_field },
+              date,
+              arrest_city,
+            } = currentFormData
+            setValue('arrests', [
+              ...(getValues().arrests || []),
+              { id, arrestee: { search_display_field }, date, arrest_city },
+            ])
+          }
           return (
             <Stack spacing={2}>
               <Row>
@@ -151,6 +181,24 @@ const LogsForm = ({ callback, log: { id: log_id } = {} }) => {
               <Row>
                 <Field name="action" {...schema.action} />
                 <Field name="arrests" {...schema.arrests} multiple />
+              </Row>
+              <Row>
+                <Button
+                  size="small"
+                  disabled={!enableActionLink}
+                  variant="outlined"
+                  onClick={linkAction}
+                >
+                  Link Current Action
+                </Button>
+                <Button
+                  size="small"
+                  disabled={!enableArrestLink}
+                  variant="outlined"
+                  onClick={linkArrest}
+                >
+                  Link Current Arrest
+                </Button>
               </Row>
               <Stack
                 direction="row"

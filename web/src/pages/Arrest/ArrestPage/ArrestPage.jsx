@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import { navigate, routes } from '@redwoodjs/router'
 
@@ -37,6 +37,7 @@ const ARREST_FIELDS = gql`
     arrestee {
       id
       display_field
+      search_display_field
       first_name
       last_name
       preferred_name
@@ -119,6 +120,11 @@ const ACTION_TO_ARREST_FIELDS = {
 const ArrestPage = ({ id }) => {
   const { currentAction, setPageTitle } = useApp()
   const isCreate = !id || id === 'new'
+  const { setCurrentFormData } = useApp()
+
+  useEffect(() => {
+    return () => setCurrentFormData({})
+  }, [setCurrentFormData])
 
   const applyActionDefaults = (action, target) => {
     if (!action || action.id === -1) return
@@ -158,9 +164,10 @@ const ArrestPage = ({ id }) => {
         arrest.action = currentAction
         applyActionDefaults(currentAction, arrest)
       }
+      setCurrentFormData(arrest)
       return arrest
     },
-    [currentAction, isCreate, setPageTitle]
+    [currentAction, isCreate, setPageTitle, setCurrentFormData]
   )
   const onDelete = useCallback(() => navigate(routes.arrests()), [])
   const onCreate = useCallback(

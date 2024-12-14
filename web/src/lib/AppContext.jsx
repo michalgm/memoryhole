@@ -18,6 +18,7 @@ const AppProvider = ({ children }) => {
   const [pageTitle, setPageTitle] = useState('')
   const [navOpen, setNavOpen] = useState(!smallScreen)
   const [logsOpen, setLogsOpen] = useState(false)
+  const [currentFormData, setCurrentFormData] = useState({})
   const { id } = useParams() // Get the current location
 
   useEffect(() => {
@@ -41,6 +42,8 @@ const AppProvider = ({ children }) => {
     setNavOpen,
     logsOpen,
     setLogsOpen,
+    currentFormData,
+    setCurrentFormData,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
