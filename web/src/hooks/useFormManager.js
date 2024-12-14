@@ -218,10 +218,8 @@ export function useFormManager({
   // Add this useEffect near the other hooks in useFormManager
   useEffect(() => {
     const updateData = async () => {
-      const { data } =
-        !id || !fetchQuery
-          ? { data: {} }
-          : await fetchEntity({ variables: { id } })
+      if (!id || !fetchQuery) return
+      const { data } = await fetchEntity({ variables: { id } })
       await resetForm(data)
     }
     updateData()
