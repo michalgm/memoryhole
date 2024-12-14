@@ -56,6 +56,7 @@ describe('arrestees', () => {
     expect(result).toBe(null)
   })
 })
+
 describe('updateDisplayField', () => {
   test('updates display field with all name components', () => {
     const arrestee = {
@@ -142,6 +143,19 @@ describe('updateDisplayField', () => {
     }
     updateDisplayField(arrestee)
     expect(arrestee.display_field).toEqual('Johnny Doe *')
+  })
+
+  test('handles search_display_field with legal name confidential flag', () => {
+    const arrestee = {
+      first_name: 'John',
+      last_name: 'Doe',
+      preferred_name: 'Johnny',
+      custom_fields: {
+        legal_name_confidential: true,
+      },
+    }
+    updateDisplayField(arrestee, {}, true)
+    expect(arrestee.display_field).toEqual('Johnny (John) Doe')
   })
 
   test('handles legal name confidential with preferred name containing space', () => {

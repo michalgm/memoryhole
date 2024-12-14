@@ -2,13 +2,14 @@ import { merge } from 'lodash'
 
 import { db } from 'src/lib/db'
 
-export const updateDisplayField = (arrestee, current = {}) => {
+export const updateDisplayField = (arrestee, current = {}, force) => {
   if (
     'first_name' in arrestee ||
     'last_name' in arrestee ||
     'preferred_name' in arrestee ||
     (arrestee.custom_fields &&
-      'legal_name_confidential' in arrestee.custom_fields)
+      'legal_name_confidential' in arrestee.custom_fields &&
+      !force)
   ) {
     const merged = merge(current, arrestee)
     const custom_fields = merged.custom_fields ?? {}
@@ -17,7 +18,7 @@ export const updateDisplayField = (arrestee, current = {}) => {
     let preferred_name = (merged.preferred_name ?? '')
       .replace(/ +/g, ' ')
       .trim()
-
+    const confidential = force ? false : custom_fields?.legal_name_confidential
     // Clear redundant names
     if (preferred_name === first_name) {
       first_name = ''
@@ -31,12 +32,12 @@ export const updateDisplayField = (arrestee, current = {}) => {
       preferred_name && first_name ? `(${first_name})` : first_name,
       last_name,
     ]
-    if (custom_fields?.legal_name_confidential) {
+    if (confidential) {
       fields = [preferred_name, !preferred_name.includes(' ') && last_name]
     }
     const display_field = fields.filter(Boolean).join(' ') || 'NO NAME ENTERED'
 
-    arrestee.display_field = `${display_field}${custom_fields?.legal_name_confidential ? ' *' : ''}`
+    arrestee.display_field = `${display_field}${confidential ? ' *' : ''}`
   }
 }
 
@@ -92,8 +93,7 @@ export const Arrestee = {
   },
   search_display_field: (_obj, { root }) => {
     root.custom_fields = root.custom_fields || {}
-    root.custom_fields.legal_name_confidential = false
-    updateDisplayField(root)
+    updateDisplayField(root, {}, true)
     return root.display_field
   },
 }
