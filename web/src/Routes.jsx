@@ -58,7 +58,7 @@ const Routes = () => {
               <Route path="/admin/actions" page={ActionActionsPage} name="AdminActions" />
             </Set>
           </PrivateSet>
-          <Set wrap={ModelLayout} title="Arrests" titleTo="home" buttonLabel="New Arrest" buttonTo="newArrest">
+          <Set wrap={ModelLayout} title="Arrests" titleTo="arrests" buttonLabel="New Arrest" buttonTo="newArrest">
             <Route path="/arrests/new" page={ArrestArrestPage} name="newArrest" />
             <Route path="/arrests/{id:Int}" page={ArrestArrestPage} name="arrest" />
             <Route path="/arrests" page={ArrestArrestsPage} name="arrests" />

@@ -161,7 +161,7 @@ export const BaseField = ({
           rules={{
             required: props.required && 'This field is required',
           }}
-          render={({ field, formState, ...rest }) => (
+          render={({ field, formState }) => (
             <RichTextInput
               {...textFieldOptions}
               content={field.value}

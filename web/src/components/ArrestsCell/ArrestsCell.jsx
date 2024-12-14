@@ -8,7 +8,6 @@ import { useConfirm } from 'material-ui-confirm'
 
 import { routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
 
 import { schema } from 'src/lib/FieldSchemas'
 
@@ -86,14 +85,10 @@ export const Loading = () => (
       schema={schema}
       displayColumns={displayColumns}
       tableProps={tableProps}
-      // refetch={refetch}
       preColumns={preColumns}
-      // bulkUpdate={bulkUpdate}
-      // bulkDelete={bulkDelete}
       manageViews
       type="arrestees"
       name="arrest"
-      // persistState
       loading
     />
   </div>
@@ -114,7 +109,6 @@ export const Success = ({ arrests, queryResult: { refetch } = {} }) => {
   const confirm = useConfirm()
   const [bulkDeleteArrests] = useMutation(BULK_DELETE_ARRESTS, {
     onCompleted: () => {
-      toast.success('Arrests Delete')
       refetch()
     },
   })
