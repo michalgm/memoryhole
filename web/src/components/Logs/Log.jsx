@@ -110,30 +110,32 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
             {expanded && (
               <>
                 <Divider sx={{ mx: '-16px !important' }} />
-                <Stack
-                  direction={'row'}
-                  // justifyContent="space-between"
-                  spacing={2}
-                  sx={{ pb: 2 }}
-                >
-                  <Typography sx={{ fontWeight: 'bold' }}>Action</Typography>
+                {item.action && (
                   <Stack
                     direction={'row'}
-                    spacing={1}
-                    useFlexGap
-                    justifyContent={'flex-start'}
+                    // justifyContent="space-between"
+                    spacing={2}
+                    sx={{ pb: 2 }}
                   >
-                    <Chip
-                      size="small"
-                      variant="outlined"
-                      icon={<Flag />}
-                      label={item.action.name}
-                      onClick={() => {
-                        navigate(routes.action({ id: item.action.id }))
-                      }}
-                    />{' '}
+                    <Typography sx={{ fontWeight: 'bold' }}>Action</Typography>
+                    <Stack
+                      direction={'row'}
+                      spacing={1}
+                      useFlexGap
+                      justifyContent={'flex-start'}
+                    >
+                      <Chip
+                        size="small"
+                        variant="outlined"
+                        icon={<Flag />}
+                        label={item?.action?.name}
+                        onClick={() => {
+                          navigate(routes.action({ id: item.action.id }))
+                        }}
+                      />{' '}
+                    </Stack>
                   </Stack>
-                </Stack>
+                )}
                 {item.arrests.length > 0 && (
                   <Stack
                     direction={'row'}
