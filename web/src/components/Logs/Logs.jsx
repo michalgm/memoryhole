@@ -28,7 +28,7 @@ import { FormContainer, useForm } from 'react-hook-form-mui'
 import { navigate, useLocation, useRoutePath } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
-import { LOG_FIELDS } from 'src/components/Logs/LogsForm'
+import LogsForm, { LOG_FIELDS } from 'src/components/Logs/LogsForm'
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
 import { asyncDebounce } from 'src/lib/utils'
@@ -38,7 +38,6 @@ import { Field } from '../utils/Field'
 import LoadingButton from '../utils/LoadingButton'
 
 import Log from './Log'
-import LogsForm from './LogsForm'
 
 export const QUERY = gql`
   ${LOG_FIELDS}
