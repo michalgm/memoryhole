@@ -34,13 +34,11 @@ const LogsDrawer = ({ open, width, newLogRequested, onNewLogComplete }) => {
         anchor="right"
         open={open}
       >
-        {open && (
-          <Logs
-            sidebar
-            newLogRequested={newLogRequested}
-            onNewLogComplete={onNewLogComplete}
-          />
-        )}
+        <Logs
+          sidebar
+          newLogRequested={newLogRequested}
+          onNewLogComplete={onNewLogComplete}
+        />
       </Drawer>
     </Stack>
   )

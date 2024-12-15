@@ -281,7 +281,7 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
   const { pathname, search } = useLocation()
   const [logs, setLogs] = useState([])
   const [editItem, setEditItem] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!sidebar)
 
   const defaultValues = {}
   if (currentAction && currentAction.id !== -1) {
@@ -299,7 +299,7 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
 
   const onCreate = (success) => {
     setEditItem('')
-    navigate(pathname)
+    !sidebar && navigate(pathname)
     success && searchLogs()
     onNewLogComplete && onNewLogComplete()
   }
@@ -331,8 +331,10 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
   }, [debouncedSearchLogs])
 
   useEffect(() => {
-    searchLogs()
-  }, [searchLogs])
+    if (!sidebar) {
+      searchLogs()
+    }
+  }, [searchLogs, sidebar])
 
   return (
     <Stack spacing={2} sx={{ px: sidebar ? 1 : 0 }}>
