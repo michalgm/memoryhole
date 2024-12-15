@@ -13,7 +13,7 @@ import {
   Experimental_CssVarsProvider as CssVarsProvider,
   experimental_extendTheme as extendTheme,
 } from '@mui/material/styles'
-import { alpha, getContrastRatio } from '@mui/system'
+import { alpha } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { ConfirmProvider } from 'material-ui-confirm'
@@ -31,6 +31,28 @@ import ErrorHandler from './lib/ErrorHandler'
 // Inject error handler into Apollo Link chain
 const link = (rwlinks) =>
   ApolloLink.from([ErrorHandler, ...rwlinks.map((l) => l.link)])
+const xSmallStyles = {
+  padding: 5,
+  fontSize: '13px',
+  lineHeight: 0,
+  '& .MuiSvgIcon-root': {
+    fontSize: '1.2rem',
+  },
+  '& .MuiInputBase-input': {
+    padding: '6.25px 8px',
+    '&.MuiInputBase-inputAdornedStart': {
+      paddingLeft: 0,
+    },
+    '&.MuiInputBase-inputAdornedEnd': {
+      paddingRight: 0,
+    },
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderRadius: '4px',
+    fontSize: '1rem',
+    padding: '0 8px',
+  },
+}
 
 const theme = extendTheme({
   colorSchemes: {
@@ -46,8 +68,7 @@ const theme = extendTheme({
           main: '#fff',
           light: alpha('#fff', 0.5),
           dark: alpha('#fff', 0.9),
-          contrastText:
-            getContrastRatio('#fff', '#fff') > 4.5 ? '#fff' : '#111',
+          contrastText: '#111',
         },
         background: {
           body: '#f3f3f3',
@@ -66,8 +87,7 @@ const theme = extendTheme({
           main: '#fff',
           light: alpha('#fff', 0.5),
           dark: alpha('#fff', 0.9),
-          contrastText:
-            getContrastRatio('#fff', '#fff') > 4.5 ? '#fff' : '#111',
+          contrastText: '#111',
         },
         background: {
           body: 'inherit',
@@ -85,6 +105,74 @@ const theme = extendTheme({
   },
   custom: {
     scrollAreaHeight: 'calc(100vh - 283px)',
+  },
+  components: {
+    MuiButton: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiToggleButtonGroup: {
+      styleOverrides: {
+        sizeXSmall: {
+          '& .MuiToggleButton-root': xSmallStyles,
+        },
+      },
+      variants: [
+        {
+          props: { size: 'x-small' },
+          style: {
+            '& .MuiToggleButton-root': xSmallStyles,
+          },
+        },
+      ],
+    },
+    MuiToggleButton: {
+      styleOverrides: {
+        sizeXSmall: xSmallStyles,
+      },
+      variants: [
+        {
+          props: { size: 'x-small' },
+          style: xSmallStyles,
+        },
+      ],
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        sizeXSmall: xSmallStyles,
+      },
+      variants: [
+        {
+          props: { size: 'x-small' },
+          style: { ...xSmallStyles, padding: 0 },
+        },
+      ],
+    },
+    MuiFormControl: {
+      variants: [
+        {
+          props: { size: 'x-small' },
+          style: { ...xSmallStyles, padding: 0 },
+        },
+      ],
+      styleOverrides: {
+        sizeXSmall: xSmallStyles,
+        root: {
+          '& .MuiFormLabel-colorSuccess': {
+            color: 'var(--mui-palette-success-main)', // Success color for default state
+          },
+          '& .MuiCheckbox-colorSuccess': {
+            color: 'var(--mui-palette-success-main)', // Success color for default state
+          },
+          '& .MuiInputBase-colorSuccess': {
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--mui-palette-success-main)', // Success color for default state
+            },
+          },
+        },
+      },
+    },
   },
 })
 
