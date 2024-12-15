@@ -394,9 +394,7 @@ const DataTable = ({
         '& tr:nth-of-type(odd) > td, & tr:nth-of-type(odd) > td[data-pinned="true"]:before':
           {
             backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? 'action.hover'
-                : 'background.paper',
+              theme.palette.mode === 'light' ? 'grey.100' : 'background.paper',
           },
       },
     },
