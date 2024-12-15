@@ -117,6 +117,7 @@ const NavDrawer = ({ navOpen }) => {
           marginTop: '48px',
           height: 'calc(100vh - 48px)',
           overflowX: 'hidden',
+          zIndex: 1099,
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
