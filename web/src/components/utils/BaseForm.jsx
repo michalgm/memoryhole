@@ -1,10 +1,12 @@
+import React from 'react'
+
 import { FormContainer } from 'react-hook-form-mui'
 
 import { useFormManager } from 'src/hooks/useFormManager'
 
 import { FormStateHandler } from './FormStateHandler'
 
-export const BaseForm = ({
+const BaseForm = ({
   children,
   autoComplete = 'off',
   formConfig,
@@ -28,3 +30,15 @@ export const BaseForm = ({
     </FormContainer>
   )
 }
+
+// This is to force state refresh on id change
+const BaseFormWrapper = (props) => {
+  const key = `${props.formConfig?.modelType}-${props.formConfig?.id || 'new'}`
+  return (
+    <React.Fragment key={key}>
+      <BaseForm {...props} />
+    </React.Fragment>
+  )
+}
+
+export { BaseFormWrapper as BaseForm }
