@@ -19,16 +19,17 @@ const ModelLayout = ({
   const isNew = pathname.endsWith('/new')
 
   return (
-    <Stack spacing={2} direction="column">
+    <Stack spacing={2} direction="column" useFlexGap>
       <Box
         sx={{
-          mb: 2,
+          mx: -1,
+          px: 1,
           position: 'sticky',
           top: 47,
           display: 'flex',
           justifyContent: 'space-between',
           zIndex: 10,
-          backgroundColor: 'background.paper',
+          backgroundColor: 'var(--mui-palette-background-body)',
           py: 1,
         }}
       >
