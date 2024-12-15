@@ -101,7 +101,7 @@ const transformInput = (input) => {
   return input
 }
 
-const LogsForm = ({ callback, log: { id: log_id } = {} }, sidebar) => {
+const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
   const { currentAction, currentFormData } = useApp()
   const path = useRoutePath()
   const { id } = useParams()
@@ -198,6 +198,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {} }, sidebar) => {
                   disabled={!enableArrestLink}
                   variant="outlined"
                   onClick={linkArrest}
+                  sx={{ visibility: sidebar ? undefined : 'hidden' }}
                 >
                   Link Current Arrest
                 </Button>
