@@ -38,6 +38,7 @@ const RichTextInput = (props) => {
     label,
     error,
     helperText,
+    color,
     focus = false,
   } = props
   const rteRef = useRef(null)
@@ -62,7 +63,7 @@ const RichTextInput = (props) => {
         error={Boolean(error)}
         sx={{
           '&& .MuiTiptap-FieldContainer-notchedOutline': {
-            borderColor: error ? 'error.main' : '',
+            borderColor: error ? 'error.main' : `${color}.main`,
           },
           '& .MuiTiptap-FieldContainer-root': {
             '&::before': {
@@ -96,6 +97,7 @@ const RichTextInput = (props) => {
             zIndex: 10,
           }}
           shrink
+          color={color}
           variant="outlined"
           htmlFor={props.name}
         >

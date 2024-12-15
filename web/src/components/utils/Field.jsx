@@ -1,16 +1,24 @@
+import { get } from 'lodash-es'
 import { useFormContext } from 'react-hook-form-mui'
 
 import { BaseField } from './BaseField'
 
-export const Field = (props) => {
+export const Field = ({ highlightDirty, ...props }) => {
   const context = useFormContext()
-  const { setValue, getValues, control } = useFormContext()
+  const { setValue, getValues, control, formState } = useFormContext()
+
+  const fieldState =
+    highlightDirty &&
+    get(formState.dirtyFields, props.name) &&
+    !get(formState.errors, props.name)
+  const color = fieldState ? 'success' : undefined
 
   return (
     <BaseField
       {...props}
       value={getValues(props.name)}
       control={control}
+      color={color}
       isRHF
       onChange={(...args) => {
         const inputType = args[0]?.target?.type

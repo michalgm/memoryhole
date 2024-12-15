@@ -48,6 +48,7 @@ export const BaseField = ({
   onChange,
   isRHF,
   control,
+  color,
   textFieldProps: defaultTextFieldProps,
   ...props
 }) => {
@@ -66,6 +67,7 @@ export const BaseField = ({
     variant: 'outlined',
     fullWidth: fullWidth,
     size: 'small',
+    color,
     ...defaultTextFieldProps,
   }
   if (tabIndex) {
@@ -218,6 +220,7 @@ export const BaseField = ({
           component="fieldset"
           variant="standard"
           onChange={onChange}
+          color={color}
         >
           <FormLabel component="legend">{props.label}</FormLabel>
           <FormGroup>
@@ -245,6 +248,7 @@ export const BaseField = ({
           sx={{ p: 0, pr: 1, pl: 1 }}
           label={props.label}
           onChange={onChange}
+          color={color}
         />
         <FormHelperText>{helperText}</FormHelperText>
       </FormGroup>

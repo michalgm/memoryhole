@@ -65,6 +65,7 @@ const FormContainer = ({
   id,
   skipUpdatedCheck = false,
   autoComplete = 'off',
+  highlightDirty = true,
 }) => {
   const schema = get(fieldSchema, displayConfig?.type?.toLowerCase(), {})
 
@@ -180,6 +181,7 @@ const FormContainer = ({
                                 <Field
                                   tabIndex={100 * (groupIndex + 1) + index}
                                   name={key}
+                                  highlightDirty={highlightDirty}
                                   {...options}
                                 />
                               </Grid>
@@ -195,6 +197,7 @@ const FormContainer = ({
                                   columns.length +
                                   index
                                 }
+                                highlightDirty={highlightDirty}
                                 name={key}
                                 {...options}
                               />
