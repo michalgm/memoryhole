@@ -51,6 +51,7 @@ export function useFormManager({
   onFetch,
   id,
   skipUpdatedCheck,
+  skipDirtyCheck,
 } = {}) {
   const confirm = useConfirm()
   const context = useForm({
@@ -71,7 +72,7 @@ export function useFormManager({
   const displayError = useDisplayError()
   const { openSnackbar } = useSnackbar()
 
-  const blocker = useBlocker({ when: formState.isDirty })
+  const blocker = useBlocker({ when: !skipDirtyCheck && formState.isDirty })
 
   const stats = useMemo(
     () => ({

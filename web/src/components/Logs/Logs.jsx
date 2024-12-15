@@ -345,7 +345,7 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
       {editItem === 'new' && (
         <Card>
           <CardContent>
-            <LogsForm callback={onCreate} />
+            <LogsForm callback={onCreate} sidebar={sidebar} />
           </CardContent>
         </Card>
       )}

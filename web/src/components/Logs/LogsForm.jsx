@@ -3,10 +3,11 @@ import { Button } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { Box, Stack } from '@mui/system'
 
+import { useParams, useRoutePath } from '@redwoodjs/router'
+
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
 
-import { useParams, useRoutePath } from '@redwoodjs/router'
 import { BaseForm } from '../utils/BaseForm'
 import { Field } from '../utils/Field'
 import LoadingButton from '../utils/LoadingButton'
@@ -100,7 +101,7 @@ const transformInput = (input) => {
   return input
 }
 
-const LogsForm = ({ callback, log: { id: log_id } = {} }) => {
+const LogsForm = ({ callback, log: { id: log_id } = {} }, sidebar) => {
   const { currentAction, currentFormData } = useApp()
   const path = useRoutePath()
   const { id } = useParams()
@@ -114,6 +115,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {} }) => {
           schema,
           modelType: 'log',
           namePath: 'notes',
+          skipDirtyCheck: sidebar,
           createMutation: CREATE_MUTATION,
           deleteMutation: DELETE_MUTATION,
           updateMutation: UPDATE_MUTATION,
