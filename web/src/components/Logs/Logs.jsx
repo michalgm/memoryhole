@@ -99,8 +99,8 @@ const LogsFilter = ({
           <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
             <Field
               fullWidth
-              size="small"
-              label="Search Logs"
+              size="x-small"
+              label="Search"
               name="searchString"
               onChange={() => context.handleSubmit(searchLogs)()}
               InputProps={{
@@ -111,7 +111,7 @@ const LogsFilter = ({
                 ),
               }}
             />
-            <ToggleButtonGroup size="small" value={toggles}>
+            <ToggleButtonGroup size="x-small" value={toggles}>
               <Tooltip
                 title={`${filterAction ? 'Disable' : 'Enable'} Filter on Current Action`}
               >
@@ -173,12 +173,14 @@ const LogsFilter = ({
               <Tooltip
                 title={`${showFilters ? 'Hide' : 'Show'} Additional Filters`}
               >
-                <ToggleButton
-                  value="showFilters"
-                  onClick={() => setShowFilters(!showFilters)}
-                >
-                  {showFilters ? <FilterListOff /> : <FilterList />}
-                </ToggleButton>
+                <span>
+                  <ToggleButton
+                    value="showFilters"
+                    onClick={() => setShowFilters(!showFilters)}
+                  >
+                    {showFilters ? <FilterListOff /> : <FilterList />}
+                  </ToggleButton>
+                </span>
               </Tooltip>
             </ToggleButtonGroup>
           </Stack>
@@ -196,7 +198,12 @@ const LogsFilter = ({
             </Grid2>
           </Collapse>
           <Box sx={{ textAlign: 'right' }}>
-            <LoadingButton variant="outlined" type="submit" loading={loading}>
+            <LoadingButton
+              size="small"
+              variant="outlined"
+              type="submit"
+              loading={loading}
+            >
               Filter Logs
             </LoadingButton>
           </Box>
