@@ -1,5 +1,22 @@
 
 
+## [0.7.0](https://github.com/michalgm/memoryhole/compare/v0.6.0...v0.7.0) (2024-12-15)
+
+### Features
+
+* **Form:** Set color to success on dirty form fields ([956f5e7](https://github.com/michalgm/memoryhole/commit/956f5e78dfc5dfea8561cc42c7d1d5334727de2a))
+* **UI:** add ability to skip dirty form check on nav, and use it for logs in sidebar mode ([bcba173](https://github.com/michalgm/memoryhole/commit/bcba173252656fbde65b9cb634a74708e4ea99a8))
+* **UI:** Add dark/light modle toggle UI ([3be78a5](https://github.com/michalgm/memoryhole/commit/3be78a5aef4e1d7f3875ea7408905fe26af27ee0))
+* **UI:** Add extra-small buttons + inputs, and persist success color on form fields ([a64adab](https://github.com/michalgm/memoryhole/commit/a64adabee3748de1455fdc558c01ba073cf608ea))
+* **UI:** use extra-small size for logs filter UI buttons + input ([0767cf9](https://github.com/michalgm/memoryhole/commit/0767cf9e8b6104072dae22f12d783d8c87a9db2e))
+
+### Bug Fixes
+
+* better message on dirty form navigation warning ([401ed44](https://github.com/michalgm/memoryhole/commit/401ed445047def084b84ee957bd3c069f6616914))
+* **DataTable:** fix table striping colors ([e174a25](https://github.com/michalgm/memoryhole/commit/e174a2533d862d1ee8cbc8f4a5c5e76ff54b016b))
+* **UI:** fix color + padding on Breadcrumbs ([60f625c](https://github.com/michalgm/memoryhole/commit/60f625c62a4e0567d4c7c88999bf2e2dd9910588))
+* **UI:** fix logs pane overlapping table views ([e17e4b6](https://github.com/michalgm/memoryhole/commit/e17e4b6a40458dc48b180b4e9a98e43f59dace23))
+
 ## [0.6.0](https://github.com/michalgm/memoryhole/compare/v0.5.0...v0.6.0) (2024-12-14)
 
 ### Features
