@@ -1,9 +1,9 @@
 import {
-  actions,
   action,
+  actions,
   createAction,
-  updateAction,
   deleteAction,
+  updateAction,
 } from './actions'
 
 // Generated boilerplate tests do not account for all circumstances

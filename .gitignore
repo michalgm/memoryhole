@@ -25,3 +25,7 @@ tryouts/
 deploy.toml
 deployment/nginx.conf
 deployment/linode.txt
+coverage
+
+# Million Lint
+.million

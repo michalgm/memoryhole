@@ -1,46 +1,28 @@
 import React from 'react'
 
-import { ThemeProvider, createTheme } from '@mui/material/styles'
 import userEvent from '@testing-library/user-event'
 import { ConfirmProvider } from 'material-ui-confirm'
-import { setupServer } from 'msw/node'
 
 import { navigate } from '@redwoodjs/router'
 import {
   mockGraphQLMutation,
   mockGraphQLQuery,
-  render,
   screen,
   waitFor,
 } from '@redwoodjs/testing/web'
 
+import { SnackBarProvider } from 'src/components/utils/SnackBarProvider.mock'
+import { render } from 'src/setupTests'
+
 import FormContainer from './FormContainer'
-import { SnackBarProvider } from './SnackBar'
 
-const theme = createTheme({
-  palette: {
-    contrastThreshold: 4.5,
-    primary: { main: '#37474f' },
-    secondary: { main: '#ad1457' },
-    success: { main: '#392e3d' },
-    error: { main: '#FF5449' },
-  },
-})
-
-const server = setupServer()
-
-beforeAll(() => server.listen())
-afterAll(() => server.close())
-beforeEach(() => server.resetHandlers())
 const WrappedFormContainer = (props) => {
   return (
-    <ThemeProvider theme={theme}>
+    <SnackBarProvider>
       <ConfirmProvider>
-        <SnackBarProvider>
-          <FormContainer {...props} />
-        </SnackBarProvider>
+        <FormContainer {...props} />
       </ConfirmProvider>
-    </ThemeProvider>
+    </SnackBarProvider>
   )
 }
 
@@ -61,15 +43,6 @@ afterAll(async () => {
 })
 
 const transformInputMock = jest.fn((input) => input)
-
-jest.mock('src/components/utils/SnackBar', () => {
-  const displayErrorMock = jest.fn()
-  return {
-    ...jest.requireActual('src/components/utils/SnackBar'),
-    useDisplayError: () => displayErrorMock,
-    _getMockDisplayError: () => displayErrorMock,
-  }
-})
 
 // Sample fields configuration
 const fields = [

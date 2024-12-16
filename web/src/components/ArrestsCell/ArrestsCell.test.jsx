@@ -5,12 +5,6 @@ import { SnackBarProvider } from '../utils/SnackBar'
 import { Empty, Failure, Loading, Success } from './ArrestsCell'
 import { standard } from './ArrestsCell.mock'
 
-jest.mock('@redwoodjs/router', () => ({
-  ...jest.requireActual('@redwoodjs/router'),
-  routes: {
-    arrest: jest.fn(({ id }) => `/arrest/${id}`),
-  },
-}))
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float and DateTime types.
 //           Please refer to the RedwoodJS Testing Docs:

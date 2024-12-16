@@ -1,7 +1,8 @@
-import { mockGraphQLQuery, render } from '@redwoodjs/testing/web'
+import { mockGraphQLQuery } from '@redwoodjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
+import { render } from 'src/setupTests'
 
 import ArrestPage from './ArrestPage'
 
