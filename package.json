@@ -15,6 +15,7 @@
     "@redwoodjs/studio": "13.0.1",
     "@release-it/conventional-changelog": "^9.0.3",
     "conventional-changelog-cli": "^5.0.0",
+    "ioredis": "^5.4.1",
     "node-ssh": "^13.2.0",
     "release-it": "^17.10.0"
   },
@@ -33,10 +34,10 @@
     "schema": "api/db/schema.prisma"
   },
   "version": "0.7.0",
-  "packageManager": "yarn@4.4.0",
+  "packageManager": "yarn@4.5.3",
   "dependencies": {
     "axios": "^1.7.9",
-    "axios-cookiejar-support": "^5.0.3",
+    "axios-cookiejar-support": "^5.0.5",
     "pm2": "^5.4.3",
     "tough-cookie": "^5.0.0"
   },

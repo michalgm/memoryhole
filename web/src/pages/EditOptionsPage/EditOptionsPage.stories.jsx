@@ -1,4 +1,4 @@
-import EditOptionsPage from '../../EditOptionsPage'
+import EditOptionsPage from './EditOptionsPage'
 
 const meta = {
   component: EditOptionsPage,
