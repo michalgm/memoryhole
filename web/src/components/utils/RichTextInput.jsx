@@ -66,6 +66,9 @@ const RichTextInput = (props) => {
             borderColor: error ? 'error.main' : `${color}.main`,
           },
           '& .MuiTiptap-FieldContainer-root': {
+            backgroundColor: color
+              ? `rgba(var(--mui-palette-${color}-lightChannel) / 0.1)`
+              : undefined,
             '&::before': {
               content: '""',
               position: 'absolute',

@@ -10,9 +10,9 @@ import {
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import { capitalize } from 'lodash-es'
-import { Controller } from 'react-hook-form'
 import {
   CheckboxElement,
+  Controller,
   DatePickerElement,
   DateTimePickerElement,
   RadioButtonGroup,
@@ -242,16 +242,15 @@ export const BaseField = ({
   const renderCheckbox = () => {
     const Component = isRHF ? CheckboxElement : Checkbox
     return (
-      <FormGroup {...props}>
-        <Component
-          name={`${name}`}
-          sx={{ p: 0, pr: 1, pl: 1 }}
-          label={props.label}
-          onChange={onChange}
-          color={color}
-        />
-        <FormHelperText>{helperText}</FormHelperText>
-      </FormGroup>
+      <Component
+        name={`${name}`}
+        label={props.label}
+        labelProps={{ color }}
+        onChange={onChange}
+        color={color}
+        helperText={helperText}
+        required={props.required}
+      />
     )
     // return <FormGroup>
     //   <FormControlLabel
