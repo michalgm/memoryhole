@@ -2,8 +2,6 @@ import React from 'react'
 
 import { ListItemText } from '@mui/material'
 
-import { SearchField } from '@redwoodjs/forms'
-
 import Autocomplete from './Autocomplete'
 
 const autocompleteProps = {

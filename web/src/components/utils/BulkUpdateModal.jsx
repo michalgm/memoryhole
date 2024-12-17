@@ -14,8 +14,7 @@ import dayjs from 'dayjs'
 import { capitalize, isBoolean } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
 import pluralize from 'pluralize'
-import { set, useFieldArray, useForm } from 'react-hook-form'
-import { FormContainer } from 'react-hook-form-mui'
+import { FormContainer, set, useFieldArray, useForm } from 'react-hook-form-mui'
 
 import { useMutation } from '@redwoodjs/web'
 

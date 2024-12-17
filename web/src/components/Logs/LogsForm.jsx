@@ -113,7 +113,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
         formConfig={{
           id: log_id,
           schema,
-          modelType: 'log',
+          modelType: 'Log',
           namePath: 'notes',
           skipDirtyCheck: sidebar,
           createMutation: CREATE_MUTATION,

@@ -194,6 +194,7 @@ export const AuthManage = ({
               loading={loading}
               sx={{ width: '100%' }}
               type="submit"
+              size="large"
               variant="contained"
               color="primary"
               containerProps={{ sx: { width: '100%' } }}
