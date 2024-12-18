@@ -19,13 +19,20 @@ const ModelLayout = ({
   const isNew = pathname.endsWith('/new')
 
   return (
-    <Stack spacing={2} direction="column" useFlexGap>
+    <Stack
+      spacing={2}
+      direction="column"
+      useFlexGap
+      sx={{
+        pt: 3,
+      }}
+    >
       <Box
         sx={{
           mx: -1,
           px: 1,
           position: 'sticky',
-          top: 47,
+          top: 0,
           display: 'flex',
           justifyContent: 'space-between',
           zIndex: 10,
@@ -45,7 +52,7 @@ const ModelLayout = ({
             variant="contained"
             color="secondary"
             startIcon={<Add />}
-            size="small"
+            size="medium"
           >
             {buttonLabel}
           </Button>

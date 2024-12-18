@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 
 import { Container } from '@mui/material'
 import Box from '@mui/material/Box'
-import { styled, useMediaQuery } from '@mui/system'
+import { styled } from '@mui/system'
 
-import { useRouteName } from '@redwoodjs/router'
+import { navigate, routes, useRouteName } from '@redwoodjs/router'
 
 import LogsDrawer from 'src/components/Logs/LogsDrawer'
 import AppProvider, { useApp } from 'src/lib/AppContext'
@@ -15,16 +15,16 @@ import NavDrawer from './NavDrawer'
 export const RIGHT_DRAWER_WIDTH = 450
 export const LEFT_DRAWER_WIDTH = 150
 export const LEFT_DRAWER_WIDTH_SMALL = 64
+export const HEADER_HEIGHT = 48
 
 const Main = styled('main', {
   shouldForwardProp: (prop) => !['leftOpen', 'rightOpen'].includes(prop),
 })(({ theme, leftOpen, rightOpen }) => {
-  const small = useMediaQuery(theme.breakpoints.down('md'))
   const leftWidth = leftOpen ? LEFT_DRAWER_WIDTH : LEFT_DRAWER_WIDTH_SMALL
   return {
+    '--header-height': `${HEADER_HEIGHT}px`,
     flexGrow: 1,
-    padding: theme.spacing(small ? 1 : 2),
-    marginTop: '48px',
+    marginTop: 0,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -34,6 +34,10 @@ const Main = styled('main', {
       marginRight: RIGHT_DRAWER_WIDTH,
     }),
     width: `calc(100% - ${leftWidth + (rightOpen ? RIGHT_DRAWER_WIDTH : 0)}px)`,
+    overflowX: 'auto',
+    overflowY: 'auto',
+    display: 'block',
+    height: 'calc(100vh - var(--header-height))',
   }
 })
 
@@ -62,6 +66,7 @@ const Layout = ({ children }) => {
         setNavOpen={setNavOpen}
         logsOpen={logsOpen}
         setLogsOpen={setLogsOpen}
+        height={HEADER_HEIGHT}
       />
       <Box sx={{ display: 'flex' }}>
         <NavDrawer navOpen={navOpen} />
@@ -70,7 +75,8 @@ const Layout = ({ children }) => {
             id="container"
             sx={{
               maxWidth: routeName === 'home' ? false : 'lg',
-              minWidth: '590px',
+              minWidth: '300px',
+              p: 0,
             }}
           >
             {children}

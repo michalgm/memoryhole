@@ -73,7 +73,7 @@ const textFieldProps = {
   },
 }
 
-const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen }) => {
+const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen, height }) => {
   const { currentAction, setCurrentAction } = useApp()
 
   const transformOptions = useCallback(
@@ -81,7 +81,7 @@ const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen }) => {
     []
   )
   return (
-    <Box component="header" sx={{ flexGrow: 1 }}>
+    <Box component="header" sx={{ flexGrow: 1, height }}>
       <AppBar position="fixed">
         <Toolbar className="navbar" variant="dense" sx={{ mx: '-12px' }}>
           <Stack

@@ -91,7 +91,7 @@ const theme = extendTheme({
           contrastText: '#111',
         },
         background: {
-          body: 'inherit',
+          body: '#121212',
         },
       },
     },

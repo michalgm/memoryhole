@@ -27,7 +27,7 @@ import {
   useColorScheme,
 } from '@mui/material'
 import Box from '@mui/material/Box'
-import { Stack } from '@mui/system'
+import { Stack, useMediaQuery } from '@mui/system'
 import dayjs from 'dayjs'
 import { useConfirm } from 'material-ui-confirm'
 
@@ -39,6 +39,7 @@ import { LEFT_DRAWER_WIDTH, LEFT_DRAWER_WIDTH_SMALL } from './MainLayout'
 const NavDrawer = ({ navOpen }) => {
   const { currentUser, logOut } = useAuth()
   const { mode, setMode } = useColorScheme()
+  const supportsHover = useMediaQuery('(hover: hover)')
 
   const [expires, setExpires] = useState({})
   const [isHovered, setIsHovered] = useState(false)
@@ -47,13 +48,13 @@ const NavDrawer = ({ navOpen }) => {
   const effectiveNavOpen = isHovered || navOpen
 
   const handleMouseEnter = () => {
-    if (!navOpen) {
+    if (!navOpen && supportsHover) {
       setIsHovered(true)
     }
   }
 
   const handleMouseLeave = () => {
-    if (!navOpen) {
+    if (!navOpen && supportsHover) {
       setIsHovered(false)
     }
   }
@@ -132,7 +133,7 @@ const NavDrawer = ({ navOpen }) => {
           flexDirection: 'column',
         }}
       >
-        <List sx={{ flexGrow: 1 }}>
+        <List sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           {pages.map(([route, label, Icon]) => (
             <NavMenuItem key={route} route={route} label={label} Icon={Icon} />
           ))}
@@ -161,9 +162,7 @@ const NavDrawer = ({ navOpen }) => {
               />
             </span>
           </Tooltip>
-        </List>
-        <List>
-          <ListItem>
+          <ListItem sx={{ px: 1, py: 0, flexGrow: 1, alignItems: 'flex-end' }}>
             <ListItemText sx={{ textAlign: 'center' }}>
               <ToggleButtonGroup
                 value={mode}
@@ -185,7 +184,6 @@ const NavDrawer = ({ navOpen }) => {
                     orientation="horizontal"
                     key={value}
                     in={effectiveNavOpen || value == mode}
-                    value={value}
                   >
                     <Tooltip
                       title={`Set theme to ${value === 'system' ? 'system default' : `${value} mode`}`}
@@ -227,10 +225,10 @@ const NavMenuItem = ({ route, label, Icon, ...props }) => {
           },
           '&.Mui-selected': {
             '& .MuiListItemIcon-root': {
-              color: 'primary.light',
+              color: 'primary.main',
             },
             '& .MuiListItemText-primary': {
-              color: 'primary.light',
+              color: 'primary.main',
             },
           },
         }}
