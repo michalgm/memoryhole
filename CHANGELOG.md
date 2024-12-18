@@ -1,5 +1,24 @@
 
 
+## [0.8.0](https://github.com/michalgm/memoryhole/compare/v0.7.0...v0.8.0) (2024-12-18)
+
+### Features
+
+* **UI:** Add useContainerWidth hook for responsiveness ([64cd61d](https://github.com/michalgm/memoryhole/commit/64cd61d42812e84ae901874e0c9d91fd7064d3eb))
+* **UI:** Better responsive layouts for narrow viewports ([0ac31ca](https://github.com/michalgm/memoryhole/commit/0ac31ca78c1e9e4901548e7305d4ff275d607521))
+* **UI:** CTRL-A to quickly create a new arrest ([cc5c0e3](https://github.com/michalgm/memoryhole/commit/cc5c0e3ed61b712e5478a211c921e2835b49a0ee))
+* **UI:** Persist new log input after cloing pane ([d1f227e](https://github.com/michalgm/memoryhole/commit/d1f227e7c69fc2fe5552037a90c673b54195e9ca))
+* **UI:** some minor fixes ([e0c9709](https://github.com/michalgm/memoryhole/commit/e0c9709e6ccf5b711d1d0f8189e0f99bf9bf2809))
+* **UI:** Theme updates - xsmall buttons + inputs, persistent success colors ([5ec5f1f](https://github.com/michalgm/memoryhole/commit/5ec5f1f79d54b696bd7576510c08907a36836cc6))
+
+### Bug Fixes
+
+* **DataTable:** Clean up datatable display ([a75db93](https://github.com/michalgm/memoryhole/commit/a75db9381deedcf4db437a7141310dafd6eddc99))
+* **Form:** Force form reset on id change ([b7b187c](https://github.com/michalgm/memoryhole/commit/b7b187ca253bb9643d9def5a7990a3d79ec7df32))
+* **UI:** fix logs form sidebar behavior ([8bfd369](https://github.com/michalgm/memoryhole/commit/8bfd3692a17e7418aaad8d6b7ea743d6e63ad7ff))
+* **UI:** Layout improvements ([b463492](https://github.com/michalgm/memoryhole/commit/b463492bb9e28a2676183fa8e64eed9de883a341))
+* **UI:** z-index on nav panel ([e7da567](https://github.com/michalgm/memoryhole/commit/e7da5671b193f2d10d6e58b2eed126288f905186))
+
 ## [0.7.0](https://github.com/michalgm/memoryhole/compare/v0.6.0...v0.7.0) (2024-12-15)
 
 ### Features
