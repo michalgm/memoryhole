@@ -1,5 +1,5 @@
 import { Add } from '@mui/icons-material'
-import { Box, Button } from '@mui/material'
+import { Box, Button, Tooltip } from '@mui/material'
 import { Stack } from '@mui/system'
 
 import { navigate, routes, useLocation, useParams } from '@redwoodjs/router'
@@ -47,15 +47,23 @@ const ModelLayout = ({
         />
 
         {buttonLabel && buttonTo && !id && !isNew && (
-          <Button
-            onClick={() => navigate(routes[buttonTo](buttonParams))}
-            variant="contained"
-            color="secondary"
-            startIcon={<Add />}
-            size="medium"
+          <Tooltip
+            title={
+              buttonLabel === 'New Arrest'
+                ? `(CTRL-A to quickly create a new arrest)`
+                : ''
+            }
           >
-            {buttonLabel}
-          </Button>
+            <Button
+              onClick={() => navigate(routes[buttonTo](buttonParams))}
+              variant="contained"
+              color="secondary"
+              startIcon={<Add />}
+              size="medium"
+            >
+              {buttonLabel}
+            </Button>
+          </Tooltip>
         )}
       </Box>
       <Box>{children}</Box>

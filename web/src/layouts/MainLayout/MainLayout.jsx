@@ -48,11 +48,16 @@ const Layout = ({ children }) => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key.toLowerCase() === 'l') {
-        e.preventDefault()
-        setLogsOpen(true)
-        setNavOpen(false)
-        setNewLogRequested(true)
+      if (e.ctrlKey) {
+        if (e.key.toLowerCase() === 'l') {
+          e.preventDefault()
+          setLogsOpen(true)
+          setNavOpen(false)
+          setNewLogRequested(true)
+        } else if (e.key.toLowerCase() === 'a') {
+          e.preventDefault()
+          navigate(routes['newArrest']())
+        }
       }
     }
     document.addEventListener('keydown', handleKeyDown)
