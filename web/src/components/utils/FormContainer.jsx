@@ -61,6 +61,7 @@ const ModInfo = React.forwardRef(
                 variant="body2"
                 lineHeight={1.3}
                 sx={{ display: 'block', flexGrow: 1 }}
+                component={'div'}
               >
                 <Stack direction="row" gap={1} alignItems="flex-start">
                   <b>{startCase(time)}</b>
@@ -68,9 +69,11 @@ const ModInfo = React.forwardRef(
                     <IconText icon={AccessTime}>
                       {stats[time].format('L LT')}
                     </IconText>
-                    <IconText icon={Person}>
-                      {formData[`${time}_by`]?.name}
-                    </IconText>
+                    {formData[`${time}_by`] && (
+                      <IconText icon={Person}>
+                        {formData[`${time}_by`]?.name}
+                      </IconText>
+                    )}
                   </Box>
                 </Stack>
               </Typography>

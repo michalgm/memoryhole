@@ -76,8 +76,8 @@ export function useFormManager({
 
   const stats = useMemo(
     () => ({
-      created: dayjs(formData?.created_at),
-      updated: dayjs(formData?.updated_at),
+      created: formData?.created_at && dayjs(formData.created_at),
+      updated: formData?.updated_at && dayjs(formData.updated_at),
     }),
     [formData?.created_at, formData?.updated_at]
   )
