@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
-import { Box, Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
+import { Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import { difference, get, merge, set, sortBy } from 'lodash-es'
 import {
@@ -163,10 +163,14 @@ const ToolbarActions = ({
     download(csvConfig)(csv)
   }
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+    <Stack
+      direction="row"
+      sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}
+      spacing={0}
+    >
       {reload && (
         <Tooltip title="Refresh Data">
-          <IconButton onClick={() => reload()}>
+          <IconButton onClick={() => reload()} size="small">
             <Refresh />
           </IconButton>
         </Tooltip>
@@ -175,6 +179,7 @@ const ToolbarActions = ({
         <Tooltip title="Save as spreadsheet (CSV)">
           <span>
             <IconButton
+              size="small"
               disabled={table.getPrePaginationRowModel().rows.length === 0}
               onClick={() =>
                 handleExportRows(table.getPrePaginationRowModel().rows)
@@ -193,7 +198,7 @@ const ToolbarActions = ({
         />
       )}
       {actionButtons && actionButtons(table)}
-    </Box>
+    </Stack>
   )
 }
 
@@ -405,6 +410,7 @@ const DataTable = ({
     },
     muiSearchTextFieldProps: {
       placeholder: 'Search All Fields',
+      size: 'x-small',
     },
 
     muiSkeletonProps: {

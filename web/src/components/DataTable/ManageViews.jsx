@@ -1,11 +1,9 @@
 import { useRef, useState } from 'react'
 
-import { useTheme } from '@emotion/react'
 import { Add, Delete, Edit, Save } from '@mui/icons-material'
 import {
   Button,
   ButtonGroup,
-  FormGroup,
   IconButton,
   MenuItem,
   Paper,
@@ -13,6 +11,7 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material'
+import { Stack } from '@mui/system'
 import { useConfirm } from 'material-ui-confirm'
 
 import { useMutation, useQuery } from '@redwoodjs/web'
@@ -68,9 +67,6 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [editType, setEditType] = useState(null)
   const confirm = useConfirm()
-  const theme = useTheme()
-
-  const contrast = theme?.palette?.contrast ? 'contrast' : 'primary'
 
   const { refetch } = useQuery(FETCH_TABLE_VIEWS, {
     onCompleted: ({ tableViews }) => {
@@ -170,24 +166,37 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
   const id = open ? 'simple-popover' : undefined
   return (
     <>
-      <FormGroup
-        row
+      <Stack
+        direction="row"
+        spacing={0}
         sx={{
-          transform: 'scale(0.8)',
+          alignItems: 'center',
         }}
       >
-        <Tooltip title="Create new view from current settings">
-          <Button
-            type="button"
-            variant="outlined"
-            size="small"
-            color={contrast}
-            onClick={(event) => openEdit('create')(event)}
-            sx={{ minWidth: 40, marginRight: 1 }}
-          >
-            <Add />
-          </Button>
-        </Tooltip>
+        <ButtonGroup
+          variant="text"
+          size="x-small"
+          color="inherit"
+          sx={{
+            color: 'text.secondary',
+            '& .MuiButton-root': {
+              border:
+                '1px solid rgba(var(--mui-palette-common-onBackgroundChannel) / 0.23)',
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+              borderRight: 0,
+            },
+          }}
+          disabled={currentView?.name === 'Default' || !currentView?.name}
+        >
+          <Tooltip title="Create new view from current settings">
+            <span>
+              <Button onClick={(event) => openEdit('create')(event)}>
+                <Add />
+              </Button>
+            </span>
+          </Tooltip>
+        </ButtonGroup>
         <Popover
           anchorOrigin={{
             vertical: 'bottom',
@@ -205,7 +214,7 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
           <Paper sx={{ padding: 2, marginTop: 1 }}>
             <TextField
               label="View Name"
-              size="small"
+              size="x-small"
               autoFocus // eslint-disable-line jsx-a11y/no-autofocus
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -223,56 +232,71 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
             </Tooltip>
           </Paper>
         </Popover>
+        <TextField
+          label="Load View"
+          size="x-small"
+          select
+          value={currentView}
+          onChange={loadView}
+          sx={{ minWidth: 130 }}
+          fullWidth
+          InputProps={{
+            sx: {
+              borderRadius: 0,
+            },
+          }}
+        >
+          <MenuItem key="__blank" value={defaultView.current}>
+            Default
+          </MenuItem>
+          {tableViews.map((view) => {
+            return (
+              <MenuItem key={view.id} value={view}>
+                {view.name}
+              </MenuItem>
+            )
+          })}
+        </TextField>
 
         <ButtonGroup
-          variant="outlined"
-          size="small"
-          color={contrast}
+          variant="text"
+          size="x-small"
+          color="inherit"
+          sx={{
+            color: 'text.secondary',
+            '& .MuiButton-root': {
+              border:
+                '1px solid rgba(var(--mui-palette-common-onBackgroundChannel) / 0.23)',
+              borderTopLeftRadius: 0,
+              borderBottomLeftRadius: 0,
+              borderLeft: 0,
+            },
+          }}
           disabled={currentView?.name === 'Default' || !currentView?.name}
         >
-          <TextField
-            label="Load View"
-            size="small"
-            select
-            value={currentView}
-            onChange={loadView}
-            sx={{ minWidth: 130 }}
-            fullWidth
-            InputProps={{
-              sx: {
-                borderBottomRightRadius: 0,
-                borderTopRightRadius: 0,
-              },
-            }}
-          >
-            <MenuItem key="__blank" value={defaultView.current}>
-              Default
-            </MenuItem>
-            {tableViews.map((view) => {
-              return (
-                <MenuItem key={view.id} value={view}>
-                  {view.name}
-                </MenuItem>
-              )
-            })}
-          </TextField>
-          <Button onClick={openEdit('rename')}>
-            <Tooltip title="Rename Current View">
-              <Edit />
-            </Tooltip>
-          </Button>
-          <Button onClick={() => replaceView()}>
-            <Tooltip title="Update Current View">
-              <Save />
-            </Tooltip>
-          </Button>
-          <Button onClick={() => deleteView()}>
-            <Tooltip title="Delete Current View">
-              <Delete />
-            </Tooltip>
-          </Button>
+          <Tooltip title="Rename Current View">
+            <span>
+              <Button onClick={openEdit('rename')}>
+                <Edit />
+              </Button>
+            </span>
+          </Tooltip>
+          <Tooltip title="Update Current View">
+            <span>
+              <Button onClick={() => replaceView()}>
+                <Save />
+              </Button>
+            </span>
+          </Tooltip>
+          <Tooltip title="Delete Current View">
+            <span>
+              <Button onClick={() => deleteView()}>
+                <Delete />
+              </Button>
+            </span>
+          </Tooltip>
         </ButtonGroup>
-      </FormGroup>
+      </Stack>
     </>
   )
 }
