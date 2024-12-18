@@ -11,6 +11,8 @@ import {
 } from 'material-react-table'
 import pluralize from 'pluralize'
 
+import { useContainerWidth } from 'src/lib/AppContext'
+
 import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/BaseField'
 
@@ -223,21 +225,9 @@ const DataTable = ({
   footerNotes,
 }) => {
   const [reloading, setReloading] = useState(false)
-  const containerRef = useRef(null)
-  const [containerWidth, setContainerWidth] = useState(null)
-  const smallMode = containerWidth < 700
-
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      setContainerWidth(entries[0].contentRect.width)
-    })
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current)
-    }
-
-    return () => resizeObserver.disconnect()
-  }, [])
+  const mediumLayout = useContainerWidth(870)
+  const smallLayout = useContainerWidth(680)
+  const extraSmallLayout = useContainerWidth(500)
 
   const visibleColumns = [
     ...displayColumns,
@@ -411,6 +401,9 @@ const DataTable = ({
     muiSearchTextFieldProps: {
       placeholder: 'Search All Fields',
       size: 'x-small',
+      style: {
+        maxWidth: '185px',
+      },
     },
 
     muiSkeletonProps: {
@@ -429,7 +422,7 @@ const DataTable = ({
         table={table}
         reload={refetch && reload}
         disableDownload={disableDownload}
-        manageViews={manageViews}
+        manageViews={!extraSmallLayout && manageViews}
         state={state}
         loadState={loadState}
         initialState={initialState}
@@ -441,7 +434,7 @@ const DataTable = ({
 
   if (footerNotes) {
     defaultProps.renderBottomToolbarCustomActions = () => {
-      if (!smallMode) {
+      if (!mediumLayout) {
         return footerNotes
       }
     }
@@ -507,18 +500,14 @@ const DataTable = ({
 
   if (globalFilter || tableProps?.initialState?.showGlobalFilter) {
     properties.initialState.showGlobalFilter = false
-    state.showGlobalFilter = !smallMode
+    state.showGlobalFilter = !smallLayout
   }
 
   properties.state = state
 
   const table = useMaterialReactTable(properties)
 
-  return (
-    <div ref={containerRef}>
-      <MaterialReactTable table={table} />
-    </div>
-  )
+  return <MaterialReactTable table={table} />
 }
 
 export default DataTable

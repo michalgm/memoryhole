@@ -6,13 +6,12 @@ const Footer = ({ children }) => {
       id="footer"
       elevation={4}
       sx={{
-        position: 'sticky',
-        bottom: 0,
         backgroundColor: (theme) =>
           theme.palette.mode === 'light' ? 'primary.main' : 'background.paper',
-        color: 'white',
-        zIndex: 10,
+        color: 'contrast.main',
         p: 2,
+        zIndex: 12,
+        position: 'relative',
       }}
     >
       <Stack

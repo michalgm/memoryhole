@@ -1,10 +1,12 @@
-import { Box, Tooltip, Typography } from '@mui/material'
+import { AccessTime, Person } from '@mui/icons-material'
+import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { Stack } from '@mui/system'
-import { startCase } from 'lodash-es'
-import { get } from 'react-hook-form'
+import { get, startCase } from 'lodash-es'
 
 import Loading from 'src/components/Loading/Loading'
+import IconText from 'src/components/utils/IconText'
+import { useContainerWidth } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
 
 import { BaseForm } from './BaseForm'
@@ -39,14 +41,44 @@ function fieldsToColumns(fields, columnCount = 2) {
   return { columns, fullSpan }
 }
 
-const ModTime = ({ time, stats, formData }) => (
-  <Typography variant="overline">
-    {startCase(time)}{' '}
-    <Tooltip title={stats[time].format('LLLL')}>
-      <b>{stats[time].calendar()}</b>
-    </Tooltip>{' '}
-    by <b>{formData[`${time}_by`]?.name}</b>
-  </Typography>
+const ModInfo = React.forwardRef(
+  ({ stats, formData, withBy, ...props }, ref) => {
+    return (
+      <Stack
+        spacing={3}
+        direction={withBy ? 'column' : 'row'}
+        alignItems="center"
+        justifyContent="flex-start"
+        {...props}
+        ref={ref}
+      >
+        {['created', 'updated']
+          .filter((k) => stats?.[k])
+          .map((time) => {
+            return (
+              <Typography
+                key={time}
+                variant="body2"
+                lineHeight={1.3}
+                sx={{ display: 'block', flexGrow: 1 }}
+              >
+                <Stack direction="row" gap={1} alignItems="flex-start">
+                  <b>{startCase(time)}</b>
+                  <Box>
+                    <IconText icon={AccessTime}>
+                      {stats[time].format('L LT')}
+                    </IconText>
+                    <IconText icon={Person}>
+                      {formData[`${time}_by`]?.name}
+                    </IconText>
+                  </Box>
+                </Stack>
+              </Typography>
+            )
+          })}
+      </Stack>
+    )
+  }
 )
 
 const FormContainer = ({
@@ -67,6 +99,7 @@ const FormContainer = ({
   autoComplete = 'off',
   highlightDirty = true,
 }) => {
+  const smallLayout = useContainerWidth(860)
   const schema = get(fieldSchema, displayConfig?.type?.toLowerCase(), {})
 
   return (
@@ -106,16 +139,18 @@ const FormContainer = ({
 
         const footer = (
           <Footer>
-            <Grid xs>
-              {formData?.created_at && id && (
-                <ModTime time="created" stats={stats} formData={formData} />
-              )}
-            </Grid>
-            <Grid xs>
-              {formData?.updated_at && id && (
-                <ModTime time="updated" stats={stats} formData={formData} />
-              )}
-            </Grid>
+            {id &&
+              (smallLayout ? (
+                <Tooltip
+                  title={<ModInfo stats={stats} formData={formData} withBy />}
+                >
+                  <IconButton color="inherit">
+                    <AccessTime />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <ModInfo stats={stats} formData={formData} />
+              ))}
             <Grid
               xs
               sx={{
@@ -127,9 +162,10 @@ const FormContainer = ({
             >
               {id && deleteMutation && (
                 <LoadingButton
+                  sx={{ whiteSpace: 'nowrap' }}
                   variant="outlined"
                   color="inherit"
-                  size="small"
+                  size="medium"
                   onClick={confirmDelete}
                   disabled={disabled}
                   loading={loadingDelete}
@@ -138,10 +174,11 @@ const FormContainer = ({
                 </LoadingButton>
               )}
               <LoadingButton
+                sx={{ whiteSpace: 'nowrap' }}
                 type="submit"
                 variant="contained"
                 color="secondary"
-                size="small"
+                size="medium"
                 disabled={disabled}
                 loading={loadingUpdate || loadingCreate}
               >
@@ -152,7 +189,7 @@ const FormContainer = ({
         )
 
         return (
-          <Box sx={{ position: 'relative', width: '100%' }}>
+          <Box sx={{ position: 'relative', width: '100%', pb: 3 }}>
             <Stack spacing={4} sx={{ pb: 2 }} className="content-container">
               {fields.map(
                 (
@@ -210,7 +247,28 @@ const FormContainer = ({
                 }
               )}
             </Stack>
-            {footer}
+            <Box
+              elevation={9}
+              sx={{
+                position: 'sticky',
+                bottom: 0,
+                zIndex: 10,
+                pb: 2,
+              }}
+            >
+              {footer}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  backgroundColor: 'var(--mui-palette-background-body)',
+                  mx: -1,
+                  zIndex: 0,
+                  height: 'calc(100% - 12px)',
+                  width: 'calc(100%  + 16px)',
+                  top: 12,
+                }}
+              />
+            </Box>
           </Box>
         )
       }}

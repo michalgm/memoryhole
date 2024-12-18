@@ -9,7 +9,7 @@ import {
 } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { Box, Stack } from '@mui/system'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form-mui'
 
 const FormSection = ({ title, sectionActions = [], children }) => {
   const context = useFormContext()
@@ -19,7 +19,7 @@ const FormSection = ({ title, sectionActions = [], children }) => {
         <AccordionSummary
           sx={{
             position: 'sticky',
-            top: 91,
+            top: 46,
             bgcolor: (theme) =>
               theme.palette.mode === 'light' ? 'primary.light' : 'grey.800',
             color: (theme) =>
