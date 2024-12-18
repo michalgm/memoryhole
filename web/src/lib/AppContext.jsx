@@ -1,8 +1,14 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 import { useMediaQuery } from '@mui/system'
 
 import { useParams } from '@redwoodjs/router'
+
+import {
+  LEFT_DRAWER_WIDTH,
+  LEFT_DRAWER_WIDTH_SMALL,
+  RIGHT_DRAWER_WIDTH,
+} from 'src/layouts/MainLayout/MainLayout'
 
 const AppContext = createContext()
 
@@ -51,6 +57,22 @@ const AppProvider = ({ children }) => {
 
 export const useApp = () => {
   return useContext(AppContext)
+}
+
+export const useContainerWidth = (width) => {
+  const { navOpen, logsOpen } = useApp()
+  const minWidth = useMemo(() => {
+    const padding = 24 * 2
+    return (
+      width +
+      padding +
+      (navOpen ? LEFT_DRAWER_WIDTH : LEFT_DRAWER_WIDTH_SMALL) +
+      (logsOpen ? RIGHT_DRAWER_WIDTH : 0)
+    )
+  }, [width, navOpen, logsOpen])
+
+  const matches = useMediaQuery(`(max-width:${minWidth}px)`)
+  return matches
 }
 
 export default AppProvider
