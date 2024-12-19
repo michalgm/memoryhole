@@ -28,10 +28,10 @@ export const schema = gql`
     search_display_field: String
   }
 
-  type Query {
-    arrestees: [Arrestee!]! @requireAuth
-    arrestee(id: Int!): Arrestee @requireAuth
-  }
+  # type Query {
+  #   arrestees: [Arrestee!]! @requireAuth
+  #   arrestee(id: Int!): Arrestee @requireAuth
+  # }
 
   input CreateArresteeInput {
     display_field: String
@@ -75,10 +75,10 @@ export const schema = gql`
     updated_by_id: Int
   }
 
-  type Mutation {
-    createArrestee(input: CreateArresteeInput!): Arrestee! @requireAuth
-    updateArrestee(id: Int!, input: UpdateArresteeInput!): Arrestee!
-      @requireAuth
-    deleteArrestee(id: Int!): Arrestee! @requireAuth
-  }
+  # type Mutation {
+  #   createArrestee(input: CreateArresteeInput!): Arrestee! @requireAuth
+  #   updateArrestee(id: Int!, input: UpdateArresteeInput!): Arrestee!
+  #     @requireAuth
+  #   deleteArrestee(id: Int!): Arrestee! @requireAuth
+  # }
 `
