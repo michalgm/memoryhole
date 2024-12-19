@@ -20,7 +20,8 @@
     "import_script",
     "API",
     "Tests",
-    "DataTable"
+    "DataTable",
+    "Storybook"
   ],
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
