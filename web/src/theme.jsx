@@ -1,5 +1,5 @@
 import { blueGrey, pink } from '@mui/material/colors'
-import { alpha, extendTheme } from '@mui/material/styles'
+import { alpha, createTheme } from '@mui/material/styles'
 
 const xSmallFontSize = '0.7rem'
 const xSmallPadding = '2px 3px'
@@ -54,7 +54,10 @@ const xSmallInputStyles = {
   },
 }
 
-const theme = extendTheme({
+const theme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'class',
+  },
   colorSchemes: {
     light: {
       palette: {

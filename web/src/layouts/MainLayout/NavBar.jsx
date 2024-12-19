@@ -106,15 +106,15 @@ const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen, height }) => {
                 noWrap
                 component={Link}
                 to={routes.home()}
-                sx={{
-                  color: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'secondary.light'
-                      : 'contrast.main',
+                sx={(theme) => ({
+                  color: 'contrast.main',
                   flexGrow: 0,
                   fontFamily: 'monospace',
                   textDecoration: 'none',
-                }}
+                  ...theme.applyStyles('dark', {
+                    color: 'secondary.light',
+                  }),
+                })}
               >
                 memoryhole
               </Typography>

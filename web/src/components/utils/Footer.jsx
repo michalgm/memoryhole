@@ -5,14 +5,16 @@ const Footer = ({ children }) => {
     <Paper
       id="footer"
       elevation={4}
-      sx={{
-        backgroundColor: (theme) =>
-          theme.palette.mode === 'light' ? 'primary.main' : 'background.paper',
+      sx={(theme) => ({
+        backgroundColor: 'primary.main',
         color: 'contrast.main',
         p: 2,
         zIndex: 12,
         position: 'relative',
-      }}
+        ...theme.applyStyles('dark', {
+          backgroundColor: 'Background.paper',
+        }),
+      })}
     >
       <Stack
         direction={'row'}

@@ -1,4 +1,4 @@
-import Grid2 from '@mui/material'
+import { Grid2 } from '@mui/material'
 
 import { useLocation } from '@redwoodjs/router'
 

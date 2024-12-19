@@ -240,9 +240,11 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
           onChange={loadView}
           sx={{ minWidth: 130 }}
           fullWidth
-          InputProps={{
-            sx: {
-              borderRadius: 0,
+          slotProps={{
+            input: {
+              sx: {
+                borderRadius: 0,
+              },
             },
           }}
         >

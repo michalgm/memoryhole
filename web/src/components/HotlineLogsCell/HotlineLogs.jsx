@@ -86,12 +86,14 @@ const HotlineLogs = ({ hotlineLogs = [], refetch }) => {
             onChange={({ target: { value } }) =>
               setFilter({ ...filter, notes: value })
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FilterList />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FilterList />
+                  </InputAdornment>
+                ),
+              },
             }}
           />
           <Button

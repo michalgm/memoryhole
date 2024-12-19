@@ -1,22 +1,23 @@
-import { CssBaseline, Experimental_CssVarsProvider } from '@mui/material'
+import { CssBaseline } from '@mui/material'
+import { ThemeProvider } from '@mui/material/styles'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import { MockProviders, render } from '@redwoodjs/testing/web'
 
-import { theme } from 'src/App'
 import AppProvider from 'src/lib/AppContext'
+import theme from 'src/theme'
 
 const ProviderWrapper = ({ children }) => (
-  <Experimental_CssVarsProvider theme={theme}>
-    <CssBaseline enableColorScheme>
+  <ThemeProvider theme={theme}>
+    <CssBaseline>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <MockProviders>
           <AppProvider>{children}</AppProvider>
         </MockProviders>
       </LocalizationProvider>
     </CssBaseline>
-  </Experimental_CssVarsProvider>
+  </ThemeProvider>
 )
 
 export const customRender = (ui, options) => {
