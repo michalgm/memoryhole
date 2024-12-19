@@ -1693,7 +1693,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.13.10, @babel/runtime@npm:^7.13.9, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.23.9, @babel/runtime@npm:^7.24.6, @babel/runtime@npm:^7.26.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.13.10, @babel/runtime@npm:^7.13.9, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.23.9, @babel/runtime@npm:^7.25.7, @babel/runtime@npm:^7.26.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
   version: 7.26.0
   resolution: "@babel/runtime@npm:7.26.0"
   dependencies:
@@ -2899,7 +2899,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@floating-ui/react-dom@npm:^2.0.0, @floating-ui/react-dom@npm:^2.0.8":
+"@floating-ui/react-dom@npm:^2.0.0":
   version: 2.1.2
   resolution: "@floating-ui/react-dom@npm:2.1.2"
   dependencies:
@@ -4422,28 +4422,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/base@npm:^5.0.0-beta.22":
-  version: 5.0.0-dev.20240529-082515-213b5e33ab
-  resolution: "@mui/base@npm:5.0.0-dev.20240529-082515-213b5e33ab"
-  dependencies:
-    "@babel/runtime": "npm:^7.24.6"
-    "@floating-ui/react-dom": "npm:^2.0.8"
-    "@mui/types": "npm:^7.2.14-dev.20240529-082515-213b5e33ab"
-    "@mui/utils": "npm:^6.0.0-dev.20240529-082515-213b5e33ab"
-    "@popperjs/core": "npm:^2.11.8"
-    clsx: "npm:^2.1.1"
-    prop-types: "npm:^15.8.1"
-  peerDependencies:
-    "@types/react": ^17.0.0 || ^18.0.0
-    react: ^17.0.0 || ^18.0.0
-    react-dom: ^17.0.0 || ^18.0.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-  checksum: 10c0/c6d3119aeea8abbb6494b3a3a632668bbee57e4f4e1786783908f3e19deb3b764f56e7e518849a17f3eda6db213bcc147a87fd0baf98941596466601d823478b
-  languageName: node
-  linkType: hard
-
 "@mui/core-downloads-tracker@npm:^5.16.11":
   version: 5.16.11
   resolution: "@mui/core-downloads-tracker@npm:5.16.11"
@@ -4566,7 +4544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/types@npm:^7.2.14-dev.20240529-082515-213b5e33ab, @mui/types@npm:^7.2.15, @mui/types@npm:^7.2.19":
+"@mui/types@npm:^7.2.15":
   version: 7.2.19
   resolution: "@mui/types@npm:7.2.19"
   peerDependencies:
@@ -4578,7 +4556,39 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/utils@npm:^5.14.16, @mui/utils@npm:^5.16.8":
+"@mui/types@npm:^7.2.20":
+  version: 7.2.20
+  resolution: "@mui/types@npm:7.2.20"
+  peerDependencies:
+    "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/257285386903fe0705ac6d53d0ece700323b7bc9be5239ab448b2c6523965b3cadbb636f2aec8ff60354180f53daf78df687d6828a75ad220b0f71fb5a117b5e
+  languageName: node
+  linkType: hard
+
+"@mui/utils@npm:^5.16.6 || ^6.0.0":
+  version: 6.2.1
+  resolution: "@mui/utils@npm:6.2.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.26.0"
+    "@mui/types": "npm:^7.2.20"
+    "@types/prop-types": "npm:^15.7.14"
+    clsx: "npm:^2.1.1"
+    prop-types: "npm:^15.8.1"
+    react-is: "npm:^19.0.0"
+  peerDependencies:
+    "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
+    react: ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/1c81a5d3918fda0c8518e726a4630779f9b1145306e42a72f6f5264b9c30527fc31caea6a429457ad6eee17be40636240a0e57159c881abae0c266628f7a3615
+  languageName: node
+  linkType: hard
+
+"@mui/utils@npm:^5.16.8":
   version: 5.16.8
   resolution: "@mui/utils@npm:5.16.8"
   dependencies:
@@ -4598,51 +4608,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/utils@npm:^6.0.0-dev.20240529-082515-213b5e33ab":
-  version: 6.2.0
-  resolution: "@mui/utils@npm:6.2.0"
+"@mui/x-date-pickers@npm:^7.23.2":
+  version: 7.23.2
+  resolution: "@mui/x-date-pickers@npm:7.23.2"
   dependencies:
-    "@babel/runtime": "npm:^7.26.0"
-    "@mui/types": "npm:^7.2.19"
-    "@types/prop-types": "npm:^15.7.14"
+    "@babel/runtime": "npm:^7.25.7"
+    "@mui/utils": "npm:^5.16.6 || ^6.0.0"
+    "@mui/x-internals": "npm:7.23.0"
+    "@types/react-transition-group": "npm:^4.4.11"
     clsx: "npm:^2.1.1"
-    prop-types: "npm:^15.8.1"
-    react-is: "npm:^19.0.0"
-  peerDependencies:
-    "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
-    react: ^17.0.0 || ^18.0.0 || ^19.0.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-  checksum: 10c0/a010b21f16673ece7f7c05e9c8a26a3db7d1a9e5557f2669178049bdd6f64525983eee9e6e3837221ff9261981048166716f4d37ae8cc77a2f9f525514b83496
-  languageName: node
-  linkType: hard
-
-"@mui/x-date-pickers@npm:^6.20.2":
-  version: 6.20.2
-  resolution: "@mui/x-date-pickers@npm:6.20.2"
-  dependencies:
-    "@babel/runtime": "npm:^7.23.2"
-    "@mui/base": "npm:^5.0.0-beta.22"
-    "@mui/utils": "npm:^5.14.16"
-    "@types/react-transition-group": "npm:^4.4.8"
-    clsx: "npm:^2.0.0"
     prop-types: "npm:^15.8.1"
     react-transition-group: "npm:^4.4.5"
   peerDependencies:
     "@emotion/react": ^11.9.0
     "@emotion/styled": ^11.8.1
-    "@mui/material": ^5.8.6
-    "@mui/system": ^5.8.0
-    date-fns: ^2.25.0 || ^3.2.0
-    date-fns-jalali: ^2.13.0-0
+    "@mui/material": ^5.15.14 || ^6.0.0
+    "@mui/system": ^5.15.14 || ^6.0.0
+    date-fns: ^2.25.0 || ^3.2.0 || ^4.0.0
+    date-fns-jalali: ^2.13.0-0 || ^3.2.0-0
     dayjs: ^1.10.7
     luxon: ^3.0.2
     moment: ^2.29.4
-    moment-hijri: ^2.1.2
+    moment-hijri: ^2.1.2 || ^3.0.0
     moment-jalaali: ^0.7.4 || ^0.8.0 || ^0.9.0 || ^0.10.0
-    react: ^17.0.0 || ^18.0.0
-    react-dom: ^17.0.0 || ^18.0.0
+    react: ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
   peerDependenciesMeta:
     "@emotion/react":
       optional: true
@@ -4662,7 +4652,19 @@ __metadata:
       optional: true
     moment-jalaali:
       optional: true
-  checksum: 10c0/1e1d414776564d9f6aed36ec61382a74f5002e829178af0fb1a308633a9acfe3f1a78d95bdbcd3f4b5d44c0194d940743dacb66074ee68c051f05fd0de56e239
+  checksum: 10c0/8872f79ca82c1aa7911ba1ed79054a5b8fc00c3f7f64e33a73fc7c605ae8ce710f7e0ecc58ec17f71a9249bd16ca0827503530d215051516c5dce8eff768a81f
+  languageName: node
+  linkType: hard
+
+"@mui/x-internals@npm:7.23.0":
+  version: 7.23.0
+  resolution: "@mui/x-internals@npm:7.23.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.25.7"
+    "@mui/utils": "npm:^5.16.6 || ^6.0.0"
+  peerDependencies:
+    react: ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/47d5efad1b58b2c316e7d9e61cfe536b3c0a16f6d3ff4f371c8a29aa7c598de136f328958f6b44f6401b2c96b5867872f631debb51fb9db6f3493181f43deb2a
   languageName: node
   linkType: hard
 
@@ -9413,7 +9415,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-transition-group@npm:^4.4.10, @types/react-transition-group@npm:^4.4.8":
+"@types/react-transition-group@npm:^4.4.10, @types/react-transition-group@npm:^4.4.11":
   version: 4.4.12
   resolution: "@types/react-transition-group@npm:4.4.12"
   peerDependencies:
@@ -12202,7 +12204,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^2.0.0, clsx@npm:^2.1.0, clsx@npm:^2.1.1":
+"clsx@npm:^2.1.0, clsx@npm:^2.1.1":
   version: 2.1.1
   resolution: "clsx@npm:2.1.1"
   checksum: 10c0/c4c8eb865f8c82baab07e71bfa8897c73454881c4f99d6bc81585aecd7c441746c1399d08363dc096c550cceaf97bd4ce1e8854e1771e9998d9f94c4fe075839
@@ -23065,13 +23067,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form-mui@npm:^6.8.0":
-  version: 6.8.0
-  resolution: "react-hook-form-mui@npm:6.8.0"
+"react-hook-form-mui@npm:^7.4.1":
+  version: 7.4.1
+  resolution: "react-hook-form-mui@npm:7.4.1"
   peerDependencies:
-    "@mui/icons-material": ">= 5.x <6"
-    "@mui/material": ">= 5.x <6"
-    "@mui/x-date-pickers": ">=6.1.0 <7"
+    "@mui/icons-material": ">= 5.x <7"
+    "@mui/material": ">= 5.x <7"
+    "@mui/x-date-pickers": ">=7.17.0 <8"
     react: ">=17 <19"
     react-hook-form: ">=7.33.1"
   peerDependenciesMeta:
@@ -23079,7 +23081,7 @@ __metadata:
       optional: true
     "@mui/x-date-pickers":
       optional: true
-  checksum: 10c0/7acbfe67e74dd3e7f0a0f43a4d2fbc09d03e1738891e97031918ab12288e525661fed1efd5ffe8b25e472f4c82b5dc56c0f0ab430a0bea5db43dfaf3ff8efbba
+  checksum: 10c0/5ae68f7151f54f14c1e2e35d25f3646de5795a2e813d943477ebcbf7664c70b1d271846ac6aff0ac345d1df08ceb600e2c0bbd1e696077acbcc76666fdcd367e
   languageName: node
   linkType: hard
 
@@ -27333,7 +27335,7 @@ __metadata:
     "@mui/icons-material": "npm:^5.16.11"
     "@mui/material": "npm:^5.16.11"
     "@mui/system": "npm:5.16.8"
-    "@mui/x-date-pickers": "npm:^6.20.2"
+    "@mui/x-date-pickers": "npm:^7.23.2"
     "@redwoodjs/auth-dbauth-web": "npm:8.4.1"
     "@redwoodjs/forms": "npm:8.4.1"
     "@redwoodjs/project-config": "npm:^8.4.1"
@@ -27368,7 +27370,7 @@ __metadata:
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
     react-hook-form: "npm:^7.54.1"
-    react-hook-form-mui: "npm:^6.8.0"
+    react-hook-form-mui: "npm:^7.4.1"
     react-markdown: "npm:^9.0.1"
     rehype-slug: "npm:^6.0.0"
     rehype-toc: "npm:^3.0.2"

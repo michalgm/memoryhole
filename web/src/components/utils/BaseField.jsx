@@ -13,11 +13,13 @@ import { capitalize } from 'lodash-es'
 import {
   CheckboxElement,
   Controller,
-  DatePickerElement,
-  DateTimePickerElement,
   RadioButtonGroup,
   TextFieldElement,
 } from 'react-hook-form-mui'
+import {
+  DatePickerElement,
+  DateTimePickerElement,
+} from 'react-hook-form-mui/date-pickers'
 
 import ActionChooser from '../Autocomplete/ActionChooser'
 import ArrestChooser from '../Autocomplete/ArrestChooser'

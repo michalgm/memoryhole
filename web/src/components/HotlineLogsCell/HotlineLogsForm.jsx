@@ -71,7 +71,7 @@ const HotlineLogsForm = ({ callback, log: { id: log_id, ...log } = {} }) => {
                 field_type="date-time"
                 name="start_time"
                 required={true}
-                validation={{
+                rules={{
                   validate: (value, formValues) =>
                     (formValues.start_time &&
                       formValues.end_time &&
@@ -91,7 +91,7 @@ const HotlineLogsForm = ({ callback, log: { id: log_id, ...log } = {} }) => {
                 multiline
                 fullWidth
                 minRows={log_id ? 1 : 10}
-                validation={{
+                rules={{
                   validate: (v) => /.+/.test(v) || 'Notes can not be blank',
                 }}
               />

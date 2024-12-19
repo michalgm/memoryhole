@@ -244,7 +244,7 @@ const LoginPage = () => {
         id="email"
         autoComplete="username"
         autoFocus // eslint-disable-line jsx-a11y/no-autofocus
-        validation={{
+        rules={{
           required: 'Email is required',
           validate: (value) =>
             !value ||
@@ -260,7 +260,7 @@ const LoginPage = () => {
         label="Password"
         type="password"
         autoComplete="current-password"
-        validation={{
+        rules={{
           required: 'Password is required',
         }}
       />
