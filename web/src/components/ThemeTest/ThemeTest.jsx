@@ -1,14 +1,15 @@
 import { Flag, Gavel, People, Person } from '@mui/icons-material'
 import {
+  Box,
   Button,
   ButtonGroup,
   IconButton,
   MenuItem,
+  Stack,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material'
-import { Box, Stack } from '@mui/system'
 
 const StyleShowcase = ({ size, color = 'primary' }) => {
   return (

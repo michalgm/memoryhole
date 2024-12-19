@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
-import { useMediaQuery } from '@mui/system'
+import { useMediaQuery } from '@mui/material'
 
 import { useParams } from '@redwoodjs/router'
 

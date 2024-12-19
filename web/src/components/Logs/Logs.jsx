@@ -10,19 +10,20 @@ import {
   Search,
 } from '@mui/icons-material'
 import {
+  Box,
   Button,
   Card,
   CardContent,
   Collapse,
+  Grid2,
   InputAdornment,
   Paper,
+  Stack,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
   Typography,
 } from '@mui/material'
-import { default as Grid2 } from '@mui/material/Unstable_Grid2/Grid2'
-import { Box, Stack } from '@mui/system'
 import { FormContainer, useForm } from 'react-hook-form-mui'
 
 import { navigate, useLocation, useRoutePath } from '@redwoodjs/router'
@@ -190,7 +191,7 @@ const LogsFilter = ({
               sx={{ width: '100%', '&>*': { width: '50%', mt: 1 } }}
             >
               {filterFields.map(([name, { field_type = 'text', ...props }]) => (
-                <Grid2 key={name} xs={6} alignContent={'center'}>
+                <Grid2 key={name} alignContent={'center'} size={6}>
                   <Field name={name} field_type={field_type} {...props} />
                 </Grid2>
               ))}

@@ -52,7 +52,7 @@ const ResetPasswordPage = ({ resetToken }) => {
           label="New Password"
           type="password"
           autoComplete="new-password"
-          validation={{
+          rules={{
             required: 'Password is required',
             minLength: {
               value: 8,

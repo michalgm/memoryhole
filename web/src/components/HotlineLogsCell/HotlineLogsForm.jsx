@@ -1,6 +1,5 @@
 import { Save } from '@mui/icons-material'
-import { Button, Card, CardActions, CardContent } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
+import { Button, Card, CardActions, CardContent, Grid2 } from '@mui/material'
 import dayjs from 'dayjs'
 import { FormContainer } from 'react-hook-form-mui'
 
@@ -65,13 +64,13 @@ const HotlineLogsForm = ({ callback, log: { id: log_id, ...log } = {} }) => {
         onSuccess={(data) => onSubmit(data)}
       >
         <CardContent>
-          <Grid container spacing={2}>
-            <Grid xs={6}>
+          <Grid2 container spacing={2}>
+            <Grid2 size={6}>
               <Field
                 field_type="date-time"
                 name="start_time"
                 required={true}
-                validation={{
+                rules={{
                   validate: (value, formValues) =>
                     (formValues.start_time &&
                       formValues.end_time &&
@@ -80,23 +79,23 @@ const HotlineLogsForm = ({ callback, log: { id: log_id, ...log } = {} }) => {
                     'Start time must be before End time',
                 }}
               />
-            </Grid>
-            <Grid xs={6}>
+            </Grid2>
+            <Grid2 size={6}>
               <Field field_type="date-time" name="end_time" required={true} />
-            </Grid>
-            <Grid xs={12}>
+            </Grid2>
+            <Grid2 size={12}>
               <Field
                 field_type="richtext"
                 name="notes"
                 multiline
                 fullWidth
                 minRows={log_id ? 1 : 10}
-                validation={{
+                rules={{
                   validate: (v) => /.+/.test(v) || 'Notes can not be blank',
                 }}
               />
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
         </CardContent>
         <CardActions sx={{ justifyContent: 'end' }}>
           <Button disabled={loading} onClick={() => callback()}>

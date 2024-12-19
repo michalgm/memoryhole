@@ -5,19 +5,21 @@ import {
   FormGroup,
   FormHelperText,
   FormLabel,
+  Grid2,
   TextField,
 } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import { capitalize } from 'lodash-es'
 import {
   CheckboxElement,
   Controller,
-  DatePickerElement,
-  DateTimePickerElement,
   RadioButtonGroup,
   TextFieldElement,
 } from 'react-hook-form-mui'
+import {
+  DatePickerElement,
+  DateTimePickerElement,
+} from 'react-hook-form-mui/date-pickers'
 
 import ActionChooser from '../Autocomplete/ActionChooser'
 import ArrestChooser from '../Autocomplete/ArrestChooser'
@@ -214,7 +216,7 @@ export const BaseField = ({
   const renderCheckboxGroup = () => {
     const Component = isRHF ? CheckboxElement : Checkbox
     return (
-      <Grid container spacing={2}>
+      <Grid2 container spacing={2}>
         <FormControl
           sx={{ m: 3 }}
           component="fieldset"
@@ -225,17 +227,17 @@ export const BaseField = ({
           <FormLabel component="legend">{props.label}</FormLabel>
           <FormGroup>
             {defaultOptions.map((option) => (
-              <Grid xs={6} key={option}>
+              <Grid2 key={option} size={6}>
                 <FormControlLabel
                   control={<Component name={`${name}_${option}`} />}
                   label={option}
                 />
-              </Grid>
+              </Grid2>
             ))}
           </FormGroup>
           <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
-      </Grid>
+      </Grid2>
     )
   }
 

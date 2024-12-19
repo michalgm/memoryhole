@@ -17,7 +17,8 @@
     "conventional-changelog-cli": "^5.0.0",
     "ioredis": "^5.4.1",
     "node-ssh": "^13.2.0",
-    "release-it": "^17.10.0"
+    "release-it": "^17.10.0",
+    "storybook": "7.6.17"
   },
   "eslintConfig": {
     "extends": "@redwoodjs/eslint-config",

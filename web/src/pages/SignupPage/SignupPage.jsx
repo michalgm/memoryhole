@@ -1,13 +1,12 @@
-import { useRef } from 'react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import {
+  FieldError,
   Form,
   Label,
-  TextField,
   PasswordField,
-  FieldError,
   Submit,
+  TextField,
 } from '@redwoodjs/forms'
 import { Link, navigate, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
@@ -73,7 +72,7 @@ const SignupPage = () => {
                     className="rw-input"
                     errorClassName="rw-input rw-input-error"
                     ref={emailRef}
-                    validation={{
+                    rules={{
                       required: {
                         value: true,
                         message: 'Email is required',
@@ -95,7 +94,7 @@ const SignupPage = () => {
                     className="rw-input"
                     errorClassName="rw-input rw-input-error"
                     autoComplete="current-password"
-                    validation={{
+                    rules={{
                       required: {
                         value: true,
                         message: 'Password is required',

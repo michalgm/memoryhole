@@ -8,12 +8,12 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Grid2,
   InputAdornment,
   Stack,
   TextField,
   Tooltip,
 } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
 
 import RichTextInput from '../utils/RichTextInput'
@@ -76,7 +76,7 @@ const HotlineLogs = ({ hotlineLogs = [], refetch }) => {
   })
   return (
     <Grid2 container spacing={4}>
-      <Grid2 xs={12}>
+      <Grid2 size={12}>
         <Grid2 container spacing={0} sx={{ justifyContent: 'space-between' }}>
           <TextField
             sx={{ backgroundColor: 'white', width: 400 }}
@@ -86,12 +86,14 @@ const HotlineLogs = ({ hotlineLogs = [], refetch }) => {
             onChange={({ target: { value } }) =>
               setFilter({ ...filter, notes: value })
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FilterList />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FilterList />
+                  </InputAdornment>
+                ),
+              },
             }}
           />
           <Button
@@ -111,7 +113,7 @@ const HotlineLogs = ({ hotlineLogs = [], refetch }) => {
       )}
       {filteredLogs.map((log) => {
         return (
-          <Grid2 key={log.id} xs={12}>
+          <Grid2 key={log.id} size={12}>
             {log.id === editItem ? (
               <HotlineLogsForm callback={onCreate} log={log} />
             ) : (

@@ -1,7 +1,12 @@
 import { AccessTime, Person } from '@mui/icons-material'
-import { Box, IconButton, Tooltip, Typography } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
-import { Stack } from '@mui/system'
+import {
+  Box,
+  Grid2,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import { get, startCase } from 'lodash-es'
 
 import Loading from 'src/components/Loading/Loading'
@@ -155,14 +160,14 @@ const FormContainer = ({
               ) : (
                 <ModInfo stats={stats} formData={formData} />
               ))}
-            <Grid
-              xs
+            <Grid2
               sx={{
                 textAlign: 'right',
                 display: 'flex',
                 justifyContent: 'flex-end',
                 gap: 2,
               }}
+              size="grow"
             >
               {id && deleteMutation && (
                 <LoadingButton
@@ -188,7 +193,7 @@ const FormContainer = ({
               >
                 Save {displayConfig.type}
               </LoadingButton>
-            </Grid>
+            </Grid2>
           </Footer>
         )
 
@@ -210,28 +215,28 @@ const FormContainer = ({
                       title={title}
                       sectionActions={sectionActions}
                     >
-                      <Grid container sx={{ alignItems: 'start' }} xs={12}>
+                      <Grid2 container sx={{ alignItems: 'start' }} size={12}>
                         {columns.map((fieldSet, columnIndex) => (
-                          <Grid
+                          <Grid2
                             key={columnIndex}
-                            xs={12 / columnCount}
                             container
+                            size={12 / columnCount}
                           >
                             {fieldSet.map(([key, options = {}], index) => (
-                              <Grid key={key} xs={12}>
+                              <Grid2 key={key} size={12}>
                                 <Field
                                   tabIndex={100 * (groupIndex + 1) + index}
                                   name={key}
                                   highlightDirty={highlightDirty}
                                   {...options}
                                 />
-                              </Grid>
+                              </Grid2>
                             ))}
-                          </Grid>
+                          </Grid2>
                         ))}
-                        <Grid xs={12} container>
+                        <Grid2 container size={12}>
                           {fullSpan.map(([key, options = {}], index) => (
-                            <Grid key={key} xs={12}>
+                            <Grid2 key={key} size={12}>
                               <Field
                                 tabIndex={
                                   100 * (groupIndex + 1) +
@@ -242,10 +247,10 @@ const FormContainer = ({
                                 name={key}
                                 {...options}
                               />
-                            </Grid>
+                            </Grid2>
                           ))}
-                        </Grid>
-                      </Grid>
+                        </Grid2>
+                      </Grid2>
                     </FormSection>
                   )
                 }

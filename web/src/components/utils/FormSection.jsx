@@ -3,32 +3,34 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Button,
+  Grid2,
+  Stack,
   Tooltip,
   Typography,
 } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
-import { Box, Stack } from '@mui/system'
 import { useFormContext } from 'react-hook-form-mui'
 
 const FormSection = ({ title, sectionActions = [], children }) => {
   const context = useFormContext()
   return (
-    <Grid xs={12} spacing={2} key={title}>
+    <Grid2 container spacing={2} key={title} size={12}>
       <Accordion xs={12} defaultExpanded disableGutters>
         <AccordionSummary
-          sx={{
+          sx={(theme) => ({
             position: 'sticky',
             top: 46,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'light' ? 'primary.light' : 'grey.800',
-            color: (theme) =>
-              theme.palette?.contrast ? 'contrast.main' : 'primary.main',
+            backgroundColor: 'primary.light',
+            color: 'contrast.main',
             '&.Mui-expanded': {
               marginBottom: 1,
             },
             zIndex: 9,
-          }}
+            ...theme.applyStyles('dark', {
+              backgroundColor: 'grey.800', // remove the box shadow in dark mode
+            }),
+          })}
           expandIcon={<ExpandMore sx={{ color: 'contrast.main' }} />}
         >
           <Stack
@@ -60,12 +62,12 @@ const FormSection = ({ title, sectionActions = [], children }) => {
           </Stack>
         </AccordionSummary>
         <AccordionDetails>
-          <Grid xs={12} container spacing={2} sx={{ m: 0 }}>
+          <Grid2 container spacing={2} sx={{ m: 0 }} size={12}>
             {children}
-          </Grid>
+          </Grid2>
         </AccordionDetails>
       </Accordion>
-    </Grid>
+    </Grid2>
   )
 }
 
