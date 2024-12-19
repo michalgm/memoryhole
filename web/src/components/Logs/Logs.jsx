@@ -191,7 +191,7 @@ const LogsFilter = ({
               sx={{ width: '100%', '&>*': { width: '50%', mt: 1 } }}
             >
               {filterFields.map(([name, { field_type = 'text', ...props }]) => (
-                <Grid2 key={name} xs={6} alignContent={'center'}>
+                <Grid2 key={name} alignContent={'center'} size={6}>
                   <Field name={name} field_type={field_type} {...props} />
                 </Grid2>
               ))}

@@ -106,7 +106,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
   const schema = fieldSchema.log
 
   return (
-    <Grid2 xs={12}>
+    <Grid2 size={12}>
       <BaseForm
         formConfig={{
           id: log_id,

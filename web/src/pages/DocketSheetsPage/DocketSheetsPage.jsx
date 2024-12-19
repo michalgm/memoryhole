@@ -28,13 +28,13 @@ const DocketSheetsPage = () => {
         <Typography variant="h4" gutterBottom>
           Docket Sheets
         </Typography>
-        <Grid2 container sx={{ p: 4 }} spacing={4} xs={6} xsOffset={3}>
+        <Grid2 container sx={{ p: 4 }} spacing={4} size={6} offset={3}>
           <Form
             defaultValues={search}
             onSubmit={onSubmit}
             submitText="Create Docket Sheet"
           >
-            <Grid2 xs={6}>
+            <Grid2 size={6}>
               <Field
                 field_type="select"
                 name="jurisdiction"
@@ -43,7 +43,7 @@ const DocketSheetsPage = () => {
                 // fullWidth={false}
               />
             </Grid2>
-            <Grid2 xs={6} alignContent={'center'}>
+            <Grid2 alignContent={'center'} size={6}>
               <Field
                 field_type="radio"
                 label={'Report Type'}
@@ -52,11 +52,11 @@ const DocketSheetsPage = () => {
                 options={['arrest_date', 'court_date']}
               />
             </Grid2>
-            <Grid2 xs={6}>
+            <Grid2 size={6}>
               <Field field_type="date" name="date" required />
             </Grid2>
 
-            <Grid2 xs={6}>
+            <Grid2 size={6}>
               <Field
                 field_type="text"
                 type="number"
@@ -65,7 +65,7 @@ const DocketSheetsPage = () => {
                 fullWidth={false}
               />
             </Grid2>
-            <Grid2 xs={12}>
+            <Grid2 size={12}>
               <Field
                 field_type="checkbox"
                 name="include_contact"

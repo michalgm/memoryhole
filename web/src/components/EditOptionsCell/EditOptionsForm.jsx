@@ -1,4 +1,4 @@
-import { Button, Grid2 Typography } from '@mui/material'
+import { Button, Grid2, Typography } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 import { FormContainer, useForm } from 'react-hook-form-mui'
 
@@ -136,10 +136,10 @@ const EditOptionsForm = ({ optionsSet = {} }) => {
     >
       <Grid2 container spacing={4}>
         <Typography variant="h5">Edit {name}</Typography>
-        <Grid2 xs={12}>
+        <Grid2 size={12}>
           <Field name="name" />
         </Grid2>
-        <Grid2 xs={12}>
+        <Grid2 size={12}>
           <Field
             row
             field_type="radio"
@@ -151,7 +151,7 @@ const EditOptionsForm = ({ optionsSet = {} }) => {
             ]}
           />
         </Grid2>
-        <Grid2 xs={12}>
+        <Grid2 size={12}>
           <Field
             maxRows={20}
             // sx={{ maxHeight: 300, overflowY: 'auto' }}
@@ -161,7 +161,7 @@ const EditOptionsForm = ({ optionsSet = {} }) => {
             helperText="One option value per line"
           />
         </Grid2>
-        <Grid2 xs={12}>
+        <Grid2 size={12}>
           <Grid2 container spacing={2}>
             <Grid2>
               <Button type="submit" variant="contained">

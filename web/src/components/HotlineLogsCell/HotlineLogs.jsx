@@ -76,7 +76,7 @@ const HotlineLogs = ({ hotlineLogs = [], refetch }) => {
   })
   return (
     <Grid2 container spacing={4}>
-      <Grid2 xs={12}>
+      <Grid2 size={12}>
         <Grid2 container spacing={0} sx={{ justifyContent: 'space-between' }}>
           <TextField
             sx={{ backgroundColor: 'white', width: 400 }}
@@ -111,7 +111,7 @@ const HotlineLogs = ({ hotlineLogs = [], refetch }) => {
       )}
       {filteredLogs.map((log) => {
         return (
-          <Grid2 key={log.id} xs={12}>
+          <Grid2 key={log.id} size={12}>
             {log.id === editItem ? (
               <HotlineLogsForm callback={onCreate} log={log} />
             ) : (

@@ -16,7 +16,7 @@ const Form = ({
     >
       <Grid2 container spacing={2}>
         {children}
-        <Grid2 sx={{ textAlign: 'right' }} xs={12}>
+        <Grid2 sx={{ textAlign: 'right' }} size={12}>
           {onCancel && (
             <Button disabled={loading} onClick={() => onCancel()}>
               Cancel

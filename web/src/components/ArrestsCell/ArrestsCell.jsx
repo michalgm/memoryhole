@@ -122,10 +122,10 @@ export const Success = ({ arrests, queryResult: { refetch } = {} }) => {
     const ids = rows.map(({ id }) => id)
     const list = rows.map((row) => {
       return [
-        <Grid2 key={`${row.id}-name`} xs={8}>
+        <Grid2 key={`${row.id}-name`} size={8}>
           {`${row.original?.arrestee?.display_field}`}
         </Grid2>,
-        <Grid2 key={`${row.id}-date`} xs={4}>
+        <Grid2 key={`${row.id}-date`} size={4}>
           {`${dayjs(row.original?.date).format('L hh:mm A')}`}
         </Grid2>,
       ]
@@ -135,10 +135,10 @@ export const Success = ({ arrests, queryResult: { refetch } = {} }) => {
         <>
           Are you sure you want to delete the following arrests?
           <Grid2 container spacing={2} sx={{ mt: 2 }}>
-            <Grid2 key={'name'} xs={8}>
+            <Grid2 key={'name'} size={8}>
               <b>Name</b>
             </Grid2>
-            <Grid2 key={'date'} xs={4}>
+            <Grid2 key={'date'} size={4}>
               <b>Arrest Date</b>
             </Grid2>
 

@@ -147,10 +147,10 @@ const BulkUpdateModal = ({
             </li>
           </Typography>
           <FormContainer formContext={context}>
-            <Grid2 container xs={12} spacing={2} sx={{ width: 550, pt: 2 }}>
+            <Grid2 container spacing={2} sx={{ width: 550, pt: 2 }} size={12}>
               {controlledFields.map((field, index) => (
-                <Grid2 container key={field.id} xs={12}>
-                  <Grid2 xs={5}>
+                <Grid2 container key={field.id} size={12}>
+                  <Grid2 size={5}>
                     <Field
                       key={index}
                       field_type="select"
@@ -159,7 +159,7 @@ const BulkUpdateModal = ({
                       label="Field"
                     />
                   </Grid2>
-                  <Grid2 xs={6}>
+                  <Grid2 size={6}>
                     {field.field_name && (
                       <Field
                         name={`fields.${index}.field_value`}
@@ -170,7 +170,7 @@ const BulkUpdateModal = ({
                       />
                     )}
                   </Grid2>
-                  <Grid2 xs={1}>
+                  <Grid2 size={1}>
                     <Tooltip title="Remove Field">
                       <IconButton onClick={() => remove(index)}>
                         <Delete />
@@ -179,7 +179,7 @@ const BulkUpdateModal = ({
                   </Grid2>
                 </Grid2>
               ))}
-              <Grid2 xs={12} sx={{ textAlign: 'right' }}>
+              <Grid2 sx={{ textAlign: 'right' }} size={12}>
                 <Button
                   startIcon={<Add />}
                   onClick={() => append({ ...defaultField })}

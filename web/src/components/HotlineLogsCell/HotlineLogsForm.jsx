@@ -65,7 +65,7 @@ const HotlineLogsForm = ({ callback, log: { id: log_id, ...log } = {} }) => {
       >
         <CardContent>
           <Grid2 container spacing={2}>
-            <Grid2 xs={6}>
+            <Grid2 size={6}>
               <Field
                 field_type="date-time"
                 name="start_time"
@@ -80,10 +80,10 @@ const HotlineLogsForm = ({ callback, log: { id: log_id, ...log } = {} }) => {
                 }}
               />
             </Grid2>
-            <Grid2 xs={6}>
+            <Grid2 size={6}>
               <Field field_type="date-time" name="end_time" required={true} />
             </Grid2>
-            <Grid2 xs={12}>
+            <Grid2 size={12}>
               <Field
                 field_type="richtext"
                 name="notes"

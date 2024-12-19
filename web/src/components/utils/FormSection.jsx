@@ -15,7 +15,7 @@ import { useFormContext } from 'react-hook-form-mui'
 const FormSection = ({ title, sectionActions = [], children }) => {
   const context = useFormContext()
   return (
-    <Grid2 xs={12} spacing={2} key={title}>
+    <Grid2 spacing={2} key={title} size={12}>
       <Accordion xs={12} defaultExpanded disableGutters>
         <AccordionSummary
           sx={{
@@ -61,7 +61,7 @@ const FormSection = ({ title, sectionActions = [], children }) => {
           </Stack>
         </AccordionSummary>
         <AccordionDetails>
-          <Grid2 xs={12} container spacing={2} sx={{ m: 0 }}>
+          <Grid2 container spacing={2} sx={{ m: 0 }} size={12}>
             {children}
           </Grid2>
         </AccordionDetails>

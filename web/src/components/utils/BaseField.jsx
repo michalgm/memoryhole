@@ -227,7 +227,7 @@ export const BaseField = ({
           <FormLabel component="legend">{props.label}</FormLabel>
           <FormGroup>
             {defaultOptions.map((option) => (
-              <Grid2 xs={6} key={option}>
+              <Grid2 key={option} size={6}>
                 <FormControlLabel
                   control={<Component name={`${name}_${option}`} />}
                   label={option}

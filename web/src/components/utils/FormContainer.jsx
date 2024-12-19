@@ -161,13 +161,13 @@ const FormContainer = ({
                 <ModInfo stats={stats} formData={formData} />
               ))}
             <Grid2
-              xs
               sx={{
                 textAlign: 'right',
                 display: 'flex',
                 justifyContent: 'flex-end',
                 gap: 2,
               }}
+              size="grow"
             >
               {id && deleteMutation && (
                 <LoadingButton
@@ -215,15 +215,15 @@ const FormContainer = ({
                       title={title}
                       sectionActions={sectionActions}
                     >
-                      <Grid2 container sx={{ alignItems: 'start' }} xs={12}>
+                      <Grid2 container sx={{ alignItems: 'start' }} size={12}>
                         {columns.map((fieldSet, columnIndex) => (
                           <Grid2
                             key={columnIndex}
-                            xs={12 / columnCount}
                             container
+                            size={12 / columnCount}
                           >
                             {fieldSet.map(([key, options = {}], index) => (
-                              <Grid2 key={key} xs={12}>
+                              <Grid2 key={key} size={12}>
                                 <Field
                                   tabIndex={100 * (groupIndex + 1) + index}
                                   name={key}
@@ -234,9 +234,9 @@ const FormContainer = ({
                             ))}
                           </Grid2>
                         ))}
-                        <Grid2 xs={12} container>
+                        <Grid2 container size={12}>
                           {fullSpan.map(([key, options = {}], index) => (
-                            <Grid2 key={key} xs={12}>
+                            <Grid2 key={key} size={12}>
                               <Field
                                 tabIndex={
                                   100 * (groupIndex + 1) +
