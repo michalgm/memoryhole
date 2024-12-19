@@ -1,5 +1,4 @@
-import { Drawer } from '@mui/material'
-import { Stack } from '@mui/system'
+import { Drawer, Stack } from '@mui/material'
 
 import Logs from './Logs'
 

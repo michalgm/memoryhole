@@ -10,19 +10,20 @@ import {
   Search,
 } from '@mui/icons-material'
 import {
+  Box,
   Button,
   Card,
   CardContent,
   Collapse,
+  Grid2,
   InputAdornment,
   Paper,
+  Stack,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
   Typography,
 } from '@mui/material'
-import { default as Grid2 } from '@mui/material/Unstable_Grid2/Grid2'
-import { Box, Stack } from '@mui/system'
 import { FormContainer, useForm } from 'react-hook-form-mui'
 
 import { navigate, useLocation, useRoutePath } from '@redwoodjs/router'

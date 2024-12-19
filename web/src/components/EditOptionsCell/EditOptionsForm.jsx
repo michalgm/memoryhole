@@ -1,5 +1,4 @@
-import { Button, Typography } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
+import { Button, Grid2 Typography } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 import { FormContainer, useForm } from 'react-hook-form-mui'
 
@@ -135,12 +134,12 @@ const EditOptionsForm = ({ optionsSet = {} }) => {
       defaultValues={{ name, values: valuesString, sortType: 'preserve' }}
       onSuccess={handleReplaceOptionSetValues}
     >
-      <Grid container spacing={4}>
+      <Grid2 container spacing={4}>
         <Typography variant="h5">Edit {name}</Typography>
-        <Grid xs={12}>
+        <Grid2 xs={12}>
           <Field name="name" />
-        </Grid>
-        <Grid xs={12}>
+        </Grid2>
+        <Grid2 xs={12}>
           <Field
             row
             field_type="radio"
@@ -151,8 +150,8 @@ const EditOptionsForm = ({ optionsSet = {} }) => {
               { id: 'preserve', label: 'Use current order' },
             ]}
           />
-        </Grid>
-        <Grid xs={12}>
+        </Grid2>
+        <Grid2 xs={12}>
           <Field
             maxRows={20}
             // sx={{ maxHeight: 300, overflowY: 'auto' }}
@@ -161,22 +160,22 @@ const EditOptionsForm = ({ optionsSet = {} }) => {
             field_type="textarea"
             helperText="One option value per line"
           />
-        </Grid>
-        <Grid xs={12}>
-          <Grid container spacing={2}>
-            <Grid>
+        </Grid2>
+        <Grid2 xs={12}>
+          <Grid2 container spacing={2}>
+            <Grid2>
               <Button type="submit" variant="contained">
                 Save
               </Button>
-            </Grid>
-            <Grid>
+            </Grid2>
+            <Grid2>
               <Button color="error" variant="outlined" onClick={deleteSet}>
                 Delete
               </Button>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
+            </Grid2>
+          </Grid2>
+        </Grid2>
+      </Grid2>
     </FormContainer>
   )
 }

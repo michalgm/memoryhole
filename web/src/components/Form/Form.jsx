@@ -1,5 +1,4 @@
-import { Button } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
+import { Button, Grid2 } from '@mui/material'
 import { FormContainer } from 'react-hook-form-mui'
 
 const Form = ({
@@ -15,9 +14,9 @@ const Form = ({
       defaultValues={defaultValues}
       onSuccess={(data) => onSubmit(data)}
     >
-      <Grid container spacing={2}>
+      <Grid2 container spacing={2}>
         {children}
-        <Grid sx={{ textAlign: 'right' }} xs={12}>
+        <Grid2 sx={{ textAlign: 'right' }} xs={12}>
           {onCancel && (
             <Button disabled={loading} onClick={() => onCancel()}>
               Cancel
@@ -31,8 +30,8 @@ const Form = ({
           >
             {submitText}
           </Button>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
     </FormContainer>
   )
 }

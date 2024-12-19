@@ -1,6 +1,5 @@
 import { Add } from '@mui/icons-material'
-import { Box, Button, Tooltip } from '@mui/material'
-import { Stack } from '@mui/system'
+import { Box, Button, Stack, Tooltip } from '@mui/material'
 
 import { navigate, routes, useLocation, useParams } from '@redwoodjs/router'
 

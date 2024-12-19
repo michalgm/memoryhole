@@ -3,18 +3,19 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Button,
+  Grid2,
+  Stack,
   Tooltip,
   Typography,
 } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
-import { Box, Stack } from '@mui/system'
 import { useFormContext } from 'react-hook-form-mui'
 
 const FormSection = ({ title, sectionActions = [], children }) => {
   const context = useFormContext()
   return (
-    <Grid xs={12} spacing={2} key={title}>
+    <Grid2 xs={12} spacing={2} key={title}>
       <Accordion xs={12} defaultExpanded disableGutters>
         <AccordionSummary
           sx={{
@@ -60,12 +61,12 @@ const FormSection = ({ title, sectionActions = [], children }) => {
           </Stack>
         </AccordionSummary>
         <AccordionDetails>
-          <Grid xs={12} container spacing={2} sx={{ m: 0 }}>
+          <Grid2 xs={12} container spacing={2} sx={{ m: 0 }}>
             {children}
-          </Grid>
+          </Grid2>
         </AccordionDetails>
       </Accordion>
-    </Grid>
+    </Grid2>
   )
 }
 

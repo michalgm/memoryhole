@@ -1,6 +1,5 @@
 import { blueGrey, pink } from '@mui/material/colors'
-import { experimental_extendTheme as extendTheme } from '@mui/material/styles'
-import { alpha } from '@mui/system'
+import { alpha, extendTheme } from '@mui/material/styles'
 
 const xSmallFontSize = '0.7rem'
 const xSmallPadding = '2px 3px'

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
-import { Paper, Typography } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import { Grid2, Paper, Typography } from '@mui/material'
 
 import DocketSheetCell from 'src/components/DocketSheetCell/DocketSheetCell'
 import Form from 'src/components/Form/Form'

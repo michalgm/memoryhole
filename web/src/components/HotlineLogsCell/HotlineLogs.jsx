@@ -8,12 +8,12 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Grid2,
   InputAdornment,
   Stack,
   TextField,
   Tooltip,
 } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import dayjs from 'dayjs'
 
 import RichTextInput from '../utils/RichTextInput'

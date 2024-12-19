@@ -1,8 +1,6 @@
 import { useState } from 'react'
 
-import { Typography } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
-import { Stack } from '@mui/system'
+import { Grid2, Stack, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 import { useConfirm } from 'material-ui-confirm'
 
