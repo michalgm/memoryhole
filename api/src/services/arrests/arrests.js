@@ -59,7 +59,7 @@ const checkArrestsAccess = async (ids, tx) => {
   return arrests
 }
 
-const filterAccess = (baseWhere = {}) => {
+export const filterArrestAccess = (baseWhere = {}) => {
   const {
     action_ids = [],
     arrest_date_min,
@@ -87,7 +87,7 @@ const filterAccess = (baseWhere = {}) => {
 
 export const arrests = () => {
   return db.arrest.findMany({
-    where: filterAccess({}),
+    where: filterArrestAccess({}),
   })
 }
 
@@ -117,7 +117,7 @@ export const filterArrests = async ({ filters = [] }) => {
   })
 
   return db.arrest.findMany({
-    where: filterAccess(where),
+    where: filterArrestAccess(where),
     orderBy: {
       date: 'desc',
     },
@@ -155,7 +155,7 @@ export const searchArrestNames = ({
   }
   return db.arrest.findMany({
     select,
-    where: filterAccess(where),
+    where: filterArrestAccess(where),
     take,
     orderBy,
     skip,
