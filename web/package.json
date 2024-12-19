@@ -13,9 +13,9 @@
   "dependencies": {
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.1.0",
-    "@mui/icons-material": "^5.16.12",
-    "@mui/material": "^5.16.12",
-    "@mui/system": "5.16.12",
+    "@mui/icons-material": "^6.2.1",
+    "@mui/material": "^6.2.1",
+    "@mui/system": "6.2.1",
     "@mui/x-date-pickers": "^7.23.2",
     "@redwoodjs/auth-dbauth-web": "8.4.1",
     "@redwoodjs/forms": "8.4.1",
