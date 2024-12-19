@@ -1,5 +1,11 @@
 
 
+## [0.10.0](https://github.com/michalgm/memoryhole/compare/v0.9.0...v0.10.0) (2024-12-19)
+
+### Features
+
+* **UI:** Upgraded to Material UI version 6 ([bff1521](https://github.com/michalgm/memoryhole/commit/bff152171957bbd84c52a862aa84e31f9e8fbd5a))
+
 ## [0.9.0](https://github.com/michalgm/memoryhole/compare/v0.8.0...v0.9.0) (2024-12-19)
 
 ### Features
