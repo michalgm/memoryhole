@@ -13,6 +13,7 @@ import {
   SettingsBrightness,
 } from '@mui/icons-material'
 import {
+  Box,
   Collapse,
   Divider,
   Drawer,
@@ -21,13 +22,13 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Stack,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
   useColorScheme,
+  useMediaQuery,
 } from '@mui/material'
-import Box from '@mui/material/Box'
-import { Stack, useMediaQuery } from '@mui/system'
 import dayjs from 'dayjs'
 import { useConfirm } from 'material-ui-confirm'
 

@@ -37,7 +37,7 @@ const CustomSchemaForm = (props) => {
           defaultValue={props.customSchema?.table}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
+          rules={{ required: true }}
         />
 
         <FieldError name="table" className="rw-field-error" />
@@ -55,7 +55,7 @@ const CustomSchemaForm = (props) => {
           defaultValue={props.customSchema?.section}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
+          rules={{ required: true }}
         />
 
         <FieldError name="section" className="rw-field-error" />
@@ -73,7 +73,7 @@ const CustomSchemaForm = (props) => {
           defaultValue={JSON.stringify(props.customSchema?.schema)}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
-          validation={{ valueAsJSON: true, required: true }}
+          rules={{ valueAsJSON: true, required: true }}
         />
 
         <FieldError name="schema" className="rw-field-error" />

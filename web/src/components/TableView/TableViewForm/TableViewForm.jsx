@@ -1,11 +1,11 @@
 import {
+  FieldError,
   Form,
   FormError,
-  FieldError,
   Label,
-  TextField,
   NumberField,
   Submit,
+  TextField,
 } from '@redwoodjs/forms'
 
 const TableViewForm = (props) => {
@@ -36,7 +36,7 @@ const TableViewForm = (props) => {
           defaultValue={props.tableView?.name}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
+          rules={{ required: true }}
         />
 
         <FieldError name="name" className="rw-field-error" />
@@ -54,7 +54,7 @@ const TableViewForm = (props) => {
           defaultValue={props.tableView?.state}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
+          rules={{ required: true }}
         />
 
         <FieldError name="state" className="rw-field-error" />
@@ -72,7 +72,7 @@ const TableViewForm = (props) => {
           defaultValue={props.tableView?.type}
           className="rw-input"
           errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
+          rules={{ required: true }}
         />
 
         <FieldError name="type" className="rw-field-error" />

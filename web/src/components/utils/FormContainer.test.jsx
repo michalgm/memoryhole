@@ -54,7 +54,7 @@ const fields = [
         {
           label: 'First Name',
           placeholder: 'Enter first name',
-          validation: {
+          rules: {
             required: 'First name is required',
           },
         },
@@ -71,7 +71,7 @@ const fields = [
         {
           label: 'Email',
           placeholder: 'Enter email',
-          validation: {
+          rules: {
             validate: (value) =>
               !value ||
               /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value) ||

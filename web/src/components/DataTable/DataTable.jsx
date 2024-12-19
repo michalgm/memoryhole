@@ -384,14 +384,16 @@ const DataTable = ({
       title: '',
     },
     muiTableBodyProps: {
-      sx: {
+      sx: (theme) => ({
         backgroundColor: '#fff',
         '& tr:nth-of-type(odd) > td, & tr:nth-of-type(odd) > td[data-pinned="true"]:before':
           {
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light' ? 'grey.100' : 'background.paper',
+            backgroundColor: 'grey.100',
+            ...theme.applyStyles('dark', {
+              backgroundColor: 'background.paper',
+            }),
           },
-      },
+      }),
     },
     muiTableContainerProps: {
       sx: {

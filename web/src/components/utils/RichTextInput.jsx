@@ -61,7 +61,7 @@ const RichTextInput = (props) => {
         margin="dense"
         required={required}
         error={Boolean(error)}
-        sx={{
+        sx={(theme) => ({
           '&& .MuiTiptap-FieldContainer-notchedOutline': {
             borderColor: error ? 'error.main' : `${color}.main`,
           },
@@ -76,22 +76,24 @@ const RichTextInput = (props) => {
               left: '8px',
               right: 0,
               height: '10px',
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'light' ? 'background.paper' : '#2e2e2e',
+              backgroundColor: 'background.paper',
               width: `${labelWidth + 12}px`,
               zIndex: 5,
               borderRadius: '0 0 2px 2px',
-              border: (theme) =>
-                theme.palette.mode === 'light' ? 'none' : '1px solid',
+              border: 'none',
               borderColor: 'action.disabled',
               borderTop: 'none',
+              ...theme.applyStyles('dark', {
+                backgroundColor: '#2e2e2e',
+                border: '1px solid',
+              }),
             },
             "[data-theme='light'] &::before": {
               border: 'none',
               backgroundColor: 'white',
             },
           },
-        }}
+        })}
       >
         <InputLabel
           size="small"

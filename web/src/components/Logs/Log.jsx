@@ -7,6 +7,7 @@ import {
   Warning,
 } from '@mui/icons-material'
 import {
+  Box,
   Button,
   Card,
   CardActions,
@@ -14,9 +15,9 @@ import {
   CardHeader,
   Chip,
   Divider,
+  Stack,
   Typography,
 } from '@mui/material'
-import { Box, Stack } from '@mui/system'
 import dayjs from 'dayjs'
 
 import { navigate, routes } from '@redwoodjs/router'

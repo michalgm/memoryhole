@@ -1,8 +1,5 @@
 import { CssBaseline, Paper } from '@mui/material'
-import {
-  Experimental_CssVarsProvider as CssVarsProvider,
-  useColorScheme,
-} from '@mui/material/styles'
+import { ThemeProvider, useColorScheme } from '@mui/material/styles'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { RedwoodProvider } from '@redwoodjs/web'
@@ -34,7 +31,7 @@ const ModeProvider = ({ mode }) => {
 export const decorators = [
   (Story, context) => {
     return (
-      <CssVarsProvider theme={theme} modeStorageKey={`mui-storybook-`}>
+      <ThemeProvider theme={theme} modeStorageKey={`mui-storybook-`}>
         <CssBaseline enableColorScheme />
         <ModeProvider mode={context.globals.displayMode} />
         <SnackBarProvider>
@@ -48,7 +45,7 @@ export const decorators = [
             </RedwoodProvider>
           </Paper>
         </SnackBarProvider>
-      </CssVarsProvider>
+      </ThemeProvider>
     )
   },
 ]

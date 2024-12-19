@@ -1,7 +1,5 @@
 import { gql } from '@apollo/client'
-import { Button } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
-import { Box, Stack } from '@mui/system'
+import { Box, Button, Grid2, Stack } from '@mui/material'
 
 import { useParams, useRoutePath } from '@redwoodjs/router'
 
@@ -108,7 +106,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
   const schema = fieldSchema.log
 
   return (
-    <Grid xs={12}>
+    <Grid2 size={12}>
       <BaseForm
         formConfig={{
           id: log_id,
@@ -235,7 +233,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           )
         }}
       </BaseForm>
-    </Grid>
+    </Grid2>
   )
 }
 export default LogsForm

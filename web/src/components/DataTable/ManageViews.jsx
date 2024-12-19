@@ -8,10 +8,10 @@ import {
   MenuItem,
   Paper,
   Popover,
+  Stack,
   TextField,
   Tooltip,
 } from '@mui/material'
-import { Stack } from '@mui/system'
 import { useConfirm } from 'material-ui-confirm'
 
 import { useMutation, useQuery } from '@redwoodjs/web'
@@ -240,9 +240,11 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
           onChange={loadView}
           sx={{ minWidth: 130 }}
           fullWidth
-          InputProps={{
-            sx: {
-              borderRadius: 0,
+          slotProps={{
+            input: {
+              sx: {
+                borderRadius: 0,
+              },
             },
           }}
         >

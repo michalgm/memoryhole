@@ -7,8 +7,8 @@ import './index.css'
 import * as React from 'react'
 
 import { ApolloLink } from '@apollo/client'
-import CssBaseline from '@mui/material/CssBaseline'
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles'
+import { CssBaseline } from '@mui/material'
+import { ThemeProvider } from '@mui/material/styles'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { ConfirmProvider } from 'material-ui-confirm'
@@ -32,8 +32,8 @@ const App = () => {
   return (
     <React.Fragment>
       <FatalErrorBoundary page={FatalErrorPage}>
-        <CssVarsProvider theme={theme} defaultMode={'system'}>
-          <CssBaseline enableColorScheme />
+        <ThemeProvider theme={theme} defaultMode={'system'} noSsr>
+          <CssBaseline />
           <SnackBarProvider>
             <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
               <AuthProvider>
@@ -58,7 +58,7 @@ const App = () => {
               </AuthProvider>
             </RedwoodProvider>
           </SnackBarProvider>
-        </CssVarsProvider>
+        </ThemeProvider>
       </FatalErrorBoundary>
     </React.Fragment>
   )

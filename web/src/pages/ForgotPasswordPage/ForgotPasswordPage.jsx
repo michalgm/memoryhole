@@ -27,7 +27,7 @@ const ForgotPasswordPage = () => {
         id="email"
         autoComplete="username"
         autoFocus // eslint-disable-line jsx-a11y/no-autofocus
-        validation={{
+        rules={{
           required: 'Email is required',
           validate: (value) =>
             !value ||

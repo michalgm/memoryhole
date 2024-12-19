@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import { Container } from '@mui/material'
-import Box from '@mui/material/Box'
-import { styled } from '@mui/system'
+import { Box, Container } from '@mui/material'
+import { styled } from '@mui/material/styles'
 
 import { navigate, routes, useRouteName } from '@redwoodjs/router'
 

@@ -1,5 +1,4 @@
-import { Paper, Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { Box, Paper, Typography } from '@mui/material'
 
 export default () => (
   <main>

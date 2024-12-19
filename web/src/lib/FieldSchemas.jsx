@@ -112,7 +112,7 @@ const ArrestFields = [
         'arrestee.first_name',
         {
           label: 'legal_first_name',
-          validation: {
+          rules: {
             validate: (value, formValues) =>
               value || formValues.arrestee.preferred_name
                 ? null
@@ -131,7 +131,7 @@ const ArrestFields = [
         {
           helperText:
             'Enter both first and last name if preferred last name differs from legal name',
-          validation: {
+          rules: {
             validate: (value, formValues) =>
               value || formValues.arrestee.first_name
                 ? null
@@ -198,7 +198,7 @@ const ArrestFields = [
       [
         'arrestee.email',
         {
-          validation: {
+          rules: {
             validate: (value) =>
               !value ||
               /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value) ||
@@ -229,7 +229,7 @@ const ArrestFields = [
         {
           field_type: 'date-time',
           label: 'arrest date',
-          validation: { required: true },
+          rules: { required: true },
           required: true,
         },
       ],

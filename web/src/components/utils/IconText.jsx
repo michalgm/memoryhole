@@ -1,4 +1,4 @@
-import { Stack } from '@mui/system'
+import { Stack } from '@mui/material'
 
 const IconText = ({ icon: Icon, children }) => (
   <Stack direction="row" gap={1} alignItems="center">

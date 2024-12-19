@@ -7,13 +7,18 @@ import {
   Menu,
   MenuOpen,
 } from '@mui/icons-material'
-import { IconButton, InputAdornment, Tooltip } from '@mui/material'
-import AppBar from '@mui/material/AppBar'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
-import { alpha, Stack } from '@mui/system'
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  Stack,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import { alpha } from '@mui/material/styles'
 
 import { Link, routes } from '@redwoodjs/router'
 
@@ -101,15 +106,15 @@ const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen, height }) => {
                 noWrap
                 component={Link}
                 to={routes.home()}
-                sx={{
-                  color: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? 'secondary.light'
-                      : 'contrast.main',
+                sx={(theme) => ({
+                  color: 'contrast.main',
                   flexGrow: 0,
                   fontFamily: 'monospace',
                   textDecoration: 'none',
-                }}
+                  ...theme.applyStyles('dark', {
+                    color: 'secondary.light',
+                  }),
+                })}
               >
                 memoryhole
               </Typography>

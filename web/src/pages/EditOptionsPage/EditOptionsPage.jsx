@@ -1,7 +1,6 @@
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
+import { Grid2 } from '@mui/material'
 
 import { useLocation } from '@redwoodjs/router'
-import { MetaTags } from '@redwoodjs/web'
 
 import OptionSetValuesCell from 'src/components/OptionSetValuesCell'
 
@@ -18,15 +17,13 @@ const EditOptionsPage = ({ id }) => {
   }
   return (
     <>
-      <MetaTags title="EditOptions" description="EditOptions page" />
-
       <h2>Edit Options Sets</h2>
-      <Grid container spacing={8}>
-        <Grid xs={6}>
+      <Grid2 container spacing={8}>
+        <Grid2 xs={6}>
           <EditOptionsCell id={id} />
-        </Grid>
-        <Grid xs={6}>{rightPane}</Grid>
-      </Grid>
+        </Grid2>
+        <Grid2 xs={6}>{rightPane}</Grid2>
+      </Grid2>
     </>
   )
 }

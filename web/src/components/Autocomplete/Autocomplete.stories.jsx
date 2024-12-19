@@ -58,7 +58,7 @@ export const WithArrestsQuery = {
     query: {
       model: 'arrest',
       orderBy: {
-        update_at: 'desc',
+        updated_at: 'desc',
       },
       take: 10,
     },

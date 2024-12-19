@@ -1,6 +1,5 @@
 import { NavigateNext } from '@mui/icons-material'
-import { Breadcrumbs as MUIBreadcrumbs, Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { Box, Breadcrumbs as MUIBreadcrumbs, Typography } from '@mui/material'
 
 import { routes, useLocation, useParams } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web'

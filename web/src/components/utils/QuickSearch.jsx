@@ -110,16 +110,18 @@ function QuickSearch() {
                 color: '#fff !important',
               },
             }}
-            InputProps={{
-              disableUnderline: true,
-              ...params.InputProps,
-              startAdornment: (
-                <InputAdornment position="start" color="#fff">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
             placeholder="Search arrests..."
+            slotProps={{
+              input: {
+                disableUnderline: true,
+                ...params.InputProps,
+                startAdornment: (
+                  <InputAdornment position="start" color="#fff">
+                    <Search />
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
         )}
       />

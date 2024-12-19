@@ -1,5 +1,4 @@
-import { Button, CircularProgress, useTheme } from '@mui/material'
-import { Box } from '@mui/system'
+import { Box, Button, CircularProgress, useTheme } from '@mui/material'
 
 const LoadingButton = ({
   loading,

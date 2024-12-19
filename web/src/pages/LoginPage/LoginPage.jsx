@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Key } from '@mui/icons-material'
-import { Paper, Typography } from '@mui/material'
-import { Box, Container, Stack } from '@mui/system'
+import { Box, Container, Paper, Stack, Typography } from '@mui/material'
 import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
 
 import { navigate, routes, useLocation } from '@redwoodjs/router'
@@ -244,7 +243,7 @@ const LoginPage = () => {
         id="email"
         autoComplete="username"
         autoFocus // eslint-disable-line jsx-a11y/no-autofocus
-        validation={{
+        rules={{
           required: 'Email is required',
           validate: (value) =>
             !value ||
@@ -260,7 +259,7 @@ const LoginPage = () => {
         label="Password"
         type="password"
         autoComplete="current-password"
-        validation={{
+        rules={{
           required: 'Password is required',
         }}
       />
