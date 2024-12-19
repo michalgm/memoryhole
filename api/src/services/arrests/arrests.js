@@ -41,13 +41,9 @@ const checkArrestsAccess = async (ids, tx) => {
       id: true,
       action_id: true,
       date: true,
-      custom_fields: true,
       arrestee: {
         select: {
-          first_name: true,
-          last_name: true,
-          preferred_name: true,
-          custom_fields: true,
+          id: true,
         },
       },
     },
@@ -327,17 +323,42 @@ export const bulkUpdateArrests = async ({ ids, input }) => {
 
 export const deleteArrest = async ({ id }) => {
   await arrest({ id })
-  return db.arrest.delete({
-    where: { id },
+  return db.$transaction(async (tx) => {
+    const [arrestRecord] = await checkArrestsAccess([id], tx)
+
+    const res = await tx.arrest.delete({
+      where: { id },
+    })
+
+    if (arrestRecord?.arrestee?.id) {
+      await tx.arrestee.delete({
+        where: { id: arrestRecord.arrestee.id },
+      })
+    }
+    return res
   })
 }
 
 export const bulkDeleteArrests = async ({ ids }) => {
-  await checkArrestsAccess(ids)
-  return db.arrest.deleteMany({
-    where: {
-      id: { in: ids },
-    },
+  return db.$transaction(async (tx) => {
+    const arrests = await checkArrestsAccess(ids, tx)
+
+    // Delete arrests first
+    await tx.arrest.deleteMany({
+      where: { id: { in: ids } },
+    })
+
+    // Then delete associated arrestees
+    const arresteeIds = arrests
+      .filter((arrest) => arrest.arrestee?.id)
+      .map((arrest) => arrest.arrestee.id)
+
+    if (arresteeIds.length > 0) {
+      await tx.arrestee.deleteMany({
+        where: { id: { in: arresteeIds } },
+      })
+    }
+    return { count: ids.length }
   })
 }
 
