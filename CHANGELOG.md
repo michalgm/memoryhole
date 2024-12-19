@@ -1,5 +1,17 @@
 
 
+## [0.9.0](https://github.com/michalgm/memoryhole/compare/v0.8.0...v0.9.0) (2024-12-19)
+
+### Features
+
+* **API:** Add global arrest filter to ensure access restrictions are enforced even through related queries ([f046ae9](https://github.com/michalgm/memoryhole/commit/f046ae9be11911d23705934aca77fd225e8b5111))
+
+### Bug Fixes
+
+* **API:** lock down arrestees access via api ([c900798](https://github.com/michalgm/memoryhole/commit/c90079805b84059578bc81f3cbf57056f9872bf0))
+* **API:** Make sure to delete arrestee when deleting arrest (+ tests) ([51c4a9c](https://github.com/michalgm/memoryhole/commit/51c4a9cd5af2a9a1e15a8426a296a1504eb32bac))
+* **Form:** fix some bugs w/ update/mod time in footer ([d1f0795](https://github.com/michalgm/memoryhole/commit/d1f0795cf5f51884a62d87e8c01e027943d9758d))
+
 ## [0.8.0](https://github.com/michalgm/memoryhole/compare/v0.7.0...v0.8.0) (2024-12-18)
 
 ### Features
