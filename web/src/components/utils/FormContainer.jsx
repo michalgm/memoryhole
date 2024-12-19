@@ -143,6 +143,7 @@ const FormContainer = ({
         const footer = (
           <Footer>
             {id &&
+              formData?.created_at &&
               (smallLayout ? (
                 <Tooltip
                   title={<ModInfo stats={stats} formData={formData} withBy />}

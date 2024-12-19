@@ -4,11 +4,10 @@ import { useMediaQuery } from '@mui/system'
 
 import { useParams } from '@redwoodjs/router'
 
-import {
-  LEFT_DRAWER_WIDTH,
-  LEFT_DRAWER_WIDTH_SMALL,
-  RIGHT_DRAWER_WIDTH,
-} from 'src/layouts/MainLayout/MainLayout'
+export const RIGHT_DRAWER_WIDTH = 450
+export const LEFT_DRAWER_WIDTH = 150
+export const LEFT_DRAWER_WIDTH_SMALL = 64
+export const HEADER_HEIGHT = 48
 
 const AppContext = createContext()
 

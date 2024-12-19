@@ -87,7 +87,7 @@ const CREATE_ARREST_MUTATION = gql`
 
 export const DELETE_ARREST_MUTATION = gql`
   mutation deleteArrest($id: Int!) {
-    deleteArrestee(id: $id) {
+    deleteArrest(id: $id) {
       id
     }
   }

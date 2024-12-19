@@ -7,15 +7,16 @@ import { styled } from '@mui/system'
 import { navigate, routes, useRouteName } from '@redwoodjs/router'
 
 import LogsDrawer from 'src/components/Logs/LogsDrawer'
-import AppProvider, { useApp } from 'src/lib/AppContext'
+import AppProvider, {
+  HEADER_HEIGHT,
+  LEFT_DRAWER_WIDTH,
+  LEFT_DRAWER_WIDTH_SMALL,
+  RIGHT_DRAWER_WIDTH,
+  useApp,
+} from 'src/lib/AppContext'
 
 import NavBar from './NavBar'
 import NavDrawer from './NavDrawer'
-
-export const RIGHT_DRAWER_WIDTH = 450
-export const LEFT_DRAWER_WIDTH = 150
-export const LEFT_DRAWER_WIDTH_SMALL = 64
-export const HEADER_HEIGHT = 48
 
 const Main = styled('main', {
   shouldForwardProp: (prop) => !['leftOpen', 'rightOpen'].includes(prop),

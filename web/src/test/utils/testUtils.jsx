@@ -5,12 +5,15 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { MockProviders, render } from '@redwoodjs/testing/web'
 
 import { theme } from 'src/App'
+import AppProvider from 'src/lib/AppContext'
 
 const ProviderWrapper = ({ children }) => (
   <Experimental_CssVarsProvider theme={theme}>
     <CssBaseline enableColorScheme>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <MockProviders>{children}</MockProviders>
+        <MockProviders>
+          <AppProvider>{children}</AppProvider>
+        </MockProviders>
       </LocalizationProvider>
     </CssBaseline>
   </Experimental_CssVarsProvider>
