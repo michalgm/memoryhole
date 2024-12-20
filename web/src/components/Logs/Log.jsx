@@ -24,7 +24,7 @@ import { navigate, routes } from '@redwoodjs/router'
 
 import RichTextInput from '../utils/RichTextInput'
 
-import LogsForm from './LogsForm'
+const LogsForm = React.lazy(() => import('./LogsForm'))
 
 // const ExpandMore = styled((props) => {
 //   const { expand, children } = props

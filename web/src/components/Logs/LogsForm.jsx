@@ -5,41 +5,11 @@ import { useParams, useRoutePath } from '@redwoodjs/router'
 
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
+import { LOG_FIELDS } from 'src/lib/gql_fragments'
 
 import { BaseForm } from '../utils/BaseForm'
 import { Field } from '../utils/Field'
 import LoadingButton from '../utils/LoadingButton'
-
-export const LOG_FIELDS = gql`
-  fragment LogFields on Log {
-    id
-    type
-    notes
-    needs_followup
-    arrests {
-      id
-      arrestee {
-        id
-        search_display_field
-      }
-      arrest_city
-      date
-    }
-    action {
-      id
-      name
-      start_date
-    }
-    created_at
-    created_by {
-      name
-    }
-    updated_at
-    updated_by {
-      name
-    }
-  }
-`
 
 const QUERY = gql`
   query EditLog($id: Int!) {
