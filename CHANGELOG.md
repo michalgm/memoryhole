@@ -1,5 +1,12 @@
 
 
+## [0.11.0](https://github.com/michalgm/memoryhole/compare/v0.10.0...v0.11.0) (2024-12-20)
+
+### Features
+
+* **UI:** Pre-render login + password pages ([444ea73](https://github.com/michalgm/memoryhole/commit/444ea733dd0513db169e1835f3078f73236ff747))
+* **UI:** Upgraded to Material UI version 6 ([2bbcf8f](https://github.com/michalgm/memoryhole/commit/2bbcf8f5144d28ae6e058d5551bf1ccead0c7601))
+
 ## [0.10.0](https://github.com/michalgm/memoryhole/compare/v0.9.0...v0.10.0) (2024-12-19)
 
 ### Features
