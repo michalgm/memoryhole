@@ -8,6 +8,7 @@ import * as React from 'react'
 
 import { ApolloLink } from '@apollo/client'
 import { CssBaseline } from '@mui/material'
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 import { ThemeProvider } from '@mui/material/styles'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -33,6 +34,7 @@ const App = () => {
     <React.Fragment>
       <FatalErrorBoundary page={FatalErrorPage}>
         <ThemeProvider theme={theme} defaultMode={'system'} noSsr>
+          <InitColorSchemeScript defaultMode={'system'} attribute="class" />
           <CssBaseline />
           <SnackBarProvider>
             <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
