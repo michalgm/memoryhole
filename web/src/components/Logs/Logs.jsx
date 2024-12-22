@@ -14,6 +14,8 @@ import { useForm } from 'react-hook-form-mui'
 
 import { navigate, useLocation } from '@redwoodjs/router'
 
+import LogsFilter from 'src/components/Logs/LogsFilter'
+import LogsForm from 'src/components/Logs/LogsForm'
 import { useApp } from 'src/lib/AppContext'
 import { LOG_FIELDS } from 'src/lib/gql_fragments'
 import { asyncDebounce } from 'src/lib/utils'
@@ -21,9 +23,6 @@ import { asyncDebounce } from 'src/lib/utils'
 import Loading from '../Loading/Loading'
 
 import Log from './Log'
-
-const LogsForm = React.lazy(() => import('src/components/Logs/LogsForm'))
-const LogsFilter = React.lazy(() => import('./LogsFilter'))
 
 export const QUERY = gql`
   ${LOG_FIELDS}

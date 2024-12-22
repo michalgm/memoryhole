@@ -12,9 +12,7 @@ import dayjs from 'dayjs'
 
 import { Link, routes } from '@redwoodjs/router'
 
-// import NavBarControls from 'src/layouts/MainLayout/NavBarControls'
-const NavBarControls = React.lazy(() => import('./NavBarControls'))
-
+import NavBarControls from 'src/layouts/MainLayout/NavBarControls'
 import { useApp } from 'src/lib/AppContext'
 
 const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen, height }) => {
