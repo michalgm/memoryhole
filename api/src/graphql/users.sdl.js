@@ -5,11 +5,11 @@ export const schema = gql`
     name: String!
     custom_fields: JSON
     role: String!
-    hashedPassword: String
-    salt: String
+    # hashedPassword: String
+    # salt: String
     expiresAt: DateTime
-    resetToken: String
-    resetTokenExpiresAt: DateTime
+    # resetToken: String
+    # resetTokenExpiresAt: DateTime
     action_ids: [Int]
     arrest_date_min: DateTime
     arrest_date_max: DateTime
@@ -29,6 +29,7 @@ export const schema = gql`
 
   type Query {
     users: [User!]! @requireAuth
+    searchUsers(search: String!): [User!]! @requireAuth
     user(id: Int!): User @requireAuth
   }
 
@@ -37,11 +38,11 @@ export const schema = gql`
     name: String!
     custom_fields: JSON
     role: String!
-    hashedPassword: String
-    salt: String
+    # hashedPassword: String
+    # salt: String
     expiresAt: DateTime
-    resetToken: String
-    resetTokenExpiresAt: DateTime
+    # resetToken: String
+    # resetTokenExpiresAt: DateTime
     arrest_date_min: DateTime
     arrest_date_max: DateTime
     action_ids: [Int]
@@ -52,22 +53,24 @@ export const schema = gql`
     name: String
     custom_fields: JSON
     role: String
-    hashedPassword: String
-    salt: String
+    # hashedPassword: String
+    # salt: String
     expiresAt: DateTime
-    resetToken: String
-    resetTokenExpiresAt: DateTime
+    # resetToken: String
+    # resetTokenExpiresAt: DateTime
     arrest_date_min: DateTime
     arrest_date_max: DateTime
     action_ids: [Int]
   }
 
   type Mutation {
-    createUser(input: CreateUserInput!): User! @requireAuth
-    updateUser(id: Int!, input: UpdateUserInput!): User! @requireAuth
-    deleteUser(id: Int!): User! @requireAuth
+    createUser(input: CreateUserInput!): User!
+      @requireAuth(roles: ["Admin", "Coordinator"])
+    updateUser(id: Int!, input: UpdateUserInput!): User!
+      @requireAuth(roles: ["Admin", "Coordinator"])
+    deleteUser(id: Int!): User! @requireAuth(roles: ["Admin", "Coordinator"])
     bulkUpdateUsers(ids: [Int]!, input: UpdateUserInput): BatchPayload
-      @requireAuth
+      @requireAuth(roles: ["Admin", "Coordinator"])
     # emailUser(id: String!): User! @requireAuth
   }
 `

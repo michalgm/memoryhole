@@ -18,8 +18,8 @@ import { useApp } from 'src/lib/AppContext'
 import dayjs from '../../../../api/src/lib/day'
 
 export const SEARCH_ARRESTS = gql`
-  query searchArrestNames($search: String!, $params: QueryParams!) {
-    arrest: searchArrestNames(search: $search, params: $params) {
+  query searchArrestNames($search: String!, $action_id: Int) {
+    arrest: searchArrests(search: $search, action_id: $action_id) {
       id
       arrestee {
         id
@@ -47,7 +47,7 @@ function QuickSearch() {
     setSearchValue(value)
     if (value.length) {
       searchArrests({
-        variables: { search: value, params: { where: { action_id } } },
+        variables: { search: value, action_id },
       })
     } else {
       setResults([])

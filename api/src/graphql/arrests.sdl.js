@@ -56,8 +56,7 @@ export const schema = gql`
     arrest(id: Int!): Arrest @requireAuth
 
     "Search arrests by name with optional query parameters"
-    searchArrestNames(search: String, params: QueryParams): [Arrest!]!
-      @requireAuth
+    searchArrests(search: String, action_id: Int): [Arrest!]! @requireAuth
 
     "Filter arrests using flexible criteria"
     filterArrests(filters: [GenericFilterInput]): [Arrest]! @requireAuth

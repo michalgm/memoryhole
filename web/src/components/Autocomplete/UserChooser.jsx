@@ -1,50 +1,33 @@
-import React from 'react'
-
 import { ListItemText } from '@mui/material'
 
 import Autocomplete from './Autocomplete'
 
+const QUERY = gql`
+  query searchUsers($search: String!) {
+    searchUsers(search: $search) {
+      id
+      name
+      email
+    }
+  }
+`
+
 const autocompleteProps = {
   getOptionLabel: (option) => option?.name || '',
-  renderOption: (props, { id, name }) => {
+  renderOption: (props, { id, name, email }) => {
     return (
       <li {...props} key={id}>
-        <ListItemText primary={name} />
+        <ListItemText primary={name} secondary={email} />
       </li>
     )
   },
 }
 
-const query = {
-  model: 'user',
-  searchField: 'name',
-  orderBy: {
-    name: 'desc',
-  },
-  take: 10,
-}
-
-const UserChooser = ({
-  name,
-  helperText,
-  isRHF,
-  onChange,
-  value,
-  textFieldProps,
-  ...props
-}) => {
+const UserChooser = (props) => {
   return (
     <Autocomplete
-      name={name}
-      model="user"
-      label={props.label}
-      helperText={helperText}
-      query={query}
-      isRHF={isRHF}
-      onChange={onChange}
-      value={value}
+      query={QUERY}
       storeFullObject
-      textFieldProps={textFieldProps}
       autocompleteProps={autocompleteProps}
       {...props}
     />

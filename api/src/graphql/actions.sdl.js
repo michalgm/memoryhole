@@ -14,6 +14,7 @@ export const schema = gql`
   type Query {
     actions: [Action!]! @requireAuth
     action(id: Int!): Action @requireAuth
+    searchActions(search: String): [Action!]! @requireAuth
   }
 
   input CreateActionInput {

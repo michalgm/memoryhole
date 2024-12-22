@@ -128,33 +128,54 @@ export const arrest = async ({ id }) => {
   return arrest
 }
 
-export const searchArrestNames = ({
-  search = '',
-  params: {
-    where: inputWhere,
-    orderBy = { updated_at: 'desc' },
-    select,
-    take = 20,
-    skip = 0,
-  },
-}) => {
+export const searchArrests = ({ search = '', action_id }) => {
   const where = {
     OR: search.split(/\s+/).map((term) => ({
-      arrestee: {
-        display_field: {
-          contains: term,
-          mode: 'insensitive',
+      OR: [
+        {
+          arrestee: {
+            first_name: {
+              contains: term,
+              mode: 'insensitive',
+            },
+          },
         },
-      },
+        {
+          arrestee: {
+            last_name: {
+              contains: term,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          arrestee: {
+            email: {
+              contains: term,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          arrestee: {
+            preferred_name: {
+              contains: term,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ],
     })),
-    ...inputWhere,
+  }
+  if (action_id) {
+    where.action_id = action_id
   }
   return db.arrest.findMany({
-    select,
     where: filterArrestAccess(where),
-    take,
-    orderBy,
-    skip,
+    take: 10,
+    orderBy: {
+      date: 'desc',
+    },
   })
 }
 
