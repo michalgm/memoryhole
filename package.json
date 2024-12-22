@@ -8,6 +8,7 @@
     ]
   },
   "devDependencies": {
+    "@redwoodjs/cli-data-migrate": "8.4.1",
     "@redwoodjs/cli-storybook-vite": "8.4.1",
     "@redwoodjs/core": "8.4.1",
     "@redwoodjs/project-config": "8.4.1",
@@ -15,10 +16,10 @@
     "@redwoodjs/studio": "13.0.1",
     "@release-it/conventional-changelog": "^9.0.3",
     "conventional-changelog-cli": "^5.0.0",
-    "ioredis": "^5.4.1",
+    "ioredis": "^5.4.2",
     "node-ssh": "^13.2.0",
     "release-it": "^17.10.0",
-    "storybook": "7.6.17"
+    "storybook": "7.6.20"
   },
   "eslintConfig": {
     "extends": "@redwoodjs/eslint-config",
