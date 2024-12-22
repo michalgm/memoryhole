@@ -22,9 +22,9 @@ import dayjs from 'dayjs'
 
 import { navigate, routes } from '@redwoodjs/router'
 
-import RichTextInput from '../utils/RichTextInput'
+import LogsForm from 'src/components/Logs/LogsForm'
 
-const LogsForm = React.lazy(() => import('./LogsForm'))
+import RichTextInput from '../utils/RichTextInput'
 
 // const ExpandMore = styled((props) => {
 //   const { expand, children } = props
