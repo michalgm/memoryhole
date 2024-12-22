@@ -1,16 +1,28 @@
-import React from 'react'
-
 import { ListItemText } from '@mui/material'
 
 import dayjs from '../../../../api/src/lib/day'
 
 import Autocomplete from './Autocomplete'
 
+const QUERY = gql`
+  query lookupArrestNames($search: String!) {
+    searchArrests(search: $search) {
+      id
+      arrestee {
+        id
+        search_display_field
+      }
+      date
+      arrest_city
+    }
+  }
+`
+
 const autocompleteProps = {
   getOptionLabel: (option) => option?.arrestee?.search_display_field || '',
   renderOption: (
     props,
-    { id, arrestee: { search_display_field }, date, arrest_city }
+    { arrestee: { id, search_display_field }, date, arrest_city }
   ) => {
     const subtitle = `${date ? dayjs(date).format('L') : ''}${
       date && arrest_city ? ' - ' : ''
@@ -23,35 +35,11 @@ const autocompleteProps = {
   },
 }
 
-const query = {
-  model: 'arrest',
-  orderBy: {
-    updated_at: 'desc',
-  },
-  take: 10,
-}
-
-const ArrestChooser = ({
-  name,
-  helperText,
-  isRHF,
-  onChange,
-  value,
-  textFieldProps,
-  ...props
-}) => {
+const ArrestChooser = (props) => {
   return (
     <Autocomplete
-      name={name}
-      model="arrest"
-      label={props.label}
-      helperText={helperText}
-      query={query}
-      isRHF={isRHF}
-      onChange={onChange}
-      value={value}
+      query={QUERY}
       storeFullObject
-      textFieldProps={textFieldProps}
       autocompleteProps={autocompleteProps}
       {...props}
     />

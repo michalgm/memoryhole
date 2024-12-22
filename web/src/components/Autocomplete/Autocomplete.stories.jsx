@@ -1,5 +1,3 @@
-import dayjs from 'dayjs'
-
 import { SnackBarProvider } from '../utils/SnackBar'
 
 import Autocomplete from './Autocomplete'
@@ -27,61 +25,6 @@ export const WithStaticOptions = {
       { id: 3, label: 'Option 3' },
     ],
     storeFullObject: false,
-  },
-}
-
-// Dynamic query example
-export const WithDynamicQuery = {
-  args: {
-    name: 'dynamic-autocomplete',
-    label: 'Search users',
-    query: {
-      model: 'user',
-      searchField: 'name',
-      select: {
-        id: true,
-        name: true,
-      },
-      orderBy: {
-        name: 'asc',
-      },
-      take: 10,
-    },
-  },
-}
-
-// Dynamic query example
-export const WithArrestsQuery = {
-  args: {
-    name: 'dynamic-autocomplete-arrests',
-    label: 'Search arrests',
-    query: {
-      model: 'arrest',
-      orderBy: {
-        updated_at: 'desc',
-      },
-      take: 10,
-    },
-    getOptionLabel: (option) => option.arrestee.search_display_field || '',
-    onChange: (e, value) => {
-      console.log('value', value)
-    },
-    renderOption: (
-      props,
-      { id, arrestee: { search_display_field }, date, arrest_city }
-    ) => {
-      const subtitle = `${date ? dayjs(date).format('L') : ''}${
-        date && arrest_city ? ' - ' : ''
-      }${arrest_city ? arrest_city : ''}`
-      return (
-        <li {...props} key={id}>
-          <div>
-            {' '}
-            {search_display_field} ({subtitle})
-          </div>
-        </li>
-      )
-    },
   },
 }
 

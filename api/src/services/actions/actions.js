@@ -10,6 +10,24 @@ export const action = ({ id }) => {
   })
 }
 
+export const searchActions = ({ search = '' }) => {
+  const where = {
+    OR: search.split(/\s+/).map((term) => ({
+      name: {
+        contains: term,
+        mode: 'insensitive',
+      },
+    })),
+  }
+  return db.action.findMany({
+    where,
+    take: 10,
+    orderBy: {
+      name: 'asc',
+    },
+  })
+}
+
 export const createAction = ({ input }) => {
   return db.action.create({
     data: input,

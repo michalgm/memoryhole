@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import {
   Checkbox,
   FormControl,
@@ -63,20 +65,19 @@ export const BaseField = ({
     props.value = value
   }
 
-  const textFieldProps = {
-    name,
-    helperText,
-    variant: 'outlined',
-    fullWidth: fullWidth,
-    size: 'small',
-    color,
-    ...defaultTextFieldProps,
-  }
-  if (tabIndex) {
-    textFieldProps.inputProps = {
-      tabIndex,
-    }
-  }
+  const textFieldProps = useMemo(
+    () => ({
+      name,
+      helperText,
+      variant: 'outlined',
+      fullWidth: fullWidth,
+      size: 'small',
+      color,
+      tabIndex: tabIndex || undefined,
+      ...defaultTextFieldProps,
+    }),
+    [color, defaultTextFieldProps, fullWidth, helperText, name, tabIndex]
+  )
 
   const renderDatePicker = () => {
     const Component = isRHF

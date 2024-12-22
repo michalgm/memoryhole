@@ -8,29 +8,21 @@ import {
   TextField,
 } from '@mui/material'
 import { debounce, merge } from 'lodash-es'
-import { AutocompleteElement } from 'react-hook-form-mui'
+import { AutocompleteElement, useFormContext } from 'react-hook-form-mui'
 
 import { useDisplayError } from '../utils/SnackBar'
 
-const DYNAMIC_QUERY = gql`
-  query DynamicQuery($model: String!, $params: QueryParams!) {
-    dynamicModelQuery(model: $model, params: $params)
+const mockQuery = gql`
+  query NoOpQuery {
+    __typename
   }
 `
 
-const ARRESTEE_QUERY = gql`
-  query lookupArrestNames($search: String!, $params: QueryParams!) {
-    searchArrestNames(search: $search, params: $params) {
-      id
-      arrestee {
-        id
-        search_display_field
-      }
-      date
-      arrest_city
-    }
-  }
-`
+const getOperationName = (query) => {
+  const def = query.definitions[0]
+  const selection = def.selectionSet.selections[0]
+  return selection.name.value
+}
 
 const Autocomplete = ({
   name,
@@ -39,7 +31,7 @@ const Autocomplete = ({
   options: staticOptions,
   autocompleteProps: defaultAutocompleteProps,
   storeFullObject = false,
-  query: inputQuery,
+  query,
   value,
   onChange,
   helperText,
@@ -47,27 +39,10 @@ const Autocomplete = ({
   transformOptions,
   ...props
 }) => {
-  const query = useMemo(
-    () => ({
-      model: inputQuery?.model,
-      searchField: inputQuery?.searchField,
-      select: inputQuery?.select,
-      orderBy: inputQuery?.orderBy,
-      take: inputQuery?.take,
-    }),
-    [
-      inputQuery?.model,
-      inputQuery?.searchField,
-      inputQuery?.select,
-      inputQuery?.orderBy,
-      inputQuery?.take,
-    ]
-  )
-
-  const gqlQuery = query?.model === 'arrest' ? ARRESTEE_QUERY : DYNAMIC_QUERY
-
-  const currentValue = value
+  const graphqlQuery = query || mockQuery
   const displayError = useDisplayError()
+  const { getValues } = useFormContext() || {}
+  const currentValue = isRHF && getValues && isRHF ? getValues()[name] : value
   const [options, setOptions] = useState(() => {
     if (currentValue && !staticOptions) {
       if (props.multiple && Array.isArray(currentValue)) {
@@ -84,50 +59,41 @@ const Autocomplete = ({
 
     return transformOptions ? transformOptions(initialOptions) : initialOptions
   })
-  const [searchQuery, { loading }] = useLazyQuery(gqlQuery, {
+
+  const [searchQuery, { loading }] = useLazyQuery(graphqlQuery, {
     onError: displayError,
   })
 
   const handleSearch = useCallback(
     async (searchTerm = '') => {
       if (!query || staticOptions) return
+      const result = await searchQuery({ variables: { search: searchTerm } })
+      const operationName = getOperationName(query)
+      const options = result?.data?.[operationName] || []
 
-      const { select, orderBy, model, searchField, take = 10 } = query
-      const params = {
-        orderBy,
-        select,
-        take,
-      }
-      const variables =
-        query.model === 'arrest'
-          ? { search: searchTerm, params }
-          : {
-              model,
-              params: {
-                ...params,
-                where: {
-                  [searchField]: {
-                    contains: searchTerm,
-                    mode: 'insensitive',
-                  },
-                },
-              },
-            }
-      const result = await searchQuery({
-        variables,
-      })
-
-      const options =
-        result.data[
-          query.model === 'arrest' ? 'searchArrestNames' : 'dynamicModelQuery'
-        ] || []
       const transformedOptions = transformOptions
         ? transformOptions(options.map((o) => ({ ...o, label: o.name })))
         : options.map((o) => ({ ...o, label: o.name }))
 
-      setOptions(transformedOptions)
+      // Merge with current values if multiple
+      if (props.multiple && Array.isArray(currentValue)) {
+        const optionsMap = new Map([
+          ...transformedOptions.map((o) => [o.id, o]),
+          ...currentValue.map((v) => [v.id, v]),
+        ])
+        setOptions(Array.from(optionsMap.values()))
+      } else {
+        setOptions(transformedOptions)
+      }
     },
-    [query, staticOptions, searchQuery, transformOptions]
+    [
+      query,
+      staticOptions,
+      searchQuery,
+      transformOptions,
+      currentValue,
+      props.multiple,
+    ]
   )
 
   const debouncedSearch = useMemo(
@@ -145,7 +111,7 @@ const Autocomplete = ({
     },
     getOptionLabel: (option) => option.label || '',
     onChange: (e, value) => {
-      onChange(storeFullObject ? value : value?.id || null)
+      onChange && onChange(storeFullObject ? value : value?.id || null)
     },
 
     onInputChange: (_, value, reason) => {
@@ -154,6 +120,7 @@ const Autocomplete = ({
       }
     },
     size: textFieldProps?.size || 'small',
+    clearOnBlur: !props.multiple,
     ...defaultAutocompleteProps,
   }
   delete autocompleteProps.inputProps
@@ -173,6 +140,7 @@ const Autocomplete = ({
       />
     )
   }
+
   return (
     <MUIAutocomplete
       name={name}
@@ -184,8 +152,8 @@ const Autocomplete = ({
         if (loading) {
           mergedProps.InputProps = {
             ...mergedProps.InputProps,
-            startAdornment: (
-              <InputAdornment position="start">
+            endAdornment: (
+              <InputAdornment position="end">
                 <CircularProgress color="inherit" size={20} />
               </InputAdornment>
             ),

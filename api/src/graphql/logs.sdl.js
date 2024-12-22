@@ -1,4 +1,11 @@
 export const schema = gql`
+  input QueryParams {
+    where: JSON
+    orderBy: JSON
+    select: JSON
+    take: Int
+    skip: Int
+  }
   type Log {
     id: Int!
     time: DateTime!
@@ -19,7 +26,7 @@ export const schema = gql`
 
   type Query {
     arresteeLogs(arrestee_id: Int): [Log!]! @requireAuth
-    logs(params: QueryParams): [Log!]! @requireAuth
+    logs(params: QueryParams): [Log!]! @requireAuth #FIXME
     log(id: Int!): Log @requireAuth
   }
 

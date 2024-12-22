@@ -7,6 +7,7 @@ import { initUser, onboardUser } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
 
 const requireAdmin = () => requireAuth({ roles: 'Admin' })
+
 export const users = () => {
   return db.user.findMany()
 }
@@ -14,6 +15,34 @@ export const users = () => {
 export const user = ({ id }) => {
   return db.user.findUnique({
     where: { id },
+  })
+}
+
+export const searchUsers = ({ search = '' }) => {
+  const where = {
+    OR: search.split(/\s+/).map((term) => ({
+      OR: [
+        {
+          name: {
+            contains: term,
+            mode: 'insensitive',
+          },
+        },
+        {
+          email: {
+            contains: term,
+            mode: 'insensitive',
+          },
+        },
+      ],
+    })),
+  }
+  return db.user.findMany({
+    where,
+    take: 10,
+    orderBy: {
+      name: 'asc',
+    },
   })
 }
 

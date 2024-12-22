@@ -1,22 +1,30 @@
-import React from 'react'
-
 import { ListItemText } from '@mui/material'
 
 import dayjs from '../../../../api/src/lib/day'
 
 import Autocomplete from './Autocomplete'
 
+const QUERY = gql`
+  query searchActions($search: String!) {
+    searchActions(search: $search) {
+      id
+      name
+      start_date
+      city
+      jurisdiction
+    }
+  }
+`
+
 const autocompleteProps = {
-  getOptionLabel: (option) => {
-    return option.name
-  },
-  renderOption: ({ key, ...props }, option) => {
-    const date = option.start_date && dayjs(option.start_date).format('L LT')
-    const location = option.city || option.jurisdiction
+  getOptionLabel: (option) => option?.name || '',
+  renderOption: (props, { id, start_date, city, jurisdiction, name }) => {
+    const date = start_date && dayjs(start_date).format('L LT')
+    const location = city || jurisdiction
     return (
-      <li key={key} {...props}>
+      <li {...props} key={id}>
         <ListItemText
-          primary={option.name}
+          primary={name}
           secondary={
             <>
               {date}
@@ -29,35 +37,11 @@ const autocompleteProps = {
     )
   },
 }
-
-const query = {
-  model: 'action',
-  orderBy: {
-    start_date: 'desc',
-  },
-  searchField: 'name',
-}
-
-const ActionChooser = ({
-  name,
-  helperText,
-  isRHF,
-  onChange,
-  value,
-  textFieldProps,
-  ...props
-}) => {
+const ActionChooser = (props) => {
   return (
     <Autocomplete
-      name={name}
-      label={props.label}
-      helperText={helperText}
-      query={query}
-      isRHF={isRHF}
-      onChange={onChange}
-      value={value}
+      query={QUERY}
       storeFullObject
-      textFieldProps={textFieldProps}
       autocompleteProps={autocompleteProps}
       {...props}
     />
