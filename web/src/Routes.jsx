@@ -38,6 +38,9 @@ const Routes = () => {
             <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
             <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
             <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
+            <Set wrap={ModelLayout} title="Edit Site Help">
+              <Route path="/admin/edit-help" page={EditHelpPage} name="editHelp" />
+            </Set>
             <Set wrap={ModelLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
               <Route path="/admin/users/new" page={UserUserPage} name="newUser" />
               <Route path="/admin/users/{id:Int}" page={UserUserPage} name="user" />

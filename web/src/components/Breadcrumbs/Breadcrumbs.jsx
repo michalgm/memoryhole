@@ -20,6 +20,8 @@ const Breadcrumbs = ({ title, titleTo, buttonLabel }) => {
     endCrumb = pageTitle
   } else if (isNew && buttonLabel) {
     endCrumb = buttonLabel
+  } else if (!titleTo) {
+    endCrumb = pageTitle || title
   }
 
   const metaTitle = [
@@ -30,7 +32,6 @@ const Breadcrumbs = ({ title, titleTo, buttonLabel }) => {
   ]
     .filter((t) => t)
     .join(' | ')
-
   const crumbs = []
   if (pathname.startsWith('/admin')) {
     crumbs.push(<Link to={routes.admin()}>Admin</Link>)
@@ -42,6 +43,7 @@ const Breadcrumbs = ({ title, titleTo, buttonLabel }) => {
   if (endCrumb) {
     crumbs.push(endCrumb)
   }
+
   return (
     <>
       <Metadata title={metaTitle} />

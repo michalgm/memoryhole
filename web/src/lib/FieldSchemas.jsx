@@ -1,9 +1,8 @@
 import { fromPairs, sortBy, toPairs } from 'lodash-es'
 
-import dayjs from '../../../api/src/lib/day'
 import { formatLabel } from '../components/utils/BaseField'
 
-const usStates = [
+export const usStates = [
   'Alabama',
   'Alaska',
   'Arizona',
@@ -491,7 +490,7 @@ export const UserFields = [
         'role',
         {
           field_type: 'select',
-          options: ['User', 'Admin'],
+          options: ['User', 'Coordinator', 'Admin'],
           required: true,
         },
       ],
@@ -511,22 +510,8 @@ export const UserFields = [
       [
         'actions',
         {
-          field_type: 'select',
+          field_type: 'action_chooser',
           multiple: true,
-          query: {
-            model: 'action',
-            orderBy: {
-              start_date: 'desc',
-            },
-            searchField: 'name',
-          },
-          storeFullObject: true,
-          autocompleteProps: {
-            getOptionLabel: (option) => {
-              const date = dayjs(option.start_date).format('L LT')
-              return `${option.name} (${date})`
-            },
-          },
           helperText:
             'User will not have access to arrests outside of these actions. If no actions are set, the user will have access to all actions.',
         },
@@ -614,6 +599,15 @@ fieldSchema.log = {
   arrests: {
     field_type: 'arrest_chooser',
     multiple: true,
+  },
+}
+
+fieldSchema.siteSettings = {
+  id: { label: 'Name' },
+  value: {
+    label: 'Site Help',
+    field_type: 'richtext',
+    rows: 10,
   },
 }
 

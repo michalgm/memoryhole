@@ -1,4 +1,4 @@
-import { Flag, Gavel, People } from '@mui/icons-material'
+import { Flag, Gavel, Help, People } from '@mui/icons-material'
 import {
   Divider,
   List,
@@ -37,7 +37,13 @@ const AdminPage = () => {
       label: 'Create Docket Sheets',
       icon: <Gavel />,
     },
+    {
+      to: routes.editHelp(),
+      label: 'Edit Site Help Page',
+      icon: <Help />,
+    },
   ]
+
   return (
     <>
       <List>

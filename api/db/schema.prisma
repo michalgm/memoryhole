@@ -177,3 +177,9 @@ model Action {
   Arrest        Arrest[]
   Log           Log[]
 }
+
+model SiteSetting {
+  id          String  @id
+  description String?
+  value       Json
+}

@@ -1,156 +1,143 @@
-import { ExpandMore } from '@mui/icons-material'
+import React, { useEffect, useRef, useState } from 'react'
+
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
-  Divider,
+  List,
+  ListItemButton,
+  ListItemText,
   Paper,
   Typography,
 } from '@mui/material'
-import ReactMarkdown from 'react-markdown'
-import rehypeSlug from 'rehype-slug'
-import rehypeToc from 'rehype-toc'
+import { Stack } from '@mui/system'
 
-import Link from 'src/components/utils/Link'
+import { useQuery } from '@redwoodjs/web'
 
-// import admin from '../../../../docs/admin.md?raw'
-import home from '../../../../docs/README.md?raw'
+import RichTextInput from 'src/components/utils/RichTextInput'
 
-const docs = {
-  home,
-  // admin,
+const QUERY = gql`
+  query EditSiteHelp {
+    siteSetting: siteSetting(id: "siteHelp") {
+      id
+      value
+    }
+  }
+`
+
+const Toc = ({ contentRef, data }) => {
+  const [toc, setToc] = useState([])
+  useEffect(() => {
+    if (contentRef.current) {
+      const headings = contentRef.current.querySelectorAll(
+        'h1, h2, h3, h4, h5, h6'
+      )
+
+      const tocToList = (children) => {
+        if (!children || children.length === 0) return null
+        const { id: listId, level: listLevel } = children[0]
+        return (
+          <List key={listId} dense>
+            {children.map(({ id, textContent, children }) => (
+              <React.Fragment key={id}>
+                <ListItemButton
+                  key={id}
+                  component="a"
+                  href={`#${id}`}
+                  sx={{ pl: (listLevel - 1) * 2 }}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    document.querySelector(`#${id}`).scrollIntoView({
+                      behavior: 'smooth',
+                    })
+                    window.history.replaceState({}, '', `#${id}`)
+                  }}
+                >
+                  <ListItemText primary={textContent} />
+                </ListItemButton>
+                {children.length > 0 && tocToList(children)}
+              </React.Fragment>
+            ))}
+          </List>
+        )
+      }
+      const root = { children: [], level: 0, id: 'root', textContent: 'root' }
+
+      let stack = [root]
+      Array.from(headings).forEach((heading) => {
+        const { textContent, tagName } = heading
+        const id = textContent
+          .toLowerCase()
+          .replace(/[^a-z0-9-\s]/g, '-') // Remove any chars that aren't letters, numbers, hyphens
+          .replace(/\s+/g, '-') // Replace spaces with hyphens
+          .replace(/-+/g, '-') // Replace multiple consecutive hyphens with single hyphen
+          .trim()
+        const level = parseInt(tagName[1])
+        if (level === 1) {
+          return
+        }
+        const listItem = { id, textContent, level, children: [] }
+        heading.id = id
+        while (stack.length > 1 && stack[stack.length - 1].level >= level) {
+          stack.pop()
+        }
+        stack[stack.length - 1].children.push(listItem)
+        stack.push(listItem)
+      })
+      const tocData = tocToList(root.children)
+      setToc(tocData)
+    }
+  }, [data])
+  return toc
 }
 
-const components = {
-  a: ({ href, title, children }) => (
-    <Link href={href} title={title} underline={'always'}>
-      {children}
-    </Link>
-  ),
+const DocumentationPage = () => {
+  const contentRef = useRef()
+  const { data } = useQuery(QUERY)
 
-  p: ({ children }) => <Typography sx={{ mt: 1 }}>{children}</Typography>,
-  del: ({ children }) => (
-    <Typography component="span" sx={{ mt: 1, textDecoration: 'line-through' }}>
-      {children}
-    </Typography>
-  ),
-  em: ({ children }) => (
-    <Typography component="span" sx={{ mt: 1, fontStyle: 'italic' }}>
-      {children}
-    </Typography>
-  ),
-  strong: ({ children }) => (
-    <Typography component="span" sx={{ mt: 1, fontWeight: 'bold' }}>
-      {children}
-    </Typography>
-  ),
-  b: ({ children }) => (
-    <Typography component="span" sx={{ mt: 1, fontWeight: 'bold' }}>
-      {' '}
-      {children}{' '}
-    </Typography>
-  ),
-  h1: ({ children, id }) => (
-    <Typography id={id} gutterBottom sx={{ mt: 2 }} variant={'h1'}>
-      {children}
-    </Typography>
-  ),
-  h2: ({ children, id }) => (
-    <Typography
-      id={id}
-      gutterBottom
-      sx={{ mt: 2, textTransform: 'uppercase' }}
-      variant={'h2'}
-      color={'secondary'}
-    >
-      {children}
-    </Typography>
-  ),
-  h3: ({ children, id }) => (
-    <Typography
-      id={id}
-      gutterBottom
-      sx={{ mt: 2, fontWeight: 400 }}
-      variant={'h3'}
-    >
-      {children}
-    </Typography>
-  ),
-  h4: ({ children, id }) => (
-    <Typography
-      id={id}
-      variant="subtitle1"
-      gutterBottom
-      sx={{ mt: 2, fontStyle: 'italic' }}
-    >
-      {children}
-    </Typography>
-  ),
-  h5: ({ children, id }) => (
-    <Typography id={id} gutterBottom sx={{ mt: 2 }} variant={'h5'}>
-      {children}
-    </Typography>
-  ),
-  h6: ({ children, id }) => (
-    <Typography id={id} gutterBottom sx={{ mt: 2 }} variant={'h6'}>
-      {children}
-    </Typography>
-  ),
-  hr: () => <Divider sx={{ my: 2 }} />,
-  nav: ({ children }) => (
-    <nav>
-      <Accordion sx={{ mt: 2, bgcolor: 'divider' }} defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Typography variant="h2">Table of Contents</Typography>
-        </AccordionSummary>
-        <AccordionDetails>{children}</AccordionDetails>
-      </Accordion>
-    </nav>
-  ),
-}
+  if (!data) return null
+  const {
+    siteSetting: { value },
+  } = data
 
-const DocumentationPage = ({ page = 'home' }) => {
   return (
-    <Box p={2}>
+    <Stack direction="row" alignItems={'flex-start'}>
       <Paper
         sx={{
-          p: 3,
-          '& h1, & h2, & h3, & h4, & h5, & h6': {
-            scrollMarginTop: '64px',
-          },
-          '& nav ol': {
-            listStyleType: 'disc',
-            margin: 0,
-          },
-          '& .markdown-body h1': {
-            display: 'none',
-          },
+          flex: 1,
+          position: 'sticky',
+          top: 16,
+          minWidth: 200,
+          minHeight: '10px',
         }}
       >
-        <Typography variant="h1" className="doc-header" gutterBottom>
-          Memoryhole User Documentation
+        <Typography variant="h6" p={2} pb={0}>
+          Table of Contents
         </Typography>
-        <Divider />
-        <Box className="markdown-body">
-          <ReactMarkdown
-            rehypePlugins={[
-              rehypeSlug,
-              [
-                rehypeToc,
-                {
-                  headings: ['h2', 'h3', 'h4', 'h5', 'h6'],
-                  position: 'afterend',
-                },
-              ],
-            ]}
-            components={components}
-          >
-            {docs[page.replace(/\.md$/, '')]}
-          </ReactMarkdown>
-        </Box>
+        <Toc data={data} contentRef={contentRef} />
       </Paper>
-    </Box>
+      <Box p={2} position={'relative'} sx={{ flex: 3 }}>
+        <Paper
+          ref={contentRef}
+          sx={(theme) => ({
+            p: 3,
+            ...[1, 2, 3, 4, 5, 6].reduce((acc, l) => {
+              acc[`& h${l}`] = {
+                ...theme.typography[`h${l}`],
+                scrollMarginTop: 4,
+                marginBlockStart: l == 1 ? 'inherit' : 'revert !important',
+                marginBlockEnd: 'revert !important',
+                letterSpacing: 'revert !important',
+                lineHeight: 'revert !important',
+                fontWeight: 'revert !important',
+                fontSize: 'revert !important',
+              }
+              return acc
+            }, {}),
+          })}
+        >
+          <RichTextInput content={value} editable={false} />
+        </Paper>
+      </Box>
+    </Stack>
   )
 }
 
