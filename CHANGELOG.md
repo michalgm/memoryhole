@@ -1,5 +1,21 @@
 
 
+## [0.12.0](https://github.com/michalgm/memoryhole/compare/v0.11.0...v0.12.0) (2024-12-22)
+
+### Features
+
+* **UI:** Add interface to edit site help ([ab7d704](https://github.com/michalgm/memoryhole/commit/ab7d7044252741efad4fca2384b603c1c81ff4f8))
+* **UI:** Allow Form Footer to be imported independant of formContainer ([a487368](https://github.com/michalgm/memoryhole/commit/a487368b093d665b37da4807ccced44753e07787))
+
+### Bug Fixes
+
+* **API:** lock down search queries ([5f779c8](https://github.com/michalgm/memoryhole/commit/5f779c80b02d750266b26aeb378c0d0e12644407))
+* **Form:** fix bug w/ richtexteditor text-align ([b170324](https://github.com/michalgm/memoryhole/commit/b17032461feb753310b18ed884ab52818ffa9f3f))
+
+### Reverts
+
+* revert prerenders - was causing issues ([7d56af4](https://github.com/michalgm/memoryhole/commit/7d56af4e8e3fa3916596fd369571037de3b77854))
+
 ## [0.11.0](https://github.com/michalgm/memoryhole/compare/v0.10.0...v0.11.0) (2024-12-20)
 
 ### Features
