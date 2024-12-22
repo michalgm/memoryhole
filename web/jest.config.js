@@ -7,8 +7,8 @@ const config = {
     '/node_modules/(?!(@mui|lodash-es|export-to-csv|material-ui-confirm))',
   ],
   setupFilesAfterEnv: [
-    'jest-matchmedia-mock',
     '<rootDir>/web/src/setupTests.js',
+    'jest-matchmedia-mock',
   ],
   moduleNameMapper: {
     'material-ui-confirm':

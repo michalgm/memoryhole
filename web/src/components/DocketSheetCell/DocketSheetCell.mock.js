@@ -10,6 +10,12 @@ export const standard = (/* vars, { ctx, req } */) => ({
       custom_fields: {
         'Custom Field 1': 'Value 1',
       },
+      arrestee: {
+        display_field: 'B',
+        email: 'foo@bar.com',
+        first_name: 'John',
+        last_name: 'Doe',
+      },
     },
   ],
 })

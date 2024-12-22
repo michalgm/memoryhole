@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 import { mockGraphQLQuery } from '@redwoodjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
@@ -15,6 +17,12 @@ describe('ArrestPage', () => {
         created_by: { name: 'Test User' },
         updated_at: '2023-01-01T00:00:00Z',
         updated_by: { name: 'Test User' },
+        date: dayjs().format('YYYY-MM-DD'),
+        jurisdiction: 'Alameda',
+        arrestee: {
+          id: 1,
+          display_field: 'Test Arrestee',
+        },
       },
     }
   })
