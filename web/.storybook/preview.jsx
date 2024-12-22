@@ -3,7 +3,9 @@ import { ThemeProvider, useColorScheme } from '@mui/material/styles'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { RedwoodProvider } from '@redwoodjs/web'
+import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
 import { useEffect } from 'react'
+import { AuthProvider, useAuth } from '../src/auth'
 import { SnackBarProvider } from '../src/components/utils/SnackBar'
 import AppProvider from '../src/lib/AppContext'
 import theme from '../src/theme'
@@ -39,7 +41,11 @@ export const decorators = [
             <RedwoodProvider>
               <AppProvider>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Story />
+                  <AuthProvider>
+                    <RedwoodApolloProvider useAuth={useAuth}>
+                      <Story />
+                    </RedwoodApolloProvider>
+                  </AuthProvider>
                 </LocalizationProvider>
               </AppProvider>
             </RedwoodProvider>
