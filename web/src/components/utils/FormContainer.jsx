@@ -1,16 +1,7 @@
-import { AccessTime, Person } from '@mui/icons-material'
-import {
-  Box,
-  Grid2,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material'
-import { get, startCase } from 'lodash-es'
+import { Box, Grid2, Stack } from '@mui/material'
+import { get } from 'lodash-es'
 
 import Loading from 'src/components/Loading/Loading'
-import IconText from 'src/components/utils/IconText'
 import { useContainerWidth } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
 
@@ -18,7 +9,6 @@ import { BaseForm } from './BaseForm'
 import { Field } from './Field'
 import Footer from './Footer'
 import FormSection from './FormSection'
-import LoadingButton from './LoadingButton'
 
 function fieldsToColumns(fields, columnCount = 2) {
   const { fullSpan, nonFullSpan } = fields.reduce(
@@ -45,49 +35,6 @@ function fieldsToColumns(fields, columnCount = 2) {
 
   return { columns, fullSpan }
 }
-
-const ModInfo = React.forwardRef(
-  ({ stats, formData, withBy, ...props }, ref) => {
-    return (
-      <Stack
-        spacing={3}
-        direction={withBy ? 'column' : 'row'}
-        alignItems="center"
-        justifyContent="flex-start"
-        {...props}
-        ref={ref}
-      >
-        {['created', 'updated']
-          .filter((k) => stats?.[k])
-          .map((time) => {
-            return (
-              <Typography
-                key={time}
-                variant="body2"
-                lineHeight={1.3}
-                sx={{ display: 'block', flexGrow: 1 }}
-                component={'div'}
-              >
-                <Stack direction="row" gap={1} alignItems="flex-start">
-                  <b>{startCase(time)}</b>
-                  <Box>
-                    <IconText icon={AccessTime}>
-                      {stats[time].format('L LT')}
-                    </IconText>
-                    {formData[`${time}_by`] && (
-                      <IconText icon={Person}>
-                        {formData[`${time}_by`]?.name}
-                      </IconText>
-                    )}
-                  </Box>
-                </Stack>
-              </Typography>
-            )
-          })}
-      </Stack>
-    )
-  }
-)
 
 const FormContainer = ({
   fields,
@@ -144,58 +91,6 @@ const FormContainer = ({
         loading: { loadingDelete, loadingCreate, loadingUpdate },
       }) => {
         const disabled = isLoading
-
-        const footer = (
-          <Footer>
-            {id &&
-              formData?.created_at &&
-              (smallLayout ? (
-                <Tooltip
-                  title={<ModInfo stats={stats} formData={formData} withBy />}
-                >
-                  <IconButton color="inherit">
-                    <AccessTime />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <ModInfo stats={stats} formData={formData} />
-              ))}
-            <Grid2
-              sx={{
-                textAlign: 'right',
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: 2,
-              }}
-              size="grow"
-            >
-              {id && deleteMutation && (
-                <LoadingButton
-                  sx={{ whiteSpace: 'nowrap' }}
-                  variant="outlined"
-                  color="inherit"
-                  size="medium"
-                  onClick={confirmDelete}
-                  disabled={disabled}
-                  loading={loadingDelete}
-                >
-                  Delete {displayConfig.type}
-                </LoadingButton>
-              )}
-              <LoadingButton
-                sx={{ whiteSpace: 'nowrap' }}
-                type="submit"
-                variant="contained"
-                color="secondary"
-                size="medium"
-                disabled={disabled}
-                loading={loadingUpdate || loadingCreate}
-              >
-                Save {displayConfig.type}
-              </LoadingButton>
-            </Grid2>
-          </Footer>
-        )
 
         return (
           <Box sx={{ position: 'relative', width: '100%', pb: 3 }}>
@@ -256,28 +151,21 @@ const FormContainer = ({
                 }
               )}
             </Stack>
-            <Box
-              elevation={9}
-              sx={{
-                position: 'sticky',
-                bottom: 0,
-                zIndex: 10,
-                pb: 2,
+            <Footer
+              {...{
+                id,
+                formData,
+                smallLayout,
+                stats,
+                deleteMutation,
+                disabled,
+                confirmDelete,
+                loadingUpdate,
+                loadingCreate,
+                loadingDelete,
+                label: displayConfig?.type,
               }}
-            >
-              {footer}
-              <Box
-                sx={{
-                  position: 'absolute',
-                  backgroundColor: 'var(--mui-palette-background-body)',
-                  mx: -1,
-                  zIndex: 0,
-                  height: 'calc(100% - 12px)',
-                  width: 'calc(100%  + 16px)',
-                  top: 12,
-                }}
-              />
-            </Box>
+            />
           </Box>
         )
       }}

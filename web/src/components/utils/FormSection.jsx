@@ -16,7 +16,7 @@ const FormSection = ({ title, sectionActions = [], children }) => {
   const context = useFormContext()
   return (
     <Grid2 container spacing={2} key={title} size={12}>
-      <Accordion xs={12} defaultExpanded disableGutters>
+      <Accordion size={12} defaultExpanded disableGutters>
         <AccordionSummary
           sx={(theme) => ({
             position: 'sticky',
