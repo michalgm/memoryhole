@@ -7,6 +7,7 @@ import TaskList from '@tiptap/extension-task-list'
 import TextAlign from '@tiptap/extension-text-align'
 import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
+import { merge } from 'lodash-es'
 import {
   LinkBubbleMenu,
   LinkBubbleMenuHandler,
@@ -40,6 +41,7 @@ const RichTextInput = (props) => {
     helperText,
     color,
     focus = false,
+    sx = {},
   } = props
   const rteRef = useRef(null)
 
@@ -51,6 +53,31 @@ const RichTextInput = (props) => {
     }
   }, [label])
 
+  const extensions = [
+    StarterKit,
+    LinkBubbleMenuHandler,
+    Link,
+    Underline,
+    TaskList,
+    TaskItem,
+    TextAlign.configure({
+      types: [
+        'paragraph',
+        'blockquote',
+        'bulletList',
+        'codeBlock',
+        'doc',
+        'hardBreak',
+        'heading',
+        'horizontalRule',
+        'listItem',
+        'orderedList',
+        'taskList',
+        'taskItem',
+      ],
+    }),
+  ]
+
   if (editable) {
     return (
       <FormControl
@@ -61,39 +88,44 @@ const RichTextInput = (props) => {
         margin="dense"
         required={required}
         error={Boolean(error)}
-        sx={(theme) => ({
-          '&& .MuiTiptap-FieldContainer-notchedOutline': {
-            borderColor: error ? 'error.main' : `${color}.main`,
-          },
-          '& .MuiTiptap-FieldContainer-root': {
-            backgroundColor: color
-              ? `rgba(var(--mui-palette-${color}-lightChannel) / 0.1)`
-              : undefined,
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: '0px',
-              left: '8px',
-              right: 0,
-              height: '10px',
-              backgroundColor: 'background.paper',
-              width: `${labelWidth + 12}px`,
-              zIndex: 5,
-              borderRadius: '0 0 2px 2px',
-              border: 'none',
-              borderColor: 'action.disabled',
-              borderTop: 'none',
-              ...theme.applyStyles('dark', {
-                backgroundColor: '#2e2e2e',
-                border: '1px solid',
-              }),
+        sx={(theme) =>
+          merge(
+            {
+              '&& .MuiTiptap-FieldContainer-notchedOutline': {
+                borderColor: error ? 'error.main' : `${color}.main`,
+              },
+              '& .MuiTiptap-FieldContainer-root': {
+                backgroundColor: color
+                  ? `rgba(var(--mui-palette-${color}-lightChannel) / 0.1)`
+                  : undefined,
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: '0px',
+                  left: '8px',
+                  right: 0,
+                  height: '10px',
+                  backgroundColor: 'background.paper',
+                  width: `${labelWidth + 12}px`,
+                  zIndex: 5,
+                  borderRadius: '0 0 2px 2px',
+                  border: 'none',
+                  borderColor: 'action.disabled',
+                  borderTop: 'none',
+                  ...theme.applyStyles('dark', {
+                    backgroundColor: '#2e2e2e',
+                    border: '1px solid',
+                  }),
+                },
+                "[data-theme='light'] &::before": {
+                  border: 'none',
+                  backgroundColor: 'white',
+                },
+              },
             },
-            "[data-theme='light'] &::before": {
-              border: 'none',
-              backgroundColor: 'white',
-            },
-          },
-        })}
+            sx
+          )
+        }
       >
         <InputLabel
           size="small"
@@ -121,15 +153,7 @@ const RichTextInput = (props) => {
         >
           <RichTextEditor
             ref={rteRef}
-            extensions={[
-              StarterKit,
-              LinkBubbleMenuHandler,
-              Link,
-              Underline,
-              TextAlign,
-              TaskList,
-              TaskItem,
-            ]} // Or any Tiptap extensions you wish!
+            extensions={extensions}
             content={content} // Initial content for the editor
             onUpdate={({ editor }) => {
               onChange(editor.getHTML())
@@ -139,10 +163,9 @@ const RichTextInput = (props) => {
                 editor.commands.focus('end')
               }
             }}
-            // autofocus={focus}
+            autofocus={focus ? 'end' : false}
             editable={!disabled}
             editorProps={{
-              autofocus: focus ? 'end' : false,
               attributes: {
                 class: 'ProseMirror',
                 tabindex: props?.inputProps?.tabIndex || 0,
@@ -187,7 +210,7 @@ const RichTextInput = (props) => {
       </FormControl>
     )
   } else {
-    return <RichTextReadOnly content={content} extensions={[StarterKit]} />
+    return <RichTextReadOnly content={content} extensions={extensions} />
   }
 }
 
