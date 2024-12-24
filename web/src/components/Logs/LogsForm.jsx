@@ -5,7 +5,6 @@ import { useParams, useRoutePath } from '@redwoodjs/router'
 
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
-import { LOG_FIELDS } from 'src/lib/gql_fragments'
 
 import { BaseForm } from '../utils/BaseForm'
 import { Field } from '../utils/Field'
@@ -17,7 +16,6 @@ const QUERY = gql`
       ...LogFields
     }
   }
-  ${LOG_FIELDS}
 `
 
 const CREATE_MUTATION = gql`
@@ -26,7 +24,6 @@ const CREATE_MUTATION = gql`
       ...LogFields
     }
   }
-  ${LOG_FIELDS}
 `
 
 const UPDATE_MUTATION = gql`
@@ -35,7 +32,6 @@ const UPDATE_MUTATION = gql`
       ...LogFields
     }
   }
-  ${LOG_FIELDS}
 `
 const DELETE_MUTATION = gql`
   mutation DeleteLogMutation($id: Int!) {

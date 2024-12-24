@@ -10,6 +10,7 @@ import {
   screen,
   waitFor,
 } from '@redwoodjs/testing/web'
+import { registerFragment } from '@redwoodjs/web/apollo'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBarProvider.mock'
 import { render } from 'src/setupTests'
@@ -127,7 +128,7 @@ const displayConfig = {
   namePath: 'arrestee.first_name',
 }
 
-const ENTITY_FIELDS = gql`
+registerFragment(gql`
   fragment EntityFields on Arrest {
     id
     arrestee {
@@ -140,7 +141,7 @@ const ENTITY_FIELDS = gql`
       name
     }
   }
-`
+`)
 
 // Sample mutation and query
 const UPDATE_ENTITY_MUTATION = gql`
@@ -149,7 +150,6 @@ const UPDATE_ENTITY_MUTATION = gql`
       ...EntityFields
     }
   }
-  ${ENTITY_FIELDS}
 `
 const CREATE_ENTITY_MUTATION = gql`
   mutation CreateEntity($input: CreateArrestInput!) {
@@ -157,7 +157,6 @@ const CREATE_ENTITY_MUTATION = gql`
       ...EntityFields
     }
   }
-  ${ENTITY_FIELDS}
 `
 const DELETE_ENTITY_MUTATION = gql`
   mutation DeleteEntity($id: Int!) {
@@ -165,7 +164,6 @@ const DELETE_ENTITY_MUTATION = gql`
       id
     }
   }
-  ${ENTITY_FIELDS}
 `
 
 const FETCH_ENTITY_QUERY = gql`
@@ -174,7 +172,6 @@ const FETCH_ENTITY_QUERY = gql`
       ...EntityFields
     }
   }
-  ${ENTITY_FIELDS}
 `
 
 test('renders form fields correctly', async () => {

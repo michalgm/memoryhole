@@ -17,6 +17,7 @@ import { ConfirmProvider } from 'material-ui-confirm'
 import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
 import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
 
+import possibleTypes from 'src/graphql/possibleTypes'
 import FatalErrorPage from 'src/pages/FatalErrorPage'
 import Routes from 'src/Routes'
 
@@ -28,6 +29,14 @@ import theme from './theme'
 // Inject error handler into Apollo Link chain
 const link = (rwlinks) =>
   ApolloLink.from([ErrorHandler, ...rwlinks.map((l) => l.link)])
+
+const graphQLClientConfig = {
+  link,
+
+  cacheConfig: {
+    possibleTypes: possibleTypes.possibleTypes,
+  },
+}
 
 const App = () => {
   return (
@@ -41,7 +50,7 @@ const App = () => {
               <AuthProvider>
                 <RedwoodApolloProvider
                   useAuth={useAuth}
-                  graphQLClientConfig={{ link }}
+                  graphQLClientConfig={graphQLClientConfig}
                 >
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <ConfirmProvider

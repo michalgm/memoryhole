@@ -1,12 +1,13 @@
 import { useCallback } from 'react'
 
 import { navigate, routes } from '@redwoodjs/router'
+import { registerFragment } from '@redwoodjs/web/apollo'
 
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
 import { ActionFields } from 'src/lib/FieldSchemas'
 
-const ACTION_FIELDS = gql`
+registerFragment(gql`
   fragment ActionFields on Action {
     id
     name
@@ -16,7 +17,7 @@ const ACTION_FIELDS = gql`
     jurisdiction
     city
   }
-`
+`)
 
 export const QUERY = gql`
   query EditAction($id: Int!) {
@@ -24,7 +25,6 @@ export const QUERY = gql`
       ...ActionFields
     }
   }
-  ${ACTION_FIELDS}
 `
 
 const UPDATE_MUTATION = gql`
@@ -33,7 +33,6 @@ const UPDATE_MUTATION = gql`
       ...ActionFields
     }
   }
-  ${ACTION_FIELDS}
 `
 
 const CREATE_MUTATION = gql`
@@ -42,7 +41,6 @@ const CREATE_MUTATION = gql`
       ...ActionFields
     }
   }
-  ${ACTION_FIELDS}
 `
 
 export const DELETE_MUTATION = gql`
