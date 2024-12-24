@@ -1,12 +1,13 @@
 import { useCallback, useEffect } from 'react'
 
 import { navigate, routes } from '@redwoodjs/router'
+import { registerFragment } from '@redwoodjs/web/apollo'
 
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
 import ArrestFields from 'src/lib/FieldSchemas'
 
-const ARREST_FIELDS = gql`
+registerFragment(gql`
   fragment ArrestFields on Arrest {
     id
     date
@@ -56,7 +57,7 @@ const ARREST_FIELDS = gql`
       }
     }
   }
-`
+`)
 
 export const QUERY = gql`
   query EditArrestById($id: Int!) {
@@ -64,7 +65,6 @@ export const QUERY = gql`
       ...ArrestFields
     }
   }
-  ${ARREST_FIELDS}
 `
 
 const UPDATE_ARREST_MUTATION = gql`
@@ -73,7 +73,6 @@ const UPDATE_ARREST_MUTATION = gql`
       ...ArrestFields
     }
   }
-  ${ARREST_FIELDS}
 `
 
 const CREATE_ARREST_MUTATION = gql`
@@ -82,7 +81,6 @@ const CREATE_ARREST_MUTATION = gql`
       ...ArrestFields
     }
   }
-  ${ARREST_FIELDS}
 `
 
 export const DELETE_ARREST_MUTATION = gql`

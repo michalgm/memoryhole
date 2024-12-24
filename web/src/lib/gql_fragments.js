@@ -1,6 +1,8 @@
 import gql from 'graphql-tag'
 
-export const LOG_FIELDS = gql`
+import { registerFragments } from '@redwoodjs/graphql-server'
+
+registerFragments(gql`
   fragment LogFields on Log {
     id
     type
@@ -29,4 +31,4 @@ export const LOG_FIELDS = gql`
       name
     }
   }
-`
+`)

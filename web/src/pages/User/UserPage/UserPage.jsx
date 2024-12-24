@@ -6,13 +6,14 @@ import { upperCase } from 'lodash-es'
 import pluralize from 'pluralize'
 
 import { navigate, routes } from '@redwoodjs/router'
+import { registerFragment } from '@redwoodjs/web/apollo'
 
 import { useAuth } from 'src/auth'
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
 import { UserFields } from 'src/lib/FieldSchemas'
 
-const USER_FIELDS = gql`
+registerFragment(gql`
   fragment UserFields on User {
     id
     email
@@ -29,7 +30,7 @@ const USER_FIELDS = gql`
       start_date
     }
   }
-`
+`)
 
 export const QUERY = gql`
   query EditUser($id: Int!) {
@@ -37,7 +38,6 @@ export const QUERY = gql`
       ...UserFields
     }
   }
-  ${USER_FIELDS}
 `
 
 const UPDATE_USER_MUTATION = gql`
@@ -46,7 +46,6 @@ const UPDATE_USER_MUTATION = gql`
       ...UserFields
     }
   }
-  ${USER_FIELDS}
 `
 
 const CREATE_USER_MUTATION = gql`
@@ -55,7 +54,6 @@ const CREATE_USER_MUTATION = gql`
       ...UserFields
     }
   }
-  ${USER_FIELDS}
 `
 
 export const DELETE_USER_MUTATION = gql`

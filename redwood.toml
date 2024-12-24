@@ -25,3 +25,6 @@
   authProvider = "dbAuth"
   email = "greg@primate.net"
   userId = "1"
+
+[graphql]
+  fragments = true
