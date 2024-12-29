@@ -8,15 +8,21 @@ import {
   FormHelperText,
   FormLabel,
   Grid2,
+  InputAdornment,
+  Switch,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
-import { capitalize } from 'lodash-es'
+import { capitalize, merge } from 'lodash-es'
 import {
   CheckboxElement,
   Controller,
   RadioButtonGroup,
+  SwitchElement,
   TextFieldElement,
+  ToggleButtonGroupElement,
 } from 'react-hook-form-mui'
 import {
   DatePickerElement,
@@ -41,6 +47,16 @@ export const formatLabel = (label) => {
     .replace(/\b(bipoc|id\/pfn)\b/gi, (s) => s.toUpperCase())
 }
 
+const transformOptions = (options) => {
+  if (!options) return null
+  return options.map((option) => {
+    if (typeof option === 'string') {
+      return { id: option, label: formatLabel(option) }
+    }
+    return option
+  })
+}
+
 export const BaseField = ({
   name,
   field_type = 'text',
@@ -53,20 +69,22 @@ export const BaseField = ({
   isRHF,
   control,
   color,
+  endAdornment,
+  startAdornment,
   textFieldProps: defaultTextFieldProps,
   ...props
 }) => {
   // const { setValue, getValues } = useFormContext()
 
-  props.label = props.label || formatLabel(name)
+  props.label = props.label === '' ? null : props.label || formatLabel(name)
 
   if (!isRHF) {
     props.onChange = onChange
     props.value = value
   }
 
-  const textFieldProps = useMemo(
-    () => ({
+  const textFieldProps = useMemo(() => {
+    const textFieldProps = {
       name,
       helperText,
       variant: 'outlined',
@@ -75,9 +93,32 @@ export const BaseField = ({
       color,
       tabIndex: tabIndex || undefined,
       ...defaultTextFieldProps,
-    }),
-    [color, defaultTextFieldProps, fullWidth, helperText, name, tabIndex]
-  )
+    }
+    if (endAdornment) {
+      textFieldProps.InputProps = merge(textFieldProps.InputProps || {}, {
+        endAdornment: (
+          <InputAdornment position="end">{endAdornment}</InputAdornment>
+        ),
+      })
+    }
+    if (startAdornment) {
+      textFieldProps.InputProps = merge(textFieldProps.InputProps || {}, {
+        startAdornment: (
+          <InputAdornment position="start">{startAdornment}</InputAdornment>
+        ),
+      })
+    }
+    return textFieldProps
+  }, [
+    color,
+    defaultTextFieldProps,
+    fullWidth,
+    helperText,
+    name,
+    tabIndex,
+    endAdornment,
+    startAdornment,
+  ])
 
   const renderDatePicker = () => {
     const Component = isRHF
@@ -106,11 +147,7 @@ export const BaseField = ({
   }
 
   const renderAutocomplete = (extraProps = {}) => {
-    const options = defaultOptions
-      ? [...(defaultOptions || [])].map((opt) =>
-          opt.label ? opt : { id: opt, label: opt }
-        )
-      : null
+    const options = transformOptions(defaultOptions)
 
     return (
       <Autocomplete
@@ -198,9 +235,7 @@ export const BaseField = ({
   }
 
   const renderRadio = () => {
-    const options = defaultOptions.map((opt) =>
-      opt.label ? opt : { id: opt, label: formatLabel(opt) }
-    )
+    const options = transformOptions(defaultOptions)
     return (
       <RadioButtonGroup
         name={name}
@@ -248,7 +283,7 @@ export const BaseField = ({
       <Component
         name={`${name}`}
         label={props.label}
-        labelProps={{ color }}
+        labelProps={{ color, sx: { userSelect: 'none' } }}
         onChange={onChange}
         color={color}
         helperText={helperText}
@@ -263,14 +298,70 @@ export const BaseField = ({
     //   />
     // </FormGroup>
   }
+
+  const renderSwitch = () => {
+    const Component = isRHF ? SwitchElement : Switch
+    const switchInput = (
+      <Component
+        name={name}
+        checked={value}
+        onChange={onChange}
+        color={color}
+        {...props}
+      />
+    )
+    if (isRHF) {
+      return switchInput
+    }
+    return (
+      <FormControlLabel
+        control={switchInput}
+        label={props.label}
+        disabled={props.disabled}
+        required={props.required}
+        labelPlacement={props.labelPlacement}
+      />
+    )
+  }
+
+  const renderToggleButton = () => {
+    const options = transformOptions(defaultOptions)
+    if (isRHF) {
+      return (
+        <ToggleButtonGroupElement
+          name={name}
+          value={value}
+          onChange={onChange}
+          options={options}
+          {...props}
+        />
+      )
+    }
+    return (
+      <ToggleButtonGroup
+        name={name}
+        value={value}
+        onChange={onChange}
+        {...props}
+      >
+        {options.map((option) => (
+          <ToggleButton key={option.id} value={option.id}>
+            {option.label}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+    )
+  }
+
   switch (field_type) {
     case 'checkbox':
       return renderCheckbox()
-
     case 'checkbox_group':
       return renderCheckboxGroup()
     case 'radio':
       return renderRadio()
+    case 'switch':
+      return renderSwitch()
     case 'date-time':
     case 'date':
       return renderDatePicker()
@@ -284,6 +375,8 @@ export const BaseField = ({
     case 'arrest_chooser':
     case 'user_chooser':
       return renderChooser()
+    case 'togglebutton':
+      return renderToggleButton()
     case 'textarea':
     default:
       return renderTextField()
