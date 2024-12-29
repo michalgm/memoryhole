@@ -5,8 +5,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model OptionSet {
@@ -150,6 +151,7 @@ model User {
   updated_logs           Log[]          @relation("ModifiedLog")
   created_table_views    TableView[]    @relation("CreatedTableView")
   updated_table_views    TableView[]    @relation("ModifiedTableView")
+  updated_site_settings  SiteSetting[]  @relation("ModifiedSiteSetting")
 }
 
 model TableView {
@@ -179,7 +181,10 @@ model Action {
 }
 
 model SiteSetting {
-  id          String  @id
-  description String?
-  value       Json
+  id            String   @id
+  description   String?
+  value         Json
+  updated_at    DateTime @updatedAt
+  updated_by    User?    @relation("ModifiedSiteSetting", fields: [updated_by_id], references: [id])
+  updated_by_id Int?
 }

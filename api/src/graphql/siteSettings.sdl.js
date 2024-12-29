@@ -3,14 +3,18 @@ export const schema = gql`
     id: String!
     description: String
     value: JSON!
+    updated_at: DateTime
+    updated_by: User
+    updated_by_id: Int
   }
 
   type Query {
-    siteSettings: [SiteSetting!]! @requireAuth
+    siteSettings(ids: [String]): [SiteSetting] @requireAuth
     siteSetting(id: String!): SiteSetting @requireAuth
   }
 
   input CreateSiteSettingInput {
+    id: String!
     description: String
     value: JSON!
   }
@@ -19,9 +23,11 @@ export const schema = gql`
     description: String
     value: JSON
   }
-
-  type Mutation {
+  extend type Mutation {
     createSiteSetting(input: CreateSiteSettingInput!): SiteSetting! @requireAuth
+    upsertSiteSetting(input: CreateSiteSettingInput!): SiteSetting! @requireAuth
+    bulkUpsertSiteSetting(input: [CreateSiteSettingInput]!): [SiteSetting]!
+      @requireAuth
     updateSiteSetting(
       id: String!
       input: UpdateSiteSettingInput!
