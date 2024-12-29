@@ -130,7 +130,9 @@ const ArrestPage = ({ id }) => {
       ([actionField, arrestField]) => {
         if (action[actionField]) {
           if (target.setValue) {
-            target.setValue(arrestField, action[actionField])
+            target.setValue(arrestField, action[actionField], {
+              shouldDirty: true,
+            })
           } else {
             target[arrestField] = action[actionField]
           }

@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
-import { registerFragments } from '@redwoodjs/graphql-server'
+import { registerFragment } from '@redwoodjs/web/apollo'
 
-registerFragments(gql`
+registerFragment(gql`
   fragment LogFields on Log {
     id
     type
@@ -32,3 +32,14 @@ registerFragments(gql`
     }
   }
 `)
+
+export const mockMutation = gql`
+  mutation NoOp {
+    __typename
+  }
+`
+export const mockQuery = gql`
+  query NoOpQuery {
+    __typename
+  }
+`

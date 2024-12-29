@@ -19,6 +19,11 @@ export const transformData = (data, schema = {}) => {
     return {}
   }
 
+  // If no schema provided, return original data
+  if (Object.keys(schema).length === 0) {
+    return data
+  }
+
   const buildNewObject = (schema, originalData) =>
     reduce(
       schema,

@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form-mui'
 import { useBlocker } from '@redwoodjs/router'
 
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
+import { mockMutation, mockQuery } from 'src/lib/gql_fragments'
 import { transformData } from 'src/lib/transforms'
 
 const dataFromResult = (result) => {
@@ -30,12 +31,6 @@ const getChangedFields = (input, dirtyFields) => {
   }, {})
 }
 
-const mockMutation = gql`
-  mutation NoOp {
-    __typename
-  }
-`
-
 export function useFormManager({
   schema,
   namePath = 'name',
@@ -52,13 +47,14 @@ export function useFormManager({
   id,
   skipUpdatedCheck,
   skipDirtyCheck,
+  defaultValues: inputDefaultValues,
 } = {}) {
   const confirm = useConfirm()
   const context = useForm({
     defaultValues: async () => {
       const { data } =
         !id || !fetchQuery
-          ? { data: {} }
+          ? { data: inputDefaultValues ? { key: inputDefaultValues } : {} }
           : await fetchEntity({ variables: { id } })
       const [defaultValues] = await processData(data)
       return defaultValues
@@ -126,27 +122,34 @@ export function useFormManager({
       onError: displayError,
     }
   )
-  const [fetchEntity, { loading: loadingFetch }] = useLazyQuery(fetchQuery, {
-    onError: displayError,
-    fetchPolicy: 'no-cache',
-  })
+
+  const [fetchEntity, { loading: loadingFetch }] = useLazyQuery(
+    fetchQuery || mockQuery,
+    {
+      onError: displayError,
+      fetchPolicy: 'no-cache',
+    }
+  )
 
   // Move all the existing form management functions here
   const resetForm = useCallback(
     async (result) => {
       const [values, data] = await processData(result)
       reset(values)
-
       // Create a Promise that resolves when formState.isDirty becomes false
       const waitForReset = new Promise((resolve) => {
-        resetPromiseRef.current = resolve
+        if (!formState.isDirty) {
+          resolve()
+        } else {
+          resetPromiseRef.current = resolve
+        }
       })
 
       // Await the Promise
       await waitForReset
       return data
     },
-    [reset, processData]
+    [reset, processData] // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {
