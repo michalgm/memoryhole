@@ -37,6 +37,7 @@ const FormSection = ({ title, sectionActions = [], children }) => {
             spacing={2}
             direction="row"
             justifyContent="space-between"
+            alignItems="center"
             width="100%"
             sx={{ pr: 2 }}
           >
@@ -45,6 +46,7 @@ const FormSection = ({ title, sectionActions = [], children }) => {
               <Box key={action.label}>
                 <Tooltip title={action.tooltip}>
                   <Button
+                    component="div"
                     variant="contained"
                     size="small"
                     onClick={(e) => {
@@ -52,7 +54,6 @@ const FormSection = ({ title, sectionActions = [], children }) => {
                       e.stopPropagation()
                       action.onClick(e, context)
                     }}
-                    sx={{ my: -10 }}
                   >
                     {action.label}
                   </Button>
