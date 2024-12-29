@@ -26,6 +26,8 @@ describe('siteSettings', () => {
   })
 
   scenario('creates a siteSetting', async () => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+
     const result = await createSiteSetting({
       input: { id: 'String3', value: { foo: 'bar' } },
     })
@@ -35,6 +37,8 @@ describe('siteSettings', () => {
   })
 
   scenario('updates a siteSetting', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+
     const original = await siteSetting({
       id: scenario.siteSetting.one.id,
     })

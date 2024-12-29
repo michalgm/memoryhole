@@ -31,6 +31,7 @@ const Routes = () => {
           <PrivateSet unauthenticated="login" roles="Admin">
             <Set wrap={ModelLayout}>
               <Route path="/admin" page={AdminPage} name="admin" />
+              <Route path="/admin/settings" page={SettingsPage} name="settings" />
             </Set>
             <Set wrap={ModelLayout} title="Docket Sheets" titleTo="docketSheets">
               <Route path="/admin/docket-sheets" page={DocketSheetsPage} name="docketSheets" />

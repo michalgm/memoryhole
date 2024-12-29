@@ -1,4 +1,4 @@
-import { Flag, Gavel, Help, People } from '@mui/icons-material'
+import { Gavel, Help, People, Settings } from '@mui/icons-material'
 import {
   Divider,
   List,
@@ -28,9 +28,9 @@ const AdminPage = () => {
       icon: <People />,
     },
     {
-      to: routes.actions(),
-      label: 'Manage Actions',
-      icon: <Flag />,
+      to: routes.settings(),
+      label: 'Edit Site Settings',
+      icon: <Settings />,
     },
     {
       to: routes.docketSheets(),
