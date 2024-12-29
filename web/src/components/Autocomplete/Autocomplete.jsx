@@ -10,13 +10,8 @@ import {
 import { debounce, merge } from 'lodash-es'
 import { AutocompleteElement, useFormContext } from 'react-hook-form-mui'
 
-import { useDisplayError } from '../utils/SnackBar'
-
-const mockQuery = gql`
-  query NoOpQuery {
-    __typename
-  }
-`
+import { useDisplayError } from 'src/components/utils/SnackBar'
+import { mockQuery } from 'src/lib/gql_fragments'
 
 const getOperationName = (query) => {
   const def = query.definitions[0]
