@@ -3,6 +3,7 @@ import {
   PasswordValidationError,
 } from '@redwoodjs/auth-dbauth-api'
 
+import { cookieName } from 'src/lib/auth'
 import { sendReset, tokenExpireHours } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
 
@@ -26,10 +27,15 @@ export const handler = async (event, context) => {
     // https://example.com/reset-password?resetToken=${user.resetToken}
     //
     // Whatever is returned from this function will be returned from
-    // the `forgotPassword()` function that is destructured from `useAuth()`
+    // the `forgotPassword()` function that is destructured from `useAuth()`.
     // You could use this return value to, for example, show the email
     // address in a toast message so the user will know it worked and where
     // to look for the email.
+    //
+    // Note that this return value is sent to the client in *plain text*
+    // so don't include anything you wouldn't want prying eyes to see. The
+    // `user` here has been sanitized to only include the fields listed in
+    // `allowedUserFields` so it should be safe to return as-is.
     handler: async (user, resetToken) => {
       await sendReset(user, resetToken)
 
@@ -189,6 +195,7 @@ export const handler = async (event, context) => {
       'action_ids',
       'arrest_date_max',
       'arrest_date_min',
+      'arrest_date_threshold',
       'expiresAt',
     ],
     // A map of what dbAuth calls a field to what your database calls it.
@@ -206,14 +213,17 @@ export const handler = async (event, context) => {
     // Specifies attributes on the cookie that dbAuth sets in order to remember
     // who is logged in. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies
     cookie: {
-      HttpOnly: true,
-      Path: '/',
-      SameSite: 'Strict',
-      Secure: process.env.NODE_ENV !== 'development',
+      attributes: {
+        HttpOnly: true,
+        Path: '/',
+        SameSite: 'Strict',
+        Secure: process.env.NODE_ENV !== 'development',
 
-      // If you need to allow other domains (besides the api side) access to
-      // the dbAuth session cookie:
-      // Domain: 'example.com',
+        // If you need to allow other domains (besides the api side) access to
+        // the dbAuth session cookie:
+        // Domain: 'example.com',
+      },
+      name: cookieName,
     },
 
     forgotPassword: forgotPasswordOptions,
