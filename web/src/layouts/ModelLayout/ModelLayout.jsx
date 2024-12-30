@@ -4,6 +4,7 @@ import { Box, Button, Stack, Tooltip } from '@mui/material'
 import { navigate, routes, useLocation, useParams } from '@redwoodjs/router'
 
 import Breadcrumbs from 'src/components/Breadcrumbs/Breadcrumbs'
+import ShortcutIndicator from 'src/components/utils/ShortcutIndicator'
 
 const ModelLayout = ({
   title,
@@ -48,9 +49,14 @@ const ModelLayout = ({
         {buttonLabel && buttonTo && !id && !isNew && (
           <Tooltip
             title={
-              buttonLabel === 'New Arrest'
-                ? `(CTRL-A to quickly create a new arrest)`
-                : ''
+              buttonLabel === 'New Arrest' ? (
+                <>
+                  (<ShortcutIndicator combo="alt+a" /> to quickly create a new
+                  arrest)
+                </>
+              ) : (
+                ''
+              )
             }
           >
             <Button

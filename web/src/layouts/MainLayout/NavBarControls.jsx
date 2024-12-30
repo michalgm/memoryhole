@@ -4,6 +4,7 @@ import { alpha } from '@mui/material/styles'
 
 import { BaseField } from 'src/components/utils/BaseField'
 import QuickSearch from 'src/components/utils/QuickSearch'
+import ShortcutIndicator from 'src/components/utils/ShortcutIndicator'
 import { defaultAction } from 'src/lib/AppContext'
 
 const textFieldProps = {
@@ -92,7 +93,8 @@ const NavBarControls = ({
         <p>
           Toggle Logs Panel
           <br />
-          (CTRL-L to quickly create a new log)
+          <ShortcutIndicator combo="Alt+L" />
+          to quickly create a new log)
         </p>
       }
     >
