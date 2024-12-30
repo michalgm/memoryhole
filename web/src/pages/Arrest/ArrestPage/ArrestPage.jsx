@@ -141,15 +141,13 @@ const ArrestPage = ({ id }) => {
     )
   }
 
-  ArrestFields.forEach((section) => {
-    section.fields.forEach((field) => {
-      if (field[0] == 'action') {
-        field[1].onChange = (value, context) => {
-          applyActionDefaults(value, context)
-        }
-      }
-    })
-  })
+  const fieldProps = {
+    action: {
+      onChange: (value, context) => {
+        applyActionDefaults(value, context)
+      },
+    },
+  }
 
   const onFetch = useCallback(
     (arrest) => {
@@ -180,6 +178,7 @@ const ArrestPage = ({ id }) => {
       <FormContainer
         fields={ArrestFields}
         id={id === 'new' ? null : id}
+        fieldProps={fieldProps}
         displayConfig={{
           type: 'Arrest',
           namePath: 'arrestee.display_field',

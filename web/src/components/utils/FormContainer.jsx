@@ -10,9 +10,10 @@ import { Field } from './Field'
 import Footer from './Footer'
 import FormSection from './FormSection'
 
-function fieldsToColumns(fields, columnCount = 2) {
+function fieldsToColumns(fields, schema, columnCount = 2) {
   const { fullSpan, nonFullSpan } = fields.reduce(
-    (acc, [name, props = {}], index) => {
+    (acc, name, index) => {
+      const props = schema[name]
       const res = [name, props, index]
       if (props.span === 12) {
         acc.fullSpan.push(res)
@@ -53,9 +54,18 @@ const FormContainer = ({
   skipUpdatedCheck = false,
   autoComplete = 'off',
   highlightDirty = true,
+  layout,
+  fieldProps = {},
 }) => {
   const smallLayout = useContainerWidth(860)
   const schema = get(fieldSchema, displayConfig?.type?.toLowerCase(), {})
+
+  if (!layout) {
+    layout = fields.map((section) => ({
+      ...section,
+      fields: section.fields.map(([name]) => name),
+    }))
+  }
 
   return (
     <BaseForm
@@ -95,13 +105,14 @@ const FormContainer = ({
         return (
           <Box sx={{ position: 'relative', width: '100%', pb: 3 }}>
             <Stack spacing={4} sx={{ pb: 2 }} className="content-container">
-              {fields.map(
+              {layout.map(
                 (
                   { fields: sectionFields, title, sectionActions },
                   groupIndex
                 ) => {
                   const { columns, fullSpan } = fieldsToColumns(
                     sectionFields,
+                    schema,
                     columnCount
                   )
                   return (
@@ -124,6 +135,7 @@ const FormContainer = ({
                                   name={key}
                                   highlightDirty={highlightDirty}
                                   {...options}
+                                  {...(fieldProps[key] || {})}
                                 />
                               </Grid2>
                             ))}
@@ -141,6 +153,7 @@ const FormContainer = ({
                                 highlightDirty={highlightDirty}
                                 name={key}
                                 {...options}
+                                {...(fieldProps[key] || {})}
                               />
                             </Grid2>
                           ))}
