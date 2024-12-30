@@ -27,7 +27,7 @@ const QUERY_SETTINGS = gql`
 `
 
 const UPSERT_SETTINGS_MUTATION = gql`
-  mutation BulkUpsertSiteSettingMutation($input: [CreateSiteSettingInput!]!) {
+  mutation BulkUpsertSiteSettingMutation($input: [UpsertSiteSettingInput!]!) {
     bulkUpsertSiteSetting(input: $input) {
       id
       value
@@ -46,6 +46,7 @@ const restrictionTypes = [
     label: 'Expires At',
     description: "User's login will be disabled this many days after being set",
     field_type: 'date',
+    noDisable: true,
   },
   {
     name: 'arrest_date_min',
@@ -154,9 +155,7 @@ const SettingsPage = () => {
       }}
     >
       {({ formData, disabled, loadingUpdate, formContext }) => {
-        const restrictionSettings = formContext.watch(
-          'default_restriction_settings'
-        )
+        const restrictionSettings = formContext.watch('restriction_settings')
 
         return (
           <>
@@ -175,13 +174,14 @@ const SettingsPage = () => {
                   description="Use the toggles to enable or disable the restriction types in the settings and user edit interfaces"
                 >
                   {restrictionTypes.map((setting) => (
-                    <Field
-                      key={setting.name}
-                      name={`default_restriction_settings.${setting.name}`}
-                      field_type="switch"
-                      label={setting.label}
-                      labelPlacement="bottom"
-                    />
+                    <Show unless={setting.noDisable} key={setting.name}>
+                      <Field
+                        name={`restriction_settings.${setting.name}`}
+                        field_type="switch"
+                        label={setting.label}
+                        labelPlacement="bottom"
+                      />
+                    </Show>
                   ))}
                 </SettingsRow>
 
@@ -192,7 +192,10 @@ const SettingsPage = () => {
                 </SettingsRow>
                 {restrictionTypes.map((setting) => (
                   <Show
-                    unless={!restrictionSettings?.[setting.name]}
+                    unless={
+                      !restrictionSettings?.[setting.name] &&
+                      setting.name !== 'expiresAt'
+                    }
                     key={setting.name}
                   >
                     <SettingsRow
