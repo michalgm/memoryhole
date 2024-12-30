@@ -1,4 +1,24 @@
+# Changelog
 
+## [0.13.0](https://github.com/michalgm/memoryhole/compare/v0.12.0...v0.13.0) (2024-12-30)
+
+### Features
+
+* **API:** Add settingsCache and improve settings schema validation ([292d257](https://github.com/michalgm/memoryhole/commit/292d257ae290f042c1083d8ef42ae4f92ca2ce57))
+* **API:** add User arrest_date_threshold field ([e875164](https://github.com/michalgm/memoryhole/commit/e8751644c0f99dfe3485902187bb3b7e93bc3c96))
+* **API:** enable arrest_date_threshold restrictions to arrest service + add lots of tests ([6448e04](https://github.com/michalgm/memoryhole/commit/6448e04ec8dbde16feb3f0e5bd994c59ab668bd9))
+* **Form:** Add ToggleButton and Switch fields ([dc3dc4d](https://github.com/michalgm/memoryhole/commit/dc3dc4d615c53389ba318003042888d5ff306f03))
+* **Form:** Allow passing layout + fieldProps to formContainer ([83c3ad8](https://github.com/michalgm/memoryhole/commit/83c3ad81539f3a7a93ae9fa3fdf402e3de92282f))
+* **UI:** Add SiteSettings admin Page, allow editing of default restrictions ([1e7c6c4](https://github.com/michalgm/memoryhole/commit/1e7c6c45ecbcf0dc945a660c15279c3cbbd13c78))
+* **UI:** Enable configurable restriction defaults in User edit page ([b99a51d](https://github.com/michalgm/memoryhole/commit/b99a51d90931676fc1378f91fbd6d9025c518623))
+* **UI:** switch shortcuts to use alt-[a|l] vs ctrl to avoid conflicts ([6f7fa6f](https://github.com/michalgm/memoryhole/commit/6f7fa6f62e8ffa3c33118665a4233fed6d77a541))
+
+### Bug Fixes
+
+* **deployment:** Clean up docker compose + db init ([fdf60a3](https://github.com/michalgm/memoryhole/commit/fdf60a3b10789350d08741392bff867bfbaa9bfe))
+* **Form:** Allow autocomplete fields to be disabled ([5b1038a](https://github.com/michalgm/memoryhole/commit/5b1038a7e8faa4520452fb00beab8d0bdde6732e))
+* **Form:** Allow type=number fields to be null ([930abe8](https://github.com/michalgm/memoryhole/commit/930abe8d25958193e0a31913f37d2cbbed34a4f1))
+* **Form:** There should ne no need to update the form data outside of the defaultValues init ([c592f79](https://github.com/michalgm/memoryhole/commit/c592f792658906ae8965eedc1cfb152eafad34d8))
 
 ## [0.12.0](https://github.com/michalgm/memoryhole/compare/v0.11.0...v0.12.0) (2024-12-22)
 
