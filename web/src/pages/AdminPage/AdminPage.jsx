@@ -14,7 +14,6 @@ import Link from 'src/components/utils/Link'
 const AdminPage = () => {
   const admin_routes = [
     // 'users',
-    // 'hotlineLogs',
     // 'customSchemata',
     'logs',
     'tableViews',

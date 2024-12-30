@@ -84,21 +84,21 @@ model Log {
   action_id      Int?
 }
 
-model HotlineLog {
-  id            Int       @id @default(autoincrement())
-  start_time    DateTime
-  end_time      DateTime
-  type          String?
-  notes         String?
-  notes_raw     String?
-  custom_fields Json?
-  created_at    DateTime? @default(now())
-  created_by_id Int?
-  updated_at    DateTime? @updatedAt
-  updated_by_id Int?
-  created_by    User?     @relation("CreatedHotlineLog", fields: [created_by_id], references: [id])
-  updated_by    User?     @relation("ModifiedHotlineLog", fields: [updated_by_id], references: [id])
-}
+// model HotlineLog {
+//   id            Int       @id @default(autoincrement())
+//   start_time    DateTime
+//   end_time      DateTime
+//   type          String?
+//   notes         String?
+//   notes_raw     String?
+//   custom_fields Json?
+//   created_at    DateTime? @default(now())
+//   created_by_id Int?
+//   updated_at    DateTime? @updatedAt
+//   updated_by_id Int?
+//   created_by    User?     @relation("CreatedHotlineLog", fields: [created_by_id], references: [id])
+//   updated_by    User?     @relation("ModifiedHotlineLog", fields: [updated_by_id], references: [id])
+// }
 
 model Arrest {
   id              Int       @id @default(autoincrement())
@@ -146,8 +146,8 @@ model User {
   created_arrestees      Arrestee[]     @relation("CreatedArrestee")
   updated_arrestees      Arrestee[]     @relation("ModifiedArrestee")
   updated_custom_schemas CustomSchema[]
-  created_hotline_logs   HotlineLog[]   @relation("CreatedHotlineLog")
-  updated_hotline_logs   HotlineLog[]   @relation("ModifiedHotlineLog")
+  // created_hotline_logs   HotlineLog[]   @relation("CreatedHotlineLog")
+  // updated_hotline_logs   HotlineLog[]   @relation("ModifiedHotlineLog")
   created_logs           Log[]          @relation("CreatedLog")
   updated_logs           Log[]          @relation("ModifiedLog")
   created_table_views    TableView[]    @relation("CreatedTableView")
@@ -182,10 +182,10 @@ model Action {
 }
 
 model SiteSetting {
-  id            String   @id
+  id            String    @id
   description   String?
   value         Json
-  updated_at    DateTime @updatedAt
-  updated_by    User?    @relation("ModifiedSiteSetting", fields: [updated_by_id], references: [id])
+  updated_at    DateTime? @updatedAt
+  updated_by    User?     @relation("ModifiedSiteSetting", fields: [updated_by_id], references: [id])
   updated_by_id Int?
 }
