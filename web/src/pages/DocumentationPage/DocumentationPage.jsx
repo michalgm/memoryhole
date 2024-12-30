@@ -85,7 +85,7 @@ const Toc = ({ contentRef, data }) => {
       const tocData = tocToList(root.children)
       setToc(tocData)
     }
-  }, [data])
+  }, [data, contentRef])
   return toc
 }
 

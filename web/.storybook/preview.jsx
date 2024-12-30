@@ -1,10 +1,13 @@
+import React, { useEffect } from 'react'
+
 import { CssBaseline, Paper } from '@mui/material'
 import { ThemeProvider, useColorScheme } from '@mui/material/styles'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+
 import { RedwoodProvider } from '@redwoodjs/web'
 import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
-import { useEffect } from 'react'
+
 import { AuthProvider, useAuth } from '../src/auth'
 import { SnackBarProvider } from '../src/components/utils/SnackBar'
 import AppProvider from '../src/lib/AppContext'
@@ -27,7 +30,7 @@ const ModeProvider = ({ mode }) => {
   const { setMode } = useColorScheme()
   useEffect(() => {
     setMode(mode)
-  }, [mode])
+  }, [mode, setMode])
 }
 
 export const decorators = [
