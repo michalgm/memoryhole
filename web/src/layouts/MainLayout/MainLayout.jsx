@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { Box, Container } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import isHotkey from 'is-hotkey'
 
 import { navigate, routes, useRouteName } from '@redwoodjs/router'
 
@@ -48,16 +49,15 @@ const Layout = ({ children }) => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey) {
-        if (e.key.toLowerCase() === 'l') {
-          e.preventDefault()
-          setLogsOpen(true)
-          setNavOpen(false)
-          setNewLogRequested(true)
-        } else if (e.key.toLowerCase() === 'a') {
-          e.preventDefault()
-          navigate(routes['newArrest']())
-        }
+      if (isHotkey('alt+l', e)) {
+        e.preventDefault()
+        setLogsOpen(true)
+        setNavOpen(false)
+        setNewLogRequested(true)
+      }
+      if (isHotkey('alt+a', e)) {
+        e.preventDefault()
+        navigate(routes['newArrest']())
       }
     }
     document.addEventListener('keydown', handleKeyDown)
