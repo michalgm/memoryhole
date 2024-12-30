@@ -4,29 +4,48 @@ import { validate, validateWithSync } from '@redwoodjs/api'
 import { ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
+import { getSetting } from 'src/lib/settingsCache'
 
 import dayjs from '../../lib/day'
 import { updateDisplayField as updateArresteeDisplayField } from '../arrestees/arrestees'
 
-// import localizedFormat from 'dayjs/plugin/localizedFormat'
-
-const checkArrestAccess = (arrest) => {
+export const checkArrestAccess = (arrest) => {
+  const settings = getSetting('restriction_settings')
   const {
     action_ids = [],
     arrest_date_min,
     arrest_date_max,
+    arrest_date_threshold,
   } = context.currentUser
 
-  if (arrest_date_min && arrest.date < arrest_date_min) {
+  if (
+    settings.arrest_date_min &&
+    arrest_date_min &&
+    arrest.date < arrest_date_min
+  ) {
     throw new ForbiddenError(
       `Arrest date ${arrest.date} is before your minimum access date ${arrest_date_min}`
     )
   }
-  if (arrest_date_max && arrest.date > dayjs(arrest_date_max).endOf('day')) {
+  if (
+    settings.arrest_date_max &&
+    arrest_date_max &&
+    arrest.date > dayjs(arrest_date_max).endOf('day')
+  ) {
     throw new ForbiddenError(
       `Arrest date ${arrest.date} is after your maximum access date ${arrest_date_max}`
     )
   }
+  if (
+    settings.arrest_date_threshold &&
+    arrest_date_threshold &&
+    arrest.date < dayjs().subtract(arrest_date_threshold, 'day').startOf('day')
+  ) {
+    throw new ForbiddenError(
+      `Arrest date ${arrest.date} is older than your access date threshold of ${arrest_date_threshold} days`
+    )
+  }
+
   if (action_ids.length === 0) return true
 
   if (!arrest.action_id || !action_ids.includes(arrest.action_id)) {
@@ -56,19 +75,33 @@ const checkArrestsAccess = async (ids, tx) => {
 }
 
 export const filterArrestAccess = (baseWhere = {}) => {
+  const settings = getSetting('restriction_settings')
   const {
     action_ids = [],
     arrest_date_min,
     arrest_date_max,
+    arrest_date_threshold,
   } = context.currentUser
   const where = { ...baseWhere }
 
-  if (arrest_date_min || arrest_date_max) {
-    where.date = {
-      ...where.date,
-      ...(arrest_date_min && { gte: arrest_date_min }),
-      ...(arrest_date_max && { lte: arrest_date_max }),
-    }
+  const dateConstraints = []
+
+  if (where.date) {
+    dateConstraints.push(where.date)
+  }
+  if (arrest_date_min && settings.arrest_date_min) {
+    dateConstraints.push({ gte: arrest_date_min })
+  }
+  if (arrest_date_max && settings.arrest_date_max) {
+    dateConstraints.push({ lte: arrest_date_max })
+  }
+  if (arrest_date_threshold && settings.arrest_date_threshold) {
+    dateConstraints.push({
+      gte: dayjs().subtract(arrest_date_threshold, 'day').startOf('day'),
+    })
+  }
+  if (dateConstraints.length > 0) {
+    where.AND = dateConstraints.map((c) => ({ date: c }))
   }
 
   if (action_ids.length > 0) {
