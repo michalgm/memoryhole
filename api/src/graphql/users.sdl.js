@@ -19,8 +19,8 @@ export const schema = gql`
     created_arrestees: [Arrestee]!
     updated_arrestees: [Arrestee]!
     updated_custom_schemas: [CustomSchema]!
-    created_hotline_logs: [HotlineLog]!
-    updated_hotline_logs: [HotlineLog]!
+    # created_hotline_logs: [HotlineLog]!
+    # updated_hotline_logs: [HotlineLog]!
     created_arrestee_logs: [Log]!
     updated_arrestee_logs: [Log]!
     created_table_views: [TableView]!

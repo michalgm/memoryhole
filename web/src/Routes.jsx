@@ -73,7 +73,6 @@ const Routes = () => {
             <Route path="/arrests" page={ArrestArrestsPage} name="arrests" />
             <Route path="/" redirect="arrests" name="home" />
           </Set>
-          {/* <Route path="/hotline-logs" page={HotlineLogsPage} name="hotlineLogs" /> */}
           <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
             <Route path="/actions" page={ActionActionsPage} name="actions" />
             <Route path="/actions/new" page={ActionActionPage} name="newAction" />
