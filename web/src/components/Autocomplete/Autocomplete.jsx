@@ -101,6 +101,7 @@ const Autocomplete = ({
   }, [debouncedSearch])
 
   const autocompleteProps = {
+    disabled: props.disabled,
     isOptionEqualToValue: (option = {}, value) => {
       return option.id === value || option.id === value?.id
     },
