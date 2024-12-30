@@ -19,19 +19,26 @@ export const schema = gql`
     value: JSON!
   }
 
+  input UpsertSiteSettingInput {
+    id: String
+    description: String
+    value: JSON!
+  }
+
   input UpdateSiteSettingInput {
     description: String
-    value: JSON
+    value: JSON!
   }
+
   extend type Mutation {
     createSiteSetting(input: CreateSiteSettingInput!): SiteSetting! @requireAuth
-    upsertSiteSetting(input: CreateSiteSettingInput!): SiteSetting! @requireAuth
-    bulkUpsertSiteSetting(input: [CreateSiteSettingInput]!): [SiteSetting]!
-      @requireAuth
+    upsertSiteSetting(input: UpsertSiteSettingInput!): SiteSetting! @requireAuth
     updateSiteSetting(
       id: String!
       input: UpdateSiteSettingInput!
     ): SiteSetting! @requireAuth
+    bulkUpsertSiteSetting(input: [UpsertSiteSettingInput]!): [SiteSetting]!
+      @requireAuth
     deleteSiteSetting(id: String!): SiteSetting! @requireAuth
   }
 `

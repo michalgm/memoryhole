@@ -1,7 +1,7 @@
 export const standard = defineScenario({
   siteSetting: {
-    one: { data: { id: 'String', value: { foo: 'bar' } } },
-    two: { data: { id: 'String2', value: { foo: 'bar' } } },
+    one: { data: { id: 'siteHelp', value: 'hi' } },
+    two: { data: { id: 'restriction_settings', value: { expiresAt: true } } },
   },
   user: {
     test: {
