@@ -26,7 +26,7 @@ export const Field = ({ highlightDirty, ...props }) => {
         if (['checkbox', 'switch'].includes(inputType)) {
           value = args[1]
         } else if (inputType) {
-          if (inputType === 'number') {
+          if (inputType === 'number' && args[0].target.value) {
             value = Number(args[0].target.value)
           } else {
             value = args[0].target.value
