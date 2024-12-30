@@ -53,7 +53,7 @@ const fields = [
       [
         'arrestee.first_name',
         {
-          label: 'First Name',
+          label: 'Legal First Name',
           placeholder: 'Enter first name',
           rules: {
             required: 'First name is required',
@@ -195,8 +195,8 @@ test('renders form fields correctly', async () => {
     </SnackBarProvider>
   )
   await waitFor(() => {
-    expect(screen.getByLabelText('First Name')).toHaveValue('John')
-    expect(screen.getByLabelText('Last Name')).toHaveValue('Doe')
+    expect(screen.getByLabelText('Legal First Name')).toHaveValue('John')
+    expect(screen.getByLabelText('Legal Last Name')).toHaveValue('Doe')
     expect(screen.getByLabelText('Email')).toHaveValue('john.doe@example.com')
   })
 })
@@ -268,7 +268,7 @@ test('submits only changed fields', async () => {
   )
 
   // Change the first name field
-  const nameField = await screen.findByLabelText('First Name')
+  const nameField = await screen.findByLabelText('Legal First Name')
 
   await waitFor(() => user.click(nameField))
   await waitFor(() => user.clear(nameField))
@@ -337,7 +337,7 @@ test('prevents submission if record has been updated by another user', async () 
     />
   )
 
-  const nameField = await screen.findByLabelText('First Name')
+  const nameField = await screen.findByLabelText('Legal First Name')
 
   await waitFor(() => userEvent.click(nameField))
   await waitFor(() => userEvent.clear(nameField))
@@ -391,7 +391,7 @@ test('shows warning when navigating away with unsaved changes', async () => {
     />
   )
 
-  const nameField = await screen.findByLabelText('First Name')
+  const nameField = await screen.findByLabelText('Legal First Name')
 
   await waitFor(() => user.click(nameField))
   await waitFor(() => user.clear(nameField))
@@ -455,7 +455,7 @@ test('does not warn on nav from new entry', async () => {
     />
   )
 
-  const nameField = await screen.findByLabelText('First Name')
+  const nameField = await screen.findByLabelText('Legal First Name')
 
   await waitFor(() => user.click(nameField))
   await waitFor(() => user.clear(nameField))
@@ -559,7 +559,7 @@ test('shows validation errors for invalid fields', async () => {
       fetchQuery={FETCH_ENTITY_QUERY}
     />
   )
-  const firstNameInput = await screen.findByLabelText('First Name')
+  const firstNameInput = await screen.findByLabelText('Legal First Name')
 
   // Clear the first name field to trigger required field validation
   await waitFor(async () => {
@@ -575,7 +575,7 @@ test('shows validation errors for invalid fields', async () => {
   })
   await waitFor(async () => {})
   expect(
-    await screen.findByText('First name is required', {
+    await screen.findByText('Either first or preferred name must be entered', {
       selector: '.MuiFormHelperText-root',
     })
   ).toBeInTheDocument()
@@ -651,7 +651,7 @@ test('resets form state after successful save', async () => {
   )
 
   // Make changes to fields
-  const nameField = await screen.findByLabelText('First Name')
+  const nameField = await screen.findByLabelText('Legal First Name')
   await waitFor(() => user.click(nameField))
   await waitFor(() => user.clear(nameField))
   await waitFor(() => user.type(nameField, 'Jane'))
@@ -673,8 +673,8 @@ test('resets form state after successful save', async () => {
   })
 
   await waitFor(() => {
-    expect(screen.getByLabelText('First Name')).toHaveValue('Jane')
-    expect(screen.getByLabelText('Last Name')).toHaveValue('Doe')
+    expect(screen.getByLabelText('Legal First Name')).toHaveValue('Jane')
+    expect(screen.getByLabelText('Legal Last Name')).toHaveValue('Doe')
     expect(screen.getByLabelText('Email')).toHaveValue('jane@example.com')
   })
   // Verify form values match the server response
@@ -695,7 +695,7 @@ test('resets form state after successful save', async () => {
 //     />
 //   )
 
-//     const nameField = await screen.findByLabelText('First Name')
+//     const nameField = await screen.findByLabelText('Legal First Name')
 
 //   const emailField = screen.getByLabelText('Email')
 //   console.log('Initial value:', nameField.value)
