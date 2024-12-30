@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client'
 
 import { emitLogLevels, handlePrismaLogging } from '@redwoodjs/api/logger'
 
-import { filterArrestAccess } from '../services/arrests/arrests'
+import { applyExtensions } from 'src/lib/db_extensions'
 
 import { logger } from './logger'
 
@@ -22,16 +22,6 @@ handlePrismaLogging({
   logLevels: ['info', 'warn', 'error'],
 })
 
-export const db = prismaClient.$extends({
-  name: 'arrestAccessFilter',
-  query: {
-    arrest: {
-      async $allOperations({ args, query }) {
-        if (args.where) {
-          args.where = filterArrestAccess(args.where)
-        }
-        return query(args)
-      },
-    },
-  },
-})
+const extendedClient = applyExtensions(prismaClient)
+extendedClient.runInitFunctions()
+export const db = extendedClient

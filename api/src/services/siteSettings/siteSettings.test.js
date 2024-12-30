@@ -4,6 +4,7 @@ import {
   siteSetting,
   siteSettings,
   updateSiteSetting,
+  upsertSiteSetting,
 } from './siteSettings'
 
 // Generated boilerplate tests do not account for all circumstances
@@ -15,8 +16,9 @@ import {
 describe('siteSettings', () => {
   scenario('returns all siteSettings', async (scenario) => {
     const result = await siteSettings()
-
-    expect(result.length).toEqual(Object.keys(scenario.siteSetting).length)
+    expect(result.length).toBeGreaterThanOrEqual(
+      Object.keys(scenario.siteSetting).length
+    )
   })
 
   scenario('returns a single siteSetting', async (scenario) => {
@@ -29,16 +31,18 @@ describe('siteSettings', () => {
     mockCurrentUser({ name: 'Rob', id: 1 })
 
     const result = await createSiteSetting({
-      input: { id: 'String3', value: { foo: 'bar' } },
+      input: {
+        id: 'default_restrictions',
+        value: { user: {}, coordinator: {}, admin: {} },
+      },
     })
 
-    expect(result.id).toEqual('String3')
-    expect(result.value).toEqual({ foo: 'bar' })
+    expect(result.id).toEqual('default_restrictions')
+    expect(result.value).toEqual({ user: {}, coordinator: {}, admin: {} })
   })
 
   scenario('updates a siteSetting', async (scenario) => {
     mockCurrentUser({ name: 'Rob', id: 1 })
-
     const original = await siteSetting({
       id: scenario.siteSetting.one.id,
     })
@@ -46,8 +50,33 @@ describe('siteSettings', () => {
       id: original.id,
       input: { value: 'String2' },
     })
+    expect(result.value).toEqual('String2')
+    expect(result.updated_by_id).toEqual(1)
+  })
+
+  scenario('updates a siteSetting on upsert', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+
+    const original = await siteSetting({
+      id: scenario.siteSetting.one.id,
+    })
+    const result = await upsertSiteSetting({
+      input: { id: original.id, value: 'String2' },
+    })
 
     expect(result.value).toEqual('String2')
+    expect(result.id).toEqual(original.id)
+  })
+
+  scenario('creates a siteSetting on upsert', async () => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+
+    const result = await upsertSiteSetting({
+      input: { id: 'siteHelp', value: 'String3' },
+    })
+
+    expect(result.value).toEqual('String3')
+    expect(result.id).toEqual('siteHelp')
   })
 
   scenario('deletes a siteSetting', async (scenario) => {
