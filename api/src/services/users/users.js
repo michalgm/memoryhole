@@ -6,7 +6,7 @@ import { requireAuth } from 'src/lib/auth'
 import { initUser, onboardUser } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
 
-const requireAdmin = () => requireAuth({ roles: 'Admin' })
+const requireAdmin = () => requireAuth({ roles: ['Admin', 'Coordinator'] })
 
 export const users = () => {
   return db.user.findMany()
