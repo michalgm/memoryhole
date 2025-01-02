@@ -72,7 +72,7 @@ const NavDrawer = ({ navOpen }) => {
     ['dark', DarkMode],
   ]
 
-  if (currentUser && currentUser.roles.includes('Admin')) {
+  if (currentUser && ['Admin', 'Coordinator'].includes(currentUser.roles[0])) {
     pages.push(['admin', 'Admin', <ManageAccounts key="admin" />])
   }
 

@@ -28,7 +28,7 @@ const Routes = () => {
       </Set>
       <PrivateSet unauthenticated="login">
         <Set wrap={MainLayout}>
-          <PrivateSet unauthenticated="login" roles="Admin">
+          <PrivateSet unauthenticated="login" roles={['Admin', 'Coordinator']}>
             <Set wrap={ModelLayout}>
               <Route path="/admin" page={AdminPage} name="admin" />
               <Route path="/admin/settings" page={SettingsPage} name="settings" />
