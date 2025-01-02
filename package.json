@@ -8,6 +8,9 @@
     ]
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.3",
+    "@graphql-codegen/typescript": "^4.1.2",
+    "@graphql-codegen/typescript-resolvers": "^4.4.1",
     "@redwoodjs/cli-data-migrate": "8.4.2",
     "@redwoodjs/cli-storybook-vite": "8.4.2",
     "@redwoodjs/core": "8.4.2",
@@ -16,6 +19,8 @@
     "@redwoodjs/studio": "13.0.1",
     "@release-it/conventional-changelog": "^9.0.4",
     "conventional-changelog-cli": "^5.0.0",
+    "graphql": "^16.10.0",
+    "graphql-codegen-typescript-mock-data": "^4.1.0",
     "ioredis": "^5.4.2",
     "node-ssh": "^13.2.0",
     "release-it": "^17.11.0",

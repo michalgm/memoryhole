@@ -1,0 +1,12 @@
+schema: ".redwood/schema.graphql"
+generates:
+  ./web/src/test/mocks/generated.ts:
+    plugins:
+      - add:
+          content: "/* eslint-disable @typescript-eslint/no-use-before-define,@typescript-eslint/no-unused-vars,no-prototype-builtins,@typescript-eslint/no-explicit-any */"
+      - typescript
+      - typescript-resolvers
+      - typescript-mock-data:
+          generateDefaultValues: true
+          terminateCircularRelationships: true
+          addTypename: true
