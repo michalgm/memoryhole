@@ -19,7 +19,6 @@
     "@redwoodjs/studio": "13.0.1",
     "@release-it/conventional-changelog": "^9.0.4",
     "conventional-changelog-cli": "^5.0.0",
-    "graphql": "^16.10.0",
     "graphql-codegen-typescript-mock-data": "^4.1.0",
     "ioredis": "^5.4.2",
     "node-ssh": "^13.2.0",
