@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.14.0](https://github.com/michalgm/memoryhole/compare/v0.13.0...v0.14.0) (2025-01-02)
+
+### Features
+
+* **API:** allow coordinators to manage users ([c802abb](https://github.com/michalgm/memoryhole/commit/c802abb2b4ade38c8c38801af545640f23ef4acb))
+* **import_script:** send email on import failure ([65aa9a8](https://github.com/michalgm/memoryhole/commit/65aa9a8511606614754299056c30d570e9b0b75d))
+* **Tests:** add tools to generate mocks from schema ([e8df6d0](https://github.com/michalgm/memoryhole/commit/e8df6d0302c76cd33f10603d36b901d7289bae12))
+
+### Bug Fixes
+
+* **Form:** improve label id on rich text ([ac00a5e](https://github.com/michalgm/memoryhole/commit/ac00a5ef15d5c489af48e2333a65ad45278cc07a))
+* **UI:** Include Admin link for coordinators ([f86d506](https://github.com/michalgm/memoryhole/commit/f86d506ca114ea5222c5d25633f357aa5250ab9b))
+
 ## [0.13.0](https://github.com/michalgm/memoryhole/compare/v0.12.0...v0.13.0) (2024-12-30)
 
 ### Features
