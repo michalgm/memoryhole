@@ -29,10 +29,12 @@ registerFragment(gql`
     custom_fields
     created_at
     created_by {
+      id
       name
     }
     updated_at
     updated_by {
+      id
       name
     }
     arrestee {
@@ -52,9 +54,6 @@ registerFragment(gql`
       state
       zip
       custom_fields
-      arrests {
-        id
-      }
     }
   }
 `)
