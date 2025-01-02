@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.14.2](https://github.com/michalgm/memoryhole/compare/v0.14.1...v0.14.2) (2025-01-02)
+
+### Bug Fixes
+
+* **import_script:** fix email handler on intake errors ([ac87422](https://github.com/michalgm/memoryhole/commit/ac874227f4a55ddf3bc19333e334688301557bb7))
+
 ## [0.14.1](https://github.com/michalgm/memoryhole/compare/v0.14.0...v0.14.1) (2025-01-02)
 
 ### Bug Fixes
