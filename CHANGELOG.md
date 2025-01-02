@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.14.1](https://github.com/michalgm/memoryhole/compare/v0.14.0...v0.14.1) (2025-01-02)
+
+### Bug Fixes
+
+* fix package dependency issue ([2b0e74b](https://github.com/michalgm/memoryhole/commit/2b0e74b2c140a0215334999d45be87f8e14a5819))
+
 ## [0.14.0](https://github.com/michalgm/memoryhole/compare/v0.13.0...v0.14.0) (2025-01-02)
 
 ### Features
