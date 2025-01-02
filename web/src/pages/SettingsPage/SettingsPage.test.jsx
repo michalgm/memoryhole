@@ -1,14 +1,14 @@
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import { render } from 'src/setupTests'
 
+import { settingsSchemas } from '../../../../api/src/services/siteSettings/siteSettings.validation'
+
 import SettingsPage from './SettingsPage'
 
-//   Improve this test with help from the Redwood Testing Doc:
-//   https://redwoodjs.com/docs/testing#testing-pages-layouts
-const siteSettings = {
-  id: 'default_restrictions',
-  value: {},
-}
+const siteSettings = Object.entries(settingsSchemas).map(([id, schema]) => ({
+  id,
+  value: schema.parse(undefined), // This uses the schema's default values
+}))
 
 describe('SettingsPage', () => {
   mockGraphQLQuery('SettingsQuery', () => ({ siteSettings }))

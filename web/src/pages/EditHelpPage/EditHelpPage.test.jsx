@@ -1,3 +1,5 @@
+import { screen, waitFor } from '@redwoodjs/testing/web'
+
 import { SnackBarProvider } from 'src/components/utils/SnackBarProvider.mock'
 import { render } from 'src/setupTests'
 
@@ -13,7 +15,7 @@ const setting = {
 
 describe('EditHelpPage', () => {
   it('renders successfully', () => {
-    mockGraphQLQuery('FetchEntity', () => ({ siteSetting: setting }))
+    mockGraphQLQuery('EditSiteSetting', () => ({ siteSetting: setting }))
     expect(() => {
       render(
         <SnackBarProvider>
@@ -21,5 +23,20 @@ describe('EditHelpPage', () => {
         </SnackBarProvider>
       )
     }).not.toThrow()
+  })
+  it('fetches data', async () => {
+    mockGraphQLQuery('EditSiteSetting', () => ({ siteSetting: setting }))
+    const { container } = render(
+      <SnackBarProvider>
+        <EditHelpPage />
+      </SnackBarProvider>
+    )
+
+    const label = await screen.findByText('Site Help')
+    await waitFor(() => {
+      expect(label).toBeInTheDocument()
+      const editField = container.querySelector('.tiptap')
+      expect(editField.innerHTML).toEqual(setting.value)
+    })
   })
 })
