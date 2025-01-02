@@ -10,6 +10,7 @@ const utc = require('dayjs/plugin/utc')
 const { set } = require('lodash')
 const { CookieJar } = require('tough-cookie')
 
+const { sendEmail } = require('../api/src/lib/email.ts')
 const cookieJar = new CookieJar()
 
 dayjs.extend(customParseFormat)
@@ -173,12 +174,12 @@ const importRecord = async (data) => {
       const path = fieldMap[key]
       if (path) {
         if (key === 'arrest_date') {
-          if (data.arrest_time === 'Invalid date') {
+          if (data.arrest_time === 'Invalid date' || !data.court_time) {
             data.arrest_time = '12:00AM'
           }
           val = combineDateTime(data.arrest_date, data.arrest_time)
         } else if (key == 'court_date') {
-          if (data.court_time === 'Invalid date') {
+          if (data.court_time === 'Invalid date' || !data.court_time) {
             data.court_time = '12:00AM'
           }
           val = combineDateTime(data.court_date, data.court_time)
@@ -203,10 +204,15 @@ const importRecord = async (data) => {
 // main()
 
 export default async ({ args }) => {
-  const file = args._[1]
-  console.log(`Importing record from ${file}`)
-  const data = await fs.readFile(file, 'utf8')
-  const json = JSON.parse(data)
-  await importRecord(json)
-  await logout()
+  try {
+    const file = args._[1]
+    console.log(`Importing record from ${file}`)
+    const data = await fs.readFile(file, 'utf8')
+    const json = JSON.parse(data)
+    await importRecord(json)
+    await logout()
+  } catch (err) {
+    sendEmail(process.env.IMPORT_USERNAME, 'Arrest Intake Import error', err)
+    throw err
+  }
 }
