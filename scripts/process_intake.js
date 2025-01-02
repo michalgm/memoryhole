@@ -212,7 +212,11 @@ export default async ({ args }) => {
     await importRecord(json)
     await logout()
   } catch (err) {
-    sendEmail(process.env.IMPORT_USERNAME, 'Arrest Intake Import error', err)
+    await sendEmail({
+      to: process.env.IMPORT_USERNAME,
+      subject: 'Arrest Intake Import error',
+      text: err.toString(),
+    })
     throw err
   }
 }
