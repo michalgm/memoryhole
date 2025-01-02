@@ -167,6 +167,8 @@ const RichTextInput = (props) => {
             editable={!disabled}
             editorProps={{
               attributes: {
+                id: props.name,
+                'aria-labelledby': props.name,
                 class: 'ProseMirror',
                 tabindex: props?.inputProps?.tabIndex || 0,
               },
@@ -203,7 +205,7 @@ const RichTextInput = (props) => {
           </RichTextEditor>
         </Box>
         {((error?.message && !disabled) || helperText) && (
-          <FormHelperText error={Boolean(error)}>
+          <FormHelperText id={props.name} error={Boolean(error)}>
             {error?.message && !disabled ? error.message : helperText}
           </FormHelperText>
         )}
