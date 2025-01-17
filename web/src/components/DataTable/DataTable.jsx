@@ -3,13 +3,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import { Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { difference, get, merge, set, sortBy } from 'lodash-es'
+import { difference, get, isArray, merge, set, sortBy } from 'lodash-es'
 import {
+  flexRender,
   getDefaultColumnFilterFn,
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table'
 import pluralize from 'pluralize'
+import { flushSync } from 'react-dom'
+import ReactDOM from 'react-dom/client'
 
 import { useContainerWidth } from 'src/lib/AppContext'
 
@@ -20,9 +23,28 @@ import ManageViews from './ManageViews'
 
 const csvConfig = mkConfig({
   useKeysAsHeaders: true,
+  prependHeader: true,
+  useBom: true,
 })
 
-export const defineColumns = (
+const extractTextFromJSXRender = (JSX) => {
+  const tempDiv = document.createElement('div')
+  tempDiv.style.position = 'absolute'
+  tempDiv.style.top = '-9999px'
+  tempDiv.style.left = '-9999px'
+  tempDiv.style.height = '0'
+  tempDiv.style.overflow = 'hidden'
+
+  document.body.appendChild(tempDiv)
+  const root = ReactDOM.createRoot(tempDiv)
+  flushSync(() => root.render(JSX))
+  const text = tempDiv.textContent.trim()
+  root.unmount()
+  document.body.removeChild(tempDiv)
+  return text
+}
+
+const defineColumns = (
   schema,
   displayColumns,
   visibleColumns,
@@ -99,7 +121,7 @@ export const defineColumns = (
   return columns
 }
 
-const useTableState = (initialState, type, persistState) => {
+const useTableState = (initialState, type, persistState, columnsRef) => {
   const [localState, setLocalState] = useState({})
   const [stateLoaded, setStateLoaded] = useState(false)
 
@@ -107,10 +129,13 @@ const useTableState = (initialState, type, persistState) => {
     const storedState = type
       ? JSON.parse(sessionStorage.getItem(`${type}_table_state`))
       : null
-    const mergedState = merge(initialState, storedState)
+    const mergedState = merge(
+      initialState,
+      processStoredState(storedState, columnsRef)
+    )
     setLocalState(mergedState)
     setStateLoaded(true)
-  }, [type, initialState])
+  }, [type, initialState, columnsRef])
 
   const saveState = useCallback(
     (state) => {
@@ -134,35 +159,34 @@ const ToolbarActions = ({
   initialState,
   actionButtons,
   columnOrder,
+  type,
 }) => {
   const handleExportRows = (data) => {
     const columns = table
       .getVisibleFlatColumns()
+      .filter((col) => !col.id.match(/^mrt/))
       .sort((a, b) => columnOrder.indexOf(a.id) - columnOrder.indexOf(b.id))
-
     const rows = data.map((row) => {
-      return columns.reduce(
-        (acc, { columnDef: { id, header, Cell, filterVariant } }, index) => {
-          if (id.match(/^mrt/)) {
-            return acc
-          }
-          const cell = row.getVisibleCells()[index]
-          let value =
-            filterVariant === 'date' ? Cell({ cell }) : cell.getValue()
-          if (typeof value === 'object') {
-            if (value !== null) {
-              console.error(`Unknown value for ${header}`, value)
-            }
-            value = ''
-          }
-          acc[header] = value === null || value === undefined ? '' : value
-          return acc
-        },
-        {}
-      )
+      return columns.reduce((acc, { columnDef: { id, header, Cell } }) => {
+        const cell = row.getVisibleCells().find((c) => c.column.id === id)
+        let value = Cell
+          ? extractTextFromJSXRender(
+              flexRender(Cell, {
+                renderedCellValue: cell.renderValue(),
+                ...cell.getContext(),
+              })
+            )
+          : cell.renderValue()
+        acc[header] = value === null || value === undefined ? '' : value
+        return acc
+      }, {})
     })
     const csv = generateCsv(csvConfig)(rows)
-    download(csvConfig)(csv)
+    const filename = `${type || 'download'}-${dayjs().format('YYYY-MM-DD_hh-mm-A')}`
+    download({
+      csvConfig,
+      filename,
+    })(csv)
   }
   return (
     <Stack
@@ -204,6 +228,53 @@ const ToolbarActions = ({
   )
 }
 
+const processStoredState = (state, columnsRef) => {
+  // Process existing filters
+  if (state?.columnFilters) {
+    state.columnFilters = (state.columnFilters || []).reduce(
+      (acc, { id, value }) => {
+        const colDef = columnsRef.current.find((c) => c.id === id)
+        if (colDef?.fieldType === 'date' || colDef?.fieldType === 'date-time') {
+          if (isArray(value)) {
+            value = value.map((v) => {
+              return v ? dayjs(v) : v
+            })
+          } else {
+            value = dayjs(value)
+          }
+        }
+        if (isArray(value) && !value.find((v) => v)) {
+          return acc
+        }
+        acc.push({ id, value })
+        return acc
+      },
+      []
+    )
+  }
+
+  // Add visibility processing
+  if (state?.columnVisibility) {
+    // Get all current column IDs
+    const currentColumnIds = columnsRef.current.map(
+      (col) => col.id || col.accessorKey
+    )
+
+    // Set any new columns (not in saved state) to hidden
+    currentColumnIds.forEach((colId) => {
+      const column = columnsRef.current.find(
+        (col) => (col.id || col.accessorKey) === colId
+      )
+      // Always show pre/post columns, hide other new columns
+      if (state.columnVisibility[colId] === undefined) {
+        state.columnVisibility[colId] = column.isPre || column.isPost || false
+      }
+    })
+  }
+
+  return state
+}
+
 const DataTable = ({
   data: inputData = [],
   schema = {},
@@ -241,9 +312,9 @@ const DataTable = ({
   }
 
   const columns = [
-    ...preColumns,
+    ...preColumns.map((col) => ({ ...col, isPre: true })),
     ...defineColumns(schema, displayColumns, visibleColumns, customFields),
-    ...postColumns,
+    ...postColumns.map((col) => ({ ...col, isPost: true })),
   ]
   const columnsRef = useRef(columns)
 
@@ -286,22 +357,12 @@ const DataTable = ({
   const { localState, stateLoaded, setLocalState, saveState } = useTableState(
     initialState,
     type,
-    persistState
+    persistState,
+    columnsRef
   )
 
   const loadState = (state) => {
-    state.columnFilters = (state.columnFilters || []).reduce(
-      (acc, { id, value }) => {
-        const colDef = columnsRef.current.find((c) => c.id === id)
-        if (colDef?.fieldType === 'date' || colDef?.fieldType === 'date-time') {
-          value = dayjs(value)
-        }
-        acc.push({ id, value })
-        return acc
-      },
-      []
-    )
-
+    state = processStoredState(state, columnsRef)
     setColumnFilters(state.columnFilters)
     setGlobalFilter(state.globalFilter)
     setColumnOrder(state.columnOrder)
@@ -312,6 +373,7 @@ const DataTable = ({
     setSorting(state.sorting)
     setColumnFilterFns(state.columnFilterFns)
     setLocalState(state)
+    saveState(state)
   }
 
   const getDefault = (key) => localState[key] || initialState[key]
@@ -430,6 +492,7 @@ const DataTable = ({
         initialState={initialState}
         actionButtons={actionButtons}
         columnOrder={columnOrder}
+        type={type}
       />
     ),
   }
