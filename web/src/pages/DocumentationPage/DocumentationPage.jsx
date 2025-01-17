@@ -35,7 +35,7 @@ const Toc = ({ contentRef, data }) => {
         if (!children || children.length === 0) return null
         const { id: listId, level: listLevel } = children[0]
         return (
-          <List key={listId} dense>
+          <List key={listId} dense sx={{ py: 0 }}>
             {children.map(({ id, textContent, children }) => (
               <React.Fragment key={id}>
                 <ListItemButton
@@ -99,7 +99,12 @@ const DocumentationPage = () => {
   } = data
 
   return (
-    <Stack direction="row" alignItems={'flex-start'}>
+    <Stack
+      direction="row"
+      alignItems={'flex-start'}
+      spacing={2}
+      sx={{ mt: 2, position: 'relative', my: 2 }}
+    >
       <Paper
         sx={{
           flex: 1,
@@ -107,6 +112,7 @@ const DocumentationPage = () => {
           top: 16,
           minWidth: 200,
           minHeight: '10px',
+          pb: 1,
         }}
       >
         <Typography variant="h6" p={2} pb={0}>
@@ -114,7 +120,7 @@ const DocumentationPage = () => {
         </Typography>
         <Toc data={data} contentRef={contentRef} />
       </Paper>
-      <Box p={2} position={'relative'} sx={{ flex: 3 }}>
+      <Box position={'relative'} sx={{ flex: 3 }}>
         <Paper
           ref={contentRef}
           sx={(theme) => ({
