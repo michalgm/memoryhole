@@ -10,6 +10,11 @@ generates:
           generateDefaultValues: true
           terminateCircularRelationships: true
           addTypename: true
+          dynamicValues: true
           scalars:
             Date: date.past
             DateTime: date.past
+            ID:
+              generator: incrementalId
+              increment: 1
+              start: 1

@@ -1,4 +1,11 @@
-import { afterAll, afterEach, beforeAll, beforeEach, jest } from '@jest/globals'
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  expect,
+  jest,
+} from '@jest/globals'
 
 import { waitFor } from '@redwoodjs/testing/web'
 
@@ -7,32 +14,50 @@ import './test/setup/browserMocks'
 jest.mock('src/components/utils/SnackBar', () =>
   jest.requireActual('src/components/utils/SnackBarProvider.mock')
 )
-jest.mock('src/components/utils/RichTextInput', () => {
-  return {
-    __esModule: true,
-    default: (props) => {
-      if (props.readonly) {
-        return (
-          <div data-testid="mocked-rich-text" className="tiptap">
-            {props.content}
-          </div>
-        )
+expect.extend({
+  toContainText(received, text) {
+    const containsText = (element, searchText) => {
+      if (typeof element === 'string') {
+        return element.includes(searchText)
       }
-      return (
-        <div data-testid="mocked-rich-text">
-          <label htmlFor={props.name}>{props.label}</label>
-          <input
-            type="text"
-            name={props.name}
-            id={props.name}
-            defaultValue={props.content}
-          />
+      if (element.props && element.props.children) {
+        if (Array.isArray(element.props.children)) {
+          return element.props.children.some((child) =>
+            containsText(child, searchText)
+          )
+        }
+        return containsText(element.props.children, searchText)
+      }
+      return false
+    }
+
+    return {
+      pass: containsText(received, text),
+      message: () => `expected ${received} to contain text "${text}"`,
+    }
+  },
+})
+
+jest.mock('src/components/utils/BaseField', () => {
+  const ActualBaseField = jest.requireActual('src/components/utils/BaseField')
+  return {
+    ...ActualBaseField,
+    BaseField: (props) => {
+      if (props.field_type === 'richtext' && props.editable === false) {
+        return (
           <div
             className="tiptap"
-            dangerouslySetInnerHTML={{ __html: props.content }}
+            dangerouslySetInnerHTML={{ __html: props.value }}
           />
-        </div>
-      )
+        )
+      }
+      const modifiedProps = {
+        ...props,
+        field_type:
+          props.field_type === 'richtext' ? 'text-area' : props.field_type,
+      }
+
+      return <ActualBaseField.BaseField {...modifiedProps} />
     },
   }
 })

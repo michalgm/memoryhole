@@ -12,7 +12,7 @@ import { generateMockData } from '../../test/mocks/generateMockData'
 import Log from './Log'
 
 const mockLog = generateMockData('aLog', 'LogFields', [
-  { type: 'Email', notes: 'Test log entry' },
+  { type: 'Email', notes: 'Test log entry', needs_followup: true },
 ])[0]
 
 const renderLog = (log) => {
@@ -132,7 +132,7 @@ describe('Log', () => {
     )
     await waitFor(() => {
       expect(screen.getByLabelText('Type *')).toHaveValue('Email')
-      expect(screen.getByText('Test log entry')).toBeInTheDocument()
+      expect(screen.getByLabelText('Notes *')).toHaveValue('Test log entry')
       expect(screen.queryByText('Show more')).not.toBeInTheDocument()
       expect(screen.queryByText('Edit Log')).not.toBeInTheDocument()
     })

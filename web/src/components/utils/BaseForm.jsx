@@ -22,7 +22,7 @@ const BaseForm = ({
   return (
     <FormContainer
       onSuccess={onSave}
-      FormProps={{ autoComplete }}
+      FormProps={{ autoComplete, name: formConfig?.modelType || 'form' }}
       formContext={formContext}
     >
       <FormStateHandler blocker={blocker} />

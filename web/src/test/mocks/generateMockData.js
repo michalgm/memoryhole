@@ -51,8 +51,8 @@ function filterFields(data, fields) {
 export const generateMockData = (mockMethod, fragmentName, overrides = []) => {
   const fragment = fragmentRegistry.lookup(fragmentName)
   const fields = extractFields(fragment)
-  const mockData = filterFields(generatedMocks[mockMethod]({}), fields)
   return overrides.map((override) => {
+    const mockData = filterFields(generatedMocks[mockMethod]({}), fields)
     return merge(cloneDeep(mockData), override)
   })
 }

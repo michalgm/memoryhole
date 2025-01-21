@@ -27,22 +27,6 @@ const WrappedFormContainer = (props) => {
   )
 }
 
-beforeEach(() => {
-  jest.clearAllMocks()
-})
-
-afterEach(async () => {
-  await waitFor(() => {
-    // Wait for any pending state updates or async operations
-  })
-})
-
-afterAll(async () => {
-  await waitFor(() => {
-    // Wait for any pending state updates or async operations
-  })
-})
-
 const transformInputMock = jest.fn((input) => input)
 
 // Sample fields configuration
@@ -83,30 +67,6 @@ const fields = [
     ],
   },
 ]
-
-expect.extend({
-  toContainText(received, text) {
-    const containsText = (element, searchText) => {
-      if (typeof element === 'string') {
-        return element.includes(searchText)
-      }
-      if (element.props && element.props.children) {
-        if (Array.isArray(element.props.children)) {
-          return element.props.children.some((child) =>
-            containsText(child, searchText)
-          )
-        }
-        return containsText(element.props.children, searchText)
-      }
-      return false
-    }
-
-    return {
-      pass: containsText(received, text),
-      message: () => `expected ${received} to contain text "${text}"`,
-    }
-  },
-})
 
 // Sample entity data
 const entity = {
