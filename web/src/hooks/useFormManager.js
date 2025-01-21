@@ -138,11 +138,11 @@ export function useFormManager({
       reset(values)
       // Create a Promise that resolves when formState.isDirty becomes false
       const waitForReset = new Promise((resolve) => {
-        if (!formState.isDirty) {
-          resolve()
-        } else {
-          resetPromiseRef.current = resolve
-        }
+        // if (!formState.isDirty) {
+        //   resolve()
+        // } else {
+        resetPromiseRef.current = resolve
+        // }
       })
 
       // Await the Promise
