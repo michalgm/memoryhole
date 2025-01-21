@@ -26,17 +26,16 @@ describe('EditHelpPage', () => {
   })
   it('fetches data', async () => {
     mockGraphQLQuery('EditSiteSetting', () => ({ siteSetting: setting }))
-    const { container } = render(
+    render(
       <SnackBarProvider>
         <EditHelpPage />
       </SnackBarProvider>
     )
 
-    const label = await screen.findByText('Site Help')
+    const editField = await screen.findByLabelText('Site Help')
     await waitFor(() => {
-      expect(label).toBeInTheDocument()
-      const editField = container.querySelector('.tiptap')
-      expect(editField.innerHTML).toEqual(setting.value)
+      expect(editField).toBeInTheDocument()
+      expect(editField).toHaveValue(setting.value)
     })
   })
 })

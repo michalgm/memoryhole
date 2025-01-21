@@ -1,6 +1,6 @@
 import { Box, CircularProgress } from '@mui/material'
 
-const Loading = ({ size = 150, ...props }) => {
+const Loading = ({ size = 150, name = 'loader', ...props }) => {
   return (
     <Box
       sx={{
@@ -11,7 +11,7 @@ const Loading = ({ size = 150, ...props }) => {
         ...props,
       }}
     >
-      <CircularProgress size={size} />
+      <CircularProgress size={size} aria-label={name} />
     </Box>
   )
 }

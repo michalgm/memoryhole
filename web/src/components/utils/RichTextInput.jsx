@@ -136,7 +136,8 @@ const RichTextInput = (props) => {
           shrink
           color={color}
           variant="outlined"
-          htmlFor={props.name}
+          htmlFor={`${props.name}`}
+          id={`${props.name}-label`}
         >
           <span ref={labelRef}>{label}</span>
         </InputLabel>
@@ -168,7 +169,7 @@ const RichTextInput = (props) => {
             editorProps={{
               attributes: {
                 id: props.name,
-                'aria-labelledby': props.name,
+                'aria-labelledby': `${props.name}-label`,
                 class: 'ProseMirror',
                 tabindex: props?.inputProps?.tabIndex || 0,
               },

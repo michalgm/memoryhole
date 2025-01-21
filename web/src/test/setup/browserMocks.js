@@ -19,3 +19,34 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 })
+
+// function getBoundingClientRect() {
+//   const rec = {
+//     x: 0,
+//     y: 0,
+//     bottom: 0,
+//     height: 0,
+//     left: 0,
+//     right: 0,
+//     top: 0,
+//     width: 0,
+//   }
+//   return {
+//     ...rec,
+//     toJSON: () => rec,
+//   }
+// }
+
+// class FakeDOMRectList extends Array {
+//   item(index) {
+//     return this[index] || null
+//   }
+// }
+
+// document.elementFromPoint = () => null
+
+// HTMLElement.prototype.getBoundingClientRect = getBoundingClientRect
+// HTMLElement.prototype.getClientRects = () => new FakeDOMRectList()
+
+// Range.prototype.getBoundingClientRect = getBoundingClientRect
+// Range.prototype.getClientRects = () => new FakeDOMRectList()

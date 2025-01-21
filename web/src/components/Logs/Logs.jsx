@@ -2,14 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
 import { Add } from '@mui/icons-material'
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form-mui'
 
 import { navigate, routes, useLocation } from '@redwoodjs/router'
@@ -181,7 +174,7 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
         context={context}
         loading={loading}
       />
-      {loading && <Loading />}
+      {loading && <Loading name="loading-logs" />}
       {!loading && !logs.length && (
         <Typography variant="h6" align="center">
           No Logs Found
