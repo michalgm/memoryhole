@@ -3,6 +3,7 @@ import { Box, Button, Grid2, Stack } from '@mui/material'
 
 import { useParams, useRoutePath } from '@redwoodjs/router'
 
+import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
 
@@ -70,7 +71,6 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
   const path = useRoutePath()
   const { id } = useParams()
   const schema = fieldSchema.log
-
   return (
     <Grid2 size={12}>
       <BaseForm
@@ -176,14 +176,15 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
                 <Button disabled={disabled} onClick={() => callback()}>
                   Cancel
                 </Button>
-                <LoadingButton
-                  loading={loadingDelete}
-                  disabled={disabled}
-                  onClick={() => confirmDelete()}
-                >
-                  Delete
-                </LoadingButton>
-
+                <Show when={Boolean(log_id)}>
+                  <LoadingButton
+                    loading={loadingDelete}
+                    disabled={disabled}
+                    onClick={() => confirmDelete()}
+                  >
+                    Delete
+                  </LoadingButton>
+                </Show>
                 <LoadingButton
                   size="small"
                   disabled={disabled}

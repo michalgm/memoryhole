@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import {
+  Edit,
   ExpandMore as ExpandMoreIcon,
   Flag,
   Person,
@@ -23,39 +24,15 @@ import dayjs from 'dayjs'
 import { navigate, routes } from '@redwoodjs/router'
 
 import LogsForm from 'src/components/Logs/LogsForm'
-
-import RichTextInput from '../utils/RichTextInput'
-
-// const ExpandMore = styled((props) => {
-//   const { expand, children } = props
-//   return <span>{children}</span>
-// })(({ theme }) => ({
-//   marginLeft: 'auto',
-//   transition: theme.transitions.create('transform', {
-//     duration: theme.transitions.duration.shortest,
-//   }),
-//   variants: [
-//     {
-//       props: ({ expand }) => !expand,
-//       style: {
-//         transform: 'rotate(0deg)',
-//       },
-//     },
-//     {
-//       props: ({ expand }) => !!expand,
-//       style: {
-//         transform: 'rotate(180deg)',
-//       },
-//     },
-//   ],
-// }))
+import RichTextInput from 'src/components/utils/RichTextInput'
+import Show from 'src/components/utils/Show'
 
 const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
   const [expanded, setExpanded] = useState(false)
   const [isOverflowing, setIsOverflowing] = useState(false)
   const maxHeight = 200
   const contentRef = useRef(null)
-
+  const editLog = editItem && editItem === item?.id
   useEffect(() => {
     if (contentRef.current) {
       setIsOverflowing(contentRef.current.scrollHeight > maxHeight)
@@ -87,10 +64,11 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
             )}
           </Stack>
         }
+        sx={{ pb: 0 }}
       />
-      <Divider flexItem />
+      <Divider flexItem sx={{ my: 1 }} />
       <CardContent sx={{ pt: 0, pb: 0 }}>
-        {editItem === item.id ? (
+        {editLog ? (
           <LogsForm callback={onCreate} log={item} />
         ) : (
           <Stack spacing={1}>
@@ -176,41 +154,44 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
           </Stack>
         )}
       </CardContent>
-      <CardActions sx={{ px: 2 }}>
-        <Stack
-          direction={'row'}
-          justifyContent="space-between"
-          spacing={2}
-          sx={{ width: '100%' }}
-        >
-          <span>
-            <Button
-              variant="text"
-              onClick={() => setExpanded(!expanded)}
-              startIcon={
-                <ExpandMoreIcon
-                  sx={{
-                    transition: '200ms',
-                    transform: `rotate(${expanded ? 180 : 0}deg)`,
-                  }}
-                />
-              }
-            >
-              {expanded ? 'Show less' : 'Show more'}
-            </Button>
-          </span>
-          <span>
-            <Button
-              variant="outlined"
-              size="small"
-              color="secondary"
-              onClick={() => setEditItem(item.id)}
-            >
-              Edit Log
-            </Button>
-          </span>
-        </Stack>
-      </CardActions>
+      <Show unless={editLog}>
+        <CardActions sx={{ px: 2 }}>
+          <Stack
+            direction={'row'}
+            justifyContent="space-between"
+            spacing={2}
+            sx={{ width: '100%' }}
+          >
+            <span>
+              <Button
+                variant="text"
+                onClick={() => setExpanded(!expanded)}
+                startIcon={
+                  <ExpandMoreIcon
+                    sx={{
+                      transition: '200ms',
+                      transform: `rotate(${expanded ? 180 : 0}deg)`,
+                    }}
+                  />
+                }
+              >
+                {expanded ? 'Show less' : 'Show more'}
+              </Button>
+            </span>
+            <span>
+              <Button
+                variant="outlined"
+                size="small"
+                color="secondary"
+                onClick={() => setEditItem(item.id)}
+                startIcon={<Edit />}
+              >
+                Edit Log
+              </Button>
+            </span>
+          </Stack>
+        </CardActions>
+      </Show>
     </Card>
   )
 }

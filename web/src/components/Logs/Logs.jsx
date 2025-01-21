@@ -12,10 +12,11 @@ import {
 } from '@mui/material'
 import { useForm } from 'react-hook-form-mui'
 
-import { navigate, useLocation } from '@redwoodjs/router'
+import { navigate, routes, useLocation } from '@redwoodjs/router'
 
 import LogsFilter from 'src/components/Logs/LogsFilter'
 import LogsForm from 'src/components/Logs/LogsForm'
+import FormSection from 'src/components/utils/FormSection'
 import { useApp } from 'src/lib/AppContext'
 import { asyncDebounce } from 'src/lib/utils'
 
@@ -96,7 +97,7 @@ const processQuery = (values) => {
 
 const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
   const { currentAction } = useApp()
-  const { pathname, search } = useLocation()
+  const { search } = useLocation()
   const [logs, setLogs] = useState([])
   const [editItem, setEditItem] = useState(false)
   const [loading, setLoading] = useState(!sidebar)
@@ -117,9 +118,9 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
 
   const onCreate = (success) => {
     setEditItem('')
-    !sidebar && navigate(pathname)
     success && searchLogs()
     onNewLogComplete && onNewLogComplete()
+    !sidebar && navigate(routes.logs({}))
   }
 
   const debouncedSearchLogs = useMemo(() => {
@@ -170,11 +171,9 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
         </Box>
       )}
       {editItem === 'new' && (
-        <Card>
-          <CardContent>
-            <LogsForm callback={onCreate} sidebar={sidebar} />
-          </CardContent>
-        </Card>
+        <FormSection title="New Log" small={sidebar}>
+          <LogsForm callback={onCreate} sidebar={sidebar} />
+        </FormSection>
       )}
       <LogsFilter
         sidebar={sidebar}

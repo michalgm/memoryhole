@@ -594,6 +594,7 @@ fieldSchema.log = {
   type: {
     field_type: 'select',
     options: [
+      'Shift Summary',
       'Jail Call',
       'Witness Call',
       'Support Call',
