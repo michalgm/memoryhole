@@ -90,12 +90,12 @@ const NavBarControls = ({
     </Box>
     <Tooltip
       title={
-        <p>
+        <Box sx={{ p: 1 }}>
           Toggle Logs Panel
           <br />
           <ShortcutIndicator combo="Alt+L" />
           to quickly create a new log)
-        </p>
+        </Box>
       }
     >
       <Button
