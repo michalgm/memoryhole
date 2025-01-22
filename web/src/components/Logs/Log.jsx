@@ -40,7 +40,7 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
   }, [item.notes])
 
   return (
-    <Card key={item.id}>
+    <Card key={item.id} elevation={2}>
       <CardHeader
         title={
           <Stack direction={'row'} justifyContent="space-between">

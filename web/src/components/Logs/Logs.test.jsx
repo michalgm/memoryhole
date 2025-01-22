@@ -64,7 +64,7 @@ describe('Logs', () => {
     renderLogs()
 
     await waitFor(() => {
-      expect(screen.getByText('No Logs Found')).toBeInTheDocument()
+      expect(screen.getByText('No Logs Match Search')).toBeInTheDocument()
     })
   })
 

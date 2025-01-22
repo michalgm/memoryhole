@@ -1,8 +1,18 @@
+import { useEffect, useState } from 'react'
+
 import { Drawer, Stack } from '@mui/material'
+
+import Show from 'src/components/utils/Show'
 
 import Logs from './Logs'
 
 const LogsDrawer = ({ open, width, newLogRequested, onNewLogComplete }) => {
+  const [hasBeenOpened, setHasBeenOpened] = useState(false)
+  useEffect(() => {
+    if (open && !hasBeenOpened) {
+      setHasBeenOpened(true)
+    }
+  }, [open, hasBeenOpened])
   return (
     <Stack
       direction="column"
@@ -32,12 +42,15 @@ const LogsDrawer = ({ open, width, newLogRequested, onNewLogComplete }) => {
         variant="persistent"
         anchor="right"
         open={open}
+        PaperProps={{ id: 'arrestee-logs-drawer-container' }}
       >
-        <Logs
-          sidebar
-          newLogRequested={newLogRequested}
-          onNewLogComplete={onNewLogComplete}
-        />
+        <Show when={hasBeenOpened}>
+          <Logs
+            sidebar
+            newLogRequested={newLogRequested}
+            onNewLogComplete={onNewLogComplete}
+          />
+        </Show>
       </Drawer>
     </Stack>
   )
