@@ -22,7 +22,9 @@
     "API",
     "Tests",
     "DataTable",
-    "Storybook"
+    "Storybook",
+    "deployment",
+    "dependencies"
   ],
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
