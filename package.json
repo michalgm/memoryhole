@@ -17,12 +17,12 @@
     "@redwoodjs/project-config": "8.4.2",
     "@redwoodjs/realtime": "8.4.2",
     "@redwoodjs/studio": "13.0.1",
-    "@release-it/conventional-changelog": "^9.0.4",
+    "@release-it/conventional-changelog": "^10.0.0",
     "conventional-changelog-cli": "^5.0.0",
     "graphql-codegen-typescript-mock-data": "^4.1.0",
     "ioredis": "^5.4.2",
     "node-ssh": "^13.2.0",
-    "release-it": "^17.11.0",
+    "release-it": "^18.1.1",
     "storybook": "7.6.20"
   },
   "eslintConfig": {
@@ -45,7 +45,7 @@
     "axios": "^1.7.9",
     "axios-cookiejar-support": "^5.0.5",
     "pm2": "^5.4.3",
-    "tough-cookie": "^5.0.0"
+    "tough-cookie": "^5.1.0"
   },
   "scripts": {
     "release": "git stash && release-it --no-npm.publish && git stash pop"
