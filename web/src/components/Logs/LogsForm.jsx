@@ -131,6 +131,9 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           }
           return (
             <Stack spacing={2}>
+              <Box>
+                <Field name="notes" {...schema.notes} focus="true" />
+              </Box>
               <Row>
                 <Field name="type" {...schema.type} />
                 <Field
@@ -141,9 +144,6 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
                   }}
                 />
               </Row>
-              <Box>
-                <Field name="notes" {...schema.notes} focus="true" />
-              </Box>
               <Row>
                 <Field name="action" {...schema.action} />
                 <Field name="arrests" {...schema.arrests} multiple />

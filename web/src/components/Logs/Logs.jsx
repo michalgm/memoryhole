@@ -4,12 +4,14 @@ import { useLazyQuery } from '@apollo/client'
 import { Add } from '@mui/icons-material'
 import { Box, Button, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form-mui'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { navigate, routes, useLocation } from '@redwoodjs/router'
 
 import LogsFilter from 'src/components/Logs/LogsFilter'
 import LogsForm from 'src/components/Logs/LogsForm'
 import FormSection from 'src/components/utils/FormSection'
+import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
 import { asyncDebounce } from 'src/lib/utils'
 
@@ -93,7 +95,10 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
   const { search } = useLocation()
   const [logs, setLogs] = useState([])
   const [editItem, setEditItem] = useState(false)
-  const [loading, setLoading] = useState(!sidebar)
+  const [loading, setLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
+  const [skip, setSkip] = useState(0)
+  const ITEMS_PER_PAGE = 20
 
   const defaultValues = {}
   if (currentAction && currentAction.id !== -1) {
@@ -109,44 +114,56 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
     }
   }, [search, sidebar, newLogRequested])
 
-  const onCreate = (success) => {
-    setEditItem('')
-    success && searchLogs()
-    onNewLogComplete && onNewLogComplete()
-    !sidebar && navigate(routes.logs({}))
-  }
-
   const debouncedSearchLogs = useMemo(() => {
-    return asyncDebounce(() => {
+    return asyncDebounce((skip) => {
       return (async () => {
         const values = getValues()
         const { where } = processQuery(values)
-        const logs = await fetchLogs({ variables: { params: { where } } })
+        const logs = await fetchLogs({
+          variables: { params: { where, take: ITEMS_PER_PAGE, skip } },
+        })
         if (logs?.data?.logs) {
-          setLogs(logs.data.logs)
+          setLogs((prev) => [...(skip === 0 ? [] : prev), ...logs.data.logs])
+          setHasMore(logs.data.logs.length === ITEMS_PER_PAGE)
         }
       })()
     }, 1000)
   }, [fetchLogs, getValues])
 
-  const searchLogs = useCallback(async () => {
-    setLoading(true)
-    let values = []
-    try {
-      values = await debouncedSearchLogs()
-    } catch (e) {
-      console.error(e)
-    }
+  const searchLogs = useCallback(
+    async (skip) => {
+      setLoading(true)
+      try {
+        await debouncedSearchLogs(skip)
+      } catch (e) {
+        console.error(e)
+      }
 
-    setLoading(false)
-    return values
-  }, [debouncedSearchLogs])
+      setLoading(false)
+    },
+    [debouncedSearchLogs]
+  )
 
   useEffect(() => {
-    if (!sidebar) {
-      searchLogs()
-    }
-  }, [searchLogs, sidebar])
+    searchLogs(skip)
+  }, [searchLogs, skip])
+
+  const filterLogs = useCallback(() => {
+    setSkip(0)
+    setLogs([])
+    setHasMore(true)
+    return searchLogs(0)
+  }, [searchLogs])
+
+  const onCreate = useCallback(
+    (success) => {
+      setEditItem('')
+      success && filterLogs()
+      onNewLogComplete && onNewLogComplete()
+      !sidebar && navigate(routes.logs({}))
+    },
+    [filterLogs, onNewLogComplete, sidebar]
+  )
 
   return (
     <Stack spacing={2} sx={{ px: sidebar ? 1 : 0 }}>
@@ -170,18 +187,35 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
       )}
       <LogsFilter
         sidebar={sidebar}
-        searchLogs={searchLogs}
+        searchLogs={filterLogs}
         context={context}
         loading={loading}
       />
-      {loading && <Loading name="loading-logs" />}
-      {!loading && !logs.length && (
-        <Typography variant="h6" align="center">
-          No Logs Found
-        </Typography>
-      )}
-      {!loading &&
-        logs.map((item) => (
+      <InfiniteScroll
+        dataLength={logs.length}
+        next={() => setSkip((prev) => prev + ITEMS_PER_PAGE)}
+        hasMore={hasMore}
+        loader={<Loading name="loading-logs" />}
+        scrollableTarget={
+          sidebar ? 'arrestee-logs-drawer-container' : 'main-content'
+        }
+        endMessage={
+          <Show when={logs.length === 0}>
+            <Typography variant="h6" align="center">
+              No Logs Match Search
+            </Typography>
+          </Show>
+        }
+        className="MuiStack-root"
+        style={{
+          gap: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          paddingBottom: 16,
+          overflow: 'visible',
+        }}
+      >
+        {logs.map((item) => (
           <Log
             key={item.id}
             log={item}
@@ -190,6 +224,20 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
             onCreate={onCreate}
           />
         ))}
+      </InfiniteScroll>
+      {/* <div
+        style={{
+          position: 'fixed',
+          bottom: sidebar ? 40 : 10,
+          right: 10,
+          zIndex: 10000,
+          backgroundColor: 'white',
+        }}
+      >
+        hasMore: {hasMore.toString()}
+        count: {logs.length}
+        skip: {skip}
+      </div> */}
     </Stack>
   )
 }
