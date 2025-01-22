@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.15.0](https://github.com/michalgm/memoryhole/compare/v0.14.2...v0.15.0) (2025-01-22)
+
+### Features
+
+* **Form:** Logs improvements ([9d45db5](https://github.com/michalgm/memoryhole/commit/9d45db5be117a571b506a8018db2400058220968))
+* **UI:** Add Infinite scroll loader for logs ([4a0f05a](https://github.com/michalgm/memoryhole/commit/4a0f05a4c363c8ccb2ba85da472b267572657ac4))
+* **UI:** cleanup formSection, add small variant ([b25b10d](https://github.com/michalgm/memoryhole/commit/b25b10d07fa881b9772af94fc74eb327faf55555))
+
+### Bug Fixes
+
+* **DataTable:** CSV export Improvements ([05862f5](https://github.com/michalgm/memoryhole/commit/05862f5423d65cdee953c59fe9c7f6a0c46e4439))
+* **Form:** simplify formmanager dirty detection ([2ea1338](https://github.com/michalgm/memoryhole/commit/2ea1338221ac3017cb83f9af8faf3d3b229a24b4))
+* **UI:** Clean up documentation TOC ([e24c53b](https://github.com/michalgm/memoryhole/commit/e24c53bf43c689328adbf26bec809b7daf4df3fe))
+* **UI:** UI tweaks ([c5a7781](https://github.com/michalgm/memoryhole/commit/c5a7781ab9ae9b00d977334be67eeb45767ca76b))
+
 ## [0.14.2](https://github.com/michalgm/memoryhole/compare/v0.14.1...v0.14.2) (2025-01-02)
 
 ### Bug Fixes
