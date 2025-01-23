@@ -157,7 +157,8 @@ const RichTextInput = (props) => {
             extensions={extensions}
             content={content} // Initial content for the editor
             onUpdate={({ editor }) => {
-              onChange(editor.getHTML())
+              const content = editor.getHTML()
+              onChange(content === '<p></p>' ? '' : content)
             }}
             onCreate={({ editor }) => {
               if (focus) {
