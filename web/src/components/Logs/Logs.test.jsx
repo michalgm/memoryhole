@@ -9,6 +9,14 @@ import { generateMockData } from '../../test/mocks/generateMockData'
 
 import Logs from './Logs'
 
+// Mock the asyncDebounce function
+jest.mock('src/lib/utils', () => ({
+  // Use all the original exports
+  ...jest.requireActual('src/lib/utils'),
+  // Override asyncDebounce to call the function immediately
+  asyncDebounce: (fn) => fn,
+}))
+
 const mockLogs = generateMockData('aLog', 'LogFields', [
   { type: 'Email', notes: 'Test log 1' },
   { type: 'Phone', notes: 'Test log 2' },

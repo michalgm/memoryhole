@@ -245,6 +245,7 @@ export function useFormManager({
     display_name,
     retrieveTime,
     isLoading: loadingCreate || loadingDelete || loadingUpdate || loadingFetch,
+    hasDirtyFields: Object.keys(formState.dirtyFields).length > 0,
     loading: {
       loadingDelete,
       loadingCreate,

@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client'
-import { Box, Button, Grid2, Stack } from '@mui/material'
+import { Box, Button, Grid2, Stack, Tooltip } from '@mui/material'
 
 import { useParams, useRoutePath } from '@redwoodjs/router'
 
@@ -100,6 +100,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           loading: { loadingCreate, loadingUpdate, loadingDelete },
           confirmDelete,
           formContext: { getValues, setValue },
+          hasDirtyFields,
         }) => {
           const disabled = isLoading
           const enableArrestLink =
@@ -185,16 +186,23 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
                     Delete
                   </LoadingButton>
                 </Show>
-                <LoadingButton
-                  size="small"
-                  disabled={disabled}
-                  loading={loadingCreate || loadingUpdate}
-                  type="submit"
-                  variant="contained"
-                  color="secondary"
+                <Tooltip
+                  title={!hasDirtyFields && 'There are no changes to be saved'}
+                  placement="top"
                 >
-                  {log_id ? 'Save' : 'Create'} Log
-                </LoadingButton>
+                  <Box>
+                    <LoadingButton
+                      size="small"
+                      disabled={disabled || !hasDirtyFields}
+                      loading={loadingCreate || loadingUpdate}
+                      type="submit"
+                      variant="contained"
+                      color="secondary"
+                    >
+                      {log_id ? 'Save' : 'Create'} Log
+                    </LoadingButton>
+                  </Box>
+                </Tooltip>
               </Stack>
             </Stack>
           )
