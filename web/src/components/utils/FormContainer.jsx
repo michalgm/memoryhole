@@ -98,6 +98,7 @@ const FormContainer = ({
         confirmDelete,
         formData,
         stats,
+        hasDirtyFields,
         loading: { loadingDelete, loadingCreate, loadingUpdate },
       }) => {
         const disabled = isLoading
@@ -176,6 +177,7 @@ const FormContainer = ({
                 loadingUpdate,
                 loadingCreate,
                 loadingDelete,
+                allowSave: hasDirtyFields,
                 label: displayConfig?.type,
               }}
             />

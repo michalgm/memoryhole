@@ -69,6 +69,7 @@ const Footer = ({
   loadingCreate,
   loadingDelete,
   label,
+  allowSave = true,
 }) => {
   return (
     <Box
@@ -136,17 +137,24 @@ const Footer = ({
                 Delete {label}
               </LoadingButton>
             )}
-            <LoadingButton
-              sx={{ whiteSpace: 'nowrap' }}
-              type="submit"
-              variant="contained"
-              color="secondary"
-              size="medium"
-              disabled={disabled}
-              loading={loadingUpdate || loadingCreate}
+            <Tooltip
+              title={!allowSave && 'There are no changes to be saved'}
+              placement="top"
             >
-              Save {label}
-            </LoadingButton>
+              <Box>
+                <LoadingButton
+                  sx={{ whiteSpace: 'nowrap' }}
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  size="medium"
+                  disabled={disabled || !allowSave}
+                  loading={loadingUpdate || loadingCreate}
+                >
+                  Save {label}
+                </LoadingButton>
+              </Box>
+            </Tooltip>
           </Grid2>
           {children}
         </Stack>
