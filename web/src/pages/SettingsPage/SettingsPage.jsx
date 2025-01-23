@@ -1,7 +1,7 @@
 // import { Link, routes } from '@redwoodjs/router'
 import { useEffect } from 'react'
 
-import { Grid2, Typography } from '@mui/material'
+import { Divider, Grid2, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 
 import { BaseForm } from 'src/components/utils/BaseForm'
@@ -184,7 +184,9 @@ const SettingsPage = () => {
                     </Show>
                   ))}
                 </SettingsRow>
-
+                <Grid2 size={12}>
+                  <Divider />
+                </Grid2>
                 <SettingsRow>
                   <Typography variant="h6">User</Typography>
                   <Typography variant="h6">Coordinator</Typography>
