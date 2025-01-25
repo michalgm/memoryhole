@@ -62,12 +62,7 @@ const StyleShowcase = ({ size, color = 'primary' }) => {
             >
               Text
             </Button>
-            <IconButton
-              size={size}
-              color={color}
-              startIcon={<Flag />}
-              endIcon={<Person />}
-            >
+            <IconButton size={size} color={color}>
               <Flag />
             </IconButton>
           </Box>
