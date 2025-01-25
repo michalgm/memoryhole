@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { Check } from '@mui/icons-material'
 import {
   Checkbox,
   FormControl,
@@ -14,9 +15,11 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material'
+import { Box } from '@mui/system'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import { capitalize, merge } from 'lodash-es'
 import {
+  CheckboxButtonGroup,
   CheckboxElement,
   Controller,
   RadioButtonGroup,
@@ -28,6 +31,8 @@ import {
   DatePickerElement,
   DateTimePickerElement,
 } from 'react-hook-form-mui/date-pickers'
+
+import { convertSvgToDataUrl } from 'src/lib/utils'
 
 import ActionChooser from '../Autocomplete/ActionChooser'
 import ArrestChooser from '../Autocomplete/ArrestChooser'
@@ -250,7 +255,33 @@ export const BaseField = ({
   }
 
   const renderCheckboxGroup = () => {
-    const Component = isRHF ? CheckboxElement : Checkbox
+    if (isRHF) {
+      return (
+        <Box
+          sx={{
+            '.MuiFormControl-root': {
+              width: '100%',
+            },
+            '.MuiFormGroup-root': {
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+              width: '100%',
+              justifyItems: 'stretch',
+            },
+          }}
+        >
+          <CheckboxButtonGroup
+            variant="outlined"
+            color="primary"
+            name={name}
+            label={props.label}
+            options={transformOptions(defaultOptions)}
+            {...props}
+          />
+        </Box>
+      )
+    }
     return (
       <Grid2 container spacing={2}>
         <FormControl
@@ -265,7 +296,7 @@ export const BaseField = ({
             {defaultOptions.map((option) => (
               <Grid2 key={option} size={6}>
                 <FormControlLabel
-                  control={<Component name={`${name}_${option}`} />}
+                  control={<Checkbox name={`${name}_${option}`} />}
                   label={option}
                 />
               </Grid2>
@@ -299,6 +330,8 @@ export const BaseField = ({
     // </FormGroup>
   }
 
+  const checkBoxImageUrl = convertSvgToDataUrl(Check)
+
   const renderSwitch = () => {
     const Component = isRHF ? SwitchElement : Switch
     const switchInput = (
@@ -308,6 +341,30 @@ export const BaseField = ({
         onChange={onChange}
         color={color}
         {...props}
+        sx={{
+          '& .MuiSwitch-thumb': {
+            position: 'relative',
+            '&:before': {
+              content: '""',
+              position: 'absolute',
+              width: '16px',
+              height: '16px',
+              left: 2,
+              top: 2,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              backgroundImage: checkBoxImageUrl,
+              opacity: 0,
+              transition: 'opacity 200ms',
+            },
+          },
+          '& .Mui-checked .MuiSwitch-thumb': {
+            '&:before': {
+              opacity: 1,
+            },
+          },
+          ...props.sx,
+        }}
       />
     )
     if (isRHF) {
