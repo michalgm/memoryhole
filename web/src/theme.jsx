@@ -36,7 +36,7 @@ const xSmallInputStyles = {
     padding: '6px 8px',
   },
   '& .MuiInputBase-input.MuiSelect-select': {
-    height: '1.2rem',
+    padding: '5px 8px',
   },
   '& .MuiInputBase-adornedStart': { paddingLeft: '8px' },
   '& .MuiInputBase-inputAdornedStart': { paddingLeft: 0 },
