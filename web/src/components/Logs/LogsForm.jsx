@@ -92,6 +92,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           },
           onCreate: callback,
           onUpdate: callback,
+          onDelete: callback,
           transformInput,
         }}
       >
@@ -133,21 +134,32 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           return (
             <Stack spacing={2}>
               <Box>
-                <Field name="notes" {...schema.notes} focus="true" />
+                <Field
+                  name="notes"
+                  {...schema.notes}
+                  focus="true"
+                  highlightDirty
+                />
               </Box>
               <Row>
-                <Field name="type" {...schema.type} />
+                <Field name="type" {...schema.type} highlightDirty />
                 <Field
                   name="needs_followup"
                   {...schema.needs_followup}
                   sx={{
                     '& .MuiFormGroup-root': { justifyContent: 'flex-end' },
                   }}
+                  highlightDirty
                 />
               </Row>
               <Row>
-                <Field name="action" {...schema.action} />
-                <Field name="arrests" {...schema.arrests} multiple />
+                <Field name="action" {...schema.action} highlightDirty />
+                <Field
+                  name="arrests"
+                  {...schema.arrests}
+                  multiple
+                  highlightDirty
+                />
               </Row>
               <Row>
                 <Button
