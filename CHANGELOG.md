@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.16.0](https://github.com/michalgm/memoryhole/compare/v0.15.0...v0.16.0) (2025-01-25)
+
+### Features
+
+* **Form:** Add icon to switch component - clean up checkboxgroup ([2455b49](https://github.com/michalgm/memoryhole/commit/2455b49926e755ea2b26de668afd768c699fd0c6))
+* **Form:** Disable submit buttons when no fields have changed ([a50e06a](https://github.com/michalgm/memoryhole/commit/a50e06a5f0bed831d8b5f584f6b4c6d271bda061))
+* **UI:** Add checkbox on Action delete to delete related arrests and logs ([e190cb0](https://github.com/michalgm/memoryhole/commit/e190cb0f8c841d20c031453bc84dd8aca3fcbb15))
+* **UI:** add seperator on siteSettings page ([36f500e](https://github.com/michalgm/memoryhole/commit/36f500eced5c974f461a337606fdda1e23d8ae36))
+
+### Bug Fixes
+
+* **Form:** Clear blank <p> tag in rich text editor to catch blank/required entries ([a3c16dd](https://github.com/michalgm/memoryhole/commit/a3c16dde664927f93df534b1dd386755d3135fe2))
+* **Form:** don't show "no changes" tooltip on loading ([d5d52d0](https://github.com/michalgm/memoryhole/commit/d5d52d0be6b8d1e0bcbd43891c589b7a744bb037))
+* **Tests:** minor tests fixes ([13042bc](https://github.com/michalgm/memoryhole/commit/13042bcf6c294e3bf15b732d0a2ca7aedc7c9222))
+* **UI:** some logs form fixes ([2032f5e](https://github.com/michalgm/memoryhole/commit/2032f5e367cc5b2eadd111e39e41080c00939caf))
+
 ## [0.15.0](https://github.com/michalgm/memoryhole/compare/v0.14.2...v0.15.0) (2025-01-22)
 
 ### Features
