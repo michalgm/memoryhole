@@ -5,33 +5,11 @@ import dayjs from 'dayjs'
 import { startCase, upperCase } from 'lodash-es'
 
 import { navigate, routes } from '@redwoodjs/router'
-import { registerFragment } from '@redwoodjs/web/apollo'
 
 import { useAuth } from 'src/auth'
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
 import { useSiteSettings } from 'src/lib/useSiteSettings'
-
-registerFragment(gql`
-  fragment UserFields on User {
-    id
-    email
-    name
-    expiresAt
-    role
-    custom_fields
-    arrest_date_max
-    arrest_date_min
-    arrest_date_threshold
-    action_ids
-    actions {
-      id
-      name
-      start_date
-    }
-  }
-`)
-
 export const QUERY = gql`
   query EditUser($id: Int!) {
     user: user(id: $id) {

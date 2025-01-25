@@ -3,6 +3,89 @@ import gql from 'graphql-tag'
 import { registerFragment } from '@redwoodjs/web/apollo'
 
 registerFragment(gql`
+  fragment UserFields on User {
+    id
+    email
+    name
+    expiresAt
+    role
+    custom_fields
+    arrest_date_max
+    arrest_date_min
+    arrest_date_threshold
+    action_ids
+    actions {
+      id
+      name
+      start_date
+    }
+  }
+`)
+
+registerFragment(gql`
+  fragment ActionFields on Action {
+    id
+    name
+    description
+    start_date
+    end_date
+    jurisdiction
+    city
+  }
+`)
+
+registerFragment(gql`
+  fragment ArrestFields on Arrest {
+    id
+    date
+    location
+    display_field
+    search_field
+    date
+    charges
+    arrest_city
+    jurisdiction
+    citation_number
+    arrestee_id
+    action_id
+    action {
+      id
+      name
+      start_date
+    }
+    custom_fields
+    created_at
+    created_by {
+      id
+      name
+    }
+    updated_at
+    updated_by {
+      id
+      name
+    }
+    arrestee {
+      id
+      display_field
+      search_display_field
+      first_name
+      last_name
+      preferred_name
+      pronoun
+      dob
+      email
+      phone_1
+      phone_2
+      address
+      city
+      state
+      zip
+      custom_fields
+    }
+  }
+`)
+
+registerFragment(gql`
   fragment LogFields on Log {
     id
     type

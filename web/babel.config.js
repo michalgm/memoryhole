@@ -12,9 +12,10 @@ const plugins = [
   ],
   'babel-plugin-transform-vite-meta-env',
   '@babel/plugin-proposal-class-properties',
+  'babel-plugin-graphql-tag',
 ]
 
 module.exports = {
   plugins,
-  presets: ['@babel/preset-react'],
+  presets: ['@babel/preset-react', '@babel/preset-typescript'],
 }

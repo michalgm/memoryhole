@@ -1,23 +1,11 @@
 import { useCallback } from 'react'
 
 import { navigate, routes } from '@redwoodjs/router'
-import { registerFragment } from '@redwoodjs/web/apollo'
 
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
 import { ActionFields } from 'src/lib/FieldSchemas'
-
-registerFragment(gql`
-  fragment ActionFields on Action {
-    id
-    name
-    description
-    start_date
-    end_date
-    jurisdiction
-    city
-  }
-`)
+import * as _fragments from 'src/lib/gql_fragments'
 
 export const QUERY = gql`
   query EditAction($id: Int!) {

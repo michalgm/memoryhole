@@ -1,63 +1,10 @@
 import { useCallback, useEffect } from 'react'
 
 import { navigate, routes } from '@redwoodjs/router'
-import { registerFragment } from '@redwoodjs/web/apollo'
 
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
 import ArrestFields from 'src/lib/FieldSchemas'
-
-registerFragment(gql`
-  fragment ArrestFields on Arrest {
-    id
-    date
-    location
-    display_field
-    search_field
-    date
-    charges
-    arrest_city
-    jurisdiction
-    citation_number
-    arrestee_id
-    action_id
-    action {
-      id
-      name
-      start_date
-    }
-    custom_fields
-    created_at
-    created_by {
-      id
-      name
-    }
-    updated_at
-    updated_by {
-      id
-      name
-    }
-    arrestee {
-      id
-      display_field
-      search_display_field
-      first_name
-      last_name
-      preferred_name
-      pronoun
-      dob
-      email
-      phone_1
-      phone_2
-      address
-      city
-      state
-      zip
-      custom_fields
-    }
-  }
-`)
-
 export const QUERY = gql`
   query EditArrestById($id: Int!) {
     arrest: arrest(id: $id) {
