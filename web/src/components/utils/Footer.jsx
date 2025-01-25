@@ -69,6 +69,7 @@ const Footer = ({
   loadingCreate,
   loadingDelete,
   label,
+  deleteOptions,
   allowSave = true,
 }) => {
   return (
@@ -130,7 +131,7 @@ const Footer = ({
                 variant="outlined"
                 color="inherit"
                 size="medium"
-                onClick={confirmDelete}
+                onClick={() => confirmDelete(deleteOptions)}
                 disabled={disabled}
                 loading={loadingDelete}
               >

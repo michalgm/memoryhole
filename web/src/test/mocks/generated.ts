@@ -28,12 +28,14 @@ export type Scalars = {
 export type Action = {
   __typename?: 'Action';
   Arrest: Array<Maybe<Arrest>>;
+  arrests_count?: Maybe<Scalars['Int']['output']>;
   city?: Maybe<Scalars['String']['output']>;
   custom_fields?: Maybe<Scalars['JSON']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   end_date?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['Int']['output'];
   jurisdiction?: Maybe<Scalars['String']['output']>;
+  logs_count?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   start_date: Scalars['DateTime']['output'];
 };
@@ -374,6 +376,7 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeleteActionArgs = {
+  deleteRelations?: InputMaybe<Scalars['Boolean']['input']>;
   id: Scalars['Int']['input'];
 };
 
@@ -1012,12 +1015,14 @@ export type SkipAuthDirectiveResolver<Result, Parent, ContextType = any, Args = 
 
 export type ActionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Action'] = ResolversParentTypes['Action']> = {
   Arrest?: Resolver<Array<Maybe<ResolversTypes['Arrest']>>, ParentType, ContextType>;
+  arrests_count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   custom_fields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   end_date?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   jurisdiction?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  logs_count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   start_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -1320,12 +1325,14 @@ export const anAction = (overrides?: Partial<Action>, _relationshipsToOmit: Set<
     return {
         __typename: 'Action',
         Arrest: overrides && overrides.hasOwnProperty('Arrest') ? overrides.Arrest! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],
+        arrests_count: overrides && overrides.hasOwnProperty('arrests_count') ? overrides.arrests_count! : faker.number.int({ min: 0, max: 9999 }),
         city: overrides && overrides.hasOwnProperty('city') ? overrides.city! : faker.lorem.word(),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
         end_date: overrides && overrides.hasOwnProperty('end_date') ? overrides.end_date! : faker['date']['past'](),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker.lorem.word(),
+        logs_count: overrides && overrides.hasOwnProperty('logs_count') ? overrides.logs_count! : faker.number.int({ min: 0, max: 9999 }),
         name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.lorem.word(),
         start_date: overrides && overrides.hasOwnProperty('start_date') ? overrides.start_date! : faker['date']['past'](),
     };

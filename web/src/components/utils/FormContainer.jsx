@@ -55,6 +55,7 @@ const FormContainer = ({
   autoComplete = 'off',
   highlightDirty = true,
   layout,
+  deleteOptions = {},
   fieldProps = {},
 }) => {
   const smallLayout = useContainerWidth(860)
@@ -177,6 +178,7 @@ const FormContainer = ({
                 loadingUpdate,
                 loadingCreate,
                 loadingDelete,
+                deleteOptions,
                 allowSave: hasDirtyFields,
                 label: displayConfig?.type,
               }}

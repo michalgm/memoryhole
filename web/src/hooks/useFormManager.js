@@ -49,6 +49,8 @@ export function useFormManager({
   skipDirtyCheck,
   defaultValues: inputDefaultValues,
 } = {}) {
+  const [entityData, setEntityData] = useState({})
+
   const confirm = useConfirm()
   const context = useForm({
     defaultValues: async () => {
@@ -81,6 +83,7 @@ export function useFormManager({
   const processData = useCallback(
     async (result, init = false) => {
       const result_data = isEmpty(result) ? result : dataFromResult(result)
+      setEntityData(result_data)
       const data = onFetch ? await onFetch(result_data) : result_data
       setFormData(data)
       setRetrieveTime(dayjs(data?.updated_at))
@@ -144,7 +147,11 @@ export function useFormManager({
         resetPromiseRef.current = resolve
         // }
       })
-
+      // Wait for next tick for form state to settle
+      await new Promise((r) => setTimeout(r, 0))
+      // if (formState.isDirty) {
+      //   console.error('Form is still dirty after reset + tick')
+      // }
       // Await the Promise
       await waitForReset
       return data
@@ -159,16 +166,35 @@ export function useFormManager({
     }
   }, [formState.isDirty])
 
-  const confirmDelete = async () => {
+  const confirmDelete = async (deleteOptions = {}) => {
     if (!deleteMutation) {
       throw new Error('Delete mutation not configured')
     }
+    const {
+      renderContent,
+      getDeleteParams,
+      onConfirm,
+      ...customConfirmOptions
+    } = deleteOptions
 
-    await confirm({
-      title: 'Confirm Delete',
+    onConfirm && onConfirm()
+    const confirmOptions = {
+      title: `Confirm Delete of ${modelType} "${display_name}"`,
       description: `Are you sure you want to delete the ${modelType.toLowerCase()} "${display_name}"?`,
-    })
-    await deleteEntity({ variables: { id } })
+      ...customConfirmOptions,
+    }
+
+    if (renderContent) {
+      confirmOptions.content = renderContent(entityData)
+    }
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    try {
+      await confirm(confirmOptions)
+      const params = getDeleteParams?.() || {}
+      await deleteEntity({ variables: { id, ...params } })
+    } catch (e) {
+      // console.log('delete confirmation cancelled')
+    }
   }
 
   const onSave = async (input) => {
@@ -218,17 +244,6 @@ export function useFormManager({
     }
     return true
   }
-
-  // Add this useEffect near the other hooks in useFormManager
-  // useEffect(() => {
-  //   const updateData = async () => {
-  //     if (!id || !fetchQuery) return
-  //     console.log('updateData', id)
-  //     const { data } = await fetchEntity({ variables: { id } })
-  //     await resetForm(data)
-  //   }
-  //   updateData()
-  // }, [id, fetchEntity, resetForm, fetchQuery])
 
   return {
     formContext: context,
