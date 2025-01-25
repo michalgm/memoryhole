@@ -15,5 +15,33 @@ export const standard = defineScenario({
         action_ids: [7489374],
       },
     },
+    admin: {
+      data: {
+        email: 'admin@example.com',
+        name: 'Admin User',
+        role: 'Admin',
+      },
+    },
+    coordinator: {
+      data: {
+        email: 'coord1@example.com',
+        name: 'Coordinator One',
+        role: 'Coordinator',
+      },
+    },
+    coordinator2: {
+      data: {
+        email: 'coord2@example.com',
+        name: 'Coordinator Two',
+        role: 'Coordinator',
+      },
+    },
+    regular: {
+      data: {
+        email: 'user@example.com',
+        name: 'Regular User',
+        role: 'User',
+      },
+    },
   },
 })

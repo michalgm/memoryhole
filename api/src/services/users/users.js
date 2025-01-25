@@ -1,10 +1,25 @@
 import dayjs from 'dayjs'
 
-import { validate, validateUniqueness } from '@redwoodjs/api'
+import {
+  validate,
+  validateUniqueness,
+  validateWith,
+  validateWithSync,
+} from '@redwoodjs/api'
 
 import { requireAuth } from 'src/lib/auth'
 import { initUser, onboardUser } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
+
+export const ROLE_LEVELS = [, 'User', 'Coordinator', 'Admin']
+
+export function getRoleLevel(role) {
+  return ROLE_LEVELS.indexOf(role) || 0
+}
+
+export function canManageRole(currentUserRole, targetRole) {
+  return getRoleLevel(currentUserRole) >= getRoleLevel(targetRole)
+}
 
 const requireAdmin = () => requireAuth({ roles: ['Admin', 'Coordinator'] })
 
@@ -50,7 +65,7 @@ export const createUser = async ({ input }) => {
   requireAdmin()
 
   const { data, token } = initUser(input)
-
+  await validateUserUpdate({ id: null, input })
   return await validateUniqueness(
     'user',
     { email: input.email },
@@ -66,7 +81,9 @@ export const createUser = async ({ input }) => {
   )
 }
 
-const validateUserUpdate = ({ id, input }) => {
+const validateUserUpdate = async ({ id, input }) => {
+  const currentUser = context.currentUser
+
   if (input.email || input.role) {
     requireAdmin()
   }
@@ -92,10 +109,27 @@ const validateUserUpdate = ({ id, input }) => {
   if (input.arrest_date_max) {
     input.arrest_date_max = dayjs(input.arrest_date_max).endOf('day')
   }
+
+  // Check if current user can manage the target role
+  validateWithSync(() => {
+    if (input.role && !canManageRole(currentUser.role, input.role)) {
+      throw 'You cannot assign a role higher than your own'
+    }
+  })
+
+  if (id) {
+    await validateWith(async () => {
+      // Get target user's current role
+      const targetUser = await db.user.findUnique({ where: { id } })
+      if (!canManageRole(currentUser.role, targetUser.role)) {
+        throw 'You cannot modify users with a role higher than your own'
+      }
+    })
+  }
 }
 
-export const updateUser = ({ id, input }) => {
-  validateUserUpdate({ id, input })
+export const updateUser = async ({ id, input }) => {
+  await validateUserUpdate({ id, input })
 
   const doUserUpdate = async (db) => {
     return db.user.update({
@@ -114,18 +148,21 @@ export const updateUser = ({ id, input }) => {
 }
 
 export const bulkUpdateUsers = async ({ ids, input }) => {
-  if (input.email) {
-    throw new Error('Cannot bulk update user emails')
-  }
+  validateWithSync(() => {
+    if (input.email) {
+      throw new Error('Cannot bulk update user emails')
+    }
+  })
   const users = await db.user.findMany({
     where: {
       id: { in: ids },
     },
   })
+  // Run all validations concurrently
+  await Promise.all(users.map(({ id }) => validateUserUpdate({ id, input })))
+
   const res = await db.$transaction(
     users.map(({ id }) => {
-      validateUserUpdate({ id, input })
-
       return db.user.update({
         data: input,
         where: { id },
@@ -135,8 +172,19 @@ export const bulkUpdateUsers = async ({ ids, input }) => {
   return { count: res.length }
 }
 
-export const deleteUser = ({ id }) => {
+export const deleteUser = async ({ id }) => {
+  const currentUser = context.currentUser
   requireAdmin()
+
+  const targetUser = await db.user.findUnique({ where: { id } })
+  validateWithSync(() => {
+    if (!canManageRole(currentUser.role, targetUser.role)) {
+      throw new Error(
+        'You cannot delete users with a role higher than your own'
+      )
+    }
+  })
+
   return db.user.delete({
     where: { id },
   })
