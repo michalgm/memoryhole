@@ -58,7 +58,6 @@ function filterFields(data, fields) {
 }
 export const generateMockData = (mockMethod, fragmentName, overrides = []) => {
   const fragment = fragmentRegistry.lookup(fragmentName)
-  console.log('Fragment:', fragmentName, fragment)
 
   // Guard against null fragments
   if (!fragment) {
