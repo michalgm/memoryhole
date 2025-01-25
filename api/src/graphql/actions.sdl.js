@@ -9,6 +9,8 @@ export const schema = gql`
     city: String
     custom_fields: JSON
     Arrest: [Arrest]!
+    arrests_count: Int
+    logs_count: Int
   }
 
   type Query {
@@ -40,6 +42,6 @@ export const schema = gql`
   type Mutation {
     createAction(input: CreateActionInput!): Action! @requireAuth
     updateAction(id: Int!, input: UpdateActionInput!): Action! @requireAuth
-    deleteAction(id: Int!): Action! @requireAuth
+    deleteAction(id: Int!, deleteRelations: Boolean): Action! @requireAuth
   }
 `

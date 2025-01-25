@@ -31,6 +31,8 @@ registerFragment(gql`
     end_date
     jurisdiction
     city
+    arrests_count
+    logs_count
   }
 `)
 

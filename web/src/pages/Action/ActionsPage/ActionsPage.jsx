@@ -9,13 +9,7 @@ import { actionSchema } from 'src/lib/FieldSchemas'
 export const QUERY = gql`
   query ActionsQuery {
     actions {
-      id
-      name
-      description
-      start_date
-      end_date
-      jurisdiction
-      city
+      ...ActionFields
     }
   }
 `
@@ -40,6 +34,12 @@ const ActionsPage = () => {
     },
   }
 
+  const extendedSchema = {
+    ...actionSchema,
+    arrests_count: { type: 'number', props: {} },
+    logs_count: { type: 'number', props: {} },
+  }
+
   const preColumns = [
     {
       accessorKey: 'name',
@@ -59,7 +59,7 @@ const ActionsPage = () => {
       displayColumns={displayColumns}
       tableProps={tableProps}
       refetch={refetch}
-      schema={actionSchema}
+      schema={extendedSchema}
       preColumns={preColumns}
       type="actions"
       name="action"
