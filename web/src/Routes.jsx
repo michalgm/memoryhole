@@ -3,6 +3,7 @@ import { PrivateSet, Route, Router, Set } from '@redwoodjs/router'
 import MainLayout from 'src/layouts/MainLayout/MainLayout'
 import ModelLayout from 'src/layouts/ModelLayout/ModelLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout/ScaffoldLayout'
+import * as _fragments from 'src/lib/gql_fragments'
 import LoginPage from 'src/pages/LoginPage/LoginPage'
 
 import { useAuth } from './auth'

@@ -3,7 +3,15 @@ import { cloneDeep, merge } from 'lodash'
 
 import { fragmentRegistry } from '@redwoodjs/web/apollo'
 
+import * as _fragments from 'src/lib/gql_fragments'
+
 import * as generatedMocks from './generated'
+export function transformGeneratedTypes(generated) {
+  const { seedMocks: _seedMocks, ...mockGenerators } = generated
+  return mockGenerators
+}
+
+const mockGenerators = transformGeneratedTypes(generatedMocks)
 
 function extractFields(selectionSet) {
   const fields = {}
@@ -50,9 +58,16 @@ function filterFields(data, fields) {
 }
 export const generateMockData = (mockMethod, fragmentName, overrides = []) => {
   const fragment = fragmentRegistry.lookup(fragmentName)
+  console.log('Fragment:', fragmentName, fragment)
+
+  // Guard against null fragments
+  if (!fragment) {
+    console.warn(`Fragment "${fragmentName}" not found`)
+    return []
+  }
   const fields = extractFields(fragment)
   return overrides.map((override) => {
-    const mockData = filterFields(generatedMocks[mockMethod]({}), fields)
+    const mockData = filterFields(mockGenerators[mockMethod]({}), fields)
     return merge(cloneDeep(mockData), override)
   })
 }
