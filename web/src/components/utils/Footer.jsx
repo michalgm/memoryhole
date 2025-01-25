@@ -138,7 +138,12 @@ const Footer = ({
               </LoadingButton>
             )}
             <Tooltip
-              title={!allowSave && 'There are no changes to be saved'}
+              title={
+                !allowSave &&
+                !loadingUpdate &&
+                !loadingCreate &&
+                'There are no changes to be saved'
+              }
               placement="top"
             >
               <Box>
