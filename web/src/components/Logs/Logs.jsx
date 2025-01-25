@@ -157,7 +157,7 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
 
   const onCreate = useCallback(
     (success) => {
-      setEditItem('')
+      setEditItem(false)
       success && filterLogs()
       onNewLogComplete && onNewLogComplete()
       !sidebar && navigate(routes.logs({}))
