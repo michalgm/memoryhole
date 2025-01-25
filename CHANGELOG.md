@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.17.0](https://github.com/michalgm/memoryhole/compare/v0.16.0...v0.17.0) (2025-01-25)
+
+### Features
+
+* **API:** enforce user role hierachy (users cannot modify/create/delete roles higher than their own) ([5ebf9d1](https://github.com/michalgm/memoryhole/commit/5ebf9d1f763c8ac32f75c0c93b3ec5ae0bf14ff4))
+
 ## [0.16.0](https://github.com/michalgm/memoryhole/compare/v0.15.0...v0.16.0) (2025-01-25)
 
 ### Features
