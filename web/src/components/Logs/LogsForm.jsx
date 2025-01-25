@@ -187,7 +187,12 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
                   </LoadingButton>
                 </Show>
                 <Tooltip
-                  title={!hasDirtyFields && 'There are no changes to be saved'}
+                  title={
+                    !loadingCreate &&
+                    !loadingUpdate &&
+                    !hasDirtyFields &&
+                    'There are no changes to be saved'
+                  }
                   placement="top"
                 >
                   <Box>
