@@ -17,8 +17,15 @@ export function getRoleLevel(role) {
   return ROLE_LEVELS.indexOf(role) || 0
 }
 
-export function canManageRole(currentUserRole, targetRole) {
-  return getRoleLevel(currentUserRole) >= getRoleLevel(targetRole)
+const getUserRole = (user) => {
+  return user?.roles?.[0] || user.role
+}
+
+export function canManageRole(currentUser, targetRole) {
+  const currentUserRole = getUserRole(currentUser)
+  const userLevel = getRoleLevel(currentUserRole)
+  const targetLevel = getRoleLevel(targetRole)
+  return userLevel >= targetLevel && userLevel >= 0 && targetLevel >= 0
 }
 
 const requireAdmin = () => requireAuth({ roles: ['Admin', 'Coordinator'] })
@@ -112,7 +119,7 @@ const validateUserUpdate = async ({ id, input }) => {
 
   // Check if current user can manage the target role
   validateWithSync(() => {
-    if (input.role && !canManageRole(currentUser.role, input.role)) {
+    if (input.role && !canManageRole(currentUser, input.role)) {
       throw 'You cannot assign a role higher than your own'
     }
   })
@@ -121,7 +128,8 @@ const validateUserUpdate = async ({ id, input }) => {
     await validateWith(async () => {
       // Get target user's current role
       const targetUser = await db.user.findUnique({ where: { id } })
-      if (!canManageRole(currentUser.role, targetUser.role)) {
+      const targetRole = getUserRole(targetUser)
+      if (!canManageRole(currentUser, targetRole)) {
         throw 'You cannot modify users with a role higher than your own'
       }
     })
@@ -178,7 +186,7 @@ export const deleteUser = async ({ id }) => {
 
   const targetUser = await db.user.findUnique({ where: { id } })
   validateWithSync(() => {
-    if (!canManageRole(currentUser.role, targetUser.role)) {
+    if (!canManageRole(currentUser, targetUser.role)) {
       throw new Error(
         'You cannot delete users with a role higher than your own'
       )
