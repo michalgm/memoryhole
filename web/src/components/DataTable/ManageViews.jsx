@@ -187,7 +187,6 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
               borderRight: 0,
             },
           }}
-          disabled={currentView?.name === 'Default' || !currentView?.name}
         >
           <Tooltip title="Create new view from current settings">
             <span>
