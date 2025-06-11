@@ -1,3 +1,17 @@
+change logs filter to allow multiple arrests
+shift summary
+  : not need needs followup
+  : shift start + end time
+  : operators - autocomplete + free form
+  ---
+  : link to multiple actions
+  : add different color/visualization for shift summaries
+  : potential template?
+
+Store update history - time + updater
+Online intake separate entities - should be linked to arrestee
+
+Users vs Operators
 ArrestsTable:
   ✔ allow save/restore of queries @done(24-11-26 14:57)
   ☐ allow update of existing stored view
