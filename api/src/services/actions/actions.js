@@ -1,4 +1,5 @@
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 export const actions = () => {
   return db.action.findMany()
@@ -22,9 +23,14 @@ export const searchActions = ({ search = '' }) => {
   return db.action.findMany({
     where,
     take: 10,
-    orderBy: {
-      name: 'asc',
-    },
+    orderBy: [
+      {
+        start_date: 'desc',
+      },
+      {
+        name: 'asc',
+      },
+    ],
   })
 }
 
