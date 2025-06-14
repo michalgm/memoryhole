@@ -1,3 +1,5 @@
+import { merge } from 'lodash'
+
 import { db } from 'src/lib/db'
 
 export const logs = (
@@ -34,7 +36,7 @@ export const arresteeLogs = ({ arrestee_id }) => {
   })
 }
 
-const prepareData = ({ log, arrests = [], action_id, id }) => {
+const prepareData = ({ log, arrests = [], action_id, id }, current) => {
   const data = {
     ...log,
     updated_by: {
@@ -48,6 +50,9 @@ const prepareData = ({ log, arrests = [], action_id, id }) => {
   }
   if (action_id) {
     data.action = { connect: { id: action_id } }
+  }
+  if (log.shift) {
+    data.shift = merge(current.shift, log.shift)
   }
   if (!id) {
     data.created_by = {
@@ -68,16 +73,21 @@ export const createLog = ({ input: { arrests = [], action_id, ...input } }) => {
   })
 }
 
-export const updateLog = ({
+export const updateLog = async ({
   id,
   input: { arrests = [], action_id, ...input },
 }) => {
-  const data = prepareData({
-    log: input,
-    arrests,
-    action_id,
-    id,
-  })
+  const current = await db.log.findUnique({ where: { id } })
+
+  const data = prepareData(
+    {
+      log: input,
+      arrests,
+      action_id,
+      id,
+    },
+    current
+  )
 
   return db.log.update({
     data,

@@ -1,5 +1,3 @@
-import { useEffect, useRef, useState } from 'react'
-
 import {
   Edit,
   ExpandMore as ExpandMoreIcon,
@@ -19,10 +17,10 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import dayjs from 'dayjs'
-
 import { navigate, routes } from '@redwoodjs/router'
+import { useEffect, useRef, useState } from 'react'
 
+import dayjs from 'dayjs'
 import LogsForm from 'src/components/Logs/LogsForm'
 import RichTextInput from 'src/components/utils/RichTextInput'
 import Show from 'src/components/utils/Show'
@@ -39,8 +37,18 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
     }
   }, [item.notes])
 
+  const isSummary = item.type === 'Shift Summary'
+  const coordinators = item?.shift?.coordinators?.map((i) => i.name)?.join(', ')
   return (
-    <Card key={item.id} elevation={2}>
+    <Card
+      key={item.id}
+      elevation={2}
+      sx={{
+        borderLeft: isSummary
+          ? '5px solid var(--mui-palette-primary-light)'
+          : '',
+      }}
+    >
       <CardHeader
         title={
           <Stack direction={'row'} justifyContent="space-between">
@@ -49,19 +57,50 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
           </Stack>
         }
         subheader={
-          <Stack
-            direction={'row'}
-            justifyContent="space-between"
-            alignItems={'center'}
-          >
-            <span>{item.created_by?.name}</span>
-            {item.needs_followup && (
-              <span>
-                <Typography color="warning.main">
-                  <Warning fontSize="inherit" /> Needs Followup
-                </Typography>
-              </span>
-            )}
+          <Stack direction={'column'} spacing={1}>
+            <Stack
+              direction={'row'}
+              spacing={1}
+              justifyContent="space-between"
+              alignItems={'stretch'}
+            >
+              <Box sx={{ flexBasis: '50%' }}>{item.created_by?.name}</Box>
+              <Show when={isSummary}>
+                <Box sx={{ flexBasis: '50%', textAlign: 'right' }}>
+                  {[
+                    item.shift?.start_time
+                      ? dayjs(item.shift.start_time).format('MM/DD/YY, LT')
+                      : '',
+                    item.shift?.end_time
+                      ? dayjs(item.shift.end_time).format('MM/DD/YY, LT')
+                      : '',
+                  ].join(' - ')}
+                </Box>
+              </Show>
+              <Show when={!isSummary && item.needs_followup}>
+                <span>
+                  <Typography color="warning.main">
+                    <Warning fontSize="inherit" /> Needs Followup
+                  </Typography>
+                </span>
+              </Show>
+            </Stack>
+            <Show when={isSummary}>
+              <Stack
+                direction="row"
+                spacing={1}
+                justifyContent="space-between"
+                alignItems={'stretch'}
+              >
+                <Box sx={{ flexBasis: '50%' }}>
+                  {coordinators && `Coordinators: ${coordinators}`}
+                </Box>
+                <Box sx={{ flexBasis: '50%', textAlign: 'right' }}>
+                  {item?.shift?.operators &&
+                    `Operators: ${item.shift.operators}`}
+                </Box>
+              </Stack>
+            </Show>
           </Stack>
         }
         sx={{ pb: 0 }}
