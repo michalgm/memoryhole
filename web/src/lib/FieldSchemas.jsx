@@ -606,6 +606,21 @@ fieldSchema.log = {
   },
   needs_followup: { field_type: 'checkbox' },
   notes: { field_type: 'richtext', required: true },
+  'shift.start_time': { field_type: 'date-time' },
+  'shift.end_time': {
+    field_type: 'date-time',
+    rules: {
+      validate: [
+        (value, formValues) => {
+          const startTime = formValues?.shift?.start_time
+          if (value && startTime && value < startTime)
+            return 'End time must be after start time'
+        },
+      ],
+    },
+  },
+  'shift.coordinators': { field_type: 'user_chooser', multiple: true },
+  'shift.operators': {},
   action: { field_type: 'action_chooser' },
   arrests: {
     field_type: 'arrest_chooser',

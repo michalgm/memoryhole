@@ -107,6 +107,7 @@ registerFragment(gql`
       name
       start_date
     }
+    shift
     created_at
     created_by {
       name

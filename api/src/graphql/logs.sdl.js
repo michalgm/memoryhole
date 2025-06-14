@@ -20,6 +20,7 @@ export const schema = gql`
     updated_by: User
     updated_by_id: Int
     arrests: [Arrest]!
+    shift: JSON
     action: Action
     action_id: Int
   }
@@ -39,6 +40,7 @@ export const schema = gql`
     updated_by_id: Int
     action_id: Int
     arrests: [Int]
+    shift: JSON
   }
 
   input UpdateLogInput {
@@ -51,6 +53,7 @@ export const schema = gql`
     updated_by_id: Int
     action_id: Int
     arrests: [Int]
+    shift: JSON
   }
 
   type Mutation {

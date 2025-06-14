@@ -1,12 +1,10 @@
-import { gql } from '@apollo/client'
 import { Box, Button, Grid2, Stack, Tooltip } from '@mui/material'
-
 import { useParams, useRoutePath } from '@redwoodjs/router'
 
+import { gql } from '@apollo/client'
 import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
-
 import { BaseForm } from '../utils/BaseForm'
 import { Field } from '../utils/Field'
 import LoadingButton from '../utils/LoadingButton'
@@ -47,7 +45,7 @@ const Row = ({ children, ...props }) => (
     direction="row"
     spacing={2}
     justifyContent={'space-between'}
-    alignItems={'center'}
+    alignItems={'flex-start'}
     sx={{ '& > *': { flexGrow: 1, flexBasis: 0 } }}
     {...props}
   >
@@ -100,10 +98,12 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           isLoading,
           loading: { loadingCreate, loadingUpdate, loadingDelete },
           confirmDelete,
-          formContext: { getValues, setValue },
+          formContext: { getValues, setValue, watch },
           hasDirtyFields,
         }) => {
           const disabled = isLoading
+          const isSummary = watch('type') === 'Shift Summary'
+
           const enableArrestLink =
             id &&
             path.includes('arrests') &&
@@ -143,15 +143,36 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
               </Box>
               <Row>
                 <Field name="type" {...schema.type} highlightDirty />
-                <Field
-                  name="needs_followup"
-                  {...schema.needs_followup}
-                  sx={{
-                    '& .MuiFormGroup-root': { justifyContent: 'flex-end' },
-                  }}
-                  highlightDirty
-                />
+                <Show unless={isSummary}>
+                  <Field
+                    name="needs_followup"
+                    {...schema.needs_followup}
+                    sx={{
+                      '& .MuiFormGroup-root': { justifyContent: 'flex-end' },
+                    }}
+                    highlightDirty
+                  />
+                </Show>
               </Row>
+              <Show when={isSummary}>
+                <Row>
+                  <Field
+                    name="shift.coordinators"
+                    {...schema['shift.coordinators']}
+                  />
+                  <Field
+                    name="shift.operators"
+                    {...schema['shift.operators']}
+                  />
+                </Row>
+                <Row>
+                  <Field
+                    name="shift.start_time"
+                    {...schema['shift.start_time']}
+                  />
+                  <Field name="shift.end_time" {...schema['shift.end_time']} />
+                </Row>
+              </Show>
               <Row>
                 <Field name="action" {...schema.action} highlightDirty />
                 <Field
@@ -180,12 +201,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
                   Link Current Arrest
                 </Button>
               </Row>
-              <Stack
-                direction="row"
-                spacing={2}
-                justifyContent={'flex-end'}
-                xs={12}
-              >
+              <Stack direction="row" spacing={2} justifyContent={'flex-end'}>
                 <Button disabled={disabled} onClick={() => callback()}>
                   Cancel
                 </Button>

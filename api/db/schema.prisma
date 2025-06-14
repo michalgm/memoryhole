@@ -81,6 +81,7 @@ model Log {
   updated_by     User?     @relation("ModifiedLog", fields: [updated_by_id], references: [id])
   arrests        Arrest[]
   action         Action?   @relation(fields: [action_id], references: [id])
+  shift          Json?
   action_id      Int?
 }
 
