@@ -1,34 +1,46 @@
 change logs filter to allow multiple arrests
-shift summary
-  : not need needs followup
-  : shift start + end time
-  : operators - autocomplete + free form
-  ---
-  : link to multiple actions
-  : add different color/visualization for shift summaries
-  : potential template?
+☐ shift summary
+  ✔ not need needs followup @done(25-06-13 20:52)
+  ✔ shift start + end time @done(25-06-13 20:52)
+  ✔ operators - autocomplete + free form @done(25-06-13 20:52)
+  ☐ link to multiple actions
+  ✔ add different color/visualization for shift summaries @done(25-06-13 20:52)
+  ☐ potential template?
 
-Store update history - time + updater
-Online intake separate entities - should be linked to arrestee
+☐ Store update history - time + updater
+☐ Online intake separate entities - should be linked to arrestee
 
 Users vs Operators
+Whiteboard?
+
+✔ actions dropdown should sort order by date @done(25-06-13 17:29)
+
+Arrest date- auto-fill year w/ current?
 ArrestsTable:
   ✔ allow save/restore of queries @done(24-11-26 14:57)
-  ☐ allow update of existing stored view
+  ✔ allow update of existing stored view @done(25-01-11 17:14)
   ☐ PDF export?
   ✔ Allow re-order of fields @done(24-11-26 14:57)
   ✔ Bulk updates @done(24-11-26 14:57)
   ✔ add note to explain asterisk in arrests table @done(24-11-26 19:20)
+  ✔ CVS export fields messed up? @done(25-01-16 21:23)
+  ☐ Check successive bulk update wonkiness (count not updating properly?)
+
+API:
+  ☐ move updated_at checks out of client code and into to API
 
 General:
   ☐ custom fields via UI
   ☐ custom option lists on select/radio/etc
+  ☐ figure out how to refresh tokens
+  ☐ throw up warning popup before access will expire
+  ☐ redirect to login page on access expire
 
 Arrests:
   ☐ Add court_date table + relationship
     ☐ display court data in arrest view
   ☐ Interface to manage arrestee w/ multiple arrests
-  ☐ Check mod time before save
+  ✔ Check mod time before save @done(25-01-11 17:13)
   ✔ check dirty form before nav @done(24-11-27 10:14)
   ☐ Auto-handle cities->jurisdiction?
   ✔ add test on displayname to check if preferred name == first name @done(24-11-26 14:53)
@@ -41,7 +53,7 @@ Lawyers:
 Users:
   ✔ improve user management UI @done(24-11-26 14:54)
   ☐ allow admin to reset user password UI?
-  ☐ add rolling minumum access date
+  ✔ add rolling minumum access date @done(25-01-11 17:12)
   ✔ add tooltip to update resctrictions button @done(24-11-26 17:15)
   ✔ make role change set defaults on new user @done(24-11-26 16:43)
   ☐ create roles for operator and coordinator, service
@@ -49,10 +61,31 @@ Users:
   ✔ suggest protonmail for email @done(24-11-26 19:07)
   ☐ check if access expires during login session
   ☐ Add some sort of notification about access expiring
+  ☐ add setting to require expires date
+
+Logs:
+  ☐ Bulk delete logs?
+  ☐ shift summaries sre different types of logs
+  ✔ make logs filter buttons more discoverable @done(25-01-22 16:56)
+  ✔ add button to filter on shift summaries @done(25-01-22 16:56)
+  ✔ separate new logs vs log search @done(25-01-22 16:56)
+  ☐ Log templates
+  ☐ naming: Users (user type) vs Accounts - rename "user' access group to 'Operator'
+
+Actions:
+  ✔ Action - optionally delete all associated logs + arrests @done(25-01-25 02:54)
 
 Deployment:
   ☐ Linode encrypted volume
 
-
 Misc:
-☐ autoComplete disabled not working
+✔ autoComplete disabled not working @done(25-01-11 17:12)
+
+
+add section headers
+Site settings: Rolling/Static on dates
+
+
+
+
+
