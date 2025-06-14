@@ -1,15 +1,14 @@
+import { Box, Typography } from '@mui/material'
+import { navigate, routes } from '@redwoodjs/router'
+import { startCase, upperCase } from 'lodash-es'
 import { useCallback, useMemo } from 'react'
 
-import { Box, Typography } from '@mui/material'
 import dayjs from 'dayjs'
-import { startCase, upperCase } from 'lodash-es'
-
-import { navigate, routes } from '@redwoodjs/router'
-
 import { useAuth } from 'src/auth'
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
 import { useSiteSettings } from 'src/lib/useSiteSettings'
+
 export const QUERY = gql`
   query EditUser($id: Int!) {
     user: user(id: $id) {
@@ -57,7 +56,7 @@ const applyDefaults = (
   restriction_settings,
   default_restrictions
 ) => {
-  const defaults = default_restrictions[(role || '').toLowerCase()]
+  const defaults = default_restrictions?.[(role || '').toLowerCase()]
   if (!defaults) {
     return
   }
