@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.18.1](https://github.com/michalgm/memoryhole/compare/v0.18.0...v0.18.1) (2025-06-23)
+
 ## [0.18.0](https://github.com/michalgm/memoryhole/compare/v0.17.0...v0.18.0) (2025-06-23)
 
 ### Features
