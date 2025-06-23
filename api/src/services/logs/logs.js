@@ -51,8 +51,8 @@ const prepareData = ({ log, arrests = [], action_id, id }, current) => {
   if (action_id) {
     data.action = { connect: { id: action_id } }
   }
-  if (log.shift) {
-    data.shift = merge(current.shift, log.shift)
+  if (log?.shift) {
+    data.shift = merge(current?.shift || {}, log.shift)
   }
   if (!id) {
     data.created_by = {
