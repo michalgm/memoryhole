@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@redwoodjs/api": "8.4.2",
-    "@redwoodjs/api-server": "8.4.2",
-    "@redwoodjs/auth-dbauth-api": "8.4.2",
-    "@redwoodjs/graphql-server": "8.4.2",
+    "@redwoodjs/api": "8.6.1",
+    "@redwoodjs/api-server": "8.6.1",
+    "@redwoodjs/auth-dbauth-api": "8.6.1",
+    "@redwoodjs/graphql-server": "8.6.1",
     "dayjs": "^1.11.13",
-    "nodemailer": "^6.10.0",
-    "zod": "^3.24.1"
+    "nodemailer": "^6.10.1",
+    "zod": "^3.25.67"
   }
 }
