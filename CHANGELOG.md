@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.18.0](https://github.com/michalgm/memoryhole/compare/v0.17.0...v0.18.0) (2025-06-23)
+
+### Features
+
+* **UI:** shift summary improvements ([11cf86f](https://github.com/michalgm/memoryhole/commit/11cf86f0ad7afccac61ff646fde5f795488c64a9))
+
+### Bug Fixes
+
+* **API:** Fixes role-checking to handle both role and roles properties ([79c5a7c](https://github.com/michalgm/memoryhole/commit/79c5a7c7325214629fc00f8ecdb9c2dcf09cbeaa))
+* **UI:** handle race condition on user page ([27cb23c](https://github.com/michalgm/memoryhole/commit/27cb23cd08f4b3e0ff660d3bd97b6c80f0dda8a4))
+
 ## [0.17.0](https://github.com/michalgm/memoryhole/compare/v0.16.0...v0.17.0) (2025-01-25)
 
 ### Features
