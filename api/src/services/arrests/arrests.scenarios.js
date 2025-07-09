@@ -6,6 +6,19 @@ export const standard = defineScenario({
         search_field: 'String',
         date: new Date('2023-02-26'),
         jurisdiction: 'Alameda',
+        custom_fields: {
+          test: true,
+          custom: 'yes',
+        },
+
+        arrestee: {
+          create: {
+            custom_fields: {
+              test: true,
+              custom: 'yes',
+            },
+          },
+        },
       },
     },
     two: {
@@ -14,6 +27,14 @@ export const standard = defineScenario({
         search_field: 'String',
         date: new Date('2023-02-26'),
         jurisdiction: 'Alameda',
+        arrestee: {
+          create: {
+            custom_fields: {
+              test: true,
+              custom: 'yes',
+            },
+          },
+        },
       },
     },
   },

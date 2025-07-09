@@ -1,10 +1,9 @@
-import { merge } from 'lodash'
-
 import { validate, validateWithSync } from '@redwoodjs/api'
 import { ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
 import { getSetting } from 'src/lib/settingsCache'
+import { prepareJsonUpdate } from 'src/lib/utils'
 
 import dayjs from '../../lib/day'
 import { updateDisplayField as updateArresteeDisplayField } from '../arrestees/arrestees'
@@ -60,9 +59,11 @@ const checkArrestsAccess = async (ids, tx) => {
       id: true,
       action_id: true,
       date: true,
+      custom_fields: true,
       arrestee: {
         select: {
           id: true,
+          custom_fields: true,
         },
       },
     },
@@ -259,7 +260,7 @@ const updateDisplayField = (arrest) => {
 }
 
 const validateAndPrepareData = (
-  { id: _id, action_id, arrestee, custom_fields, ...arrest },
+  { id: _id, action_id, arrestee, ...arrest },
   current = {}
 ) => {
   const data = {
@@ -276,22 +277,17 @@ const validateAndPrepareData = (
       }
     })
     updateArresteeDisplayField(arrestee, current.arrestee)
-    if (arrestee.custom_fields) {
-      arrestee.custom_fields = merge(
-        current.custom_fields,
-        arrestee.custom_fields
-      )
-    }
+
     data.arrestee = {
       update: {
         data: arrestee,
       },
     }
   }
-  if (custom_fields) {
-    if (custom_fields.next_court_date) {
+  if (arrest.custom_fields) {
+    if (arrest.custom_fields.next_court_date) {
       validateWithSync(() => {
-        validate(custom_fields.next_court_date, 'Next Court Date', {
+        validate(arrest.custom_fields.next_court_date, 'Next Court Date', {
           custom: {
             with: (value) => {
               if (!dayjs(value).isValid()) {
@@ -302,7 +298,6 @@ const validateAndPrepareData = (
         })
       })
     }
-    data.custom_fields = merge(current.custom_fields, custom_fields)
   }
   updateDisplayField(arrest)
   if (action_id) {
@@ -333,20 +328,38 @@ export const createArrest = ({ input: { arrestee, action_id, ...arrest } }) => {
   })
 }
 
-export const updateArrest = async ({
-  id,
-  input: { arrestee, action_id, ...input },
-}) => {
-  const [arrest] = await checkArrestsAccess([id])
+export const updateArrest = async ({ id, input: { action_id, ...input } }) => {
+  await checkArrestsAccess([id])
+  const current = await db.arrest.findUnique({
+    where: { id },
+    include: {
+      arrestee: true,
+    },
+  })
+
+  const mergedInput = await prepareJsonUpdate(
+    'Arrest',
+    { action_id, ...input },
+    { current }
+  )
+
+  if (input.arrestee) {
+    mergedInput.arrestee = await prepareJsonUpdate(
+      'Arrestee',
+      mergedInput.arrestee,
+      { current: current.arrestee }
+    )
+  }
+
   const data = validateAndPrepareData(
     {
       id,
       action_id,
-      arrestee,
-      ...input,
+      ...mergedInput,
     },
-    arrest
+    current
   )
+  // console.log('UPDATE DATA', data)
 
   return db.arrest.update({
     data,
@@ -355,16 +368,29 @@ export const updateArrest = async ({
 }
 
 export const bulkUpdateArrests = async ({ ids, input }) => {
-  return db.$transaction(async (tx) => {
+  const update = async (tx) => {
     const arrests = await checkArrestsAccess(ids, tx)
     const updates = arrests.map(async ({ id, ...arrest }) => {
+      const mergedInput = await prepareJsonUpdate(
+        'Arrest',
+        { ...input, id },
+        { tx, current: arrest }
+      )
+      if (input.arrestee) {
+        mergedInput.arrestee = await prepareJsonUpdate(
+          'Arrestee',
+          mergedInput.arrestee,
+          { current: arrest.arrestee, tx }
+        )
+      }
       const data = await validateAndPrepareData(
         {
           id,
-          ...input,
+          ...mergedInput,
         },
         arrest
       )
+
       return tx.arrest.update({
         data,
         where: { id },
@@ -372,7 +398,13 @@ export const bulkUpdateArrests = async ({ ids, input }) => {
     })
     const results = await Promise.all(updates)
     return { count: results.length }
-  })
+  }
+
+  if (process.env.NODE_ENV === 'test') {
+    return update(db)
+  } else {
+    return db.$transaction(update)
+  }
 }
 
 export const deleteArrest = async ({ id }) => {
