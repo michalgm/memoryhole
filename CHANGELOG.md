@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.19.0](https://github.com/michalgm/memoryhole/compare/v0.18.1...v0.19.0) (2025-07-09)
+
+### Features
+
+* implement JSONB field handling for arrests and arrestees, including bulk updates ([8a6f89e](https://github.com/michalgm/memoryhole/commit/8a6f89eb70bdf0a14bc650165c418bb6a8e532d1))
+
+### Bug Fixes
+
+* **API:** fix logs bug ([3a5eec8](https://github.com/michalgm/memoryhole/commit/3a5eec8581c83d59d9178aa9531354bfb00242ba))
+* validate next court date and enhance test scenarios for arrest functionalities ([3843845](https://github.com/michalgm/memoryhole/commit/38438457682ee9ab42f5bdc1470686f52a87312a))
+
 ## [0.18.1](https://github.com/michalgm/memoryhole/compare/v0.18.0...v0.18.1) (2025-06-23)
 
 ## [0.18.0](https://github.com/michalgm/memoryhole/compare/v0.17.0...v0.18.0) (2025-06-23)
