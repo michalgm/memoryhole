@@ -121,6 +121,145 @@ describe('arrests', () => {
 
     expect(result).toEqual(null)
   })
+
+  scenario(
+    'merges non-overlapping custom_fields keys without loss',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: 1 })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: { foo: 'bar' } },
+      })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: { newKey: 'newValue' } },
+      })
+      const result = await db.arrest.findUnique({
+        where: { id: scenario.arrest.one.id },
+      })
+      expect(result.custom_fields).toMatchObject({
+        foo: 'bar',
+        newKey: 'newValue',
+      })
+    }
+  )
+
+  scenario(
+    'does not overwrite custom_fields when input is null or undefined',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: 1 })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: { foo: 'bar' } },
+      })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: null },
+      })
+      const resultNull = await db.arrest.findUnique({
+        where: { id: scenario.arrest.one.id },
+      })
+      expect(resultNull.custom_fields).toMatchObject({ foo: 'bar' })
+
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: {}, // no custom_fields key
+      })
+      const resultUndefined = await db.arrest.findUnique({
+        where: { id: scenario.arrest.one.id },
+      })
+      expect(resultUndefined.custom_fields).toMatchObject({ foo: 'bar' })
+    }
+  )
+
+  scenario(
+    'does not clear custom_fields when updating with empty object',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: 1 })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: { foo: 'bar', bar: 'baz' } },
+      })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: {} },
+      })
+      const result = await db.arrest.findUnique({
+        where: { id: scenario.arrest.one.id },
+      })
+      expect(result.custom_fields).toMatchObject({ foo: 'bar', bar: 'baz' })
+    }
+  )
+
+  scenario(
+    'merges custom_fields for records with and without existing data',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: 1 })
+      // one has custom_fields, two does not
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: { foo: 'bar' } },
+      })
+      await updateArrest({
+        id: scenario.arrest.two.id,
+        input: {}, // no custom_fields
+      })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: { newKey: 'newValue' } },
+      })
+      await updateArrest({
+        id: scenario.arrest.two.id,
+        input: { custom_fields: { newKey: 'newValue' } },
+      })
+      const result1 = await db.arrest.findUnique({
+        where: { id: scenario.arrest.one.id },
+      })
+      const result2 = await db.arrest.findUnique({
+        where: { id: scenario.arrest.two.id },
+      })
+      expect(result1.custom_fields).toMatchObject({
+        foo: 'bar',
+        newKey: 'newValue',
+      })
+      expect(result2.custom_fields).toMatchObject({ newKey: 'newValue' })
+    }
+  )
+
+  scenario(
+    'merges both arrest and arrestee custom_fields in one update',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: 1 })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: {
+          custom_fields: { foo: 'bar' },
+          arrestee: { custom_fields: { alpha: 'beta' } },
+        },
+      })
+      await updateArrest({
+        id: scenario.arrest.one.id,
+        input: {
+          custom_fields: { newKey: 'arrest' },
+          arrestee: { custom_fields: { newKey: 'arrestee' } },
+        },
+      })
+      const arrest = await db.arrest.findUnique({
+        where: { id: scenario.arrest.one.id },
+      })
+      const arrestee = await db.arrestee.findUnique({
+        where: { id: scenario.arrest.one.arrestee_id },
+      })
+      expect(arrest.custom_fields).toMatchObject({
+        foo: 'bar',
+        newKey: 'arrest',
+      })
+      expect(arrestee.custom_fields).toMatchObject({
+        alpha: 'beta',
+        newKey: 'arrestee',
+      })
+    }
+  )
 })
 
 describe('arrest access controls', () => {
