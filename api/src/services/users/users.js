@@ -11,7 +11,7 @@ import { requireAuth } from 'src/lib/auth'
 import { initUser, onboardUser } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
 
-export const ROLE_LEVELS = [, 'User', 'Coordinator', 'Admin']
+export const ROLE_LEVELS = [null, 'User', 'Coordinator', 'Admin']
 
 export function getRoleLevel(role) {
   return ROLE_LEVELS.indexOf(role) || 0

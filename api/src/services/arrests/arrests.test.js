@@ -64,6 +64,53 @@ describe('arrests', () => {
     expect(result.display_field).toEqual('String2')
   })
 
+  scenario('updates a custom field', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+    const original = await arrest({ id: scenario.arrest.one.id })
+    await updateArrest({
+      id: original.id,
+      input: { custom_fields: { foo: 'bar', bar: 'baz' } },
+    })
+    const result = await updateArrest({
+      id: original.id,
+      input: { custom_fields: { foo: 'baz' } },
+    })
+    // const result = await arrest({ id: original.id })
+    // console.log('RESULT', result)
+
+    expect(result.custom_fields).toEqual({
+      foo: 'baz',
+      bar: 'baz',
+      test: true,
+      custom: 'yes',
+    })
+  })
+
+  scenario('updates an arrestee custom field', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+    const original = await arrest({ id: scenario.arrest.one.id })
+    await updateArrest({
+      id: original.id,
+      input: { arrestee: { custom_fields: { foo: 'bar', bar: 'baz' } } },
+    })
+
+    await updateArrest({
+      id: original.id,
+      input: { arrestee: { custom_fields: { foo: 'baz' } } },
+    })
+
+    const result = await db.arrestee.findUnique({
+      where: { id: scenario.arrest.one.arrestee_id },
+    })
+
+    expect(result.custom_fields).toEqual({
+      bar: 'baz',
+      foo: 'baz',
+      custom: 'yes',
+      test: true,
+    })
+  })
+
   scenario('deletes a arrest', async (scenario) => {
     mockCurrentUser({ name: 'Rob' })
 
