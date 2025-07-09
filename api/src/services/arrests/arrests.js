@@ -289,8 +289,11 @@ const validateAndPrepareData = (
       validateWithSync(() => {
         validate(arrest.custom_fields.next_court_date, 'Next Court Date', {
           custom: {
-            with: (value) => {
-              if (!dayjs(value).isValid()) {
+            with: () => {
+              if (
+                arrest.custom_fields.next_court_date &&
+                !dayjs(arrest.custom_fields.next_court_date).isValid()
+              ) {
                 throw new Error('Invalid date')
               }
             },

@@ -13,6 +13,7 @@ export const standard = defineScenario({
 
         arrestee: {
           create: {
+            first_name: 'Test',
             custom_fields: {
               test: true,
               custom: 'yes',
