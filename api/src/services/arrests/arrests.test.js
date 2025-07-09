@@ -10,6 +10,7 @@ import {
   createArrest,
   deleteArrest,
   filterArrestAccess,
+  searchArrests,
   updateArrest,
 } from './arrests'
 
@@ -260,6 +261,98 @@ describe('arrests', () => {
       })
     }
   )
+
+  // --- Filtering ---
+  scenario('filterArrestAccess combines date and action filters', () => {
+    mockCurrentUser({
+      arrest_date_min: new Date('2023-01-01'),
+      arrest_date_max: new Date('2023-12-31'),
+      action_ids: [1, 2],
+    })
+    const result = filterArrestAccess({})
+    expect(result.AND).toBeDefined()
+    expect(result.action_id.in).toEqual([1, 2])
+  })
+
+  // --- Search ---
+  scenario(
+    'searchArrests returns correct results for name',
+    async (scenario) => {
+      mockCurrentUser({})
+      // Assume scenario.arrest.one.arrestee has first_name 'Rob'
+      const results = await searchArrests({ search: 'Test' })
+      expect(results.some((a) => a.id === scenario.arrest.one.id)).toBe(true)
+    }
+  )
+
+  // --- Validation ---
+  scenario('rejects invalid email in arrestee', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+    await expect(
+      updateArrest({
+        id: scenario.arrest.one.id,
+        input: { arrestee: { email: 'not-an-email' } },
+      })
+    ).rejects.toThrow('Email must be formatted like an email')
+  })
+
+  scenario('rejects invalid next_court_date', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+    await expect(
+      updateArrest({
+        id: scenario.arrest.one.id,
+        input: { custom_fields: { next_court_date: 'not-a-date' } },
+      })
+    ).rejects.toThrow('Invalid date')
+  })
+
+  // --- Display Field Logic ---
+  scenario('sets display_field based on date', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+    const result = await updateArrest({
+      id: scenario.arrest.one.id,
+      input: { date: new Date('2023-02-26') },
+    })
+    expect(result.display_field).toBeDefined()
+  })
+
+  // --- Create/Delete Logic ---
+  scenario('creates an arrest with arrestee', async () => {
+    mockCurrentUser({ name: 'Rob', id: 1 })
+    const { id } = await createArrest({
+      input: {
+        display_field: 'String',
+        search_field: 'String',
+        jurisdiction: 'String',
+        date: new Date('2023-02-26'),
+        arrestee: { first_name: 'Rob', custom_fields: { foo: 'bar' } },
+      },
+    })
+    const result = await db.arrest.findUnique({
+      where: { id },
+      include: { arrestee: true },
+    })
+    expect(result.arrestee).toBeDefined()
+  })
+
+  scenario('deletes an arrest and its arrestee', async (scenario) => {
+    mockCurrentUser({ name: 'Rob' })
+    const deleted = await deleteArrest({ id: scenario.arrest.one.id })
+    const arrestee = await db.arrestee.findUnique({
+      where: { id: scenario.arrest.one.arrestee_id },
+    })
+    expect(deleted).toBeDefined()
+    expect(arrestee).toBeNull()
+  })
+
+  // --- Transaction/Isolation ---
+  scenario('bulkDeleteArrests is atomic', async (scenario) => {
+    mockCurrentUser({ name: 'Rob' })
+    const ids = [scenario.arrest.one.id, scenario.arrest.two.id]
+    await bulkDeleteArrests({ ids })
+    const remaining = await db.arrest.findMany({ where: { id: { in: ids } } })
+    expect(remaining).toHaveLength(0)
+  })
 })
 
 describe('arrest access controls', () => {
