@@ -15,10 +15,10 @@ export async function prepareJsonUpdate(
   updateData,
   { id, tx, current } = {}
 ) {
-  console.log(
-    `Preparing JSONB update for model ${modelName} with data:`,
-    updateData
-  )
+  // console.log(
+  //   `Preparing JSONB update for model ${modelName} with data:`,
+  //   updateData
+  // )
   const jsonFields = jsonbFields[modelName] || []
   let currentData = current
   if (!currentData) {
@@ -34,14 +34,14 @@ export async function prepareJsonUpdate(
     if (!currentData) throw new Error(`${modelName} with id ${id} not found`)
   }
   const merged = { ...updateData }
-  console.log('JSON FIELDS', jsonbFields)
+  // console.log('JSON FIELDS', jsonbFields)
   for (const field of jsonFields) {
     if (field in updateData) {
-      console.log(
-        `Merging JSONB field ${field} for model ${modelName}`,
-        currentData[field],
-        updateData[field]
-      )
+      // console.log(
+      //   `Merging JSONB field ${field} for model ${modelName}`,
+      //   currentData[field],
+      //   updateData[field]
+      // )
       merged[field] = merge({}, currentData[field], updateData[field])
     }
   }
