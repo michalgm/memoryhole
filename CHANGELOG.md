@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.19.1](https://github.com/michalgm/memoryhole/compare/v0.19.0...v0.19.1) (2025-07-09)
+
+### Bug Fixes
+
+* update script path for production and staging environments ([49294d9](https://github.com/michalgm/memoryhole/commit/49294d9f50a084d1a5d762f34726497449a3aef3))
+
+### Reverts
+
+* Revert "update deps" ([9fabd07](https://github.com/michalgm/memoryhole/commit/9fabd0715988b3efd8b659884080b76204f90501))
+
 ## [0.19.0](https://github.com/michalgm/memoryhole/compare/v0.18.1...v0.19.0) (2025-07-09)
 
 ### Features
