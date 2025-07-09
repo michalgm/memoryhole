@@ -58,4 +58,3 @@ function getAllSDLJsonbFields() {
 }
 
 export const jsonbFields = getAllSDLJsonbFields()
-console.log('JSONB FIELDS', jsonbFields)
