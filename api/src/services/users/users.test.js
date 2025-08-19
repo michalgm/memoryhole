@@ -79,10 +79,10 @@ describe('users', () => {
           input: {
             email: 'newuser@example.com',
             name: 'New User',
-            role: 'User',
+            role: 'Operator',
           },
         })
-        expect(coordCreatesUser.role).toEqual('User')
+        expect(coordCreatesUser.role).toEqual('Operator')
 
         // Coordinator cannot create admin
         await expect(
@@ -102,7 +102,7 @@ describe('users', () => {
             input: {
               email: 'nouser@example.com',
               name: 'Try User',
-              role: 'User',
+              role: 'Operator',
             },
           })
         ).rejects.toThrow("You don't have access to do that")
@@ -156,9 +156,9 @@ describe('users', () => {
       mockCurrentUser(scenario.user.admin)
       const resultAdmin = await updateUser({
         id: scenario.user.coordinator.id,
-        input: { role: 'User' },
+        input: { role: 'Operator' },
       })
-      expect(resultAdmin.role).toEqual('User')
+      expect(resultAdmin.role).toEqual('Operator')
 
       // Coordinator cannot promote user to admin
       mockCurrentUser(scenario.user.coordinator)

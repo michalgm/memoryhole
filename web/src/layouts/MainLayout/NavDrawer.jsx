@@ -91,7 +91,7 @@ const NavDrawer = ({ navOpen }) => {
   }, [expiresAt, setExpires])
 
   const LogoutIcon =
-    expires.expiring_soon && role !== 'User' ? (
+    expires.expiring_soon && role !== 'Operator' ? (
       <Error color="error" />
     ) : (
       <Logout />

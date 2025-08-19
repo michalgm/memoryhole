@@ -150,7 +150,7 @@ const UserPage = ({ id }) => {
     (user) => {
       setPageTitle(isCreate ? 'New User' : user?.name)
       if (isCreate) {
-        user.role = 'User'
+        user.role = 'Operator'
         applyDefaultsToUser(user.role, user)
       }
       return user

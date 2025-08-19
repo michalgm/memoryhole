@@ -132,7 +132,7 @@ model User {
   email                  String         @unique
   name                   String
   custom_fields          Json?
-  role                   String         @default("User")
+  role                   String         @default("Operator")
   hashedPassword         String?
   salt                   String?
   expiresAt              DateTime?
