@@ -40,7 +40,7 @@ export const standard = defineScenario({
       data: {
         email: 'user@example.com',
         name: 'Regular User',
-        role: 'User',
+        role: 'Operator',
       },
     },
   },

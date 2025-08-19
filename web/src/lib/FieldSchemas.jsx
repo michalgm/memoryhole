@@ -490,7 +490,7 @@ export const UserFields = [
         'role',
         {
           field_type: 'select',
-          options: ['User', 'Coordinator', 'Admin'],
+          options: ['Operator', 'Coordinator', 'Admin'],
           required: true,
         },
       ],
