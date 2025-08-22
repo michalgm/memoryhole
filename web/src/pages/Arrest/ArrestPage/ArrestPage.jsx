@@ -187,7 +187,7 @@ const ArrestPage = ({ id, children, ...props }) => {
       >
         {children}
       </FormContainer>
-      {compareControlPortal}
+      {!isCreate && compareControlPortal}
     </>
   )
 }

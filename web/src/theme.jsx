@@ -192,6 +192,28 @@ const theme = createTheme({
               borderColor: 'var(--mui-palette-success-main)', // Success color for default state
             },
           },
+          '& .MuiFormLabel-colorWarning': {
+            color: 'var(--mui-palette-warning-main)', // Warning color for default state
+          },
+          '&:has(.MuiCheckbox-colorWarning).MuiFormControl-root': {
+            width: '100%',
+            outline: '1px solid var(--mui-palette-warning-main)',
+            borderRadius: '2px',
+            backgroundColor:
+              'rgba(var(--mui-palette-warning-lightChannel) / 0.1) !important',
+          },
+          '& .MuiCheckbox-colorWarning': {
+            color: 'var(--mui-palette-warning-main)', // Warning color for default state
+          },
+          '& .MuiInputBase-colorWarning': {
+            '&': {
+              backgroundColor:
+                'rgba(var(--mui-palette-warning-lightChannel) / 0.1) !important',
+            },
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--mui-palette-warning-main)', // Warning color for default state
+            },
+          },
         },
       },
     },
