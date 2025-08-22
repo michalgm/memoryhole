@@ -1,8 +1,15 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { CompareArrows } from '@mui/icons-material'
+import { Button, Tooltip } from '@mui/material'
+import { Stack } from '@mui/system'
+import { createPortal } from 'react-dom'
 
+import { navigate, routes, useLocation } from '@redwoodjs/router'
+
+import { BaseField } from 'src/components/utils/BaseField'
 import FormContainer from 'src/components/utils/FormContainer'
+import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
 import ArrestFields from 'src/lib/FieldSchemas'
 export const QUERY = gql`
@@ -36,6 +43,40 @@ export const DELETE_ARREST_MUTATION = gql`
     }
   }
 `
+
+const CompareChooser = () => {
+  const { pathname } = useLocation()
+  const [showChooser, setShowChooser] = useState(pathname.includes('compare'))
+
+  return (
+    <Stack direction={'row'} spacing={1} sx={{ mb: -10 }}>
+      <Tooltip title="Compare this arrest record to another">
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => setShowChooser(!showChooser)}
+        >
+          <CompareArrows />
+        </Button>
+      </Tooltip>
+      <Show when={showChooser}>
+        <BaseField
+          field_type="arrest_chooser"
+          name="compare_arrest"
+          isRHF={false}
+          sx={{ width: 250 }}
+          textFieldProps={{
+            label: 'Select arrest to compare',
+            sx: { backgroundColor: 'background.paper' },
+          }}
+          onChange={({ id }) =>
+            navigate(`${pathname.replace(/\/compare.+/, '')}/compare/${id}`)
+          }
+        />
+      </Show>
+    </Stack>
+  )
+}
 export const transformInput = (input) => {
   ;[
     'updated_at',
@@ -61,7 +102,7 @@ const ACTION_TO_ARREST_FIELDS = {
   jurisdiction: 'jurisdiction',
 }
 
-const ArrestPage = ({ id }) => {
+const ArrestPage = ({ id, children, ...props }) => {
   const { currentAction, setPageTitle } = useApp()
   const isCreate = !id || id === 'new'
   const { setCurrentFormData } = useApp()
@@ -118,6 +159,11 @@ const ArrestPage = ({ id }) => {
     (data) => navigate(routes.arrest({ id: data.id })),
     []
   )
+  const compareTarget = document.getElementById('modal_layout_header_actions')
+
+  const compareControlPortal = compareTarget
+    ? createPortal(<CompareChooser />, compareTarget)
+    : null
 
   return (
     <>
@@ -137,7 +183,11 @@ const ArrestPage = ({ id }) => {
         onDelete={onDelete}
         onCreate={onCreate}
         onFetch={onFetch}
-      />
+        {...props}
+      >
+        {children}
+      </FormContainer>
+      {compareControlPortal}
     </>
   )
 }

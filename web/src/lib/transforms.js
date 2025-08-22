@@ -11,6 +11,7 @@ const dateTransformer = (value) => {
 const transformers = {
   date: dateTransformer,
   'date-time': dateTransformer,
+  checkbox: value => Boolean(value),
 }
 
 export const transformData = (data, schema = {}) => {
