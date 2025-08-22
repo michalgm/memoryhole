@@ -66,6 +66,7 @@ export const schema = gql`
       date: DateTime!
       days: Int!
       jurisdiction: String
+      arrest_city: String
       report_type: String!
       include_contact: Boolean
     ): [Arrest]! @requireAuth

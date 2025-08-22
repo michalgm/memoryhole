@@ -115,9 +115,9 @@ export const filterArrestAccess = (baseWhere = {}) => {
   return where
 }
 
-export const arrests = () => {
+export const arrests = ({ where = {} }) => {
   return db.arrest.findMany({
-    where: filterArrestAccess({}),
+    where: filterArrestAccess(where),
   })
 }
 
@@ -218,12 +218,17 @@ export const docketSheetSearch = async ({
   days,
   report_type,
   jurisdiction,
+  arrest_city,
   // include_contact,
 }) => {
   const date = dayjs(dateRaw)
   const dateLimit = date.add(days, 'day').toDate()
-  const where = {
-    jurisdiction,
+  const where = {}
+  if (jurisdiction) {
+    where.jurisdiction = jurisdiction
+  }
+  if (arrest_city) {
+    where.arrest_city = arrest_city
   }
 
   if (report_type === 'arrest_date') {
@@ -236,14 +241,14 @@ export const docketSheetSearch = async ({
       lte: dateLimit,
     }
   }
-
-  const records = await db.arrest.findMany({
+  const records = await arrests({
     where,
   })
   return records.filter(({ custom_fields }) => {
     if (report_type === 'arrest_date') {
       return true
     }
+    // FIXME - this is a temporary fix to filter by next court date - prisma doesn't support date filters on JSON fields. Need to blow up the whole nested-JSON design and move to something like an EAV approach
     if (custom_fields.next_court_date) {
       const court_date = new Date(custom_fields.next_court_date)
       return court_date >= date && court_date < dateLimit

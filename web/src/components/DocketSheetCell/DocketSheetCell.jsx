@@ -4,7 +4,8 @@ import DataTable from '../DataTable/DataTable'
 
 export const QUERY = gql`
   query FindDocketSheetQuery(
-    $jurisdiction: String!
+    $jurisdiction: String
+    $arrest_city: String
     $report_type: String!
     $include_contact: Boolean
     $date: DateTime!
@@ -15,10 +16,12 @@ export const QUERY = gql`
       days: $days
       report_type: $report_type
       jurisdiction: $jurisdiction
+      arrest_city: $arrest_city
       include_contact: $include_contact
     ) {
       id
       jurisdiction
+      arrest_city
       citation_number
       charges
       date
@@ -62,6 +65,8 @@ export const Success = ({
     'arrestee.pronoun',
     ...contact_fields,
     'date',
+    'jurisdiction',
+    'arrest_city',
     'citation_number',
     'custom_fields.jail_id',
     'custom_fields.docket_number',
