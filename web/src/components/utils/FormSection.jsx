@@ -18,12 +18,14 @@ const FormSection = ({
   children,
   small = false,
   sticky = true,
+  disableCollapse = false,
 }) => {
   const context = useFormContext()
   return (
     <Accordion key={title} size={12} defaultExpanded disableGutters>
       <AccordionSummary
         sx={(theme) => ({
+          pointerEvents: disableCollapse ? 'none' : null,
           position: sticky ? 'sticky' : undefined,
           top: sticky ? 46 : undefined,
           minHeight: small ? 0 : undefined,
@@ -40,7 +42,11 @@ const FormSection = ({
             margin: 0,
           },
         })}
-        expandIcon={<ExpandMore sx={{ color: 'contrast.main' }} />}
+        expandIcon={
+          disableCollapse ? null : (
+            <ExpandMore sx={{ color: 'contrast.main' }} />
+          )
+        }
       >
         <Stack
           spacing={2}
