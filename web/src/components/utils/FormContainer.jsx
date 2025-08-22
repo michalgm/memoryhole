@@ -10,7 +10,7 @@ import { Field } from './Field'
 import Footer from './Footer'
 import FormSection from './FormSection'
 
-function fieldsToColumns(fields, schema, columnCount = 2) {
+export function fieldsToColumns(fields, schema, columnCount = 2) {
   const { fullSpan, nonFullSpan } = fields.reduce(
     (acc, name, index) => {
       const props = schema[name]
@@ -37,6 +37,74 @@ function fieldsToColumns(fields, schema, columnCount = 2) {
   return { columns, fullSpan }
 }
 
+export const FormContainerSectionFields = ({
+  highlightDirty,
+  fieldProps,
+  fields,
+  baseIndex,
+}) => {
+  return fields.map(([name, options = {}], index) => (
+    <Grid2 size={12} key={name}>
+      <Field
+        tabIndex={baseIndex + index}
+        name={name}
+        highlightDirty={highlightDirty}
+        {...options}
+        {...(fieldProps[name] || {})}
+      />
+    </Grid2>
+  ))
+}
+
+const FormContainerFieldsLayout = ({
+  layout,
+  schema,
+  columnCount,
+  highlightDirty,
+  fieldProps,
+}) => {
+  const sections = layout.map(
+    ({ fields: sectionFields, title, sectionActions }, groupIndex) => {
+      const { columns, fullSpan } = fieldsToColumns(
+        sectionFields,
+        schema,
+        columnCount
+      )
+
+      return (
+        <FormSection
+          key={groupIndex}
+          title={title}
+          sectionActions={sectionActions}
+        >
+          <Grid2 container sx={{ alignItems: 'start' }} size={12}>
+            {columns.map((fieldSet, columnIndex) => (
+              <Grid2 key={columnIndex} container size={12 / columnCount}>
+                <FormContainerSectionFields
+                  highlightDirty={highlightDirty}
+                  fieldProps={fieldProps}
+                  fields={fieldSet}
+                  baseIndex={100 * (groupIndex + 1)}
+                />
+              </Grid2>
+            ))}
+            <Grid2 container size={12}>
+              <FormContainerSectionFields
+                highlightDirty={highlightDirty}
+                fieldProps={fieldProps}
+                fields={fullSpan}
+                baseIndex={100 * (groupIndex + 1) + columns.length}
+              />
+            </Grid2>
+          </Grid2>
+        </FormSection>
+      )
+    }
+  )
+
+  return <>{sections}</>
+}
+
 const FormContainer = ({
   fields,
   displayConfig,
@@ -57,6 +125,8 @@ const FormContainer = ({
   layout,
   deleteOptions = {},
   fieldProps = {},
+  footerProps = {},
+  children,
 }) => {
   const smallLayout = useContainerWidth(860)
   const schema = get(fieldSchema, displayConfig?.type?.toLowerCase(), {})
@@ -94,76 +164,34 @@ const FormContainer = ({
         </Box>
       }
     >
-      {({
-        isLoading,
-        confirmDelete,
-        formData,
-        stats,
-        hasDirtyFields,
-        loading: { loadingDelete, loadingCreate, loadingUpdate },
-      }) => {
+      {(formManagerContext) => {
+        const {
+          isLoading,
+          confirmDelete,
+          formData,
+          stats,
+          hasDirtyFields,
+          loading: { loadingDelete, loadingCreate, loadingUpdate },
+        } = formManagerContext
         const disabled = isLoading
 
         return (
           <Box sx={{ position: 'relative', width: '100%', pb: 3 }}>
             <Stack spacing={4} sx={{ pb: 2 }} className="content-container">
-              {layout.map(
-                (
-                  { fields: sectionFields, title, sectionActions },
-                  groupIndex
-                ) => {
-                  const { columns, fullSpan } = fieldsToColumns(
-                    sectionFields,
-                    schema,
-                    columnCount
-                  )
-                  return (
-                    <FormSection
-                      key={groupIndex}
-                      title={title}
-                      sectionActions={sectionActions}
-                    >
-                      <Grid2 container sx={{ alignItems: 'start' }} size={12}>
-                        {columns.map((fieldSet, columnIndex) => (
-                          <Grid2
-                            key={columnIndex}
-                            container
-                            size={12 / columnCount}
-                          >
-                            {fieldSet.map(([key, options = {}], index) => (
-                              <Grid2 key={key} size={12}>
-                                <Field
-                                  tabIndex={100 * (groupIndex + 1) + index}
-                                  name={key}
-                                  highlightDirty={highlightDirty}
-                                  {...options}
-                                  {...(fieldProps[key] || {})}
-                                />
-                              </Grid2>
-                            ))}
-                          </Grid2>
-                        ))}
-                        <Grid2 container size={12}>
-                          {fullSpan.map(([key, options = {}], index) => (
-                            <Grid2 key={key} size={12}>
-                              <Field
-                                tabIndex={
-                                  100 * (groupIndex + 1) +
-                                  columns.length +
-                                  index
-                                }
-                                highlightDirty={highlightDirty}
-                                name={key}
-                                {...options}
-                                {...(fieldProps[key] || {})}
-                              />
-                            </Grid2>
-                          ))}
-                        </Grid2>
-                      </Grid2>
-                    </FormSection>
-                  )
-                }
+              {children ? (
+                typeof children === 'function' ? (
+                  children(formManagerContext)
+                ) : (
+                  children
+                )
+              ) : (
+                <FormContainerFieldsLayout
+                  layout={layout}
+                  schema={schema}
+                  columnCount={columnCount}
+                  highlightDirty={highlightDirty}
+                  fieldProps={fieldProps}
+                />
               )}
             </Stack>
             <Footer
@@ -181,8 +209,9 @@ const FormContainer = ({
                 deleteOptions,
                 allowSave: hasDirtyFields,
                 label: displayConfig?.type,
+                ...footerProps,
               }}
-            />
+            ></Footer>
           </Box>
         )
       }}

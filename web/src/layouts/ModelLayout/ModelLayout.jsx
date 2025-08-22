@@ -45,7 +45,7 @@ const ModelLayout = ({
           titleTo={titleTo}
           buttonLabel={buttonLabel}
         />
-
+        <div id="modal_layout_header_actions"></div>
         {buttonLabel && buttonTo && !id && !isNew && (
           <Tooltip
             title={

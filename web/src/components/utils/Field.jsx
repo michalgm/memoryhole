@@ -6,12 +6,14 @@ import { BaseField } from './BaseField'
 export const Field = ({ highlightDirty, ...props }) => {
   const context = useFormContext()
   const { setValue, getValues, control, formState } = useFormContext()
-
+  if (props.hidden) {
+    return null
+  }
   const fieldState =
     highlightDirty &&
     get(formState.dirtyFields, props.name) &&
     !get(formState.errors, props.name)
-  const color = fieldState ? 'success' : undefined
+  const color = fieldState ? 'success' : props.color
 
   return (
     <BaseField
