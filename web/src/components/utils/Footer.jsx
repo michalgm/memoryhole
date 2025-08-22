@@ -12,8 +12,9 @@ import { startCase } from 'lodash-es'
 
 import IconText from 'src/components/utils/IconText'
 import LoadingButton from 'src/components/utils/LoadingButton'
+import Show from 'src/components/utils/Show'
 
-const ModInfo = React.forwardRef(
+export const ModInfo = React.forwardRef(
   ({ stats, formData, withBy, ...props }, ref) => {
     return (
       <Stack
@@ -56,6 +57,33 @@ const ModInfo = React.forwardRef(
   }
 )
 
+const FooterButton = ({
+  children,
+  disabled,
+  loading,
+  onClick,
+  tooltip = '',
+  variant = 'contained',
+  color = 'secondary',
+  ...props
+}) => (
+  <Tooltip title={tooltip} placement="top">
+    <Box>
+      <LoadingButton
+        variant={variant}
+        color={color}
+        size="medium"
+        disabled={disabled}
+        loading={loading}
+        onClick={onClick}
+        {...props}
+      >
+        {children}
+      </LoadingButton>
+    </Box>
+  </Tooltip>
+)
+
 const Footer = ({
   children,
   id,
@@ -71,6 +99,11 @@ const Footer = ({
   label,
   deleteOptions,
   allowSave = true,
+  disableStats = false,
+  disableDelete = false,
+  disableSave = false,
+  preButtons = [],
+  postButtons = [],
 }) => {
   return (
     <Box
@@ -103,19 +136,21 @@ const Footer = ({
           // sx={{ margin: 'auto', width: 'inherit', height: 5 }}
           spacing={2}
         >
-          {id &&
-            formData?.created_at &&
-            (smallLayout ? (
-              <Tooltip
-                title={<ModInfo stats={stats} formData={formData} withBy />}
-              >
-                <IconButton color="inherit">
-                  <AccessTime />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <ModInfo stats={stats} formData={formData} />
-            ))}
+          <Show unless={disableStats}>
+            {id &&
+              formData?.created_at &&
+              (smallLayout ? (
+                <Tooltip
+                  title={<ModInfo stats={stats} formData={formData} withBy />}
+                >
+                  <IconButton color="inherit">
+                    <AccessTime />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <ModInfo stats={stats} formData={formData} />
+              ))}
+          </Show>
           <Grid2
             sx={{
               textAlign: 'right',
@@ -125,42 +160,54 @@ const Footer = ({
             }}
             size="grow"
           >
-            {id && deleteMutation && (
-              <LoadingButton
-                sx={{ whiteSpace: 'nowrap' }}
-                variant="outlined"
-                color="inherit"
-                size="medium"
-                onClick={() => confirmDelete(deleteOptions)}
+            {preButtons.map((propsMethod, index) => (
+              <FooterButton key={index} {...propsMethod()} />
+            ))}
+            <Show when={id && deleteMutation && !disableDelete}>
+              <FooterButton
                 disabled={disabled}
                 loading={loadingDelete}
+                onClick={() => confirmDelete(deleteOptions)}
+                variant="outlined"
+                color="inherit"
               >
                 Delete {label}
-              </LoadingButton>
-            )}
-            <Tooltip
-              title={
-                !allowSave &&
-                !loadingUpdate &&
-                !loadingCreate &&
-                'There are no changes to be saved'
-              }
-              placement="top"
-            >
-              <Box>
-                <LoadingButton
-                  sx={{ whiteSpace: 'nowrap' }}
-                  type="submit"
-                  variant="contained"
-                  color="secondary"
-                  size="medium"
-                  disabled={disabled || !allowSave}
-                  loading={loadingUpdate || loadingCreate}
-                >
-                  Save {label}
-                </LoadingButton>
-              </Box>
-            </Tooltip>
+              </FooterButton>
+            </Show>
+            <Show when={!disableSave}>
+              <FooterButton
+                disabled={disabled || !allowSave}
+                loading={loadingUpdate || loadingCreate}
+                tooltip={
+                  !allowSave &&
+                  !loadingUpdate &&
+                  !loadingCreate &&
+                  'There are no changes to be saved'
+                }
+                type="submit"
+              >
+                Save {label}
+              </FooterButton>
+            </Show>
+            {postButtons.map((propsMethod, index) => (
+              <FooterButton
+                key={index}
+                {...propsMethod({
+                  id,
+                  disabled,
+                  allowSave,
+                  loadingUpdate,
+                  loadingCreate,
+                  loadingDelete,
+                  formData,
+                  smallLayout,
+                  stats,
+                  deleteMutation,
+                  confirmDelete,
+                  deleteOptions,
+                })}
+              />
+            ))}
           </Grid2>
           {children}
         </Stack>
@@ -179,5 +226,4 @@ const Footer = ({
     </Box>
   )
 }
-
 export default Footer

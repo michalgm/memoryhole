@@ -4,6 +4,7 @@ import MainLayout from 'src/layouts/MainLayout/MainLayout'
 import ModelLayout from 'src/layouts/ModelLayout/ModelLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout/ScaffoldLayout'
 import * as _fragments from 'src/lib/gql_fragments'
+import CompareArrestPage from 'src/pages/Arrest/CompareArrestPage/CompareArrestPage'
 import LoginPage from 'src/pages/LoginPage/LoginPage'
 
 import { useAuth } from './auth'
@@ -73,6 +74,8 @@ const Routes = () => {
             <Route path="/arrests/{id:Int}" page={ArrestArrestPage} name="arrest" />
             <Route path="/arrests" page={ArrestArrestsPage} name="arrests" />
             <Route path="/" redirect="arrests" name="home" />
+            <Route path="/arrests/{id:Int}/compare" page={CompareArrestPage} name="compareArrestPick" />
+            <Route path="/arrests/{id:Int}/compare/{compareId:Int}" page={CompareArrestPage} name="compareArrest" />
           </Set>
           <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
             <Route path="/actions" page={ActionActionsPage} name="actions" />
