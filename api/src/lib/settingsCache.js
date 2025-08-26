@@ -12,4 +12,4 @@ export const updateSettingsCache = async (client) => {
   })
   // console.log(settingsCache)
 }
-export const getSetting = (key) => settingsCache?.[key]
+export const getSetting = (key) => settingsCache?.[key] ?? {}
