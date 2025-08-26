@@ -164,7 +164,7 @@ const CompareForm = ({
             <KeyboardDoubleArrowLeft />
           </IconButton>
           button to replace values in the left column with those from the right.
-          For multi-line text fields, the value will be appended
+          For multi-line text fields, the value will be appended.
           <br />
           <FormControlLabel
             control={
