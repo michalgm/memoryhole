@@ -76,6 +76,7 @@ export const createUser = async ({ input }) => {
   return await validateUniqueness(
     'user',
     { email: input.email },
+    { db },
     async (db) => {
       const user = await db.user.create({
         data,
@@ -148,6 +149,7 @@ export const updateUser = async ({ id, input }) => {
   if (input.email) {
     return validateUniqueness(
       'user',
+      { db },
       { email: input.email, $self: { id } },
       doUserUpdate
     )

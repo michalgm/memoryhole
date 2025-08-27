@@ -14,6 +14,9 @@ import { logger } from './logger'
  */
 const prismaClient = new PrismaClient({
   log: emitLogLevels(['info', 'warn', 'error']),
+  transactionOptions: {
+    timeout: 15000,
+  },
 })
 
 handlePrismaLogging({
