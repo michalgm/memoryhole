@@ -279,7 +279,7 @@ const DataTable = ({
   data: inputData = [],
   schema = {},
   displayColumns = [],
-  tableProps = {},
+  tableProps = { initialState: {} },
   refetch,
   disableDownload,
   preColumns = [],
@@ -307,8 +307,11 @@ const DataTable = ({
 
   const reload = async () => {
     setReloading(true)
+    try {
     await refetch()
+    } finally {
     setReloading(false)
+    }
   }
 
   const columns = [
