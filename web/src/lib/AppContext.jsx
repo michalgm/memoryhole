@@ -1,8 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import { useMediaQuery } from '@mui/material'
-
-import { useParams } from '@redwoodjs/router'
 
 export const RIGHT_DRAWER_WIDTH = 450
 export const LEFT_DRAWER_WIDTH = 150
@@ -20,21 +25,18 @@ const AppProvider = ({ children }) => {
     return stored ? JSON.parse(stored) : defaultAction
   })
   const [userPreferences, setUserPreferences] = useState({})
-  const [pageTitle, setPageTitle] = useState('')
+  const [pageTitle, setPageTitle] = useState({})
   const [navOpen, setNavOpen] = useState(!smallScreen)
   const [logsOpen, setLogsOpen] = useState(false)
   const [currentFormData, setCurrentFormData] = useState({})
-  const { id } = useParams() // Get the current location
 
   useEffect(() => {
     localStorage.setItem('currentAction', JSON.stringify(currentAction))
   }, [currentAction])
 
-  useEffect(() => {
-    if (!id) {
-      setPageTitle('')
-    }
-  }, [id])
+  const updatePageTitle = useCallback((update) => {
+    setPageTitle((prev) => ({ ...prev, ...update }))
+  }, [])
 
   const value = {
     currentAction,
@@ -42,7 +44,7 @@ const AppProvider = ({ children }) => {
     userPreferences,
     setUserPreferences,
     pageTitle,
-    setPageTitle,
+    setPageTitle: updatePageTitle,
     navOpen,
     setNavOpen,
     logsOpen,
