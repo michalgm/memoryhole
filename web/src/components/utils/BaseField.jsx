@@ -55,8 +55,8 @@ export const formatLabel = (label) => {
 const transformOptions = (options) => {
   if (!options) return null
   return options.map((option) => {
-    if (typeof option === 'string') {
-      return { id: option, label: formatLabel(option) }
+    if (typeof option === 'string' || typeof option === 'number') {
+      return { id: option, label: formatLabel(`${option}`) }
     }
     return option
   })
@@ -310,24 +310,34 @@ export const BaseField = ({
 
   const renderCheckbox = () => {
     const Component = isRHF ? CheckboxElement : Checkbox
-    return (
+    const labelProps = { color, sx: { userSelect: 'none' } }
+    if (isRHF) {
+      props.helperText = helperText
+      props.labelProps = labelProps
+    }
+    const checkBox = (
       <Component
         name={`${name}`}
         label={props.label}
-        labelProps={{ color, sx: { userSelect: 'none' } }}
         onChange={onChange}
         color={color}
-        helperText={helperText}
         required={props.required}
+        {...props}
       />
     )
-    // return <FormGroup>
-    //   <FormControlLabel
-    //     control={
-    //     }
-    //     label={props.label}
-    //   />
-    // </FormGroup>
+    if (isRHF) {
+      return checkBox
+    }
+    return (
+      <FormGroup>
+        <FormControlLabel
+          control={checkBox}
+          label={props.label}
+          {...labelProps}
+        />
+        <FormHelperText>{helperText}</FormHelperText>
+      </FormGroup>
+    )
   }
 
   const checkBoxImageUrl = convertSvgToDataUrl(Check)
