@@ -7,11 +7,11 @@ const minScore = 10
 
 /** weights should sum to ~100 for readability (we’ll normalize anyway) */
 const weights = {
-  name: 30,          // combines first/preferred + strong last-name component internally
+  name: 25,          // combines first/preferred + strong last-name component internally
   dob: 40,
-  email: 10,
-  phone: 10,
-  date_proximity: 10
+  email: 8,
+  phone: 8,
+  date_proximity: 9
 }
 
 const defaultMaxArrestDateDifferenceSeconds = 60 * 60 * 12 // 12h
@@ -255,8 +255,8 @@ ORDER BY final_score DESC
     const arrest2 = byId.get(r.arrest2_id)
     if (arrest1 && arrest2) {
       acc.push({
-        arrest1Id: r.arrest1_id,
-        arrest2Id: r.arrest2_id,
+        arrest1_id: r.arrest1_id,
+        arrest2_id: r.arrest2_id,
         matchScore: r.final_score,
         nameScore: r.name_score,
         dobScore: r.dob_score,
