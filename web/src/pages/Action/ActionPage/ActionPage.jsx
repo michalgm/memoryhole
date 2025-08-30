@@ -60,7 +60,7 @@ const ActionPage = ({ id }) => {
   const onFetch = useCallback(
     (action) => {
       if (action?.name) {
-        setPageTitle(action?.name)
+        setPageTitle({ action: action?.name })
       }
       return action
     },

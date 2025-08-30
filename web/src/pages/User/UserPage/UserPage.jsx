@@ -1,9 +1,11 @@
-import { Box, Typography } from '@mui/material'
-import { navigate, routes } from '@redwoodjs/router'
-import { startCase, upperCase } from 'lodash-es'
 import { useCallback, useMemo } from 'react'
 
+import { Box, Typography } from '@mui/material'
 import dayjs from 'dayjs'
+import { startCase, upperCase } from 'lodash-es'
+
+import { navigate, routes } from '@redwoodjs/router'
+
 import { useAuth } from 'src/auth'
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
@@ -148,7 +150,7 @@ const UserPage = ({ id }) => {
 
   const onFetch = useCallback(
     (user) => {
-      setPageTitle(isCreate ? 'New User' : user?.name)
+      setPageTitle({ user: user?.name })
       if (isCreate) {
         user.role = 'Operator'
         applyDefaultsToUser(user.role, user)
