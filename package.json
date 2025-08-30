@@ -28,6 +28,11 @@
   "eslintConfig": {
     "extends": "@redwoodjs/eslint-config",
     "root": true,
+    "ignorePatterns": [
+      "node_modules",
+      "dist",
+      "generated.ts"
+    ],
     "rules": {
       "camelcase": "off"
     }
