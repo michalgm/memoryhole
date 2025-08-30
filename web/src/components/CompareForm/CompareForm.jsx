@@ -17,11 +17,12 @@ import dayjs from 'dayjs'
 import { get, isEqual, isObject } from 'lodash-es'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
-import { Link } from '@redwoodjs/router'
+import { Link, routes, useParams } from '@redwoodjs/router'
 
 import { Field } from 'src/components/utils/Field'
 import { ModInfo } from 'src/components/utils/Footer'
 import FormSection from 'src/components/utils/FormSection'
+import TextLink from 'src/components/utils/Link'
 import Show from 'src/components/utils/Show'
 import { transformData } from 'src/lib/transforms'
 
@@ -40,7 +41,11 @@ const compareObjects = (obj1, obj2, path = '', diffs = new Set()) => {
     const value1 = obj1[key]
     const value2 = obj2[key]
 
-    if (isObject(value1) || isObject(value2)) {
+    if (dayjs.isDayjs(value1) || dayjs.isDayjs(value2)) {
+      if (!value1 || !value1?.isSame(value2)) {
+        diffs.add(currentPath)
+      }
+    } else if (isObject(value1) || isObject(value2)) {
       diffs = compareObjects(value1, value2, currentPath, diffs)
     } else if (!isEqual(value1, value2)) {
       diffs.add(currentPath)
@@ -86,10 +91,14 @@ const CompareFormSection = ({
   )
 }
 
-function DataCard({ title, subtitle, data, stats }) {
+function DataCard({ title, subtitle, data, stats, route, id }) {
   return (
     <Paper sx={{ p: 2 }}>
-      <Typography variant="h5">{title}</Typography>
+      <Typography variant="h5">
+        <TextLink to={routes[route]({ id })} target="_blank">
+          {title}
+        </TextLink>
+      </Typography>
       <Typography color="GrayText" variant="subtitle2">
         {subtitle}
       </Typography>
@@ -115,6 +124,7 @@ const CompareForm = ({
     formState: { defaultValues },
   } = formManagerContext
 
+  const { id, compareId } = useParams()
   const compareFormMethods = useForm({})
 
   useEffect(() => {
@@ -182,6 +192,8 @@ const CompareForm = ({
             subtitle={`${defaultValues?.date?.format('L LT')} - ${defaultValues.arrest_city}`}
             data={formData}
             stats={stats}
+            route="arrest"
+            id={id}
           />
           <Tooltip title="Swap comparison">
             <Link to={`/arrests/${inputData?.id}/compare/${formData?.id}`}>
@@ -195,6 +207,8 @@ const CompareForm = ({
             subtitle={`${compareStats?.date ? compareStats.date.format('L LT') : ''} - ${inputData?.arrest_city}`}
             data={inputData}
             stats={compareStats}
+            route="arrest"
+            id={compareId}
           />
         </Stack>
       </Stack>
