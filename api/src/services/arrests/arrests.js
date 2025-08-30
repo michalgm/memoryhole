@@ -8,6 +8,10 @@ import { prepareJsonUpdate } from 'src/lib/utils'
 import dayjs from '../../lib/day'
 import { updateDisplayField as updateArresteeDisplayField } from '../arrestees/arrestees'
 
+import * as duplicateArrests from './duplicateArrests'
+
+export { duplicateArrests }
+
 export const checkArrestAccess = (arrest) => {
   const settings = getSetting('restriction_settings')
   const {
@@ -115,7 +119,7 @@ export const filterArrestAccess = (baseWhere = {}) => {
   return where
 }
 
-export const arrests = ({ where = {} }) => {
+export const arrests = ({ where = {} } = {}) => {
   return db.arrest.findMany({
     where: filterArrestAccess(where),
   })
@@ -250,8 +254,8 @@ export const docketSheetSearch = async ({
     }
     // FIXME - this is a temporary fix to filter by next court date - prisma doesn't support date filters on JSON fields. Need to blow up the whole nested-JSON design and move to something like an EAV approach
     if (custom_fields.next_court_date) {
-      const court_date = new Date(custom_fields.next_court_date)
-      return court_date >= date && court_date < dateLimit
+      const court_date = dayjs(new Date(custom_fields.next_court_date))
+      return court_date >= date && court_date < dayjs(dateLimit)
     }
   })
 }
@@ -296,7 +300,7 @@ const validateAndPrepareData = (
           custom: {
             with: () => {
               if (
-                arrest.custom_fields.next_court_date &&
+                arrest?.custom_fields?.next_court_date &&
                 !dayjs(arrest.custom_fields.next_court_date).isValid()
               ) {
                 throw new Error('Invalid date')

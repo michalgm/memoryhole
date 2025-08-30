@@ -4,6 +4,7 @@ import MainLayout from 'src/layouts/MainLayout/MainLayout'
 import ModelLayout from 'src/layouts/ModelLayout/ModelLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout/ScaffoldLayout'
 import * as _fragments from 'src/lib/gql_fragments'
+import ArrestDuplicatesPage from 'src/pages/Arrest/ArrestDuplicatesPage/ArrestDuplicatesPage'
 import CompareArrestPage from 'src/pages/Arrest/CompareArrestPage/CompareArrestPage'
 import LoginPage from 'src/pages/LoginPage/LoginPage'
 
@@ -44,24 +45,24 @@ const Routes = () => {
             <Set wrap={ModelLayout} title="Edit Site Help">
               <Route path="/admin/edit-help" page={EditHelpPage} name="editHelp" />
             </Set>
-            <Set wrap={ModelLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
+            <Set wrap={ModelLayout} title="Users" titleTo="users" buttonTo="newUser">
               <Route path="/admin/users/new" page={UserUserPage} name="newUser" />
               <Route path="/admin/users/{id:Int}" page={UserUserPage} name="user" />
               <Route path="/admin/users" page={UserUsersPage} name="users" />
             </Set>
-            <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
+            <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonTo="newAction">
               <Route path="/admin/actions/new" page={ActionActionPage} name="newAdminAction" />
               <Route path="/admin/actions/{id:Int}" page={ActionActionPage} name="AdminAction" />
               <Route path="/admin/actions" page={ActionActionsPage} name="AdminActions" />
             </Set>
             <Set>
-              <Set wrap={ScaffoldLayout} title="TableViews" titleTo="tableViews" buttonLabel="New TableView" buttonTo="newTableView">
+              <Set wrap={ScaffoldLayout} title="TableViews" titleTo="tableViews" buttonTo="newTableView">
                 <Route path="/table-views/new" page={TableViewNewTableViewPage} name="newTableView" />
                 <Route path="/table-views/{id:Int}/edit" page={TableViewEditTableViewPage} name="editTableView" />
                 <Route path="/table-views/{id:Int}" page={TableViewTableViewPage} name="tableView" />
                 <Route path="/table-views" page={TableViewTableViewsPage} name="tableViews" />
               </Set>
-              <Set wrap={ScaffoldLayout} title="CustomSchemata" titleTo="customSchemata" buttonLabel="New CustomSchema" buttonTo="newCustomSchema">
+              <Set wrap={ScaffoldLayout} title="CustomSchemata" titleTo="customSchemata" buttonTo="newCustomSchema">
                 <Route path="/admin/custom-schemata/new" page={CustomSchemaNewCustomSchemaPage} name="newCustomSchema" />
                 <Route path="/admin/custom-schemata/{id:Int}/edit" page={CustomSchemaEditCustomSchemaPage} name="editCustomSchema" />
                 <Route path="/admin/custom-schemata/{id:Int}" page={CustomSchemaCustomSchemaPage} name="customSchema" />
@@ -69,20 +70,21 @@ const Routes = () => {
               </Set>
             </Set>
           </PrivateSet>
-          <Set wrap={ModelLayout} title="Arrests" titleTo="arrests" buttonLabel="New Arrest" buttonTo="newArrest">
+          <Set wrap={ModelLayout} title="Arrests" titleTo="arrests" buttonTo="newArrest">
             <Route path="/arrests/new" page={ArrestArrestPage} name="newArrest" />
             <Route path="/arrests/{id:Int}" page={ArrestArrestPage} name="arrest" />
             <Route path="/arrests" page={ArrestArrestsPage} name="arrests" />
             <Route path="/" redirect="arrests" name="home" />
-            <Route path="/arrests/{id:Int}/compare" page={CompareArrestPage} name="compareArrestPick" />
             <Route path="/arrests/{id:Int}/compare/{compareId:Int}" page={CompareArrestPage} name="compareArrest" />
+            <Route path="/arrests/duplicates" page={ArrestDuplicatesPage} name="findDuplicateArrests" />
+            <Route path="/arrests/duplicates/{id:Int}/compare/{compareId:Int}" page={CompareArrestPage} name="findDuplicateArrestsCompare" />
           </Set>
-          <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonLabel="New Action" buttonTo="newAction">
+          <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonTo="newAction">
             <Route path="/actions" page={ActionActionsPage} name="actions" />
             <Route path="/actions/new" page={ActionActionPage} name="newAction" />
             <Route path="/actions/{id:Int}" page={ActionActionPage} name="action" />
           </Set>
-          <Set wrap={ModelLayout} title="Logs" titleTo="logs" buttonLabel="New Log" buttonTo="logs" buttonParams={{ new: true }}>
+          <Set wrap={ModelLayout} title="Logs" titleTo="logs" buttonTo="logs" buttonParams={{ new: true }} buttonLabel="New Log">
             <Route path="/logs" page={LogLogsPage} name="logs" />
           </Set>
           <Route path="/docs" page={DocumentationPage} name="docsHome" />

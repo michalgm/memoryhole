@@ -1,12 +1,13 @@
 // import ArrestsCell from 'src/components/ArrestsCell/ArrestsCell'
 import { useState } from 'react'
 
-import { Grid2, Typography } from '@mui/material'
+import { Button, Grid2, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import dayjs from 'dayjs'
 import { useConfirm } from 'material-ui-confirm'
+import { createPortal } from 'react-dom'
 
-import { routes } from '@redwoodjs/router'
+import { navigate, routes } from '@redwoodjs/router'
 import { useMutation, useQuery } from '@redwoodjs/web'
 
 import DataTable from 'src/components/DataTable/DataTable'
@@ -90,6 +91,23 @@ const ArrestsPage = () => {
   const { openSnackbar } = useSnackbar()
 
   const displayError = useDisplayError()
+
+  const headerActionsDiv = document.getElementById(
+    'modal_layout_header_actions'
+  )
+
+  const findDuplicateButton = headerActionsDiv
+    ? createPortal(
+        <Button
+          variant="outlined"
+          size="medium"
+          onClick={() => navigate(routes.findDuplicateArrests())}
+        >
+          Find Duplicate Arrests
+        </Button>,
+        headerActionsDiv
+      )
+    : null
 
   const confirm = useConfirm()
   const {
@@ -185,6 +203,7 @@ const ArrestsPage = () => {
           }
         />
       </Stack>
+      {findDuplicateButton}
       <BulkUpdateModal
         bulkUpdateRows={bulkUpdateRows}
         setBulkUpdateRows={setBulkUpdateRows}

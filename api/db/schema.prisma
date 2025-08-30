@@ -54,6 +54,9 @@ model Arrestee {
   updated_by     User?     @relation("ModifiedArrestee", fields: [updated_by_id], references: [id])
 
   @@index([search_field])
+  @@index([last_name])
+  @@index([first_name])
+  @@index([preferred_name])
 }
 
 model CustomSchema {
@@ -102,37 +105,41 @@ model Log {
 // }
 
 model Arrest {
-  id              Int       @id @default(autoincrement())
-  display_field   String?
-  search_field    String?
-  date            DateTime?
-  location        String?
-  charges         String?
-  arrest_city     String?
-  jurisdiction    String?
-  citation_number String?
-  arrestee_id     Int?
-  custom_fields   Json?
-  created_at      DateTime? @default(now())
-  created_by_id   Int?
-  updated_at      DateTime? @updatedAt
-  updated_by_id   Int?
-  arrestee        Arrestee? @relation(fields: [arrestee_id], references: [id], onDelete: Cascade)
-  created_by      User?     @relation("CreatedArrest", fields: [created_by_id], references: [id])
-  updated_by      User?     @relation("ModifiedArrest", fields: [updated_by_id], references: [id])
-  action_id       Int?
-  action          Action?   @relation(fields: [action_id], references: [id])
-  logs            Log[]
+  id                 Int                      @id @default(autoincrement())
+  display_field      String?
+  search_field       String?
+  date               DateTime?
+  location           String?
+  charges            String?
+  arrest_city        String?
+  jurisdiction       String?
+  citation_number    String?
+  arrestee_id        Int?
+  custom_fields      Json?
+  created_at         DateTime?                @default(now())
+  created_by_id      Int?
+  updated_at         DateTime?                @updatedAt
+  updated_by_id      Int?
+  arrestee           Arrestee?                @relation(fields: [arrestee_id], references: [id], onDelete: Cascade)
+  created_by         User?                    @relation("CreatedArrest", fields: [created_by_id], references: [id])
+  updated_by         User?                    @relation("ModifiedArrest", fields: [updated_by_id], references: [id])
+  action_id          Int?
+  action             Action?                  @relation(fields: [action_id], references: [id])
+  logs               Log[]
+  ignoredDuplicates1 IgnoredDuplicateArrest[] @relation("IgnoredDuplicate1")
+  ignoredDuplicates2 IgnoredDuplicateArrest[] @relation("IgnoredDuplicate2")
 
   @@index([search_field])
+  @@index([date])
+  @@index([arrest_city])
 }
 
 model User {
-  id                     Int            @id @default(autoincrement())
-  email                  String         @unique
+  id                     Int                      @id @default(autoincrement())
+  email                  String                   @unique
   name                   String
   custom_fields          Json?
-  role                   String         @default("Operator")
+  role                   String                   @default("Operator")
   hashedPassword         String?
   salt                   String?
   expiresAt              DateTime?
@@ -142,18 +149,19 @@ model User {
   arrest_date_min        DateTime?
   arrest_date_max        DateTime?
   arrest_date_threshold  Int?
-  created_arrests        Arrest[]       @relation("CreatedArrest")
-  updated_arrests        Arrest[]       @relation("ModifiedArrest")
-  created_arrestees      Arrestee[]     @relation("CreatedArrestee")
-  updated_arrestees      Arrestee[]     @relation("ModifiedArrestee")
+  created_arrests        Arrest[]                 @relation("CreatedArrest")
+  updated_arrests        Arrest[]                 @relation("ModifiedArrest")
+  created_arrestees      Arrestee[]               @relation("CreatedArrestee")
+  updated_arrestees      Arrestee[]               @relation("ModifiedArrestee")
   updated_custom_schemas CustomSchema[]
   // created_hotline_logs   HotlineLog[]   @relation("CreatedHotlineLog")
   // updated_hotline_logs   HotlineLog[]   @relation("ModifiedHotlineLog")
-  created_logs           Log[]          @relation("CreatedLog")
-  updated_logs           Log[]          @relation("ModifiedLog")
-  created_table_views    TableView[]    @relation("CreatedTableView")
-  updated_table_views    TableView[]    @relation("ModifiedTableView")
-  updated_site_settings  SiteSetting[]  @relation("ModifiedSiteSetting")
+  created_logs           Log[]                    @relation("CreatedLog")
+  updated_logs           Log[]                    @relation("ModifiedLog")
+  created_table_views    TableView[]              @relation("CreatedTableView")
+  updated_table_views    TableView[]              @relation("ModifiedTableView")
+  updated_site_settings  SiteSetting[]            @relation("ModifiedSiteSetting")
+  ignoredDuplicates      IgnoredDuplicateArrest[]
 }
 
 model TableView {
@@ -189,4 +197,18 @@ model SiteSetting {
   updated_at    DateTime? @updatedAt
   updated_by    User?     @relation("ModifiedSiteSetting", fields: [updated_by_id], references: [id])
   updated_by_id Int?
+}
+
+model IgnoredDuplicateArrest {
+  id            Int      @id @default(autoincrement())
+  arrest1_id    Int
+  arrest2_id    Int
+  created_at    DateTime @default(now())
+  created_by_id Int
+
+  arrest1    Arrest @relation("IgnoredDuplicate1", fields: [arrest1_id], references: [id], onDelete: Cascade)
+  arrest2    Arrest @relation("IgnoredDuplicate2", fields: [arrest2_id], references: [id], onDelete: Cascade)
+  created_by User   @relation(fields: [created_by_id], references: [id])
+
+  @@unique([arrest1_id, arrest2_id])
 }

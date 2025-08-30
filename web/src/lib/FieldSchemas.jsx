@@ -167,6 +167,27 @@ const ArrestFields = [
   {
     title: 'Triage Issues',
     fields: [
+      // [
+      //   'arrestee.custom_fields.triage_issues',
+      //   {
+      //     field_type: 'checkbox_group',
+      //     options: [
+      //       'BIPOC',
+      //       'Trans/Non-Binary',
+      //       'Medical Needs',
+      //       'Houseless',
+      //       'Immigration Concerns',
+      //       'Legal History',
+      //       'Minor',
+      //       'Disability',
+      //       'Felony Charges',
+      //       'Violent/Targeted Arrest',
+      //     ],
+      //     span: 12,
+      //     row: true,
+      //     default: [],
+      //   },
+      // ],
       ['arrestee.custom_fields.bipoc', { field_type: 'checkbox' }],
       ['arrestee.custom_fields.trans/non-binary', { field_type: 'checkbox' }],
       ['arrestee.custom_fields.medical_needs', { field_type: 'checkbox' }],
@@ -393,13 +414,15 @@ const getSchema = (fields) => {
       const type = props.field_type || 'text'
       props.label = formatLabel(props.label || name)
       let [field, custom, table] = name.split('.').reverse()
-      if (!table) {
+      if (!table || !fieldTables[table]) {
         if (!custom) {
           fieldTables.arrest[field] = type
         } else if (custom == 'custom_fields') {
           fieldTables.arrest.custom_fields[field] = type
-        } else {
+        } else if (fieldTables[custom]) {
           fieldTables[custom][field] = type
+        } else {
+          fieldTables[name] = type
         }
       } else {
         fieldTables[table].custom_fields[field] = type
@@ -639,8 +662,49 @@ fieldSchema.siteSettings = {
 
 export default ArrestFields
 
+const arrestSchema = getSchema(ArrestFields)
+export const DuplicateArrestFields = [
+  {
+    fields: [
+      ['matchScore', { type: 'number', label: 'Match Score' }],
+      ['nameScore', { type: 'number', label: 'Name Score' }],
+      ['dobScore', { type: 'number', label: 'DOB Score' }],
+      ['emailScore', { type: 'number', label: 'Email Score' }],
+      ['phoneScore', { type: 'number', label: 'Phone Score' }],
+      ['dateProximityScore', { type: 'number', label: 'Date Proximity Score' }],
+      ['arrest1.date', { type: 'date-time', label: 'Arrest 1 Date' }],
+      ['arrest1.id', { type: 'number', label: 'Arrest 1 ID' }],
+      ['arrest1.arrest_city', { label: 'Arrest City' }],
+      ['arrest1.arrestee.display_field', { label: 'Arrest 1' }],
+      ['arrest2.date', { type: 'date-time', label: 'Arrest 2 Date' }],
+      ['arrest2.id', { type: 'number', label: 'Arrest 2 ID' }],
+      ['arrest2.arrestee.display_field', { label: 'Arrest 2' }],
+      ...Object.entries(arrestSchema).map(([key, { type, props }]) => [
+        `arrest1.${key}`,
+        {
+          type,
+          ...props,
+          label: `Arrest 1 ${formatLabel(props.label || key)}`,
+        },
+      ]),
+      ...Object.entries(arrestSchema).map(([key, { type, props }]) => [
+        `arrest2.${key}`,
+        {
+          type,
+          ...props,
+          label: `Arrest 2 ${formatLabel(props.label || key)}`,
+        },
+      ]),
+    ],
+  },
+]
+
 export const userSchema = sortObjectKeys(getSchema(UserFields), 'props.label')
 export const actionSchema = sortObjectKeys(
   getSchema(ActionFields),
+  'props.label'
+)
+export const duplicateArrestSchema = sortObjectKeys(
+  getSchema(DuplicateArrestFields),
   'props.label'
 )
