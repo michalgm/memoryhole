@@ -6,7 +6,7 @@ const Link = ({ to, ...rest }) => {
   if (!to && rest.href) {
     to = rest.href
   }
-  if (to?.startsWith('#')) {
+  if (to?.startsWith('#') || rest.target) {
     return <MUILink href={to} underline="hover" {...rest} />
   }
   return <MUILink component={RouterLink} to={to} underline="hover" {...rest} />
