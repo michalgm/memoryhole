@@ -1,7 +1,8 @@
 import { Add } from '@mui/icons-material'
 import { Box, Button, Stack, Tooltip } from '@mui/material'
+import { startCase } from 'lodash-es'
 
-import { navigate, routes, useLocation, useParams } from '@redwoodjs/router'
+import { navigate, routes, useRouteName } from '@redwoodjs/router'
 
 import Breadcrumbs from 'src/components/Breadcrumbs/Breadcrumbs'
 import ShortcutIndicator from 'src/components/utils/ShortcutIndicator'
@@ -9,14 +10,13 @@ import ShortcutIndicator from 'src/components/utils/ShortcutIndicator'
 const ModelLayout = ({
   title,
   titleTo,
-  buttonLabel,
   buttonTo,
   children,
+  buttonLabel,
   buttonParams = {},
 }) => {
-  const { id } = useParams()
-  const { pathname } = useLocation()
-  const isNew = pathname.endsWith('/new')
+  const routeName = useRouteName()
+  buttonLabel ??= startCase(buttonTo)
 
   return (
     <Stack
@@ -40,36 +40,34 @@ const ModelLayout = ({
           py: 1,
         }}
       >
-        <Breadcrumbs
-          title={title}
-          titleTo={titleTo}
-          buttonLabel={buttonLabel}
-        />
-        <div id="modal_layout_header_actions"></div>
-        {buttonLabel && buttonTo && !id && !isNew && (
-          <Tooltip
-            title={
-              buttonLabel === 'New Arrest' ? (
-                <>
-                  (<ShortcutIndicator combo="alt+a" /> to quickly create a new
-                  arrest)
-                </>
-              ) : (
-                ''
-              )
-            }
-          >
-            <Button
-              onClick={() => navigate(routes[buttonTo](buttonParams))}
-              variant="contained"
-              color="secondary"
-              startIcon={<Add />}
-              size="medium"
+        <Breadcrumbs title={title} titleTo={titleTo} />
+        <Stack direction="row" spacing={1}>
+          <div id="modal_layout_header_actions"></div>
+          {buttonTo && titleTo === routeName && (
+            <Tooltip
+              title={
+                buttonLabel === 'New Arrest' ? (
+                  <>
+                    (<ShortcutIndicator combo="alt+a" /> to quickly create a new
+                    arrest)
+                  </>
+                ) : (
+                  ''
+                )
+              }
             >
-              {buttonLabel}
-            </Button>
-          </Tooltip>
-        )}
+              <Button
+                onClick={() => navigate(routes[buttonTo](buttonParams))}
+                variant="contained"
+                color="secondary"
+                startIcon={<Add />}
+                size="medium"
+              >
+                {buttonLabel}
+              </Button>
+            </Tooltip>
+          )}
+        </Stack>
       </Box>
       <Box>{children}</Box>
     </Stack>
