@@ -136,6 +136,8 @@ const Autocomplete = ({
       />
     )
   }
+  delete props.matchId
+  textFieldProps.label = label
 
   return (
     <MUIAutocomplete
@@ -155,14 +157,7 @@ const Autocomplete = ({
             ),
           }
         }
-        return (
-          <TextField
-            {...params}
-            {...mergedProps}
-            error={props.error}
-            helperText={helperText}
-          />
-        )
+        return <TextField {...params} {...mergedProps} error={props.error} />
       }}
       {...autocompleteProps}
       {...props}
