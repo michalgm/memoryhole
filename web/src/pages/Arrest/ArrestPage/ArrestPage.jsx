@@ -5,7 +5,7 @@ import { Button, Tooltip } from '@mui/material'
 import { Stack } from '@mui/system'
 import { createPortal } from 'react-dom'
 
-import { navigate, routes, useLocation } from '@redwoodjs/router'
+import { navigate, routes, useLocation, useRouteName } from '@redwoodjs/router'
 
 import { BaseField } from 'src/components/utils/BaseField'
 import FormContainer from 'src/components/utils/FormContainer'
@@ -49,11 +49,11 @@ const CompareChooser = () => {
   const [showChooser, setShowChooser] = useState(pathname.includes('compare'))
 
   return (
-    <Stack direction={'row'} spacing={1} sx={{ mb: -10 }}>
+    <Stack direction={'row'} spacing={1}>
       <Tooltip title="Compare this arrest record to another">
         <Button
           variant="outlined"
-          size="small"
+          size="x-small"
           onClick={() => setShowChooser(!showChooser)}
         >
           <CompareArrows />
@@ -68,6 +68,8 @@ const CompareChooser = () => {
           textFieldProps={{
             label: 'Select arrest to compare',
             sx: { backgroundColor: 'background.paper' },
+            variant: 'standard',
+            size: 'x-small',
           }}
           onChange={({ id }) =>
             navigate(`${pathname.replace(/\/compare.+/, '')}/compare/${id}`)
@@ -103,9 +105,10 @@ const ACTION_TO_ARREST_FIELDS = {
 }
 
 const ArrestPage = ({ id, children, ...props }) => {
-  const { currentAction, setPageTitle } = useApp()
+  const { currentAction, setPageTitle, setCurrentFormData } = useApp()
+  const routeName = useRouteName()
   const isCreate = !id || id === 'new'
-  const { setCurrentFormData } = useApp()
+  const isDuplicateCompare = routeName === 'findDuplicateArrestsCompare'
 
   useEffect(() => {
     return () => setCurrentFormData({})
@@ -138,7 +141,7 @@ const ArrestPage = ({ id, children, ...props }) => {
 
   const onFetch = useCallback(
     (arrest) => {
-      setPageTitle(isCreate ? 'New Arrest' : arrest?.arrestee?.display_field)
+      setPageTitle({ arrest: arrest?.arrestee?.display_field })
       if (
         isCreate &&
         currentAction &&
@@ -187,7 +190,7 @@ const ArrestPage = ({ id, children, ...props }) => {
       >
         {children}
       </FormContainer>
-      {!isCreate && compareControlPortal}
+      {!isCreate && !isDuplicateCompare && compareControlPortal}
     </>
   )
 }
