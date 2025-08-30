@@ -77,7 +77,7 @@ const NavBarControls = ({
         name="action"
         color="inherit"
         field_type="action_chooser"
-        label="Action"
+        label=""
         value={currentAction}
         onChange={setCurrentAction}
         disableClearable
