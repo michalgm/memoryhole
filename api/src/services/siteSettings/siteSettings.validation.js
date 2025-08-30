@@ -15,7 +15,7 @@ const restrictionSchema = z
 
 const defaultRestrictionsSchema = z
   .object({
-    user: restrictionSchema,
+    operator: restrictionSchema,
     coordinator: restrictionSchema,
     admin: restrictionSchema,
   })
