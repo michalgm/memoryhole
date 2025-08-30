@@ -1,5 +1,4 @@
 // import { Link, routes } from '@redwoodjs/router'
-import { useEffect } from 'react'
 
 import { Divider, Grid2, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
@@ -9,7 +8,6 @@ import { Field } from 'src/components/utils/Field'
 import Footer from 'src/components/utils/Footer'
 import FormSection from 'src/components/utils/FormSection'
 import Show from 'src/components/utils/Show'
-import { useApp } from 'src/lib/AppContext'
 import { transformSettings } from 'src/lib/useSiteSettings'
 
 const QUERY_SETTINGS = gql`
@@ -129,12 +127,6 @@ const SettingsRow = ({ title, description, children }) => {
 }
 
 const SettingsPage = () => {
-  const { setPageTitle } = useApp()
-
-  useEffect(() => {
-    setPageTitle('Edit Settings')
-  }, [setPageTitle])
-
   return (
     <BaseForm
       formConfig={{
@@ -188,7 +180,7 @@ const SettingsPage = () => {
                   <Divider />
                 </Grid2>
                 <SettingsRow>
-                  <Typography variant="h6">User</Typography>
+                  <Typography variant="h6">Operator</Typography>
                   <Typography variant="h6">Coordinator</Typography>
                   <Typography variant="h6">Admin</Typography>
                 </SettingsRow>
@@ -205,7 +197,7 @@ const SettingsPage = () => {
                       title={setting.label}
                       description={setting.description}
                     >
-                      {['user', 'coordinator', 'admin'].map((role) => (
+                      {['operator', 'coordinator', 'admin'].map((role) => (
                         <DaysInputField
                           key={`${role}-${setting.name}`}
                           name={`default_restrictions.${role}.${setting.name}`}

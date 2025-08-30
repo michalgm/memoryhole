@@ -33,12 +33,12 @@ describe('siteSettings', () => {
     const result = await createSiteSetting({
       input: {
         id: 'default_restrictions',
-        value: { user: {}, coordinator: {}, admin: {} },
+        value: { operator: {}, coordinator: {}, admin: {} },
       },
     })
 
     expect(result.id).toEqual('default_restrictions')
-    expect(result.value).toEqual({ user: {}, coordinator: {}, admin: {} })
+    expect(result.value).toEqual({ operator: {}, coordinator: {}, admin: {} })
   })
 
   scenario('updates a siteSetting', async (scenario) => {
