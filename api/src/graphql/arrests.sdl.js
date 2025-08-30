@@ -70,6 +70,13 @@ export const schema = gql`
       report_type: String!
       include_contact: Boolean
     ): [Arrest]! @requireAuth
+
+    duplicateArrests(
+      strictCityMatch: Boolean,
+      strictDOBMatch: Boolean,
+      includeIgnored: Boolean,
+      maxArrestDateDifferenceSeconds: Int,
+    ): [duplicateArrest!]! @requireAuth
   }
 
   "Creates a new arrest and arrestee"
