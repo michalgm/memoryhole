@@ -107,7 +107,7 @@ export function useFormManager({
     createMutation || mockMutation,
     {
       onCompleted: async (result) => {
-        openSnackbar(`${modelType} "${display_name}" created`)
+        openSnackbar(`${modelType} created`)
         const data = await resetForm(result)
         onCreate && (await onCreate(data))
       },
