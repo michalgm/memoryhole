@@ -104,7 +104,12 @@ function DataCard({ title, subtitle, data, stats, route, id }) {
         {subtitle}
       </Typography>
       <Divider sx={{ my: 1 }} />
-      <ModInfo stats={stats} formData={data} />
+      <ModInfo
+        stats={stats}
+        formData={data}
+        sx={{ flexWrap: 'wrap' }}
+        useFlexGap
+      />
     </Paper>
   )
 }
@@ -210,7 +215,12 @@ const CompareForm = ({
             </Button>
           </Tooltip>
         </Paper>
-        <Stack direction={'row'} spacing={2} alignItems="center">
+        <Stack
+          direction={'row'}
+          spacing={2}
+          alignItems="center"
+          sx={{ justifyContent: 'space-between' }}
+        >
           <DataCard
             title={formData?.arrestee?.search_display_field}
             subtitle={`${defaultValues?.date?.format('L LT')} - ${defaultValues.arrest_city}`}
