@@ -68,10 +68,16 @@ export const Success = ({ users, queryResult: { refetch } }) => {
     },
   ]
 
+  const actions = Array.from(
+    new Set(
+      users.map((user) => user.actions.map((action) => action.name)).flat()
+    )
+  )
   const customFields = {
     actions: {
       type: 'array',
       label: 'Actions',
+      filterSelectOptions: actions,
     },
   }
 
