@@ -3632,9 +3632,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/typescript-resolvers@npm:^4.5.1":
-  version: 4.5.1
-  resolution: "@graphql-codegen/typescript-resolvers@npm:4.5.1"
+"@graphql-codegen/typescript-resolvers@npm:^4.5.2":
+  version: 4.5.2
+  resolution: "@graphql-codegen/typescript-resolvers@npm:4.5.2"
   dependencies:
     "@graphql-codegen/plugin-helpers": "npm:^5.1.0"
     "@graphql-codegen/typescript": "npm:^4.1.6"
@@ -3648,7 +3648,7 @@ __metadata:
   peerDependenciesMeta:
     graphql-sock:
       optional: true
-  checksum: 10c0/40b56f9ef25d1cde868567131e1ff3dcdc6d707acf9ec547d445eea200465b98c28e44cb3f3cc6a963feb38451c99ed028ed8b828b170b640aec675fba19257b
+  checksum: 10c0/46d65a5f65604ac68a102697a38fb2ba1eb7f7b643b73ff4ca93fffe86416b643d65bc552e252912a11cfac9b49a85ce47c5a27a837c537bbb722937adffe15f
   languageName: node
   linkType: hard
 
@@ -10513,13 +10513,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:18.3.23":
-  version: 18.3.23
-  resolution: "@types/react@npm:18.3.23"
+"@types/react@npm:18.3.24":
+  version: 18.3.24
+  resolution: "@types/react@npm:18.3.24"
   dependencies:
     "@types/prop-types": "npm:*"
     csstype: "npm:^3.0.2"
-  checksum: 10c0/49331800b76572eb2992a5c44801dbf8c612a5f99c8f4e4200f06c7de6f3a6e9455c661784a6c5469df96fa45622cb4a9d0982c44e6a0d5719be5f2ef1f545ed
+  checksum: 10c0/9e188fa8e50f172cf647fc48fea2e04d88602afff47190b697de281a8ac88df9ee059864757a2a438ff599eaf9276d9a9e0e60585e88f7d57f01a2e4877d37ec
   languageName: node
   linkType: hard
 
@@ -11445,7 +11445,7 @@ __metadata:
     "@redwoodjs/api-server": "npm:8.8.1"
     "@redwoodjs/auth-dbauth-api": "npm:8.8.1"
     "@redwoodjs/graphql-server": "npm:8.8.1"
-    dayjs: "npm:^1.11.13"
+    dayjs: "npm:^1.11.18"
     nodemailer: "npm:^6.10.1"
     zod: "npm:^3.25.76"
   languageName: unknown
@@ -14373,7 +14373,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.13, dayjs@npm:~1.11.5":
+"dayjs@npm:^1.11.18":
+  version: 1.11.18
+  resolution: "dayjs@npm:1.11.18"
+  checksum: 10c0/83b67f5d977e2634edf4f5abdd91d9041a696943143638063016915d2cd8c7e57e0751e40379a07ebca8be7a48dd380bef8752d22a63670f2d15970e34f96d7a
+  languageName: node
+  linkType: hard
+
+"dayjs@npm:~1.11.5":
   version: 1.11.13
   resolution: "dayjs@npm:1.11.13"
   checksum: 10c0/a3caf6ac8363c7dade9d1ee797848ddcf25c1ace68d9fe8678ecf8ba0675825430de5d793672ec87b24a69bf04a1544b176547b2539982275d5542a7955f35b7
@@ -21325,7 +21332,7 @@ __metadata:
   dependencies:
     "@graphql-codegen/cli": "npm:^5.0.7"
     "@graphql-codegen/typescript": "npm:^4.1.6"
-    "@graphql-codegen/typescript-resolvers": "npm:^4.5.1"
+    "@graphql-codegen/typescript-resolvers": "npm:^4.5.2"
     "@redwoodjs/cli-data-migrate": "npm:8.8.1"
     "@redwoodjs/cli-storybook-vite": "npm:8.8.1"
     "@redwoodjs/core": "npm:8.8.1"
@@ -22042,9 +22049,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mui-tiptap@npm:^1.23.0":
-  version: 1.23.0
-  resolution: "mui-tiptap@npm:1.23.0"
+"mui-tiptap@npm:^1.23.1":
+  version: 1.23.1
+  resolution: "mui-tiptap@npm:1.23.1"
   dependencies:
     encodeurl: "npm:^2.0.0"
     lodash: "npm:^4.17.21"
@@ -22063,7 +22070,7 @@ __metadata:
     "@tiptap/react": ^2.0.0-beta.210 || ^3.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/c47dd250d847a577db0cef7b586103b5212e6d98132c2d17ecdacd5e677d4b99a7acb699e30118251be82442a0845aa47259b18990ff7e8366d978be1e40dffd
+  checksum: 10c0/713b3cfafeacf2be0e78428595576d23c9d82ddfdaf7fd9917e7a26b199ef94b655b237e82cb14c4ddf829f41cd010b92b0bd1d2aa48f0c23faf3ff56e6d66f6
   languageName: node
   linkType: hard
 
@@ -28954,11 +28961,11 @@ __metadata:
     "@tiptap/pm": "npm:^2.26.1"
     "@tiptap/react": "npm:^2.26.1"
     "@tiptap/starter-kit": "npm:^2.26.1"
-    "@types/react": "npm:18.3.23"
+    "@types/react": "npm:18.3.24"
     "@types/react-dom": "npm:18.3.7"
     babel-plugin-transform-imports: "npm:^2.0.0"
     babel-plugin-transform-vite-meta-env: "npm:^1.0.3"
-    dayjs: "npm:^1.11.13"
+    dayjs: "npm:^1.11.18"
     export-to-csv: "npm:^1.4.0"
     humanize-string: "npm:2.1.0"
     is-hotkey: "npm:^0.2.0"
@@ -28967,7 +28974,7 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     material-react-table: "npm:^3.2.1"
     material-ui-confirm: "npm:^3.0.18"
-    mui-tiptap: "npm:^1.23.0"
+    mui-tiptap: "npm:^1.23.1"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
     react-hook-form: "npm:^7.62.0"
