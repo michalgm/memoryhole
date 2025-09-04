@@ -163,7 +163,7 @@ const Footer = ({
             {preButtons.map((propsMethod, index) => (
               <FooterButton key={index} {...propsMethod()} />
             ))}
-            <Show when={id && deleteMutation && !disableDelete}>
+            <Show when={(id && deleteMutation && !disableDelete) || false}>
               <FooterButton
                 disabled={disabled}
                 loading={loadingDelete}
