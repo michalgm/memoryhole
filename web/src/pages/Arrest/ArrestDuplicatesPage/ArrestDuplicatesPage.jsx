@@ -13,14 +13,13 @@ import {
   Popover,
   Typography,
 } from '@mui/material'
-import { Stack } from '@mui/system'
+import { Box, Stack } from '@mui/system'
 
-import { routes } from '@redwoodjs/router'
+import { navigate, routes } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
 
 import DataTable from 'src/components/DataTable/DataTable'
 import { BaseField } from 'src/components/utils/BaseField'
-import Link from 'src/components/utils/Link'
 import { duplicateArrestSchema } from 'src/lib/FieldSchemas'
 
 export const QUERY = gql`
@@ -84,46 +83,79 @@ const ArrestDuplicatesPage = () => {
   })
 
   const displayColumns = [
-    // 'matchScore',
-    'arrest1.arrestee.display_field',
-    'arrest2.arrestee.display_field',
-    'arrest1.arrest_city',
-    'arrest1.date',
-    'arrest2.date',
-    // 'nameScore',
-    // 'dobScore',
-    // 'emailScore',
-    // 'phoneScore',
-    // 'dateProximityScore',
+    'arrest.arrest_city',
+    'arrest.date',
+    'arrest.arrestee.dob',
+    'arrest.arrestee.phone_1',
+    'arrest.arrestee.email',
   ]
 
   const preColumns = [
     {
-      accessorKey: 'matchScore',
-      id: 'matchScore',
+      accessorKey: 'matchId',
+      id: 'matchId',
       header: 'Match Score',
-      Cell: ({ row, renderedCellValue }) => {
-        const [id, compareId] = row.id.split('-')
+      sortingFn: (rowA, rowB) => {
+        return rowA.original.matchScore - rowB.original.matchScore
+      },
+      PlaceholderCell: ({ row }) => (
+        <Box sx={{ ml: 4 }}>
+          {row?.original?.arrest?.arrestee?.display_field}
+        </Box>
+      ),
+      GroupedCell: ({ row }) => {
+        const [id, compareId] = row.original.matchId.split('-')
+
         return (
-          <Link
-            color="secondary"
-            to={routes.findDuplicateArrestsCompare({
-              id,
-              compareId,
-            })}
+          <Stack
+            sx={{ whiteSpace: 'nowrap' }}
+            direction="row"
+            alignItems="center"
+            justifyContent={'space-between'}
+            spacing={1}
           >
-            {renderedCellValue}
-          </Link>
+            <b>{row.original.matchScore}%</b>
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="x-small"
+              disableElevation
+              sx={{ ml: 1 }}
+              onClick={() => {
+                navigate(
+                  routes.findDuplicateArrestsCompare({
+                    id,
+                    compareId,
+                  })
+                )
+              }}
+            >
+              Compare Arrests
+            </Button>
+          </Stack>
         )
       },
     },
   ]
 
   const data =
-    responseData?.duplicateArrests.map((row) => ({
-      ...row,
-      id: `${row.arrest1.id}-${row.arrest2.id}`,
-    })) || []
+    responseData?.duplicateArrests.reduce(
+      (acc, { arrest1, arrest2, ...row }) => {
+        const id = `${arrest1.id}-${arrest2.id}`
+        acc.push({
+          ...row,
+          arrest: arrest1,
+          matchId: id,
+        })
+        acc.push({
+          ...row,
+          arrest: arrest2,
+          matchId: id,
+        })
+        return acc
+      },
+      []
+    ) || []
 
   const schema = duplicateArrestSchema
 
@@ -131,11 +163,32 @@ const ArrestDuplicatesPage = () => {
     enableColumnOrdering: true,
     enableColumnPinning: true,
     enableColumnFilterModes: true,
+    enableGrouping: true,
+    positionToolbarAlertBanner: 'none',
+    muiTableBodyProps: {
+      sx: (theme) => ({
+        backgroundColor: '#fff',
+        '& tr:nth-of-type(6n + 4), & tr:nth-of-type(6n + 5), & tr:nth-of-type(6n + 6)':
+          {
+            'td, td[data-pinned="true"]:before': {
+              backgroundColor: 'grey.100',
+              ...theme.applyStyles('dark', {
+                backgroundColor: 'background.paper',
+              }),
+            },
+          },
+      }),
+    },
     initialState: {
       showGlobalFilter: true,
-      sorting: [{ id: 'matchScore', desc: true }],
+      sorting: [{ id: 'matchId', desc: true }],
+      grouping: ['matchId'],
+      expanded: true,
+      columnVisibility: {
+        'mrt-row-expand': false,
+      },
       columnPinning: {
-        left: ['matchScore'],
+        left: ['matchId'],
       },
     },
   }
@@ -147,12 +200,6 @@ const ArrestDuplicatesPage = () => {
 
   return (
     <Stack spacing={2} direction="column">
-      {/* <Paper sx={{ p: 2 }}>
-        Compare the current record in the left column with the record values in
-        the right column. Use the button to replace values in the left column
-        with those from the right. For multi-line text fields, the value will be
-        appended.
-      </Paper> */}
       <DataTable
         data={data}
         schema={schema}
@@ -232,25 +279,8 @@ const ArrestDuplicatesPage = () => {
             </Popover>
           </Stack>,
         ]}
-        // bulkUpdate={bulkUpdate}
-        // bulkDelete={bulkDelete}
-        // manageViews
         loading={loading}
         type="duplicate_arrest"
-        // name="arrest"
-        // persistState
-        // footerNotes={
-        //   <Stack spacing={0} direction="column">
-        //     <Typography variant="caption">
-        //       If a preferred name is provided, the legal first name appears in
-        //       parentheses.
-        //     </Typography>
-        //     <Typography variant="caption">
-        //       * indicates the displayed name is the preferred name, and the
-        //       legal name is confidential.
-        //     </Typography>
-        //   </Stack>
-        // }
       />
       <Dialog
         open={0 || showHelp}
