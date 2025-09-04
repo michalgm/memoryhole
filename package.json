@@ -10,7 +10,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript": "^4.1.6",
-    "@graphql-codegen/typescript-resolvers": "^4.5.1",
+    "@graphql-codegen/typescript-resolvers": "^4.5.2",
     "@redwoodjs/cli-data-migrate": "8.8.1",
     "@redwoodjs/cli-storybook-vite": "8.8.1",
     "@redwoodjs/core": "8.8.1",
