@@ -140,20 +140,22 @@ export function useFormManager({
       const [values, data] = await processData(result)
       reset(values)
       // Create a Promise that resolves when formState.isDirty becomes false
-      const waitForReset = new Promise((resolve) => {
-        // if (!formState.isDirty) {
-        //   resolve()
-        // } else {
-        resetPromiseRef.current = resolve
-        // }
-      })
-      // Wait for next tick for form state to settle
       await new Promise((r) => setTimeout(r, 0))
-      // if (formState.isDirty) {
-      //   console.error('Form is still dirty after reset + tick')
-      // }
-      // Await the Promise
-      await waitForReset
+      if (formState.isDirty) {
+        const waitForReset = new Promise((resolve) => {
+          // if (!formState.isDirty) {
+          //   resolve()
+          // } else {
+          resetPromiseRef.current = resolve
+          // }
+        })
+        // Wait for next tick for form state to settle
+        // if (formState.isDirty) {
+        //   console.error('Form is still dirty after reset + tick')
+        // }
+        // Await the Promise
+        await waitForReset
+      }
       return data
     },
     [reset, processData] // eslint-disable-line react-hooks/exhaustive-deps
@@ -197,21 +199,15 @@ export function useFormManager({
     }
   }
 
-  const onSave = async (input) => {
+  const prepareUpdate = async ({ input = context.getValues() }) => {
     const { dirtyFields } = formState
 
-    if (!id && !createMutation) {
-      throw new Error('Create mutation not configured')
-    } else if (id && !updateMutation) {
-      throw new Error('Update mutation not configured')
-    }
-
-    if (!id && Object.keys(input).length === 0) {
+    if (!id && !skipDirtyCheck && Object.keys(input).length === 0) {
       displayError('No data to save')
       return
     }
     const changedFields = id ? getChangedFields(input, dirtyFields) : input
-    if (Object.keys(dirtyFields).length === 0) {
+    if (!skipDirtyCheck && Object.keys(dirtyFields).length === 0) {
       displayError('No changes to save')
       return
     }
@@ -236,11 +232,26 @@ export function useFormManager({
           return false
         }
       }
+    }
+    return { id, input: transformedInput }
+  }
+
+  const onSave = async (rawInput) => {
+    if (!id && !createMutation) {
+      throw new Error('Create mutation not configured')
+    } else if (id && !updateMutation) {
+      throw new Error('Update mutation not configured')
+    }
+    const { input } = (await prepareUpdate(rawInput)) || {}
+    if (!input) {
+      return false
+    }
+    if (id) {
       await updateEntity({
-        variables: { id: id, input: transformedInput },
+        variables: { id: id, input },
       })
     } else {
-      await createEntity({ variables: { input: transformedInput } })
+      await createEntity({ variables: { input } })
     }
     return true
   }
@@ -250,6 +261,8 @@ export function useFormManager({
     formState,
     formData,
     stats,
+    prepareUpdate,
+    resetForm,
     loadingDelete,
     loadingCreate,
     loadingUpdate,
