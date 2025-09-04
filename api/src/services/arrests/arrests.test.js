@@ -37,8 +37,8 @@ describe('arrests', () => {
     expect(result).toEqual(scenario.arrest.one)
   })
 
-  scenario('creates a arrest', async () => {
-    mockCurrentUser({ name: 'Rob', id: 1 })
+  scenario('creates a arrest', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
 
     const result = await createArrest({
       input: {
@@ -54,7 +54,7 @@ describe('arrests', () => {
   })
 
   scenario('updates a arrest', async (scenario) => {
-    mockCurrentUser({ name: 'Rob', id: 1 })
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
 
     const original = await arrest({ id: scenario.arrest.one.id })
     const result = await updateArrest({
@@ -66,7 +66,7 @@ describe('arrests', () => {
   })
 
   scenario('updates a custom field', async (scenario) => {
-    mockCurrentUser({ name: 'Rob', id: 1 })
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
     const original = await arrest({ id: scenario.arrest.one.id })
     await updateArrest({
       id: original.id,
@@ -88,7 +88,7 @@ describe('arrests', () => {
   })
 
   scenario('updates an arrestee custom field', async (scenario) => {
-    mockCurrentUser({ name: 'Rob', id: 1 })
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
     const original = await arrest({ id: scenario.arrest.one.id })
     await updateArrest({
       id: original.id,
@@ -126,7 +126,7 @@ describe('arrests', () => {
   scenario(
     'merges non-overlapping custom_fields keys without loss',
     async (scenario) => {
-      mockCurrentUser({ name: 'Rob', id: 1 })
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
       await updateArrest({
         id: scenario.arrest.one.id,
         input: { custom_fields: { foo: 'bar' } },
@@ -148,7 +148,7 @@ describe('arrests', () => {
   scenario(
     'does not overwrite custom_fields when input is null or undefined',
     async (scenario) => {
-      mockCurrentUser({ name: 'Rob', id: 1 })
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
       await updateArrest({
         id: scenario.arrest.one.id,
         input: { custom_fields: { foo: 'bar' } },
@@ -176,7 +176,7 @@ describe('arrests', () => {
   scenario(
     'does not clear custom_fields when updating with empty object',
     async (scenario) => {
-      mockCurrentUser({ name: 'Rob', id: 1 })
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
       await updateArrest({
         id: scenario.arrest.one.id,
         input: { custom_fields: { foo: 'bar', bar: 'baz' } },
@@ -195,7 +195,7 @@ describe('arrests', () => {
   scenario(
     'merges custom_fields for records with and without existing data',
     async (scenario) => {
-      mockCurrentUser({ name: 'Rob', id: 1 })
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
       // one has custom_fields, two does not
       await updateArrest({
         id: scenario.arrest.one.id,
@@ -230,7 +230,7 @@ describe('arrests', () => {
   scenario(
     'merges both arrest and arrestee custom_fields in one update',
     async (scenario) => {
-      mockCurrentUser({ name: 'Rob', id: 1 })
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
       await updateArrest({
         id: scenario.arrest.one.id,
         input: {
@@ -287,7 +287,7 @@ describe('arrests', () => {
 
   // --- Validation ---
   scenario('rejects invalid email in arrestee', async (scenario) => {
-    mockCurrentUser({ name: 'Rob', id: 1 })
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
     await expect(
       updateArrest({
         id: scenario.arrest.one.id,
@@ -297,7 +297,7 @@ describe('arrests', () => {
   })
 
   scenario('rejects invalid next_court_date', async (scenario) => {
-    mockCurrentUser({ name: 'Rob', id: 1 })
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
     await expect(
       updateArrest({
         id: scenario.arrest.one.id,
@@ -308,7 +308,7 @@ describe('arrests', () => {
 
   // --- Display Field Logic ---
   scenario('sets display_field based on date', async (scenario) => {
-    mockCurrentUser({ name: 'Rob', id: 1 })
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
     const result = await updateArrest({
       id: scenario.arrest.one.id,
       input: { date: new Date('2023-02-26') },
@@ -317,8 +317,8 @@ describe('arrests', () => {
   })
 
   // --- Create/Delete Logic ---
-  scenario('creates an arrest with arrestee', async () => {
-    mockCurrentUser({ name: 'Rob', id: 1 })
+  scenario('creates an arrest with arrestee', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
     const { id } = await createArrest({
       input: {
         display_field: 'String',
@@ -562,7 +562,7 @@ describe('checkArrestAccess', () => {
       action_ids: [1, 2, 3],
     })
 
-    expect(() => checkArrestAccess({ id: 1, action_id: 4 })).toThrow(
+    expect(() => checkArrestAccess({ action_id: 4, date: new Date() })).toThrow(
       'access to arrest'
     )
   })
