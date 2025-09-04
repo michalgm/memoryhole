@@ -127,6 +127,7 @@ const FormContainer = ({
   fieldProps = {},
   footerProps = {},
   children,
+  ...props
 }) => {
   const smallLayout = useContainerWidth(860)
   const schema = get(fieldSchema, displayConfig?.type?.toLowerCase(), {})
@@ -156,6 +157,7 @@ const FormContainer = ({
         onFetch,
         id,
         skipUpdatedCheck,
+        ...props,
       }}
       loadingElement={
         <Box>
@@ -165,14 +167,7 @@ const FormContainer = ({
       }
     >
       {(formManagerContext) => {
-        const {
-          isLoading,
-          confirmDelete,
-          formData,
-          stats,
-          hasDirtyFields,
-          loading: { loadingDelete, loadingCreate, loadingUpdate },
-        } = formManagerContext
+        const { isLoading, hasDirtyFields } = formManagerContext
         const disabled = isLoading
 
         return (
@@ -197,19 +192,14 @@ const FormContainer = ({
             <Footer
               {...{
                 id,
-                formData,
                 smallLayout,
-                stats,
                 deleteMutation,
                 disabled,
-                confirmDelete,
-                loadingUpdate,
-                loadingCreate,
-                loadingDelete,
                 deleteOptions,
                 allowSave: hasDirtyFields,
                 label: displayConfig?.type,
                 ...footerProps,
+                formManagerContext,
               }}
             ></Footer>
           </Box>
