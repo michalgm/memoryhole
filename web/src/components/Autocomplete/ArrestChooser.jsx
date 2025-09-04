@@ -1,6 +1,6 @@
 import { ListItemText } from '@mui/material'
 
-import dayjs from '../../../../api/src/lib/day'
+import { displayItemProps } from 'src/lib/utils'
 
 import Autocomplete from './Autocomplete'
 
@@ -20,16 +20,12 @@ const QUERY = gql`
 
 const autocompleteProps = {
   getOptionLabel: (option) => option?.arrestee?.search_display_field || '',
-  renderOption: (
-    props,
-    { arrestee: { id, search_display_field }, date, arrest_city }
-  ) => {
-    const subtitle = `${date ? dayjs(date).format('L') : ''}${
-      date && arrest_city ? ' - ' : ''
-    }${arrest_city ? arrest_city : ''}`
+  renderOption: (props, item) => {
+    const { id } = item.arrestee
+    const { title, subtitle } = displayItemProps({ item, type: 'arrest' })
     return (
       <li {...props} key={id}>
-        <ListItemText primary={search_display_field} secondary={subtitle} />
+        <ListItemText primary={title} secondary={subtitle} />
       </li>
     )
   },
