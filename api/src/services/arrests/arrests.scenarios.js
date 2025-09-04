@@ -43,7 +43,6 @@ export const standard = defineScenario({
     test: {
       // id: 1,
       data: {
-        id: 1,
         name: 'Greg',
         email: 'foo2@bar.com',
       },
@@ -54,10 +53,13 @@ export const standard = defineScenario({
 export const accessScenario = defineScenario({
   user: {
     admin: {
-      data: { email: 'admin@example.com', name: 'Admin' },
+      data: { email: 'adminAccess@example.com', name: 'Access Admin' },
     },
     restricted: {
-      data: { email: 'restricted@example.com', name: 'Restricted' },
+      data: {
+        email: 'restrictedAccess@example.com',
+        name: 'Access Restricted',
+      },
     },
   },
   action: {

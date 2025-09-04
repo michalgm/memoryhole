@@ -13,6 +13,9 @@ import * as duplicateArrests from './duplicateArrests'
 export { duplicateArrests }
 
 export const checkArrestAccess = (arrest) => {
+  if (!arrest) {
+    return
+  }
   const settings = getSetting('restriction_settings')
   const {
     action_ids = [],
@@ -20,6 +23,10 @@ export const checkArrestAccess = (arrest) => {
     arrest_date_max,
     arrest_date_threshold,
   } = context.currentUser
+
+  if (!arrest?.date) {
+    throw new ForbiddenError(`Incomplete arrest data for access check`)
+  }
 
   if (
     settings.arrest_date_min &&
@@ -56,8 +63,8 @@ export const checkArrestAccess = (arrest) => {
   }
 }
 
-const checkArrestsAccess = async (ids, tx) => {
-  const arrests = await (tx || db).arrest.findMany({
+export const checkArrestsAccess = async (ids, tx) => {
+  const arrests = await (tx || db).$unfilteredQuery.arrest.findMany({
     where: { id: { in: ids } },
     select: {
       id: true,
@@ -72,6 +79,10 @@ const checkArrestsAccess = async (ids, tx) => {
       },
     },
   })
+
+  if (arrests.length !== ids.length) {
+    throw new ForbiddenError('One or more arrests not found')
+  }
 
   arrests.forEach((arrest) => {
     checkArrestAccess(arrest)
@@ -340,9 +351,13 @@ export const createArrest = ({ input: { arrestee, action_id, ...arrest } }) => {
   })
 }
 
-export const updateArrest = async ({ id, input: { action_id, ...input } }) => {
-  await checkArrestsAccess([id])
-  const current = await db.arrest.findUnique({
+export const updateArrest = async ({
+  id,
+  input: { action_id, ...input },
+  tx = db,
+}) => {
+  await checkArrestsAccess([id], tx)
+  const current = await tx.arrest.findUnique({
     where: { id },
     include: {
       arrestee: true,
@@ -371,17 +386,26 @@ export const updateArrest = async ({ id, input: { action_id, ...input } }) => {
     },
     current
   )
-  // console.log('UPDATE DATA', data)
-
-  return db.arrest.update({
+  return await tx.arrest.update({
     data,
+    include: {
+      arrestee: {
+        include: {
+          created_by: true,
+          updated_by: true,
+        },
+      },
+      updated_by: true,
+      created_by: true,
+      action: true,
+    },
     where: { id },
   })
 }
 
 export const bulkUpdateArrests = async ({ ids, input }) => {
+  const arrests = await checkArrestsAccess(ids)
   const update = async (tx) => {
-    const arrests = await checkArrestsAccess(ids, tx)
     const updates = arrests.map(async ({ id, ...arrest }) => {
       const mergedInput = await prepareJsonUpdate(
         'Arrest',
@@ -412,16 +436,15 @@ export const bulkUpdateArrests = async ({ ids, input }) => {
     return { count: results.length }
   }
 
-  if (process.env.NODE_ENV === 'test') {
-    return update(db)
-  } else {
-    return db.$transaction(update)
-  }
+  return db.$transaction(update)
+  // if (process.env.NODE_ENV === 'test') {
+  //   return update(db)
+  // } else {
+  // }
 }
 
-export const deleteArrest = async ({ id }) => {
-  await arrest({ id })
-  return db.$transaction(async (tx) => {
+export const deleteArrest = async ({ id, tx }) => {
+  const doDelete = async (tx) => {
     const [arrestRecord] = await checkArrestsAccess([id], tx)
 
     const res = await tx.arrest.delete({
@@ -434,7 +457,11 @@ export const deleteArrest = async ({ id }) => {
       })
     }
     return res
-  })
+  }
+  if (tx) {
+    return doDelete(tx)
+  }
+  return db.$transaction(doDelete)
 }
 
 export const bulkDeleteArrests = async ({ ids }) => {

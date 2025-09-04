@@ -72,10 +72,10 @@ export const schema = gql`
     ): [Arrest]! @requireAuth
 
     duplicateArrests(
-      strictCityMatch: Boolean,
-      strictDOBMatch: Boolean,
-      includeIgnored: Boolean,
-      maxArrestDateDifferenceSeconds: Int,
+      strictCityMatch: Boolean
+      strictDOBMatch: Boolean
+      includeIgnored: Boolean
+      maxArrestDateDifferenceSeconds: Int
     ): [duplicateArrest!]! @requireAuth
   }
 

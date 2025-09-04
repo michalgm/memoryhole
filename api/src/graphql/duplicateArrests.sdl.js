@@ -23,7 +23,13 @@ export const schema = gql`
   }
 
   type Mutation {
-    createIgnoredDuplicateArrest(arrest1_id: Int!, arrest2_id: Int!): IgnoredDuplicate! @requireAuth
-    unIgnoreDuplicateArrest(arrest1_id: Int!, arrest2_id: Int!): IgnoredDuplicate! @requireAuth
+    createIgnoredDuplicateArrest(
+      arrest1_id: Int!
+      arrest2_id: Int!
+    ): IgnoredDuplicate! @requireAuth
+    unIgnoreDuplicateArrest(
+      arrest1_id: Int!
+      arrest2_id: Int!
+    ): IgnoredDuplicate! @requireAuth
   }
 `
