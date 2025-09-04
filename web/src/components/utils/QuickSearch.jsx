@@ -14,8 +14,7 @@ import {
 import { navigate, routes } from '@redwoodjs/router'
 
 import { useApp } from 'src/lib/AppContext'
-
-import dayjs from '../../../../api/src/lib/day'
+import { displayItemProps } from 'src/lib/utils'
 
 export const SEARCH_ARRESTS = gql`
   query searchArrestNames($search: String!, $action_id: Int) {
@@ -66,7 +65,6 @@ function QuickSearch() {
         clearOnBlur={true}
         value={value}
         open={true}
-        getOptionLabel={(option) => option.search_display_field || ''}
         onInputChange={handleInputChange}
         filterOptions={(x) => x}
         onChange={(event, value) => {
@@ -78,17 +76,14 @@ function QuickSearch() {
             navigate(routes.arrest({ id: value.id }))
           }
         }}
-        renderOption={(
-          props,
-          { id, arrestee: { search_display_field }, date, arrest_city }
-        ) => {
-          const subtitle = `${date ? dayjs(date).format('L') : ''}${
-            date && arrest_city ? ' - ' : ''
-          }${arrest_city ? arrest_city : ''}`
+        getOptionLabel={(option) => option.search_display_field || ''}
+        renderOption={(props, item) => {
+          const { title, subtitle } = displayItemProps({ item, type: 'arrest' })
+          const { id } = item
           return (
             <li {...props} key={id}>
               <div>
-                <Typography>{search_display_field}</Typography>
+                <Typography>{title}</Typography>
                 <Typography color="GrayText" variant="subtitle2">
                   {subtitle}
                 </Typography>
