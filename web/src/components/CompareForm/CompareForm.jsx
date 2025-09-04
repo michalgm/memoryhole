@@ -206,13 +206,15 @@ const CompareForm = ({
             label="Only show fields with differences"
           />
           <Tooltip title="Update all empty values in the left column with non-empty values from the right column">
-            <Button
-              variant="outlined"
-              onClick={mergeBlankValues}
-              disabled={diffFields.size === 0}
-            >
-              Merge Blank Values
-            </Button>
+            <span>
+              <Button
+                variant="outlined"
+                onClick={mergeBlankValues}
+                disabled={diffFields.size === 0}
+              >
+                Merge Blank Values
+              </Button>
+            </span>
           </Tooltip>
         </Paper>
         <Stack
@@ -292,13 +294,15 @@ const CompareField = ({
       <Grid2>
         {isDirty ? (
           <Tooltip title="Restore current value">
-            <Button
-              variant="outlined"
-              onClick={() => resetField(name)}
-              disabled={!hasDiff}
-            >
-              <Replay />
-            </Button>
+            <span>
+              <Button
+                variant="outlined"
+                onClick={() => resetField(name)}
+                disabled={!hasDiff}
+              >
+                <Replay />
+              </Button>
+            </span>
           </Tooltip>
         ) : (
           <Tooltip title={tooltip}>
