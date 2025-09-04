@@ -4,9 +4,6 @@ import MainLayout from 'src/layouts/MainLayout/MainLayout'
 import ModelLayout from 'src/layouts/ModelLayout/ModelLayout'
 import ScaffoldLayout from 'src/layouts/ScaffoldLayout/ScaffoldLayout'
 import * as _fragments from 'src/lib/gql_fragments'
-import ArrestDuplicatesPage from 'src/pages/Arrest/ArrestDuplicatesPage/ArrestDuplicatesPage'
-import CompareArrestPage from 'src/pages/Arrest/CompareArrestPage/CompareArrestPage'
-import LoginPage from 'src/pages/LoginPage/LoginPage'
 
 import { useAuth } from './auth'
 // import DocumentationPage from './pages/Documentation/DocumentationPage'
@@ -75,9 +72,9 @@ const Routes = () => {
             <Route path="/arrests/{id:Int}" page={ArrestArrestPage} name="arrest" />
             <Route path="/arrests" page={ArrestArrestsPage} name="arrests" />
             <Route path="/" redirect="arrests" name="home" />
-            <Route path="/arrests/{id:Int}/compare/{compareId:Int}" page={CompareArrestPage} name="compareArrest" />
-            <Route path="/arrests/duplicates" page={ArrestDuplicatesPage} name="findDuplicateArrests" />
-            <Route path="/arrests/duplicates/{id:Int}/compare/{compareId:Int}" page={CompareArrestPage} name="findDuplicateArrestsCompare" />
+            <Route path="/arrests/{id:Int}/compare/{compareId:Int}" page={ArrestCompareArrestPage} name="compareArrest" />
+            <Route path="/arrests/duplicates" page={ArrestArrestDuplicatesPage} name="findDuplicateArrests" />
+            <Route path="/arrests/duplicates/{id:Int}/compare/{compareId:Int}" page={ArrestCompareArrestPage} name="findDuplicateArrestsCompare" />
           </Set>
           <Set wrap={ModelLayout} title="Actions" titleTo="actions" buttonTo="newAction">
             <Route path="/actions" page={ActionActionsPage} name="actions" />
