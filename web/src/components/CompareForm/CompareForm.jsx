@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { KeyboardDoubleArrowLeft, Replay, Sync } from '@mui/icons-material'
+import { Add, KeyboardDoubleArrowLeft, Replay, Sync } from '@mui/icons-material'
 import {
   Button,
   Divider,
@@ -19,6 +19,7 @@ import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 import { Link, routes, useParams } from '@redwoodjs/router'
 
+import CompositeIcon from 'src/components/utils/CompositeIcon'
 import { Field } from 'src/components/utils/Field'
 import { ModInfo } from 'src/components/utils/Footer'
 import FormSection from 'src/components/utils/FormSection'
@@ -122,10 +123,24 @@ const CompareForm = ({
     stats,
     formData,
     formState: { defaultValues },
+    formContext: { setValue, getValues },
   } = formManagerContext
 
   const { id, compareId } = useParams()
   const compareFormMethods = useForm({})
+
+  const mergeBlankValues = () => {
+    for (const key of diffFields) {
+      const compareValue = compareFormMethods.getValues(key)
+      const prevValue = getValues(key)
+      if (compareValue !== null && prevValue == null) {
+        setValue(key, compareValue, {
+          shouldValidate: true,
+          shouldDirty: true,
+        })
+      }
+    }
+  }
 
   useEffect(() => {
     if (inputData) {
@@ -185,6 +200,15 @@ const CompareForm = ({
             }
             label="Only show fields with differences"
           />
+          <Tooltip title="Update all empty values in the left column with non-empty values from the right column">
+            <Button
+              variant="outlined"
+              onClick={mergeBlankValues}
+              disabled={diffFields.size === 0}
+            >
+              Merge Blank Values
+            </Button>
+          </Tooltip>
         </Paper>
         <Stack direction={'row'} spacing={2} alignItems="center">
           <DataCard
@@ -252,7 +276,7 @@ const CompareField = ({
           highlightDirty={true}
           name={name}
           {...options}
-          color={hasDiff ? 'warning' : null}
+          color={hasDiff ? 'info' : null}
         />
       </Grid2>
       <Grid2>
@@ -269,7 +293,14 @@ const CompareField = ({
         ) : (
           <Tooltip title={tooltip}>
             <Button variant="outlined" onClick={handleCopyRight}>
-              <KeyboardDoubleArrowLeft />
+              {append ? (
+                <CompositeIcon
+                  baseIcon={KeyboardDoubleArrowLeft}
+                  overlayIcon={Add}
+                />
+              ) : (
+                <KeyboardDoubleArrowLeft />
+              )}
             </Button>
           </Tooltip>
         )}
