@@ -34,7 +34,8 @@ const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen, height }) => {
               </IconButton>
             </Tooltip>
             <Tooltip
-              title={`Version: ${process.env.APP_VERSION} Built ${dayjs(process.env.BUILD_TIMESTAMP).format('L LT')})`}
+              //  Note this isn't actually process.env - just a placeholder string for the Vite define to replace at build time
+              title={`Version: ${process.env.APP_VERSION || 'Unknown'} (Built ${process.env.BUILD_TIMESTAMP ? dayjs(process.env.BUILD_TIMESTAMP).format('L LT') : 'Unknown'})`}
             >
               <Typography
                 variant="h4"

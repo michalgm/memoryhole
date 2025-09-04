@@ -13,6 +13,7 @@ import { version } from '../package.json'
 const viteConfig = {
   plugins: [redwood()],
   define: {
+    // Note: These aren't real env vars - just using process.env.* pattern for safe string replacement
     'process.env.BUILD_TIMESTAMP': JSON.stringify(new Date()),
     'process.env.APP_VERSION': JSON.stringify(version),
   },
