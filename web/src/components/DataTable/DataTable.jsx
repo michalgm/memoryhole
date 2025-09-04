@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import { Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { difference, get, isArray, merge, set, sortBy } from 'lodash-es'
+import { difference, get, isArray, merge, sortBy } from 'lodash-es'
 import {
   flexRender,
   getDefaultColumnFilterFn,
@@ -61,11 +61,14 @@ const defineColumns = (
 
   const columns = [...displayColumns, ...columnNames].map((field) => {
     const fieldDef = mergedSchema[field]
-    const type = fieldDef.type
-
+    const type = fieldDef?.type || 'text'
+    const label = fieldDef?.props?.label || formatLabel(field)
+    if (!fieldDef) {
+      console.log(`Field definition not found for ${field}`)
+    }
     const col = {
       accessorKey: field,
-      header: fieldDef.props?.label || formatLabel(field),
+      header: label,
       fieldType: type,
       enablePinning: false,
       size: 1,
@@ -74,7 +77,7 @@ const defineColumns = (
     if (type === 'date-time' || type === 'date') {
       const format = type === 'date' ? 'L' : 'L hh:mm A'
       col.accessorFn = (originalRow) => {
-        const val = get(originalRow, field)
+        const val = get(originalRow, field) ?? null
         if (type == 'date') {
           return val ? dayjs(val).startOf('day').toDate() : null
         } else {
@@ -86,25 +89,24 @@ const defineColumns = (
       col.filterVariant = 'date'
     } else if (type === 'checkbox') {
       col.id = field
-      col.accessorFn = (originalRow) =>
-        get(originalRow, field) ? 'true' : 'false'
-      col.Cell = ({ cell }) => (cell.getValue() === 'true' ? 'Yes' : 'No')
+      col.accessorFn = (originalRow) => !!get(originalRow, field)
+      col.Cell = ({ cell }) => (cell.getValue() ? 'Yes' : 'No')
       col.filterVariant = 'checkbox'
     } else if (type === 'select') {
       col.filterVariant = 'multi-select'
+      col.filterSelectOptions = fieldDef?.options || []
       col.filterSelectOptions = fieldDef.props.options
     } else if (type === 'action_chooser') {
       col.accessorFn = (originalRow) => {
-        return get(originalRow, field)?.name
+        return get(originalRow, field)?.name ?? null
       }
     } else if (type === 'array') {
-      col.accessorFn = (originalRow) => {
-        const val = get(originalRow, field)
-        if (!val || val.length == 0) return null
-        return val.join('|')
-      }
+      col.filterVariant = 'multi-select'
+      col.filterSelectOptions =
+        fieldDef?.props?.options || fieldDef?.filterSelectOptions || []
+      col.filterFn = 'arrIncludesSome'
       col.Cell = ({ row }) => {
-        const val = row.original[field]
+        const val = get(row.original, field) ?? null
         if (val && val.length > 0) {
           return (
             <Stack direction="row" spacing={1}>
@@ -114,6 +116,11 @@ const defineColumns = (
             </Stack>
           )
         }
+      }
+    }
+    if (!col.accessorFn) {
+      col.accessorFn = (originalRow) => {
+        return get(originalRow, field) ?? null
       }
     }
     return col
@@ -276,7 +283,7 @@ const processStoredState = (state, columnsRef) => {
 }
 
 const DataTable = ({
-  data: inputData = [],
+  data = [],
   schema = {},
   displayColumns = [],
   tableProps = { initialState: {} },
@@ -308,9 +315,9 @@ const DataTable = ({
   const reload = async () => {
     setReloading(true)
     try {
-    await refetch()
+      await refetch()
     } finally {
-    setReloading(false)
+      setReloading(false)
     }
   }
 
@@ -320,19 +327,6 @@ const DataTable = ({
     ...postColumns.map((col) => ({ ...col, isPost: true })),
   ]
   const columnsRef = useRef(columns)
-
-  const data = useMemo(() => {
-    const data = inputData.map((row) => {
-      const new_row = { id: row.id }
-      columnsRef.current.forEach((col) => {
-        const value = get(row, col.accessorKey)
-        set(new_row, col.accessorKey, value === undefined ? null : value)
-      })
-      return new_row
-    })
-
-    return data
-  }, [inputData])
 
   const initialStateRef = useRef(
     merge(
@@ -349,7 +343,11 @@ const DataTable = ({
         globalFilter: '',
         pagination: { pageSize: 50, pageIndex: 0 },
         columnFilterFns: columns.reduce((acc, column) => {
-          acc[column.accessorKey] = getDefaultColumnFilterFn(column)
+          if (column.filterFn) {
+            acc[column.accessorKey] = column.filterFn
+          } else {
+            acc[column.accessorKey] = getDefaultColumnFilterFn(column)
+          }
           return acc
         }, {}),
       },
@@ -460,11 +458,13 @@ const DataTable = ({
           },
       }),
     },
-    muiTableContainerProps: {
+    muiTableContainerProps: ({ table }) => ({
       sx: {
-        height: (theme) => theme?.custom?.scrollAreaHeight || 500,
+        height: (theme) =>
+          theme?.custom?.scrollAreaHeight ||
+          (table.getState().isFullScreen ? 0 : 500),
       },
-    },
+    }),
     muiSearchTextFieldProps: {
       placeholder: 'Search All Fields',
       size: 'x-small',
