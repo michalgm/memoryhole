@@ -34,7 +34,7 @@ const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen, height }) => {
               </IconButton>
             </Tooltip>
             <Tooltip
-              title={`Version: ${window.APP_VERSION} Built ${dayjs(window.BUILD_TIMESTAMP).format('L LT')})`}
+              title={`Version: ${process.env.APP_VERSION} Built ${dayjs(process.env.BUILD_TIMESTAMP).format('L LT')})`}
             >
               <Typography
                 variant="h4"
