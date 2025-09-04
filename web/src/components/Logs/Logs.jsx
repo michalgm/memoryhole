@@ -191,40 +191,42 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
         context={context}
         loading={loading}
       />
-      <InfiniteScroll
-        dataLength={logs.length}
-        next={() => setSkip((prev) => prev + ITEMS_PER_PAGE)}
-        hasMore={hasMore}
-        loader={<Loading name="loading-logs" />}
-        scrollableTarget={
-          sidebar ? 'arrestee-logs-drawer-container' : 'main-content'
-        }
-        endMessage={
-          <Show when={logs.length === 0}>
-            <Typography variant="h6" align="center">
-              No Logs Match Search
-            </Typography>
-          </Show>
-        }
-        className="MuiStack-root"
-        style={{
-          gap: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          paddingBottom: 16,
-          overflow: 'visible',
-        }}
-      >
-        {logs.map((item) => (
-          <Log
-            key={item.id}
-            log={item}
-            editItem={editItem}
-            setEditItem={setEditItem}
-            onCreate={onCreate}
-          />
-        ))}
-      </InfiniteScroll>
+      <div data-testid="logs-page-logs-container">
+        <InfiniteScroll
+          dataLength={logs.length}
+          next={() => setSkip((prev) => prev + ITEMS_PER_PAGE)}
+          hasMore={hasMore}
+          loader={<Loading name="loading-logs" />}
+          scrollableTarget={
+            sidebar ? 'arrestee-logs-drawer-container' : 'main-content'
+          }
+          endMessage={
+            <Show when={logs.length === 0}>
+              <Typography variant="h6" align="center">
+                No Logs Match Search
+              </Typography>
+            </Show>
+          }
+          className="MuiStack-root"
+          style={{
+            gap: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            paddingBottom: 16,
+            overflow: 'visible',
+          }}
+        >
+          {logs.map((item) => (
+            <Log
+              key={item.id}
+              log={item}
+              editItem={editItem}
+              setEditItem={setEditItem}
+              onCreate={onCreate}
+            />
+          ))}
+        </InfiniteScroll>
+      </div>
       {/* <div
         style={{
           position: 'fixed',
