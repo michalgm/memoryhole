@@ -1,5 +1,8 @@
-import { Prisma } from '.prisma/client'
+import { Prisma, PrismaClient } from '.prisma/client'
 
+import { emitLogLevels, handlePrismaLogging } from '@redwoodjs/api/logger'
+
+import { logger } from 'src/lib/logger'
 import { updateSettingsCache } from 'src/lib/settingsCache'
 
 import { filterArrestAccess } from '../services/arrests/arrests'
@@ -13,6 +16,15 @@ const MUTATION_OPERATIONS = [
   'updateMany',
   'deleteMany',
 ]
+const bypassClient = new PrismaClient({
+  log: emitLogLevels(['info', 'warn', 'error']),
+})
+
+handlePrismaLogging({
+  db: bypassClient,
+  logger,
+  logLevels: ['info', 'warn', 'error'],
+})
 
 export const settingsObserver = Prisma.defineExtension((client) => {
   client.registerInit((client) => updateSettingsCache(client))
@@ -38,6 +50,19 @@ export const settingsObserver = Prisma.defineExtension((client) => {
 export const arrestAccessFilter = Prisma.defineExtension((client) => {
   return client.$extends({
     name: 'arrestAccessFilter',
+    client: {
+      // Add unfiltered query methods
+      $unfilteredQuery: {
+        arrest: {
+          findMany: (args) => {
+            return bypassClient.arrest.findMany(args)
+          },
+          findUnique: (args) => {
+            return bypassClient.arrest.findUnique(args)
+          },
+        },
+      },
+    },
     query: {
       arrest: {
         async $allOperations({ args, query }) {
