@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
+import { DialogContentText } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 
 import { navigate, routes, useRouteName } from '@redwoodjs/router'
@@ -9,10 +10,8 @@ import CompareForm from 'src/components/CompareForm/CompareForm'
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import ArrestFields, { fieldSchema } from 'src/lib/FieldSchemas'
-import ArrestPage, {
-  DELETE_ARREST_MUTATION,
-  QUERY,
-} from 'src/pages/Arrest/ArrestPage/ArrestPage'
+import { displayItem } from 'src/lib/utils'
+import ArrestPage, { QUERY } from 'src/pages/Arrest/ArrestPage/ArrestPage'
 
 const CREATE_IGNORED_DUPLICATE = gql`
   mutation CreateIgnoredDuplicateArrest($arrest1_id: Int!, $arrest2_id: Int!) {
@@ -25,11 +24,24 @@ const CREATE_IGNORED_DUPLICATE = gql`
   }
 `
 
+const MERGE_ARRESTS_MUTATION = gql`
+  mutation MergeArrestsMutation(
+    $id: Int!
+    $input: UpdateArrestInput!
+    $merge_id: Int!
+  ) {
+    mergeArrests(id: $id, input: $input, merge_id: $merge_id) {
+      id
+      ...ArrestFields
+    }
+  }
+`
+
 const CompareArrestPage = ({ id, compareId }) => {
   const { data, loading } = useQuery(QUERY, {
     variables: { id: parseInt(compareId) },
   })
-  const deleteAfterSave = useRef(false)
+  const [merging, setMerging] = useState(false)
   const displayError = useDisplayError()
   const { openSnackbar } = useSnackbar()
   const confirm = useConfirm()
@@ -37,7 +49,6 @@ const CompareArrestPage = ({ id, compareId }) => {
   const routeName = useRouteName()
 
   const compareData = data?.arrest || {}
-  const displayName = compareData?.arrestee?.search_display_field
 
   const originalName = pageTitle?.arrest
 
@@ -57,105 +68,132 @@ const CompareArrestPage = ({ id, compareId }) => {
     CREATE_IGNORED_DUPLICATE,
     {
       onError: displayError,
-      variables: { arrest1_id: parseInt(id), arrest2_id: parseInt(compareId) },
-      onCompleted: async () => {
-        openSnackbar(
-          `Arrest pair "${originalName}" and "${displayName}" marked as not a duplicate`
-        )
-        if (routeName === 'findDuplicateArrestsCompare') {
-          navigate(routes.findDuplicateArrests())
-        } else {
-          navigate(routes.arrest({ id }))
+    }
+  )
+
+  const [mergeArrests] = useMutation(MERGE_ARRESTS_MUTATION, {
+    onError: displayError,
+  })
+
+  const mergeButton = ({
+    disabled,
+    prepareUpdate,
+    loadingUpdate,
+    resetForm,
+    formData,
+  }) => {
+    const displayMerged = displayItem({ item: compareData })
+    const displayCurrent = displayItem({ item: formData })
+    return {
+      children: 'Merge Arrests',
+      disabled: disabled || loadingUpdate || merging,
+      loading: merging,
+      onClick: async () => {
+        try {
+          await confirm({
+            title: 'Confirm Merge Arrests',
+            content: (
+              <DialogContentText component={'div'}>
+                Are you sure you want to merge these arrest records?
+                <ul>
+                  <li>
+                    The record for {displayCurrent} will be updated with the
+                    values from the left column
+                  </li>
+                  <li>
+                    All logs associated with {displayMerged} will be associated
+                    with {displayCurrent}
+                  </li>
+                  <li>The record for {displayMerged} will be deleted</li>
+                </ul>
+              </DialogContentText>
+            ),
+          })
+          setMerging(true)
+          const { input } = (await prepareUpdate({})) || {}
+          if (!input) {
+            setMerging(false)
+            return
+          }
+          await mergeArrests({
+            variables: {
+              id: parseInt(id),
+              merge_id: parseInt(compareId),
+              input,
+            },
+            onCompleted: async (result) => {
+              openSnackbar(`Arrests merged successfully`)
+              setMerging(false)
+              await resetForm(result)
+              navigate(routes.arrest({ id }))
+            },
+          })
+        } catch (err) {
+          console.debug('user cancelled')
+          setMerging(false)
         }
       },
     }
-  )
+  }
 
-  const [deleteEntity, { loading: loadingDelete }] = useMutation(
-    DELETE_ARREST_MUTATION,
-    {
-      onCompleted: async () => {
-        openSnackbar(`Arrest "${displayName}" deleted`)
+  const ignoreDuplicatesButton = ({ disabled, formData }) => {
+    const displayMerged = displayItem({ item: compareData })
+    const displayCurrent = displayItem({ item: formData })
+
+    return {
+      children: 'Mark these arrests as NOT duplicates',
+      disabled: disabled,
+      loading: loadingIgnore,
+      variant: 'outlined',
+      color: 'inherit',
+      onClick: async () => {
+        try {
+          await confirm({
+            title: 'Confirm marking as not duplicates',
+            description: (
+              <>
+                <span>
+                  Are you sure you want to mark this arrest pair as not a
+                  duplicate? They will be excluded from future duplicate
+                  searches.
+                </span>
+              </>
+            ),
+          })
+          await ignoreDuplicates({
+            variables: {
+              arrest1_id: parseInt(id),
+              arrest2_id: parseInt(compareId),
+            },
+            onCompleted: async () => {
+              openSnackbar(
+                <span>
+                  Arrest pair {displayMerged} and {displayCurrent} marked as not
+                  duplicates
+                </span>
+              )
+              if (routeName === 'findDuplicateArrestsCompare') {
+                navigate(routes.findDuplicateArrests())
+              } else {
+                navigate(routes.arrest({ id }))
+              }
+            },
+          })
+        } catch (err) {
+          console.debug('user cancelled')
+        }
       },
-      onError: displayError,
-      variables: { id: parseInt(compareId) },
-    }
-  )
-
-  const onUpdate = async () => {
-    if (deleteAfterSave.current) {
-      deleteAfterSave.current = false
-      await deleteEntity()
-      navigate(routes.arrest({ id }))
     }
   }
 
   return (
     <ArrestPage
       id={id}
-      onUpdate={onUpdate}
+      skipDirtyCheck={true}
       footerProps={{
         disableStats: true,
         disableDelete: true,
-        postButtons: [
-          ({ disabled, allowSave, loadingUpdate }) => ({
-            children: 'Save Arrest and delete comparison',
-            disabled: disabled,
-            loading: loadingUpdate || loadingDelete,
-            type: 'submit',
-            onClick: async (e) => {
-              e.preventDefault()
-              const form = e.target.closest('form')
-              try {
-                await confirm({
-                  title: 'Confirm save and delete',
-                  description: (
-                    <>
-                      <span>
-                        Are you sure you want to delete the arrest &quot;
-                        {displayName}&quot;?
-                      </span>
-                    </>
-                  ),
-                })
-                deleteAfterSave.current = true
-                if (allowSave) {
-                  form.requestSubmit()
-                } else {
-                  onUpdate()
-                }
-              } catch (err) {
-                console.debug('user cancelled')
-              }
-            },
-          }),
-          ({ disabled }) => ({
-            children: 'Mark these arrests as NOT duplicates',
-            disabled: disabled,
-            loading: loadingIgnore,
-            variant: 'outlined',
-            color: 'inherit',
-            onClick: async () => {
-              try {
-                await confirm({
-                  title: 'Confirm marking as not duplicates',
-                  description: (
-                    <>
-                      <span>
-                        Are you sure you want to mark this arrest pair as not a
-                        duplicate? They will be excluded from future duplicate
-                        searches.
-                      </span>
-                    </>
-                  ),
-                })
-                await ignoreDuplicates()
-              } catch (err) {
-                console.debug('user cancelled')
-              }
-            },
-          }),
-        ],
+        postButtons: [mergeButton, ignoreDuplicatesButton],
       }}
     >
       {(formManagerContext) => (
