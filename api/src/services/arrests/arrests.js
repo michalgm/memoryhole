@@ -487,6 +487,23 @@ export const bulkDeleteArrests = async ({ ids }) => {
   })
 }
 
+export const mergeArrests = async ({ id, input, merge_id }) => {
+  await checkArrestsAccess([id, merge_id])
+  return db.$transaction(async (tx) => {
+    const logs = await tx.log.findMany({
+      where: { arrests: { some: { id: merge_id } } },
+      select: { id: true },
+    })
+    const connect = logs.map((d) => ({ id: d.id }))
+    const updateInput = { ...input, logs: { connect } }
+
+    const arrest = await updateArrest({ id, input: updateInput, tx })
+    await deleteArrest({ id: merge_id, tx })
+
+    return arrest
+  })
+}
+
 export const Arrest = {
   arrestee: (_obj, { root }) => {
     return db.arrest.findUnique({ where: { id: root?.id } }).arrestee()
