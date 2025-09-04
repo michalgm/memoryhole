@@ -18,8 +18,8 @@ jest.mock('src/lib/utils', () => ({
 }))
 
 const mockLogs = generateMockData('aLog', 'LogFields', [
-  { type: 'Email', notes: 'Test log 1' },
-  { type: 'Phone', notes: 'Test log 2' },
+  { type: 'Email', notes: 'Test log 1', shift: '' },
+  { type: 'Phone', notes: 'Test log 2', shift: '' },
 ])
 
 // console.log(mockLogs)
@@ -63,7 +63,9 @@ describe('Logs', () => {
     ).toBeInTheDocument()
 
     await waitFor(() => {
-      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('progressbar', { name: 'loading-logs' })
+      ).not.toBeInTheDocument()
     })
   })
 
