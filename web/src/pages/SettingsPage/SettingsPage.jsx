@@ -146,7 +146,8 @@ const SettingsPage = () => {
         updateMutation: UPSERT_SETTINGS_MUTATION,
       }}
     >
-      {({ formData, disabled, loadingUpdate, formContext, hasDirtyFields }) => {
+      {(formManagerContext) => {
+        const { formContext, hasDirtyFields } = formManagerContext
         const restrictionSettings = formContext.watch('restriction_settings')
 
         return (
@@ -212,9 +213,7 @@ const SettingsPage = () => {
             </FormSection>
             <Footer
               {...{
-                formData,
-                disabled,
-                loadingUpdate,
+                formManagerContext,
                 allowSave: hasDirtyFields,
                 label: 'Settings',
               }}

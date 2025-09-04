@@ -49,17 +49,7 @@ const EditHelpPage = () => {
         updateMutation: UPDATE_MUTATION,
       }}
     >
-      {({
-        formData,
-        smallLayout,
-        stats,
-        deleteMutation,
-        disabled,
-        confirmDelete,
-        loadingUpdate,
-        loadingCreate,
-        loadingDelete,
-      }) => {
+      {(formManagerContext) => {
         return (
           <>
             <Paper sx={{ p: 2 }}>
@@ -80,16 +70,8 @@ const EditHelpPage = () => {
             </Paper>
             <Footer
               {...{
-                formData,
-                smallLayout,
-                stats,
-                deleteMutation,
-                disabled,
-                confirmDelete,
-                loadingUpdate,
-                loadingCreate,
-                loadingDelete,
                 label: 'Site Help',
+                formManagerContext,
               }}
             />
           </>

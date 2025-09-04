@@ -87,15 +87,9 @@ const FooterButton = ({
 const Footer = ({
   children,
   id,
-  formData,
   smallLayout,
-  stats,
   deleteMutation,
   disabled,
-  confirmDelete,
-  loadingUpdate,
-  loadingCreate,
-  loadingDelete,
   label,
   deleteOptions,
   allowSave = true,
@@ -104,7 +98,15 @@ const Footer = ({
   disableSave = false,
   preButtons = [],
   postButtons = [],
+  formManagerContext,
 }) => {
+  const {
+    stats,
+    formData,
+    confirmDelete,
+    loading: { loadingUpdate, loadingCreate, loadingDelete },
+  } = formManagerContext
+
   return (
     <Box
       elevation={9}
@@ -205,6 +207,7 @@ const Footer = ({
                   deleteMutation,
                   confirmDelete,
                   deleteOptions,
+                  ...formManagerContext,
                 })}
               />
             ))}
