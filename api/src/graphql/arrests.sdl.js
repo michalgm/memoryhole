@@ -134,5 +134,8 @@ export const schema = gql`
 
     "Remove multiple arrest records simultaneously (along with their arrestee records"
     bulkDeleteArrests(ids: [Int]!): BatchPayload @requireAuth
+
+    mergeArrests(id: Int!, input: UpdateArrestInput!, merge_id: Int!): Arrest!
+      @requireAuth
   }
 `
