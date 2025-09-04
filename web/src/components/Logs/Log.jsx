@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react'
+
 import {
   Edit,
   ExpandMore as ExpandMoreIcon,
@@ -17,10 +19,10 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { navigate, routes } from '@redwoodjs/router'
-import { useEffect, useRef, useState } from 'react'
-
 import dayjs from 'dayjs'
+
+import { navigate, routes } from '@redwoodjs/router'
+
 import LogsForm from 'src/components/Logs/LogsForm'
 import RichTextInput from 'src/components/utils/RichTextInput'
 import Show from 'src/components/utils/Show'
