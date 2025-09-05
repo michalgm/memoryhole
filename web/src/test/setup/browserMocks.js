@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-
+window.getComputedStyle = () => ({ getPropertyValue: () => undefined })
 window.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
   unobserve: jest.fn(),
@@ -9,7 +9,7 @@ window.ResizeObserver = jest.fn().mockImplementation(() => ({
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
-    matches: false,
+    matches: query === '(pointer: fine)',
     media: query,
     onchange: null,
     addListener: jest.fn(),
