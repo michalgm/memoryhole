@@ -108,7 +108,7 @@ export function useFormManager({
     {
       onCompleted: async (result) => {
         openSnackbar(`${modelType} created`)
-        const data = await resetForm(result)
+        const data = await resetForm(result, formState.isDirty)
         onCreate && (await onCreate(data))
       },
       onError: displayError,
@@ -119,7 +119,7 @@ export function useFormManager({
     {
       onCompleted: async (result) => {
         openSnackbar(`${modelType} "${display_name}" updated`)
-        const data = await resetForm(result)
+        const data = await resetForm(result, formState.isDirty)
         onUpdate && (await onUpdate(data))
       },
       onError: displayError,
@@ -136,29 +136,22 @@ export function useFormManager({
 
   // Move all the existing form management functions here
   const resetForm = useCallback(
-    async (result) => {
+    async (result, isDirty) => {
       const [values, data] = await processData(result)
       reset(values)
-      // Create a Promise that resolves when formState.isDirty becomes false
-      await new Promise((r) => setTimeout(r, 0))
-      if (formState.isDirty) {
+      if (!skipDirtyCheck && isDirty) {
+        // // Create a Promise that resolves when formState.isDirty becomes false
         const waitForReset = new Promise((resolve) => {
-          // if (!formState.isDirty) {
-          //   resolve()
-          // } else {
           resetPromiseRef.current = resolve
-          // }
         })
-        // Wait for next tick for form state to settle
-        // if (formState.isDirty) {
-        //   console.error('Form is still dirty after reset + tick')
-        // }
+
         // Await the Promise
+        await new Promise((r) => setTimeout(r, 0))
         await waitForReset
       }
       return data
     },
-    [reset, processData] // eslint-disable-line react-hooks/exhaustive-deps
+    [reset, processData, skipDirtyCheck]
   )
 
   useEffect(() => {
