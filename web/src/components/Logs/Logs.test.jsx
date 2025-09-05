@@ -32,18 +32,15 @@ const renderLogs = (props = {}) => {
     </AppProvider>
   )
 }
+mockGraphQLQuery('FetchLogs', () => ({ logs: mockLogs }))
+mockGraphQLQuery('searchActions', () => ({ searchActions: [] }))
+mockGraphQLQuery('lookupArrestNames', () => ({ searchArrests: [] }))
+mockGraphQLQuery('searchUsers', () => ({ searchUsers: [] }))
 
 describe('Logs', () => {
   const user = userEvent.setup()
   const { _getMockDisplayError } = require('src/components/utils/SnackBar')
   const displayErrorMock = _getMockDisplayError()
-
-  beforeEach(() => {
-    mockGraphQLQuery('FetchLogs', () => ({ logs: mockLogs }))
-    mockGraphQLQuery('searchActions', () => ({ searchActions: [] }))
-    mockGraphQLQuery('lookupArrestNames', () => ({ searchArrests: [] }))
-    mockGraphQLQuery('searchUsers', () => ({ searchUsers: [] }))
-  })
 
   it('renders logs list and filter section', async () => {
     renderLogs()
