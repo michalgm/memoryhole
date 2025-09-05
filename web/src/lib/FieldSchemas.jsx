@@ -1,4 +1,4 @@
-import { fromPairs, sortBy, toPairs } from 'lodash-es'
+import { cloneDeep, fromPairs, sortBy, toPairs } from 'lodash-es'
 
 import { formatLabel } from '../components/utils/BaseField'
 
@@ -408,50 +408,56 @@ const sortObjectKeys = (obj) => {
   return fromPairs(sortedPairs)
 }
 
-const getSchema = (fields) => {
-  return fields.reduce((acc, { fields }) => {
-    fields.forEach(([name, props = {}]) => {
-      const type = props.field_type || 'text'
-      props.label = formatLabel(props.label || name)
-      let [field, custom, table] = name.split('.').reverse()
-      if (!table || !fieldTables[table]) {
-        if (!custom) {
-          fieldTables.arrest[field] = type
-        } else if (custom == 'custom_fields') {
-          fieldTables.arrest.custom_fields[field] = type
-        } else if (fieldTables[custom]) {
-          fieldTables[custom][field] = type
+const metaFields = {
+  'created_by.name': {
+    type: 'text',
+    props: { label: 'Created By', readonly: true },
+  },
+  created_at: {
+    type: 'date-time',
+    props: { label: 'Created At', readonly: true },
+  },
+  updated_at: {
+    type: 'date-time',
+    props: { label: 'Update At', readonly: true },
+  },
+  'updated_by.name': {
+    type: 'text',
+    props: { label: 'Updated By', readonly: true },
+  },
+}
+
+const getSchema = (fields, includeMetaFields = true) => {
+  return fields.reduce(
+    (acc, { fields }) => {
+      fields.forEach(([name, props = {}]) => {
+        const type = props.field_type || 'text'
+        props.label = formatLabel(props.label || name)
+        let [field, custom, table] = name.split('.').reverse()
+        if (!table || !fieldTables[table]) {
+          if (!custom) {
+            fieldTables.arrest[field] = type
+          } else if (custom == 'custom_fields') {
+            fieldTables.arrest.custom_fields[field] = type
+          } else if (fieldTables[custom]) {
+            fieldTables[custom][field] = type
+          } else {
+            fieldTables[name] = type
+          }
         } else {
-          fieldTables[name] = type
+          fieldTables[table].custom_fields[field] = type
         }
-      } else {
-        fieldTables[table].custom_fields[field] = type
-      }
-      acc[name] = { type, props }
-    })
-    return acc
-  }, {})
+        acc[name] = { type, props }
+      })
+      return acc
+    },
+    includeMetaFields ? cloneDeep(metaFields) : {}
+  )
 }
 
 export const schema = sortObjectKeys(
   {
     ...getSchema(ArrestFields),
-    'created_by.name': {
-      type: 'text',
-      props: { label: 'Created By', readonly: true },
-    },
-    created_at: {
-      type: 'date-time',
-      props: { label: 'Created At', readonly: true },
-    },
-    updated_at: {
-      type: 'date-time',
-      props: { label: 'Update At', readonly: true },
-    },
-    'updated_by.name': {
-      type: 'text',
-      props: { label: 'Updated By', readonly: true },
-    },
   },
   // ArrestFields.reduce(
   //   (acc, { fields }) => {
@@ -662,7 +668,7 @@ fieldSchema.siteSettings = {
 
 export default ArrestFields
 
-const arrestSchema = getSchema(ArrestFields)
+const arrestSchema = schema
 export const DuplicateArrestFields = [
   {
     fields: [
@@ -684,12 +690,15 @@ export const DuplicateArrestFields = [
   },
 ]
 
-export const userSchema = sortObjectKeys(getSchema(UserFields), 'props.label')
+export const userSchema = sortObjectKeys(
+  getSchema(UserFields, false),
+  'props.label'
+)
 export const actionSchema = sortObjectKeys(
-  getSchema(ActionFields),
+  getSchema(ActionFields, false),
   'props.label'
 )
 export const duplicateArrestSchema = sortObjectKeys(
-  getSchema(DuplicateArrestFields),
+  getSchema(DuplicateArrestFields, false),
   'props.label'
 )
