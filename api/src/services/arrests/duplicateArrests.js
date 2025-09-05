@@ -1,30 +1,31 @@
 import { Prisma } from '@prisma/client'
+
 import { requireAuth } from 'src/lib/auth'
 import { db } from 'src/lib/db'
+
 import { filterArrestAccess } from './arrests'
 
 const minScore = 10
 
 /** weights should sum to ~100 for readability (we’ll normalize anyway) */
 const weights = {
-  name: 25,          // combines first/preferred + strong last-name component internally
+  name: 25, // combines first/preferred + strong last-name component internally
   dob: 40,
   email: 8,
   phone: 8,
-  date_proximity: 9
+  date_proximity: 9,
 }
 
 const defaultMaxArrestDateDifferenceSeconds = 60 * 60 * 12 // 12h
-const lastNameSimGate = 0.68             // tighten/loosen
-const lastNameLevGate = 2                // alternative gate
+const lastNameSimGate = 0.68 // tighten/loosen
+const lastNameLevGate = 2 // alternative gate
 
 export const duplicateArrests = async ({
   maxArrestDateDifferenceSeconds = defaultMaxArrestDateDifferenceSeconds,
   strictCityMatch = false,
   strictDOBMatch = false,
-  includeIgnored = false
+  includeIgnored = false,
 } = {}) => {
-
   requireAuth()
 
   // Normalize weights to 0..1 and keep a 0..100 total for readability
@@ -161,6 +162,7 @@ pairs AS (
       SELECT 1 FROM "IgnoredDuplicateArrest" ida
       WHERE (ida.arrest1_id = n1.id AND ida.arrest2_id = n2.id)
     ))
+    AND ABS(EXTRACT(EPOCH FROM (n1.date - n2.date))) <= ${maxArrestDateDifferenceSeconds}
 ),
 gated AS (
   -- Enforce last-name gate (must pass at least one criterion if both present)
@@ -243,12 +245,14 @@ ORDER BY final_score DESC
   const rows = await db.$queryRaw(query)
 
   // hydrate results
-  const ids = Array.from(new Set(rows.flatMap(r => [r.arrest1_id, r.arrest2_id])))
+  const ids = Array.from(
+    new Set(rows.flatMap((r) => [r.arrest1_id, r.arrest2_id]))
+  )
   const arrests = await db.arrest.findMany({
     where: filterArrestAccess({ id: { in: ids } }),
     include: { arrestee: true },
   })
-  const byId = new Map(arrests.map(a => [a.id, a]))
+  const byId = new Map(arrests.map((a) => [a.id, a]))
 
   return rows.reduce((acc, r) => {
     const arrest1 = byId.get(r.arrest1_id)
