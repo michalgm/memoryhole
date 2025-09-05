@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.20.0](https://github.com/michalgm/memoryhole/compare/v0.19.1...v0.20.0) (2025-09-05)
+
+### Features
+
+* add CompositeIcon component ([e84bee9](https://github.com/michalgm/memoryhole/commit/e84bee98ce5a0e3c4c9648a7ecc0ebb6223a3341))
+* add info color for form inputs ([ab4f81e](https://github.com/michalgm/memoryhole/commit/ab4f81e2727dd1100027915cf4a13a5849a2c12f))
+* add mergeArrests service method to combine arrest records and preserve logs ([3564bb3](https://github.com/michalgm/memoryhole/commit/3564bb3d6bff9be6c8d5b22c56771fa87fbe7ac2))
+* add mulit-select for actions in users page ([930a19b](https://github.com/michalgm/memoryhole/commit/930a19bb350d26fe9ce68352e72b7fb685de91b5))
+* **api:** export data validation checks via prepareUpdate method ([0d5dbd0](https://github.com/michalgm/memoryhole/commit/0d5dbd0162af4e31510768998aeff4fedcf25c9e))
+* Implement ignored duplicate arrests functionality ([59d0565](https://github.com/michalgm/memoryhole/commit/59d05655660aadbdfdc8eff55a2ca5b9141df812))
+* implement merge arrests functionality with confirmation dialog ([2377a0a](https://github.com/michalgm/memoryhole/commit/2377a0a726020baeacfac38b2ce788796a711946))
+* refine duplicate arrest scoring and add comprehensive test scenarios ([f5d0854](https://github.com/michalgm/memoryhole/commit/f5d085406dad6706a3b984ca9169ce70c5c32377))
+* **Schema:** Rename 'User' user role to 'Operator' - Fixes [#11](https://github.com/michalgm/memoryhole/issues/11) ([8820ae6](https://github.com/michalgm/memoryhole/commit/8820ae6d4a1898fe380b4b368236e6e8ea4bac2e))
+* Show duplicate arrest matches as groups of rows on duplicateArrests page ([ac05801](https://github.com/michalgm/memoryhole/commit/ac05801aa2c37b330c24beb7818c5b3f7412d76e))
+* **UI:** Add disableCollapse param to FormSection ([8741e7d](https://github.com/michalgm/memoryhole/commit/8741e7d8d6eb4fc68d1469de70a1f33cf4f09e98))
+* **UI:** Docket sheet search fixes ([58cd780](https://github.com/michalgm/memoryhole/commit/58cd7805d27af22ca2b7c59e5b417b268b2e80fd)), closes [#16](https://github.com/michalgm/memoryhole/issues/16)
+* **UI:** FIrst Pass at arrest comparison UI ([2078716](https://github.com/michalgm/memoryhole/commit/2078716e6f4a961ed511facbc988a65eb5e721d6)), closes [#15](https://github.com/michalgm/memoryhole/issues/15)
+
+### Bug Fixes
+
+* add ignorePatterns to eslintConfig for better linting control ([dae8e3d](https://github.com/michalgm/memoryhole/commit/dae8e3decdf382b6fca26691cca34782dc4d405a))
+* allow target attribute in Link component to handle external links ([35a4a50](https://github.com/michalgm/memoryhole/commit/35a4a503c6df0132fd4ac487ff8190a06598e360))
+* **api:** enforce data vaildity checks on arrestAccess ([0c9774d](https://github.com/michalgm/memoryhole/commit/0c9774d667b85ce1fa65b1fc9d8f6f93e4d13a5a))
+* Correct punctuation in multi-line text field description ([a5f4eb7](https://github.com/michalgm/memoryhole/commit/a5f4eb74b63972027a6f72fb15747039cd00a046))
+* enhance column definition handling in DataTable component ([47f3dec](https://github.com/michalgm/memoryhole/commit/47f3dec491a2234d19211412c6b8a9d83db54e58))
+* enhance layout of ModInfo and CompareForm components for better responsiveness ([b581c99](https://github.com/michalgm/memoryhole/commit/b581c990a19736056df4c79b4daf4c102d43d438))
+* Ensure getSetting returns an empty object if key is not found in settingsCache ([63b109a](https://github.com/michalgm/memoryhole/commit/63b109a950d6a2cc11cfde632109403c93cead9e))
+* ensure initial state is set for tableProps and handle refetch reloading state ([73e434e](https://github.com/michalgm/memoryhole/commit/73e434e22610fa2330630c02f45d72289de03cfc))
+* hide label on action search ([977cde8](https://github.com/michalgm/memoryhole/commit/977cde898d3df00b1788c9f870d137717a388088))
+* **NavBar:** correct environment variable access for version and build timestamp ([bf31e9d](https://github.com/michalgm/memoryhole/commit/bf31e9d0eb37cb8f51775da271d4231866fc8738))
+* **NavBar:** improve version and build timestamp display with fallback values ([1480f31](https://github.com/michalgm/memoryhole/commit/1480f31a8c65505a092a90a743ff2fd91894aa6f))
+* **Routes:** update route components for arrest comparison and duplicates ([db0eee7](https://github.com/michalgm/memoryhole/commit/db0eee72447874188d980ceaa6598c152f6ff58a))
+* simplify snackbar message on entity creation ([2f4cdb1](https://github.com/michalgm/memoryhole/commit/2f4cdb142159d90d1794332181df1a9b1f146f52))
+* update Autocomplete and BaseField components to improve label handling and option formatting ([3778baa](https://github.com/michalgm/memoryhole/commit/3778baa2b76ec698709ce5198b1dc3f1c39df4c1))
+* update condition for rendering delete button in Footer component ([3b6c6c3](https://github.com/michalgm/memoryhole/commit/3b6c6c3c8d4e6c5a89263bd110084c6cf4774bf1))
+* Update user references to operator in site settings and related migration ([8b79373](https://github.com/michalgm/memoryhole/commit/8b79373284b1545a62e419b752762735c9a3be8c))
+* **useFormManager:** pass formState.isDirty to resetForm for improved state handling ([11e6bb7](https://github.com/michalgm/memoryhole/commit/11e6bb7d487f8f2142c80684026e05c237dc8bd6))
+* **vite.config:** correct environment variable definitions for build timestamp and app version ([094875e](https://github.com/michalgm/memoryhole/commit/094875edaa4eb8d2f0ab484a2a3a6df4b56737ea))
+* **vite.config:** remove unnecessary semicolon in version import ([34d00df](https://github.com/michalgm/memoryhole/commit/34d00dfdfa9446819039d7edbca53a19ec7f2bdc))
+
 ## [0.19.1](https://github.com/michalgm/memoryhole/compare/v0.19.0...v0.19.1) (2025-07-09)
 
 ### Bug Fixes
