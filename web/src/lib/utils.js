@@ -1,8 +1,9 @@
 import { Person } from '@mui/icons-material'
 import { Chip, Tooltip, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import dayjs from 'dayjs'
 import { renderToStaticMarkup } from 'react-dom/server'
+
+import dayjs from 'src/lib/dayjs'
 
 export const asyncDebounce = (fn, wait) => {
   let pending = null

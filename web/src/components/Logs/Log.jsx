@@ -19,13 +19,13 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import dayjs from 'dayjs'
 
 import { navigate, routes } from '@redwoodjs/router'
 
 import LogsForm from 'src/components/Logs/LogsForm'
 import RichTextInput from 'src/components/utils/RichTextInput'
 import Show from 'src/components/utils/Show'
+import dayjs from 'src/lib/dayjs'
 
 const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
   const [expanded, setExpanded] = useState(false)

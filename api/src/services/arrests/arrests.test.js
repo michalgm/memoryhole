@@ -1,5 +1,4 @@
-import dayjs from 'dayjs'
-
+import dayjs from 'src/lib/dayjs'
 import { db } from 'src/lib/db'
 
 import {

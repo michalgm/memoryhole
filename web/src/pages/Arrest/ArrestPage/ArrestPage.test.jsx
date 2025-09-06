@@ -1,5 +1,4 @@
 import userEvent from '@testing-library/user-event'
-import dayjs from 'dayjs'
 import { ConfirmProvider } from 'material-ui-confirm'
 
 import { navigate } from '@redwoodjs/router'
@@ -7,6 +6,7 @@ import { mockGraphQLQuery, screen, waitFor } from '@redwoodjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
+import dayjs from 'src/lib/dayjs'
 import { render } from 'src/setupTests'
 
 import ArrestPage from './ArrestPage'

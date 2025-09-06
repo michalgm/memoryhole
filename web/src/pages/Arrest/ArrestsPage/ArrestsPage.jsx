@@ -3,7 +3,6 @@ import { useState } from 'react'
 
 import { Button, Grid2, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
-import dayjs from 'dayjs'
 import { useConfirm } from 'material-ui-confirm'
 import { createPortal } from 'react-dom'
 
@@ -15,6 +14,7 @@ import BulkUpdateModal from 'src/components/utils/BulkUpdateModal'
 import Link from 'src/components/utils/Link'
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
+import dayjs from 'src/lib/dayjs'
 import { schema } from 'src/lib/FieldSchemas'
 
 export const QUERY = gql`

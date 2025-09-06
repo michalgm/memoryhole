@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLazyQuery, useMutation } from '@apollo/client'
-import dayjs from 'dayjs'
 import { get, isEmpty } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
 import { useForm } from 'react-hook-form-mui'
@@ -9,6 +8,7 @@ import { useForm } from 'react-hook-form-mui'
 import { useBlocker } from '@redwoodjs/router'
 
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
+import dayjs from 'src/lib/dayjs'
 import { mockMutation, mockQuery } from 'src/lib/gql_fragments'
 import { transformData } from 'src/lib/transforms'
 

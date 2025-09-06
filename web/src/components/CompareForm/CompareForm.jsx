@@ -13,7 +13,6 @@ import {
   Typography,
 } from '@mui/material'
 import { Stack } from '@mui/system'
-import dayjs from 'dayjs'
 import { get, isEqual, isObject } from 'lodash-es'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
@@ -25,6 +24,7 @@ import { ModInfo } from 'src/components/utils/Footer'
 import FormSection from 'src/components/utils/FormSection'
 import TextLink from 'src/components/utils/Link'
 import Show from 'src/components/utils/Show'
+import dayjs from 'src/lib/dayjs'
 import { transformData } from 'src/lib/transforms'
 
 const compareObjects = (obj1, obj2, path = '', diffs = new Set()) => {

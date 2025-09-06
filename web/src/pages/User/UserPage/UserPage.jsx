@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
 import { Box, Typography } from '@mui/material'
-import dayjs from 'dayjs'
 import { startCase, upperCase } from 'lodash-es'
 
 import { navigate, routes } from '@redwoodjs/router'
@@ -9,6 +8,7 @@ import { navigate, routes } from '@redwoodjs/router'
 import { useAuth } from 'src/auth'
 import FormContainer from 'src/components/utils/FormContainer'
 import { useApp } from 'src/lib/AppContext'
+import dayjs from 'src/lib/dayjs'
 import { useSiteSettings } from 'src/lib/useSiteSettings'
 
 export const QUERY = gql`

@@ -29,13 +29,13 @@ import {
   useColorScheme,
   useMediaQuery,
 } from '@mui/material'
-import dayjs from 'dayjs'
 import { useConfirm } from 'material-ui-confirm'
 
 import { Link, routes, useMatch } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
 import { LEFT_DRAWER_WIDTH, LEFT_DRAWER_WIDTH_SMALL } from 'src/lib/AppContext'
+import dayjs from 'src/lib/dayjs'
 
 const NavDrawer = ({ navOpen }) => {
   const { currentUser, logOut } = useAuth()
