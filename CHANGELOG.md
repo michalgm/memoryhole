@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.21.1](https://github.com/michalgm/memoryhole/compare/v0.21.0...v0.21.1) (2025-09-06)
+
+### Features
+
+* expand access restrictions ([310f900](https://github.com/michalgm/memoryhole/commit/310f900e8dc1430e8c6ff834db9a506bf57905db))
+
 ## [0.21.0](https://github.com/michalgm/memoryhole/compare/v0.19.1...v0.21.0) (2025-09-06)
 
 ### Features
