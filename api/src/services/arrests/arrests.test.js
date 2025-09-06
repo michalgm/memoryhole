@@ -145,21 +145,33 @@ describe('arrests', () => {
   )
 
   scenario(
-    'does not overwrite custom_fields when input is null or undefined',
+    'throws custom_fields when input is null or undefined',
     async (scenario) => {
       mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
       await updateArrest({
         id: scenario.arrest.one.id,
         input: { custom_fields: { foo: 'bar' } },
       })
-      await updateArrest({
-        id: scenario.arrest.one.id,
-        input: { custom_fields: null },
-      })
-      const resultNull = await db.arrest.findUnique({
-        where: { id: scenario.arrest.one.id },
-      })
-      expect(resultNull.custom_fields).toMatchObject({ foo: 'bar' })
+      await expect(
+        updateArrest({
+          id: scenario.arrest.one.id,
+          input: { custom_fields: null },
+        })
+      ).rejects.toThrow('Arrest.custom_fields must be an object')
+
+      await expect(
+        updateArrest({
+          id: scenario.arrest.one.id,
+          input: { custom_fields: undefined },
+        })
+      ).rejects.toThrow('Arrest.custom_fields must be an object')
+
+      await expect(
+        updateArrest({
+          id: scenario.arrest.one.id,
+          input: { custom_fields: '' },
+        })
+      ).rejects.toThrow('Arrest.custom_fields must be an object')
 
       await updateArrest({
         id: scenario.arrest.one.id,
@@ -258,6 +270,128 @@ describe('arrests', () => {
         alpha: 'beta',
         newKey: 'arrestee',
       })
+    }
+  )
+
+  scenario(
+    'per-key primitives/arrays are valid replacements',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+      const id = scenario.arrest.one.id
+
+      await updateArrest({
+        id,
+        input: { custom_fields: { a: 'x', b: 2, c: true } },
+      })
+      await updateArrest({
+        id,
+        input: { custom_fields: { a: null, b: 0, c: false, d: '', e: [] } },
+      })
+
+      const r = await db.arrest.findUnique({ where: { id } })
+      expect(r.custom_fields).toMatchObject({
+        a: null,
+        b: 0,
+        c: false,
+        d: '',
+        e: [],
+      })
+    }
+  )
+
+  scenario('per-key undefined is ignored', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+    const id = scenario.arrest.one.id
+
+    await updateArrest({
+      id,
+      input: { custom_fields: { a: 'keep', b: 'change' } },
+    })
+    // Note: undefined will not serialize over the wire; simulate internal call
+    await updateArrest({
+      id,
+      input: { custom_fields: { a: undefined, b: 'new' } },
+    })
+
+    const r = await db.arrest.findUnique({ where: { id } })
+    expect(r.custom_fields).toMatchObject({ a: 'keep', b: 'new' })
+  })
+
+  scenario(
+    'nested objects replace whole key value (no deep merge)',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+      const id = scenario.arrest.one.id
+
+      await updateArrest({
+        id,
+        input: { custom_fields: { settings: { x: 1, y: 2, z: 3 } } },
+      })
+      await updateArrest({
+        id,
+        input: { custom_fields: { settings: { y: 200 } } }, // replace *entire* settings
+      })
+
+      const r = await db.arrest.findUnique({ where: { id } })
+      expect(r.custom_fields.settings).toEqual({ y: 200 }) // x,z gone
+    }
+  )
+
+  scenario('arrays replace, not concat', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+    const id = scenario.arrest.one.id
+
+    await updateArrest({ id, input: { custom_fields: { tags: ['a', 'b'] } } })
+    await updateArrest({ id, input: { custom_fields: { tags: ['x'] } } })
+
+    const r = await db.arrest.findUnique({ where: { id } })
+    expect(r.custom_fields.tags).toEqual(['x'])
+  })
+
+  scenario(
+    'merges when existing custom_fields is null/absent',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+      const id = scenario.arrest.two.id // ensure two starts with null/empty
+
+      await updateArrest({ id, input: { custom_fields: { a: 1 } } })
+      const r = await db.arrest.findUnique({ where: { id } })
+      expect(r.custom_fields).toEqual({ a: 1 })
+    }
+  )
+
+  scenario('rejects non-plain objects at top level', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+    const id = scenario.arrest.one.id
+
+    // Simulate internal call passing a Date (GraphQL would usually serialize to string)
+    await expect(
+      updateArrest({
+        id,
+        input: { custom_fields: new Date() },
+      })
+    ).rejects.toThrow('Arrest.custom_fields must be an object')
+  })
+
+  scenario(
+    'arrestee: nested key replacement, not deep merge',
+    async (scenario) => {
+      mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+      const id = scenario.arrest.one.id
+
+      await updateArrest({
+        id,
+        input: { arrestee: { custom_fields: { prefs: { a: 1, b: 2 } } } },
+      })
+      await updateArrest({
+        id,
+        input: { arrestee: { custom_fields: { prefs: { b: 200 } } } },
+      })
+
+      const arrestee = await db.arrestee.findUnique({
+        where: { id: scenario.arrest.one.arrestee_id },
+      })
+      expect(arrestee.custom_fields.prefs).toEqual({ b: 200 })
     }
   )
 

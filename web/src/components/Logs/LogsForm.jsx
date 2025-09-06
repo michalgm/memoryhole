@@ -1,10 +1,12 @@
+import { gql } from '@apollo/client'
 import { Box, Button, Grid2, Stack, Tooltip } from '@mui/material'
+
 import { useParams, useRoutePath } from '@redwoodjs/router'
 
-import { gql } from '@apollo/client'
 import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
+
 import { BaseForm } from '../utils/BaseForm'
 import { Field } from '../utils/Field'
 import LoadingButton from '../utils/LoadingButton'
@@ -54,8 +56,8 @@ const Row = ({ children, ...props }) => (
 )
 
 const transformInput = (input) => {
-  if (input.action) {
-    input.action_id = input.action.id
+  if (input.action !== undefined) {
+    input.action_id = input.action?.id || null
     delete input.action
   }
   if (input.arrests) {
@@ -76,7 +78,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           id: log_id,
           schema,
           modelType: 'Log',
-          namePath: 'notes',
+          namePath: 'time',
           skipDirtyCheck: sidebar,
           createMutation: CREATE_MUTATION,
           deleteMutation: DELETE_MUTATION,

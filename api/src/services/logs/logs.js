@@ -1,3 +1,5 @@
+import { disconnect } from 'pm2'
+
 import { ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
@@ -55,20 +57,21 @@ export const arresteeLogs = ({ arrestee_id }) => {
   })
 }
 
-const prepareData = ({ log, arrests = [], action_id, id }) => {
+const prepareData = ({ log, arrests, action_id, id }) => {
   const data = {
     ...log,
     updated_by: {
       connect: { id: context.currentUser.id },
     },
   }
-  if (arrests.length) {
+  if (arrests !== undefined) {
     data.arrests = {
-      connect: arrests.map((id) => ({ id })),
+      set: (arrests || []).map((id) => ({ id })),
     }
   }
-  if (action_id) {
-    data.action = { connect: { id: action_id } }
+  if (action_id !== undefined) {
+    data.action =
+      action_id === null ? { disconnect: true } : { connect: { id: action_id } }
   }
   if (!id) {
     data.created_by = {
@@ -91,11 +94,10 @@ export const createLog = ({ input: { arrests = [], action_id, ...input } }) => {
 
 export const updateLog = async ({
   id,
-  input: { arrests = [], action_id, ...input },
+  input: { arrests, action_id, ...input },
 }) => {
   await checkLogsAccess([id])
   const current = await db.log.findUnique({ where: { id } })
-
   const data = prepareData({
     log: input,
     arrests,
@@ -103,7 +105,6 @@ export const updateLog = async ({
     id,
   })
   const mergedInput = await prepareJsonUpdate('Log', data, { current })
-
   return db.log.update({
     data: mergedInput,
     where: { id },

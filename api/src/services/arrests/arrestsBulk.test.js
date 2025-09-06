@@ -112,14 +112,12 @@ describe('bulk arrestee custom_fields update', () => {
         id: scenario.arrest.one.id,
         input: { custom_fields: { foo: 'bar' } },
       })
-      await bulkUpdateArrests({
-        ids: [scenario.arrest.one.id],
-        input: { custom_fields: null },
-      })
-      const resultNull = await db.arrest.findUnique({
-        where: { id: scenario.arrest.one.id },
-      })
-      expect(resultNull.custom_fields).toMatchObject({ foo: 'bar' })
+      await expect(
+        bulkUpdateArrests({
+          ids: [scenario.arrest.one.id],
+          input: { custom_fields: null },
+        })
+      ).rejects.toThrow('Arrest.custom_fields must be an object')
 
       await bulkUpdateArrests({
         ids: [scenario.arrest.one.id],

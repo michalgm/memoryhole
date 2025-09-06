@@ -1,6 +1,6 @@
-import { merge, startCase } from 'lodash'
+import { isPlainObject, startCase } from 'lodash'
 
-import { ForbiddenError } from '@redwoodjs/graphql-server'
+import { ForbiddenError, ValidationError } from '@redwoodjs/graphql-server'
 
 import dayjs from 'src/lib/dayjs'
 import { db } from 'src/lib/db'
@@ -38,15 +38,29 @@ export async function prepareJsonUpdate(
     if (!currentData) throw new Error(`${modelName} with id ${id} not found`)
   }
   const merged = { ...updateData }
-  // console.log('JSON FIELDS', jsonbFields)
   for (const field of jsonFields) {
     if (field in updateData) {
-      // console.log(
-      //   `Merging JSONB field ${field} for model ${modelName}`,
-      //   currentData[field],
-      //   updateData[field]
-      // )
-      merged[field] = merge({}, currentData[field], updateData[field])
+      const base = currentData?.[field]
+      const patch = updateData[field]
+
+      if (!isPlainObject(patch)) {
+        throw new ValidationError(`${modelName}.${field} must be an object`)
+      }
+
+      // Shallow merge top-level keys; keep unspecified keys from base.
+      const baseObj =
+        base && typeof base === 'object' && !Array.isArray(base) ? base : {}
+
+      const out = { ...baseObj }
+      for (const [k, v] of Object.entries(patch)) {
+        if (v === undefined) {
+          // treat undefined as "leave key unchanged"
+          continue
+        }
+        out[k] = v // allow null/[], etc. to overwrite
+      }
+
+      merged[field] = out
     }
   }
   return merged
