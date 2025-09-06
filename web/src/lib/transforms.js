@@ -1,6 +1,6 @@
 import { get, reduce, set } from 'lodash-es'
 
-import dayjs from '../../../api/src/lib/day'
+import dayjs from 'src/lib/dayjs'
 
 const dateTransformer = (value) => {
   if (!value) return null

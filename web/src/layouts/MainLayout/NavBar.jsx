@@ -8,12 +8,12 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import dayjs from 'dayjs'
 
 import { Link, routes } from '@redwoodjs/router'
 
 import NavBarControls from 'src/layouts/MainLayout/NavBarControls'
 import { useApp } from 'src/lib/AppContext'
+import dayjs from 'src/lib/dayjs'
 
 const NavBar = ({ navOpen, setNavOpen, setLogsOpen, logsOpen, height }) => {
   const { currentAction, setCurrentAction } = useApp()

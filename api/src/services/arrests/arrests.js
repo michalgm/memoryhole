@@ -5,7 +5,7 @@ import { db } from 'src/lib/db'
 import { getSetting } from 'src/lib/settingsCache'
 import { prepareJsonUpdate } from 'src/lib/utils'
 
-import dayjs from '../../lib/day'
+import dayjs from '../../lib/dayjs'
 import { updateDisplayField as updateArresteeDisplayField } from '../arrestees/arrestees'
 
 import * as duplicateArrests from './duplicateArrests'

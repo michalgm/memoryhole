@@ -7,9 +7,8 @@ import DocketSheetCell from 'src/components/DocketSheetCell/DocketSheetCell'
 import Form from 'src/components/Form/Form'
 import { Field } from 'src/components/utils/Field'
 import FormSection from 'src/components/utils/FormSection'
+import dayjs from 'src/lib/dayjs'
 import { schema } from 'src/lib/FieldSchemas'
-
-import dayjs from '../../../../api/src/lib/day'
 
 const DocketSheetsPage = () => {
   const [search, setSearch] = useState({

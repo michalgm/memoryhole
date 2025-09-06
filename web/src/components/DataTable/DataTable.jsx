@@ -15,8 +15,8 @@ import { flushSync } from 'react-dom'
 import ReactDOM from 'react-dom/client'
 
 import { useContainerWidth } from 'src/lib/AppContext'
+import dayjs from 'src/lib/dayjs'
 
-import dayjs from '../../../../api/src/lib/day'
 import { formatLabel } from '../utils/BaseField'
 
 import ManageViews from './ManageViews'
@@ -75,17 +75,16 @@ const defineColumns = (
       minSize: 1,
     }
     if (type === 'date-time' || type === 'date') {
-      const format = type === 'date' ? 'L' : 'L hh:mm A'
       col.accessorFn = (originalRow) => {
         const val = get(originalRow, field) ?? null
-        if (type == 'date') {
-          return val ? dayjs(val).startOf('day').toDate() : null
-        } else {
-          return val ? dayjs(val).toDate() : null
-        }
+        return val ? dayjs(val).toDate() : null
       }
       col.Cell = ({ cell }) =>
-        cell.getValue() ? dayjs(cell.getValue()).format(format) : null
+        cell.getValue()
+          ? type == 'date'
+            ? dayjs.utc(cell.getValue()).format('L')
+            : dayjs(cell.getValue()).format('L hh:mm A')
+          : null
       col.filterVariant = 'date'
     } else if (type === 'checkbox') {
       col.id = field

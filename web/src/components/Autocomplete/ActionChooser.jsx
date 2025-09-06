@@ -1,6 +1,6 @@
 import { ListItemText } from '@mui/material'
 
-import dayjs from '../../../../api/src/lib/day'
+import dayjs from 'src/lib/dayjs'
 
 import Autocomplete from './Autocomplete'
 
