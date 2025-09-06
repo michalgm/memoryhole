@@ -149,8 +149,8 @@ export const updateUser = async ({ id, input }) => {
   if (input.email) {
     return validateUniqueness(
       'user',
-      { db },
       { email: input.email, $self: { id } },
+      { db },
       doUserUpdate
     )
   }
