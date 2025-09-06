@@ -44,7 +44,7 @@
     "seed": "yarn rw exec seed",
     "schema": "api/db/schema.prisma"
   },
-  "version": "0.20.0",
+  "version": "0.21.0",
   "packageManager": "yarn@4.5.3",
   "dependencies": {
     "axios": "^1.11.0",
