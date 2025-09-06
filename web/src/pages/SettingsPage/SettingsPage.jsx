@@ -8,6 +8,7 @@ import { Field } from 'src/components/utils/Field'
 import Footer from 'src/components/utils/Footer'
 import FormSection from 'src/components/utils/FormSection'
 import Show from 'src/components/utils/Show'
+import { userSchema } from 'src/lib/FieldSchemas'
 import { transformSettings } from 'src/lib/useSiteSettings'
 
 const QUERY_SETTINGS = gql`
@@ -41,34 +42,24 @@ const UPSERT_SETTINGS_MUTATION = gql`
 const restrictionTypes = [
   {
     name: 'expiresAt',
-    label: 'Expires At',
-    description: "User's login will be disabled this many days after being set",
-    field_type: 'date',
     noDisable: true,
   },
   {
-    name: 'arrest_date_min',
-    label: 'Minimum Arrest Date',
-    description:
-      'User will not have access to arrests this many days before being set',
-    field_type: 'date',
+    name: 'access_date_min',
     withDirection: true,
   },
   {
-    name: 'arrest_date_max',
-    label: 'Maximum Arrest Date',
-    description:
-      'User will not have access to arrests this many days after being set',
-    field_type: 'date',
+    name: 'access_date_max',
     withDirection: true,
   },
   {
-    name: 'arrest_date_threshold',
-    label: 'Arrest Date Threshold',
-    description:
-      'Users will not have access to arrests where the arrest date is older than this many days before the time they view the data.',
+    name: 'access_date_threshold',
   },
-]
+].map((type) => ({
+  ...type,
+  label: userSchema[type.name]?.props.label,
+  description: userSchema[type.name]?.props.helperText,
+}))
 
 const DaysInputField = ({ withDirection = false, ...props }) => {
   return (
@@ -156,8 +147,8 @@ const SettingsPage = () => {
               <Typography variant="body1">
                 The settings below define default values for new users and apply
                 when a user&apos;s restrictions are updated. For all fields
-                except &apos;Arrest Date Threshold,&apos; values are relative to
-                the time the user is created or updated. For &apos;Arrest Date
+                except &apos;Access Date Threshold,&apos; values are relative to
+                the time the user is created or updated. For &apos;Access Date
                 Threshold,&apos; the value is always relative to the current
                 time, functioning as a rolling restriction.
               </Typography>

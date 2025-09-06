@@ -14,8 +14,8 @@ export const QUERY = gql`
       name
       email
       role
-      arrest_date_max
-      arrest_date_min
+      access_date_max
+      access_date_min
       expiresAt
       actions {
         name

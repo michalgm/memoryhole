@@ -10,9 +10,9 @@ export const schema = gql`
     expiresAt: DateTime
     # resetToken: String
     # resetTokenExpiresAt: DateTime
-    arrest_date_min: DateTime
-    arrest_date_max: DateTime
-    arrest_date_threshold: Int
+    access_date_min: DateTime
+    access_date_max: DateTime
+    access_date_threshold: Int
     action_ids: [Int]
     created_arrests: [Arrest]!
     updated_arrests: [Arrest]!
@@ -44,9 +44,9 @@ export const schema = gql`
     expiresAt: DateTime
     # resetToken: String
     # resetTokenExpiresAt: DateTime
-    arrest_date_min: DateTime
-    arrest_date_max: DateTime
-    arrest_date_threshold: Int
+    access_date_min: DateTime
+    access_date_max: DateTime
+    access_date_threshold: Int
     action_ids: [Int]
   }
 
@@ -60,9 +60,9 @@ export const schema = gql`
     expiresAt: DateTime
     # resetToken: String
     # resetTokenExpiresAt: DateTime
-    arrest_date_min: DateTime
-    arrest_date_max: DateTime
-    arrest_date_threshold: Int
+    access_date_min: DateTime
+    access_date_max: DateTime
+    access_date_threshold: Int
     action_ids: [Int]
   }
 

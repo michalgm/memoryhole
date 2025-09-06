@@ -1,37 +1,57 @@
-import { db } from 'src/lib/db'
-import { prepareJsonUpdate } from 'src/lib/utils'
+import { ForbiddenError } from '@redwoodjs/graphql-server'
 
+import { db } from 'src/lib/db'
+import { checkAccess, filterAccess, prepareJsonUpdate } from 'src/lib/utils'
+
+export const checkLogAccess = checkAccess('time', 'action_id', 'log')
+
+export const checkLogsAccess = async (ids, tx) => {
+  const logs = await (tx || db).$unfilteredQuery.log.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      action_id: true,
+      time: true,
+      custom_fields: true,
+    },
+  })
+
+  if (logs.length !== ids.length) {
+    throw new ForbiddenError('One or more logs not found')
+  }
+
+  logs.forEach((log) => {
+    checkLogAccess(log)
+  })
+  return logs
+}
+
+export const filterLogAccess = filterAccess('time', 'action_id')
 export const logs = (
   {
-    params: {
-      where = {},
-      orderBy = { created_at: 'desc' },
-      take = 20,
-      skip = 0,
-    },
+    params: { where = {}, orderBy = { time: 'desc' }, take = 20, skip = 0 },
   } = { params: {} }
 ) => {
   return db.log.findMany({
-    where,
+    where: filterLogAccess(where),
     orderBy,
     take,
     skip,
   })
 }
 
-export const log = ({ id }) => {
-  return db.log.findUnique({
+export const log = async ({ id }) => {
+  const log = await db.log.findUnique({
     where: { id },
   })
+  checkLogAccess(log)
+  return log
 }
 
 export const arresteeLogs = ({ arrestee_id }) => {
+  const where = { arrests: { some: { id: arrestee_id } } }
   return db.log.findMany({
-    where: {
-      arrests: {
-        some: { id: arrestee_id },
-      },
-    },
+    where: filterLogAccess(where),
   })
 }
 
@@ -73,6 +93,7 @@ export const updateLog = async ({
   id,
   input: { arrests = [], action_id, ...input },
 }) => {
+  await checkLogsAccess([id])
   const current = await db.log.findUnique({ where: { id } })
 
   const data = prepareData({
@@ -89,7 +110,8 @@ export const updateLog = async ({
   })
 }
 
-export const deleteLog = ({ id }) => {
+export const deleteLog = async ({ id }) => {
+  await checkLogsAccess([id])
   return db.log.delete({
     where: { id },
   })

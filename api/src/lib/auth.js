@@ -41,9 +41,9 @@ export const getCurrentUser = async (session) => {
       name: true,
       role: true,
       action_ids: true,
-      arrest_date_max: true,
-      arrest_date_min: true,
-      arrest_date_threshold: true,
+      access_date_max: true,
+      access_date_min: true,
+      access_date_threshold: true,
       expiresAt: true,
     },
   })

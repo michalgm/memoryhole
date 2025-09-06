@@ -10,9 +10,9 @@ registerFragment(gql`
     expiresAt
     role
     custom_fields
-    arrest_date_max
-    arrest_date_min
-    arrest_date_threshold
+    access_date_max
+    access_date_min
+    access_date_threshold
     action_ids
     actions {
       id

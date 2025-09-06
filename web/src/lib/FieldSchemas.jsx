@@ -537,29 +537,31 @@ export const UserFields = [
         },
       ],
       [
-        'arrest_date_threshold',
+        'access_date_threshold',
         {
           type: 'number',
-          label: 'Arrest Date Threshold',
+          label: 'Access Date Threshold',
           endAdornment: 'days',
           helperText:
-            'Users will not have access to arrests where the arrest date is older than this many days before the time they view the data.',
+            'Users will not have access to arrests or logs where the date is older than this many days before the time they view the data.',
         },
       ],
       [
-        'arrest_date_min',
+        'access_date_min',
         {
           field_type: 'date',
-          label: 'Minimum Arrest Date',
-          helperText: 'User will not have access to arrests before this date',
+          label: 'Minimum Access Date',
+          helperText:
+            'User will not have access to arrests or logs before this date',
         },
       ],
       [
-        'arrest_date_max',
+        'access_date_max',
         {
           field_type: 'date',
-          label: 'Maximum Arrest Date',
-          helperText: 'User will not have access to arrests after this date',
+          label: 'Maximum Access Date',
+          helperText:
+            'User will not have access to arrests or logs after this date',
         },
       ],
       [
@@ -568,7 +570,7 @@ export const UserFields = [
           field_type: 'action_chooser',
           multiple: true,
           helperText:
-            'User will not have access to arrests outside of these actions. If no actions are set, the user will have access to all actions.',
+            'User will not have access to arrests or logs outside of these actions. If no actions are set, the user will have access to all actions.',
         },
       ],
     ],

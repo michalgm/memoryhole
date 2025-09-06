@@ -70,7 +70,7 @@ const applyDefaults = (
           return
         }
         let value = defaults[field]
-        if (value && field !== 'arrest_date_threshold') {
+        if (value && field !== 'access_date_threshold') {
           const operation =
             defaults[`${field}_direction`] === 'before' ? 'subtract' : 'add'
           value = dayjs()[operation](value, 'day').endOf('day')
@@ -106,7 +106,7 @@ const DefaultsTooltip = ({ default_restrictions, restriction_settings }) => (
                 }
                 if (!values[field]) {
                   value = 'N/A'
-                } else if (field === 'arrest_date_threshold') {
+                } else if (field === 'access_date_threshold') {
                   value = `${values[field]} days`
                 } else {
                   const direction =
