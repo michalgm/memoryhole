@@ -1,6 +1,10 @@
-import { merge } from 'lodash'
+import { merge, startCase } from 'lodash'
 
+import { ForbiddenError } from '@redwoodjs/graphql-server'
+
+import dayjs from 'src/lib/dayjs'
 import { db } from 'src/lib/db'
+import { getSetting } from 'src/lib/settingsCache'
 import { jsonbFields } from 'src/lib/utils/jsonbFieldsFromSDL'
 
 /**
@@ -46,4 +50,94 @@ export async function prepareJsonUpdate(
     }
   }
   return merged
+}
+
+export const checkAccess = (dateField, action_id, type) => (item) => {
+  if (!item) {
+    return
+  }
+  const uCaseType = startCase(type)
+  const settings = getSetting('restriction_settings')
+  const {
+    action_ids = [],
+    access_date_min,
+    access_date_max,
+    access_date_threshold,
+  } = context.currentUser
+
+  if (!item?.[dateField]) {
+    throw new ForbiddenError(
+      `Incomplete ${type} data for access check - missing ${dateField} field`
+    )
+  }
+
+  if (
+    settings.access_date_min &&
+    access_date_min &&
+    item[dateField] < access_date_min
+  ) {
+    throw new ForbiddenError(
+      `${uCaseType} ${dateField} ${item[dateField]} is before your minimum access date ${access_date_min}`
+    )
+  }
+  if (
+    settings.access_date_max &&
+    access_date_max &&
+    item[dateField] > dayjs(access_date_max).endOf('day')
+  ) {
+    throw new ForbiddenError(
+      `${uCaseType} ${dateField} ${item[dateField]} is after your maximum access date ${access_date_max}`
+    )
+  }
+  if (
+    settings.access_date_threshold &&
+    access_date_threshold &&
+    item[dateField] <
+    dayjs().subtract(access_date_threshold, 'day').startOf('day')
+  ) {
+    throw new ForbiddenError(
+      `${uCaseType} ${dateField} ${item[dateField]} is older than your access date threshold of ${access_date_threshold} days`
+    )
+  }
+
+  if (action_ids.length === 0) return true
+
+  if (!item?.[action_id] || !action_ids.includes(item[action_id])) {
+    throw new ForbiddenError(`You don't have access to ${type} id ${item.id}`)
+  }
+}
+
+export const filterAccess = (dateField, action_id) => {
+  return (baseWhere = {}) => {
+    const settings = getSetting('restriction_settings')
+    const {
+      action_ids = [],
+      access_date_min,
+      access_date_max,
+      access_date_threshold,
+    } = context.currentUser
+    const where = { ...baseWhere }
+    const dateConstraints = []
+    if (where[dateField]) {
+      dateConstraints.push(where[dateField])
+    }
+    if (access_date_min && settings.access_date_min) {
+      dateConstraints.push({ gte: access_date_min })
+    }
+    if (access_date_max && settings.access_date_max) {
+      dateConstraints.push({ lte: access_date_max })
+    }
+    if (access_date_threshold && settings.access_date_threshold) {
+      dateConstraints.push({
+        gte: dayjs().subtract(access_date_threshold, 'day').startOf('day'),
+      })
+    }
+    if (dateConstraints.length > 0) {
+      where.AND = dateConstraints.map((c) => ({ [dateField]: c }))
+    }
+    if (action_ids.length > 0) {
+      where[action_id] = { ...where[action_id], in: action_ids }
+    }
+    return where
+  }
 }

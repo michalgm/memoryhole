@@ -4,8 +4,8 @@ import { emitLogLevels, handlePrismaLogging } from '@redwoodjs/api/logger'
 
 import { logger } from 'src/lib/logger'
 import { updateSettingsCache } from 'src/lib/settingsCache'
-
-import { filterArrestAccess } from '../services/arrests/arrests'
+import { filterArrestAccess } from 'src/services/arrests/arrests'
+import { filterLogAccess } from 'src/services/logs/logs'
 
 const MUTATION_OPERATIONS = [
   'create',
@@ -47,12 +47,20 @@ export const settingsObserver = Prisma.defineExtension((client) => {
   })
 })
 
-export const arrestAccessFilter = Prisma.defineExtension((client) => {
+export const accessFilter = Prisma.defineExtension((client) => {
   return client.$extends({
-    name: 'arrestAccessFilter',
+    name: 'accessFilter',
     client: {
       // Add unfiltered query methods
       $unfilteredQuery: {
+        log: {
+          findMany: (args) => {
+            return bypassClient.log.findMany(args)
+          },
+          findUnique: (args) => {
+            return bypassClient.log.findUnique(args)
+          },
+        },
         arrest: {
           findMany: (args) => {
             return bypassClient.arrest.findMany(args)
@@ -68,6 +76,14 @@ export const arrestAccessFilter = Prisma.defineExtension((client) => {
         async $allOperations({ args, query }) {
           if (args.where) {
             args.where = filterArrestAccess(args.where)
+          }
+          return query(args)
+        },
+      },
+      log: {
+        async $allOperations({ args, query }) {
+          if (args.where) {
+            args.where = filterLogAccess(args.where)
           }
           return query(args)
         },
@@ -97,5 +113,5 @@ export const applyExtensions = (client) => {
   return client
     .$extends(initExtension)
     .$extends(settingsObserver)
-    .$extends(arrestAccessFilter)
+    .$extends(accessFilter)
 }

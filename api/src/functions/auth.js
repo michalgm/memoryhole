@@ -193,9 +193,9 @@ export const handler = async (event, context) => {
       'name',
       'role',
       'action_ids',
-      'arrest_date_max',
-      'arrest_date_min',
-      'arrest_date_threshold',
+      'access_date_max',
+      'access_date_min',
+      'access_date_threshold',
       'expiresAt',
     ],
     // A map of what dbAuth calls a field to what your database calls it.

@@ -264,8 +264,8 @@ describe('arrests', () => {
   // --- Filtering ---
   scenario('filterArrestAccess combines date and action filters', () => {
     mockCurrentUser({
-      arrest_date_min: new Date('2023-01-01'),
-      arrest_date_max: new Date('2023-12-31'),
+      access_date_min: new Date('2023-01-01'),
+      access_date_max: new Date('2023-12-31'),
       action_ids: [1, 2],
     })
     const result = filterArrestAccess({})
@@ -361,8 +361,8 @@ describe('arrest access controls', () => {
     async (scenario) => {
       mockCurrentUser({
         id: scenario.user.admin.id,
-        arrest_date_min: new Date('2023-01-01'),
-        arrest_date_max: new Date('2023-12-31'),
+        access_date_min: new Date('2023-01-01'),
+        access_date_max: new Date('2023-12-31'),
       })
 
       const result = await arrests()
@@ -444,12 +444,12 @@ describe('arrest date threshold filtering', () => {
     jest.useFakeTimers()
     jest.setSystemTime(mockDate)
     mockCurrentUser({
-      arrest_date_threshold: 30, // 30 days threshold
+      access_date_threshold: 30, // 30 days threshold
     })
     jest.spyOn(require('src/lib/settingsCache'), 'getSetting').mockReturnValue({
-      arrest_date_threshold: true,
-      arrest_date_max: true,
-      arrest_date_min: true,
+      access_date_threshold: true,
+      access_date_max: true,
+      access_date_min: true,
     })
   })
 
@@ -479,8 +479,8 @@ describe('arrest date threshold filtering', () => {
 
   test('combines threshold with max date correctly', () => {
     mockCurrentUser({
-      arrest_date_threshold: 30,
-      arrest_date_max: new Date('2024-12-31'),
+      access_date_threshold: 30,
+      access_date_max: new Date('2024-12-31'),
     })
 
     const result = filterArrestAccess({})
@@ -493,13 +493,13 @@ describe('arrest date threshold filtering', () => {
   })
   test('does not apply threshold when setting is disabled', () => {
     require('src/lib/settingsCache').getSetting.mockReturnValue({
-      arrest_date_threshold: false,
-      arrest_date_max: true,
+      access_date_threshold: false,
+      access_date_max: true,
     })
 
     mockCurrentUser({
-      arrest_date_threshold: 30,
-      arrest_date_max: new Date('2024-12-31'),
+      access_date_threshold: 30,
+      access_date_max: new Date('2024-12-31'),
     })
 
     const result = filterArrestAccess({})
@@ -517,9 +517,9 @@ describe('checkArrestAccess', () => {
     jest.useFakeTimers()
     jest.setSystemTime(mockDate)
     jest.spyOn(require('src/lib/settingsCache'), 'getSetting').mockReturnValue({
-      arrest_date_threshold: true,
-      arrest_date_max: true,
-      arrest_date_min: true,
+      access_date_threshold: true,
+      access_date_max: true,
+      access_date_min: true,
     })
   })
 
@@ -529,7 +529,7 @@ describe('checkArrestAccess', () => {
 
   test('throws error when arrest date is before min date', () => {
     mockCurrentUser({
-      arrest_date_min: new Date('2023-01-01'),
+      access_date_min: new Date('2023-01-01'),
     })
 
     expect(() => checkArrestAccess({ date: new Date('2022-12-31') })).toThrow(
@@ -539,7 +539,7 @@ describe('checkArrestAccess', () => {
 
   test('throws error when arrest date is after max date', () => {
     mockCurrentUser({
-      arrest_date_max: new Date('2023-12-31'),
+      access_date_max: new Date('2023-12-31'),
     })
 
     expect(() => checkArrestAccess({ date: new Date('2024-01-01') })).toThrow(
@@ -549,7 +549,7 @@ describe('checkArrestAccess', () => {
 
   test('throws error when arrest date exceeds threshold', () => {
     mockCurrentUser({
-      arrest_date_threshold: 30,
+      access_date_threshold: 30,
     })
 
     const oldDate = dayjs().subtract(31, 'days').toDate()
@@ -568,9 +568,9 @@ describe('checkArrestAccess', () => {
 
   test('allows access when all conditions are met', () => {
     mockCurrentUser({
-      arrest_date_min: new Date('2023-01-01'),
-      arrest_date_max: new Date('2024-12-31'),
-      arrest_date_threshold: 30,
+      access_date_min: new Date('2023-01-01'),
+      access_date_max: new Date('2024-12-31'),
+      access_date_threshold: 30,
       action_ids: [1],
     })
 

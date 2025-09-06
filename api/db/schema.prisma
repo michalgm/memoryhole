@@ -146,9 +146,9 @@ model User {
   resetToken             String?
   resetTokenExpiresAt    DateTime?
   action_ids             Int[] // Array of action IDs
-  arrest_date_min        DateTime?
-  arrest_date_max        DateTime?
-  arrest_date_threshold  Int?
+  access_date_min        DateTime?
+  access_date_max        DateTime?
+  access_date_threshold  Int?
   created_arrests        Arrest[]                 @relation("CreatedArrest")
   updated_arrests        Arrest[]                 @relation("ModifiedArrest")
   created_arrestees      Arrestee[]               @relation("CreatedArrestee")

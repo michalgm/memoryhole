@@ -106,7 +106,7 @@ const validateUserUpdate = async ({ id, input }) => {
     })
   }
   if (context.currentUser.id === id) {
-    ;['expiresAt', 'arrest_date_min', 'arrest_date_max'].forEach((key) => {
+    ;['expiresAt', 'access_date_min', 'access_date_max'].forEach((key) => {
       validate(input[key], {
         absence: {
           message: `You cannot change your own ${key} value`,
@@ -114,8 +114,8 @@ const validateUserUpdate = async ({ id, input }) => {
       })
     })
   }
-  if (input.arrest_date_max) {
-    input.arrest_date_max = dayjs(input.arrest_date_max).endOf('day')
+  if (input.access_date_max) {
+    input.access_date_max = dayjs(input.access_date_max).endOf('day')
   }
 
   // Check if current user can manage the target role
