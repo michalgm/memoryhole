@@ -2,16 +2,22 @@ import { get, reduce, set } from 'lodash-es'
 
 import dayjs from 'src/lib/dayjs'
 
-const dateTransformer = (value) => {
+const dateTimeTransformer = (value) => {
   if (!value) return null
   const date = dayjs(value)
   return date.isValid() ? date : null
 }
 
+const dateTransformer = (value) => {
+  if (!value) return null
+  const date = dayjs.utc(value)
+  return date.isValid() ? date : null
+}
+
 const transformers = {
   date: dateTransformer,
-  'date-time': dateTransformer,
-  checkbox: value => Boolean(value),
+  'date-time': dateTimeTransformer,
+  checkbox: (value) => Boolean(value),
 }
 
 export const transformData = (data, schema = {}) => {
