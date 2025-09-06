@@ -35,7 +35,7 @@ model Arrestee {
   last_name      String?
   preferred_name String?
   pronoun        String?
-  dob            DateTime?
+  dob            DateTime? @db.Date
   email          String?
   phone_1        String?
   phone_2        String?

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Arrestee" ALTER COLUMN "dob" SET DATA TYPE DATE;
