@@ -233,8 +233,9 @@ const validateAndPrepareData = (
     }
   }
   updateDisplayField(arrest)
-  if (action_id) {
-    data.action = { connect: { id: action_id } }
+  if (action_id !== undefined) {
+    data.action =
+      action_id === null ? { disconnect: true } : { connect: { id: action_id } }
   }
 
   return data

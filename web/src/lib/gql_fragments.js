@@ -91,6 +91,7 @@ registerFragment(gql`
   fragment LogFields on Log {
     id
     type
+    time
     notes
     needs_followup
     arrests {
