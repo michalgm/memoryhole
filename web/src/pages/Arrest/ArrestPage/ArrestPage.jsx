@@ -92,10 +92,10 @@ export const transformInput = (input) => {
   if (!input.date) {
     delete input.date
   }
-  if (input.action?.id) {
-    input.action_id = input.action.id
+  if (input.action !== undefined) {
+    input.action_id = input.action?.id || null
+    delete input.action
   }
-  delete input.action
   return input
 }
 
