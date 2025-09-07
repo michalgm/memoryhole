@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.22.0](https://github.com/michalgm/memoryhole/compare/v0.21.1...v0.22.0) (2025-09-07)
+
+### Features
+
+* add arrest meta fields ([f86c621](https://github.com/michalgm/memoryhole/commit/f86c621f54f4d2ae8dd09b8e73e9d4fc7357d30e)), closes [#7](https://github.com/michalgm/memoryhole/issues/7) [#9](https://github.com/michalgm/memoryhole/issues/9)
+* Allow editing of log time ([02f17bb](https://github.com/michalgm/memoryhole/commit/02f17bb47d2a22d49db0993400cac5a624ee5781)), closes [#17](https://github.com/michalgm/memoryhole/issues/17)
+* change name display behavior ([1bd79e2](https://github.com/michalgm/memoryhole/commit/1bd79e268a619f546058d69b05cbacf2abfac121)), closes [#8](https://github.com/michalgm/memoryhole/issues/8)
+* Custody status behavior ([cc6d7dc](https://github.com/michalgm/memoryhole/commit/cc6d7dc75195e11098fbb5410dd2b980c90613d4)), closes [#20](https://github.com/michalgm/memoryhole/issues/20)
+
+### Bug Fixes
+
+* **api:** handle relation removal + better json updates ([b01eee6](https://github.com/michalgm/memoryhole/commit/b01eee6d848f812b2b1930b08de4e52d65360c02))
+* **api:** update transformInput to handle action field more robustly ([e36946e](https://github.com/michalgm/memoryhole/commit/e36946ed688dd50b8c8f1563b4b55b18225680b4))
+* Log relations access ([3e18ecd](https://github.com/michalgm/memoryhole/commit/3e18ecde5c7f07803b53c4e897a099b7e63d6cc2))
+
 ## [0.21.1](https://github.com/michalgm/memoryhole/compare/v0.21.0...v0.21.1) (2025-09-06)
 
 ### Features
