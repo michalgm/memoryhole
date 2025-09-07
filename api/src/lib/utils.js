@@ -85,13 +85,14 @@ export const checkAccess = (dateField, action_id, type) => (item) => {
     )
   }
 
+  const idString = `You don't have access to ${type} id "${item.id}"`
   if (
     settings.access_date_min &&
     access_date_min &&
     item[dateField] < access_date_min
   ) {
     throw new ForbiddenError(
-      `${uCaseType} ${dateField} ${item[dateField]} is before your minimum access date ${access_date_min}`
+      `${idString} - ${uCaseType} ${dateField} ${item[dateField]} is before your minimum access date ${access_date_min}`
     )
   }
   if (
@@ -100,7 +101,7 @@ export const checkAccess = (dateField, action_id, type) => (item) => {
     item[dateField] > dayjs(access_date_max).endOf('day')
   ) {
     throw new ForbiddenError(
-      `${uCaseType} ${dateField} ${item[dateField]} is after your maximum access date ${access_date_max}`
+      `${idString} - ${uCaseType} ${dateField} ${item[dateField]} is after your maximum access date ${access_date_max}`
     )
   }
   if (
@@ -110,14 +111,14 @@ export const checkAccess = (dateField, action_id, type) => (item) => {
     dayjs().subtract(access_date_threshold, 'day').startOf('day')
   ) {
     throw new ForbiddenError(
-      `${uCaseType} ${dateField} ${item[dateField]} is older than your access date threshold of ${access_date_threshold} days`
+      `${idString} - ${uCaseType} ${dateField} ${item[dateField]} is older than your access date threshold of ${access_date_threshold} days`
     )
   }
 
   if (action_ids.length === 0) return true
 
   if (!item?.[action_id] || !action_ids.includes(item[action_id])) {
-    throw new ForbiddenError(`You don't have access to ${type} id ${item.id}`)
+    throw new ForbiddenError(idString)
   }
 }
 

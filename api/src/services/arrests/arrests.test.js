@@ -506,6 +506,22 @@ describe('arrest access controls', () => {
 
   scenario(
     'accessScenario',
+    'enforces date range restrictions without max date',
+    async (scenario) => {
+      mockCurrentUser({
+        id: scenario.user.admin.id,
+      })
+
+      const result = await arrests()
+      expect(result).toEqual([
+        scenario.arrest.inRange,
+        scenario.arrest.outOfRange,
+      ])
+    }
+  )
+
+  scenario(
+    'accessScenario',
     'enforces action restrictions',
     async (scenario) => {
       mockCurrentUser({

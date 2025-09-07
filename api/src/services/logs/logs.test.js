@@ -1,12 +1,26 @@
 import dayjs from 'src/lib/dayjs'
 
-import { checkLogAccess, deleteLog, filterLogAccess, log, logs } from './logs'
-
+import {
+  checkLogAccess,
+  deleteLog,
+  filterLogAccess,
+  Log,
+  log,
+  logs,
+  updateLog,
+} from './logs'
+// jest.setTimeout(10000)
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float.
 //           Please refer to the RedwoodJS Testing Docs:
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
+
+afterEach(async () => {
+  // Clean up any test data that might interfere
+  jest.useRealTimers()
+  jest.restoreAllMocks()
+})
 
 describe('logs', () => {
   scenario('returns all logs', async (scenario) => {
@@ -222,4 +236,109 @@ describe('checkLogAccess', () => {
     expect(() => checkLogAccess(validLog)).not.toThrow()
     // jest.useRealTimers() // Reset timers after test
   })
+})
+
+describe('log access with arrest restrictions', () => {
+  scenario(
+    'arrestAccessScenario',
+    'filters out restricted arrests from log',
+    async (scenario) => {
+      // User has access to logs but restricted arrests
+      mockCurrentUser({
+        id: scenario.user.restrictedArrests.id,
+        access_date_min: new Date('2023-01-01'),
+        access_date_max: new Date('2023-06-30'),
+        action_ids: [scenario.action.allowed.id],
+      })
+
+      const result = await log({ id: scenario.log.withMultipleArrests.id })
+      const arrests = await Log.arrests(null, {
+        root: { id: result.id },
+      })
+
+      // Should return the log but with filtered arrests
+      expect(result).toBeDefined()
+      expect(result.id).toEqual(scenario.log.withMultipleArrests.id)
+      expect(arrests).toHaveLength(1)
+      expect(arrests[0].id).toEqual(scenario.arrest.allowed.id)
+      // Should not include the restricted arrest
+      expect(
+        arrests.find((a) => a.id === scenario.arrest.restricted.id)
+      ).toBeUndefined()
+    }
+  )
+  scenario(
+    'arrestAccessScenario',
+    'prevents user from updating arrests on logs with restricted arrests',
+    async (scenario) => {
+      // User has limited arrest access
+      mockCurrentUser({
+        id: scenario.user.restrictedArrests.id,
+        access_date_min: new Date('2023-01-01'),
+        access_date_max: new Date('2023-06-30'),
+        action_ids: [scenario.action.allowed.id],
+      })
+
+      // Get the original log with filtered arrests
+      const originalArrests = await Log.arrests(null, {
+        root: { id: scenario.log.withMultipleArrests.id },
+      })
+      expect(originalArrests).toHaveLength(1) // User sees only one arrest
+      // User updates the log (should preserve hidden arrests)
+      await expect(
+        updateLog({
+          id: scenario.log.withMultipleArrests.id,
+          input: {
+            notes: 'Updated notes',
+            // User passes back the arrests they can see
+            arrests: originalArrests.map((a) => a.id),
+          },
+        })
+      ).rejects.toThrow('Cannot update arrests')
+    }
+  )
+
+  scenario(
+    'arrestAccessScenario',
+    'prevents user from adding restricted arrests to log',
+    async (scenario) => {
+      mockCurrentUser({
+        id: scenario.user.restrictedArrests.id,
+        access_date_min: new Date('2023-01-01'),
+        access_date_max: new Date('2023-06-30'),
+        action_ids: [scenario.action.allowed.id],
+      })
+
+      // User tries to add an arrest they don't have access to
+      await expect(
+        updateLog({
+          id: scenario.log.simple.id,
+          input: {
+            arrests: [scenario.arrest.restricted.id],
+          },
+        })
+      ).rejects.toThrow('access to arrest')
+    }
+  )
+})
+
+describe('Log resolvers', () => {
+  scenario(
+    'arrestAccessScenario',
+    'arrests resolver respects access control',
+    async (scenario) => {
+      mockCurrentUser({
+        id: scenario.user.restrictedArrests.id,
+        access_date_min: new Date('2023-01-01'),
+        access_date_max: new Date('2023-06-30'),
+      })
+
+      const arrests = await Log.arrests(null, {
+        root: { id: scenario.log.withMultipleArrests.id },
+      })
+
+      expect(arrests).toHaveLength(1)
+      expect(arrests[0].id).toEqual(scenario.arrest.allowed.id)
+    }
+  )
 })
