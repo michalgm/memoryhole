@@ -1,3 +1,5 @@
+import { get, startCase } from 'lodash'
+
 import { validate, validateWithSync } from '@redwoodjs/api'
 import { ForbiddenError } from '@redwoodjs/graphql-server'
 
@@ -427,6 +429,35 @@ export const Arrest = {
   },
   updated_by: (_obj, { root }) => {
     return db.arrest.findUnique({ where: { id: root?.id } }).updated_by()
+  },
+  combined_notes: async (_obj, { root }) => {
+    const arrest = await db.arrest.findUnique({
+      where: { id: root?.id },
+      select: {
+        custom_fields: true,
+        arrestee: { select: { custom_fields: true } },
+      },
+    })
+    if (!arrest) {
+      return ''
+    }
+    const notes = []
+    for (const field of [
+      'arrestee.custom_fields.arrestee_notes',
+      'arrestee.custom_fields.risk_identifier_notes',
+      'arrestee.custom_fields.contact/support_notes',
+      'custom_fields.arrest_notes',
+      'custom_fields.bail_notes',
+      'custom_fields.jail_notes',
+      'custom_fields.case_notes',
+    ]) {
+      const value = (get(arrest, field) || '').trim()
+      const label = startCase(field.split('.').pop())
+      if (value) {
+        notes.push(`--${label}--\n${value}`)
+      }
+    }
+    return notes.join('\n\n')
   },
   // display_field: (_obj, { root }) => {
   //   if (root.date) {

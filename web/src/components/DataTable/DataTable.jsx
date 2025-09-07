@@ -91,6 +91,18 @@ const defineColumns = (
       col.accessorFn = (originalRow) => !!get(originalRow, field)
       col.Cell = ({ cell }) => (cell.getValue() ? 'Yes' : 'No')
       col.filterVariant = 'checkbox'
+    } else if (type === 'textarea') {
+      col.Cell = ({ cell }) => (
+        <div
+          style={{
+            whiteSpace: 'pre-wrap',
+            maxHeight: '200px',
+            overflow: 'auto',
+          }}
+        >
+          {cell.getValue()}
+        </div>
+      )
     } else if (type === 'select') {
       col.filterVariant = 'multi-select'
       col.filterSelectOptions = fieldDef?.options || []

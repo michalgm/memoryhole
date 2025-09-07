@@ -50,6 +50,7 @@ registerFragment(gql`
     citation_number
     arrestee_id
     action_id
+    combined_notes
     action {
       id
       name
@@ -83,6 +84,7 @@ registerFragment(gql`
       state
       zip
       custom_fields
+      full_legal_name
     }
   }
 `)

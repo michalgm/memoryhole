@@ -96,4 +96,9 @@ export const Arrestee = {
     updateDisplayField(root, {}, true)
     return root.display_field
   },
+  full_legal_name: (_obj, { root }) => {
+    const first_name = (root.first_name || '').trim()
+    const last_name = (root.last_name || '').trim()
+    return [first_name, last_name].filter(Boolean).join(' ')
+  },
 }
