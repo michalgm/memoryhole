@@ -107,7 +107,7 @@ describe('updateDisplayField', () => {
       },
     }
     updateDisplayField(arrestee)
-    expect(arrestee.display_field).toEqual('John Doe *')
+    expect(arrestee.display_field).toEqual('John *')
   })
 
   test('handle first name + last_name ==  preferred name with confidential', () => {
@@ -142,7 +142,7 @@ describe('updateDisplayField', () => {
       },
     }
     updateDisplayField(arrestee)
-    expect(arrestee.display_field).toEqual('Johnny Doe *')
+    expect(arrestee.display_field).toEqual('Johnny *')
   })
 
   test('handles search_display_field with legal name confidential flag', () => {
