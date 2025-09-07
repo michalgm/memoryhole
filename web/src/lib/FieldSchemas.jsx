@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { cloneDeep, fromPairs, sortBy, toPairs } from 'lodash-es'
 
 import { formatLabel } from '../components/utils/BaseField'
@@ -58,6 +57,7 @@ export const usStates = [
 
 const release_types = [
   'Unknown/In Custody',
+  'Unknown Released',
   'Own Recognizance',
   'Bail',
   'Cited Out',
@@ -65,7 +65,6 @@ const release_types = [
   'Dismissed',
   'Charges Dropped',
   'Charges Pending',
-  'Unknown Released',
   'Guilty Plea',
   'Out With No Complaint',
 ]
@@ -289,7 +288,18 @@ const ArrestFields = [
         {
           field_type: 'select',
           options: ['Unknown/Unconfirmed', 'In Custody', 'Out of Custody'],
-          default: 'Unknown/Unconfirmed',
+          required: true,
+          rules: {
+            validate: (value, formValues) => {
+              if (
+                formValues.custom_fields?.release_type !==
+                  'Unknown/In Custody' &&
+                value !== 'Out of Custody'
+              ) {
+                return 'Custody status must be updated to "Out of Custody" if release type is not "Unknown/In Custody"'
+              }
+            },
+          },
         },
       ],
       ['custom_fields.jail_facility'],
@@ -316,6 +326,16 @@ const ArrestFields = [
           field_type: 'select',
           options: release_types,
           default: 'Unknown/In Custody',
+          rules: {
+            validate: (value, formValues) => {
+              if (
+                value === 'Unknown/In Custody' &&
+                formValues.custom_fields?.custody_status === 'Out of Custody'
+              ) {
+                return 'Release type must be set if custody status is "Out of Custody"'
+              }
+            },
+          },
         },
       ],
       ['custom_fields.bail_notes', { field_type: 'textarea', span: 12 }],
