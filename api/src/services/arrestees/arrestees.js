@@ -33,11 +33,11 @@ export const updateDisplayField = (arrestee, current = {}, force) => {
       last_name,
     ]
     if (confidential) {
-      fields = [preferred_name, !preferred_name.includes(' ') && last_name]
+      fields = [preferred_name || 'NO NAME ENTERED', '*']
     }
-    const display_field = fields.filter(Boolean).join(' ') || 'NO NAME ENTERED'
 
-    arrestee.display_field = `${display_field}${confidential ? ' *' : ''}`
+    arrestee.display_field =
+      fields.filter(Boolean).join(' ') || 'NO NAME ENTERED'
   }
 }
 
