@@ -5,6 +5,7 @@ import { useParams, useRoutePath } from '@redwoodjs/router'
 
 import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
+import dayjs from 'src/lib/dayjs'
 import { fieldSchema } from 'src/lib/FieldSchemas'
 
 import { BaseForm } from '../utils/BaseForm'
@@ -84,6 +85,9 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           deleteMutation: DELETE_MUTATION,
           updateMutation: UPDATE_MUTATION,
           fetchQuery: QUERY,
+          defaultValues: {
+            time: dayjs(),
+          },
           onFetch: (log) => {
             if (!log_id && currentAction && currentAction.id !== -1) {
               log.action = currentAction
@@ -143,6 +147,9 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
                   highlightDirty
                 />
               </Box>
+              <Row>
+                <Field name="time" {...schema.time} />
+              </Row>
               <Row>
                 <Field name="type" {...schema.type} highlightDirty />
                 <Show unless={isSummary}>

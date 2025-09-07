@@ -54,7 +54,7 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
       <CardHeader
         title={
           <Stack direction={'row'} justifyContent="space-between">
-            <span>{dayjs(item.created_at).format('MM/DD/YY - LT')}</span>
+            <span>{dayjs(item.time).format('MM/DD/YY - LT')}</span>
             <span>{item.type}</span>
           </Stack>
         }

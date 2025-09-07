@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { cloneDeep, fromPairs, sortBy, toPairs } from 'lodash-es'
 
 import { formatLabel } from '../components/utils/BaseField'
@@ -622,6 +623,10 @@ export const fieldSchema = Object.entries({
 }, {})
 
 fieldSchema.log = {
+  time: {
+    field_type: 'date-time',
+    required: true,
+  },
   type: {
     field_type: 'select',
     options: [
