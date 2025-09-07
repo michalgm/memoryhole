@@ -79,7 +79,7 @@ const processQuery = (values) => {
     where.needs_followup = values.needs_followup
   }
   if (values.after_date || values.before_date) {
-    where.created_at = {
+    where.time = {
       ...(values.after_date && { gte: values.after_date }),
       ...(values.before_date && { lte: values.before_date }),
     }
