@@ -13,7 +13,7 @@ export { duplicateArrests }
 
 export const checkArrestAccess = checkAccess('date', 'action_id', 'arrest')
 export const checkArrestsAccess = async (ids, tx) => {
-  const arrests = await (tx || db).$unfilteredQuery.arrest.findMany({
+  const arrests = await (tx || db).arrest.findMany({
     where: { id: { in: ids } },
     select: {
       id: true,

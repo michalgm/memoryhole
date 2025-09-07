@@ -1,14 +1,16 @@
-import { disconnect } from 'pm2'
-
 import { ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
 import { checkAccess, filterAccess, prepareJsonUpdate } from 'src/lib/utils'
+import {
+  checkArrestsAccess,
+  filterArrestAccess,
+} from 'src/services/arrests/arrests'
 
 export const checkLogAccess = checkAccess('time', 'action_id', 'log')
 
 export const checkLogsAccess = async (ids, tx) => {
-  const logs = await (tx || db).$unfilteredQuery.log.findMany({
+  const logs = await (tx || db).log.findMany({
     where: { id: { in: ids } },
     select: {
       id: true,
@@ -92,18 +94,49 @@ export const createLog = ({ input: { arrests = [], action_id, ...input } }) => {
   })
 }
 
+const checkUserCanUpdateLogArrests = async (logId, current) => {
+  const filtered = await db.log.findUnique({
+    where: { id: logId },
+    include: {
+      arrests: {
+        select: { id: true },
+        where: filterArrestAccess({}),
+      },
+    },
+  })
+
+  if (filtered.arrests.length !== current.arrests.length) {
+    const hiddenCount = current.arrests.length - filtered.arrests.length
+    throw new ForbiddenError(
+      `Cannot update arrests for this log because it contains ${hiddenCount} arrests you do not have access to.`
+    )
+  }
+}
 export const updateLog = async ({
   id,
   input: { arrests, action_id, ...input },
 }) => {
   await checkLogsAccess([id])
-  const current = await db.log.findUnique({ where: { id } })
+  await checkArrestsAccess(arrests || [])
+
+  const current = await db.log.findUnique({
+    where: { id },
+    include: {
+      arrests: { select: { id: true } },
+    },
+  })
+
+  if (arrests !== undefined) {
+    await checkUserCanUpdateLogArrests(id, current)
+  }
+
   const data = prepareData({
     log: input,
     arrests,
     action_id,
     id,
   })
+
   const mergedInput = await prepareJsonUpdate('Log', data, { current })
   return db.log.update({
     data: mergedInput,
@@ -125,8 +158,10 @@ export const Log = {
   updated_by: (_obj, { root }) => {
     return db.log.findUnique({ where: { id: root?.id } }).updated_by()
   },
-  arrests: (_obj, { root }) => {
-    return db.log.findUnique({ where: { id: root?.id } }).arrests()
+  arrests: async (_obj, { root }) => {
+    return db.log
+      .findUnique({ where: { id: root?.id } })
+      .arrests({ where: filterArrestAccess({}) })
   },
   action: (_obj, { root }) => {
     return db.log.findUnique({ where: { id: root?.id } }).action()

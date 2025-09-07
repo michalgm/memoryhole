@@ -1,5 +1,6 @@
 import { db } from 'src/lib/db'
-import { logger } from 'src/lib/logger'
+
+import { filterArrestAccess } from '../arrests/arrests'
 
 export const actions = () => {
   return db.action.findMany()
@@ -65,7 +66,9 @@ export const deleteAction = async ({ id, deleteRelations = false }) => {
 
 export const Action = {
   Arrest: (_obj, { root }) => {
-    return db.action.findUnique({ where: { id: root?.id } }).Arrest()
+    return db.action
+      .findUnique({ where: { id: root?.id } })
+      .Arrest({ where: filterArrestAccess({}) })
   },
   arrests_count: async (_obj, { root }) => {
     const result = await db.action.findUnique({
