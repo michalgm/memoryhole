@@ -46,6 +46,7 @@ export const schema = gql`
     updated_by: User
     "Foreign key linking to updating user"
     updated_by_id: Int
+    combined_notes: String
   }
 
   type Query {

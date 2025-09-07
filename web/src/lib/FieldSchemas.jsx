@@ -476,9 +476,32 @@ const getSchema = (fields, includeMetaFields = true) => {
   )
 }
 
+console.log('Field Schema:', {
+  ...getSchema(ArrestFields),
+  ...{
+    'arrestee.full_legal_name': {
+      type: 'text',
+      props: { label: 'Full Legal Name', readonly: true },
+    },
+    combined_notes: {
+      type: 'textarea',
+      props: { label: 'Combined Notes', readonly: true, rows: 10 },
+    },
+  },
+})
 export const schema = sortObjectKeys(
   {
     ...getSchema(ArrestFields),
+    ...{
+      'arrestee.full_legal_name': {
+        type: 'text',
+        props: { label: 'Full Legal Name', readonly: true },
+      },
+      combined_notes: {
+        type: 'textarea',
+        props: { label: 'Combined Notes', readonly: true, rows: 10 },
+      },
+    },
   },
   // ArrestFields.reduce(
   //   (acc, { fields }) => {
@@ -523,6 +546,7 @@ export const schema = sortObjectKeys(
   'props.label'
 )
 
+console.log(schema)
 export const UserFields = [
   {
     title: 'User Details',
