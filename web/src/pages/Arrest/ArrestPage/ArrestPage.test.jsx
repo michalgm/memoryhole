@@ -36,7 +36,7 @@ describe('ArrestPage', () => {
         created_by: { name: 'Test User' },
         updated_at: '2023-01-01T00:00:00Z',
         updated_by: { name: 'Test User' },
-        date: dayjs().format('YYYY-MM-DD'),
+        date: dayjs.tz().format('YYYY-MM-DD'),
         jurisdiction: 'Alameda',
         city: 'Oakland',
         arrestee: {
@@ -93,11 +93,16 @@ describe('ArrestPage - Create', () => {
     const nameField = await screen.findByLabelText('Legal First Name')
     const dateField = await screen.findByLabelText('Arrest Date *')
     const cityField = await screen.findByLabelText('Arrest City *')
+    const custodyField = await screen.findByLabelText('Custody Status *')
 
     await user.click(nameField)
     await user.type(nameField, 'Jane')
 
     await user.type(cityField, 'Oakland')
+    await user.keyboard('{ArrowDown}') // Navigate to first option
+    await user.keyboard('{Enter}')
+
+    await user.type(custodyField, 'In Custody')
     await user.keyboard('{ArrowDown}') // Navigate to first option
     await user.keyboard('{Enter}')
 

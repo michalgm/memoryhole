@@ -53,6 +53,7 @@
     "tough-cookie": "^5.1.2"
   },
   "scripts": {
-    "release": "git stash && release-it --no-npm.publish && git stash pop"
+    "release": "git stash && release-it --no-npm.publish && git stash pop",
+    "refresh-mocks": "yarn graphql-codegen"
   }
 }
