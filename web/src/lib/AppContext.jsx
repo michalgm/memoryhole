@@ -9,6 +9,9 @@ import {
 
 import { useMediaQuery } from '@mui/material'
 
+import dayjs from 'src/lib/dayjs'
+import { useSiteSettings } from 'src/lib/useSiteSettings'
+
 export const RIGHT_DRAWER_WIDTH = 450
 export const LEFT_DRAWER_WIDTH = 150
 export const LEFT_DRAWER_WIDTH_SMALL = 64
@@ -29,6 +32,7 @@ const AppProvider = ({ children }) => {
   const [navOpen, setNavOpen] = useState(!smallScreen)
   const [logsOpen, setLogsOpen] = useState(false)
   const [currentFormData, setCurrentFormData] = useState({})
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     localStorage.setItem('currentAction', JSON.stringify(currentAction))
@@ -37,6 +41,15 @@ const AppProvider = ({ children }) => {
   const updatePageTitle = useCallback((update) => {
     setPageTitle((prev) => ({ ...prev, ...update }))
   }, [])
+
+  const { settings } = useSiteSettings()
+
+  useEffect(() => {
+    if (settings.timeZone) {
+      dayjs.tz.setDefault(settings.timeZone)
+      setLoading(false)
+    }
+  }, [settings.timeZone])
 
   const value = {
     currentAction,
@@ -51,6 +64,9 @@ const AppProvider = ({ children }) => {
     setLogsOpen,
     currentFormData,
     setCurrentFormData,
+    loading,
+    setLoading,
+    settings,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

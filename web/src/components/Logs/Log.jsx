@@ -54,7 +54,7 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
       <CardHeader
         title={
           <Stack direction={'row'} justifyContent="space-between">
-            <span>{dayjs(item.time).format('MM/DD/YY - LT')}</span>
+            <span>{dayjs.tz(item.time).format('MM/DD/YY - LT')}</span>
             <span>{item.type}</span>
           </Stack>
         }
@@ -71,10 +71,10 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
                 <Box sx={{ flexBasis: '50%', textAlign: 'right' }}>
                   {[
                     item.shift?.start_time
-                      ? dayjs(item.shift.start_time).format('MM/DD/YY, LT')
+                      ? dayjs.tz(item.shift.start_time).format('MM/DD/YY, LT')
                       : '',
                     item.shift?.end_time
-                      ? dayjs(item.shift.end_time).format('MM/DD/YY, LT')
+                      ? dayjs.tz(item.shift.end_time).format('MM/DD/YY, LT')
                       : '',
                   ].join(' - ')}
                 </Box>

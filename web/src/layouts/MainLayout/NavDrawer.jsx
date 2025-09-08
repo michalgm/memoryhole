@@ -84,7 +84,7 @@ const NavDrawer = ({ navOpen }) => {
   useEffect(() => {
     if (expiresAt) {
       setExpires({
-        expiring: `Your access will expire on ${dayjs(expiresAt).format('lll')}`,
+        expiring: `Your access will expire on ${dayjs.tz(expiresAt).format('lll')}`,
         expiring_soon: dayjs(expiresAt).isBefore(dayjs().add(1, 'week')),
       })
     }

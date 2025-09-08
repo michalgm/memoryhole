@@ -142,6 +142,7 @@ export const BaseField = ({
         name={name}
         onChange={onChange}
         inputProps={textFieldProps}
+        timezone={field_type === 'date' ? 'UTC' : 'default'}
         timeSteps={{ minutes: 1 }}
         slotProps={{
           field: { clearable: true },

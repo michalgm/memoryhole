@@ -40,7 +40,7 @@ export const ModInfo = React.forwardRef(
                   <b>{startCase(time)}</b>
                   <Box>
                     <IconText icon={AccessTime}>
-                      {stats[time].format('L LT')}
+                      {stats[time].tz().format('L LT')}
                     </IconText>
                     {formData[`${time}_by`] && (
                       <IconText icon={Person}>

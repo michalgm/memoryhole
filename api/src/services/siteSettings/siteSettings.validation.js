@@ -35,6 +35,7 @@ const restrictionSettingsSchema = z
 
 export const settingsSchemas = {
   siteHelp: z.string().default('help'),
+  timeZone: z.string().default('America/Los_Angeles'),
   restriction_settings: restrictionSettingsSchema,
   default_restrictions: defaultRestrictionsSchema,
 }

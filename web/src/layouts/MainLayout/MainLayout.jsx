@@ -6,6 +6,7 @@ import isHotkey from 'is-hotkey'
 
 import { navigate, routes, useRouteName } from '@redwoodjs/router'
 
+import Loading from 'src/components/Loading/Loading'
 import LogsDrawer from 'src/components/Logs/LogsDrawer'
 import AppProvider, {
   HEADER_HEIGHT,
@@ -44,7 +45,7 @@ const Main = styled('main', {
 
 const Layout = ({ children }) => {
   const routeName = useRouteName()
-  const { logsOpen, setLogsOpen, navOpen, setNavOpen } = useApp()
+  const { logsOpen, setLogsOpen, navOpen, setNavOpen, loading } = useApp()
   const [newLogRequested, setNewLogRequested] = useState(false)
 
   useEffect(() => {
@@ -63,7 +64,9 @@ const Layout = ({ children }) => {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [setLogsOpen, setNavOpen])
-
+  if (loading) {
+    return <Loading />
+  }
   return (
     <>
       <NavBar
