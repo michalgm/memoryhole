@@ -217,9 +217,10 @@ export function useFormManager({
           displayError(
             <span>
               Unable to save your changes. This record was updated by{' '}
-              <b>{updated_by?.name}</b> on <b>{currentTime?.format('LLLL')}</b>{' '}
-              after you began editing. Please refresh the page to view the
-              latest version and manually reapply your changes.
+              <b>{updated_by?.name}</b> on{' '}
+              <b>{currentTime.tz()?.format('LLLL')}</b> after you began editing.
+              Please refresh the page to view the latest version and manually
+              reapply your changes.
             </span>
           )
           return false

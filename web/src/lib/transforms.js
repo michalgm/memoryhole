@@ -10,7 +10,7 @@ const dateTimeTransformer = (value) => {
 
 const dateTransformer = (value) => {
   if (!value) return null
-  const date = dayjs.utc(value)
+  const date = dayjs(value)
   return date.isValid() ? date : null
 }
 

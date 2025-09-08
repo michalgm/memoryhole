@@ -15,7 +15,11 @@ const prepareUpdate = (input) => {
 export const siteSettings = async ({ ids } = {}) => {
   const where = ids ? { id: { in: ids } } : {}
   const settings = await db.siteSetting.findMany({ where })
-  return transformSettings(settings)
+  const transformed = transformSettings(settings)
+  if (!ids) {
+    return transformed
+  }
+  return transformed.filter((s) => ids.includes(s.id))
 }
 
 export const siteSetting = ({ id }) => {

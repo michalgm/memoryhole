@@ -225,7 +225,7 @@ const CompareForm = ({
         >
           <DataCard
             title={formData?.arrestee?.search_display_field}
-            subtitle={`${defaultValues?.date?.format('L LT')} - ${defaultValues.arrest_city}`}
+            subtitle={`${defaultValues?.date?.tz().format('L LT')} - ${defaultValues.arrest_city}`}
             data={formData}
             stats={stats}
             route="arrest"
@@ -240,7 +240,7 @@ const CompareForm = ({
           </Tooltip>
           <DataCard
             title={inputData?.arrestee?.search_display_field}
-            subtitle={`${compareStats?.date ? compareStats.date.format('L LT') : ''} - ${inputData?.arrest_city}`}
+            subtitle={`${compareStats?.date ? compareStats.date.tz().format('L LT') : ''} - ${inputData?.arrest_city}`}
             data={inputData}
             stats={compareStats}
             route="arrest"

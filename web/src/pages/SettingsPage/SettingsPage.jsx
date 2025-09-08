@@ -122,7 +122,6 @@ const SettingsPage = () => {
     <BaseForm
       formConfig={{
         id: 'settings',
-        title: 'Site Help',
         modelType: 'Settings',
         skipUpdatedCheck: true,
         transformInput: (input) => {
@@ -142,7 +141,24 @@ const SettingsPage = () => {
         const restrictionSettings = formContext.watch('restriction_settings')
 
         return (
-          <>
+          <Stack spacing={3} sx={{ mb: 3 }}>
+            <FormSection title="General Settings">
+              <Grid2 container spacing={2} sx={{ width: '100%' }}>
+                <SettingsRow
+                  title="Time Zone"
+                  description="Select the default time zone for the site. This will be used for displaying dates and times."
+                >
+                  <Field
+                    name="timeZone"
+                    field_type="select"
+                    label=""
+                    description=""
+                    options={Intl.supportedValuesOf('timeZone')}
+                    fullWidth
+                  />
+                </SettingsRow>
+              </Grid2>
+            </FormSection>
             <FormSection title="Default User Restrictions">
               <Typography variant="body1">
                 The settings below define default values for new users and apply
@@ -209,7 +225,7 @@ const SettingsPage = () => {
                 label: 'Settings',
               }}
             />
-          </>
+          </Stack>
         )
       }}
     </BaseForm>

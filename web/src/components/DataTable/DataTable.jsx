@@ -83,7 +83,7 @@ const defineColumns = (
         cell.getValue()
           ? type == 'date'
             ? dayjs.utc(cell.getValue()).format('L')
-            : dayjs(cell.getValue()).format('L hh:mm A')
+            : dayjs.tz(cell.getValue()).format('L hh:mm A')
           : null
       col.filterVariant = 'date'
     } else if (type === 'checkbox') {
@@ -200,7 +200,7 @@ const ToolbarActions = ({
       }, {})
     })
     const csv = generateCsv(csvConfig)(rows)
-    const filename = `${type || 'download'}-${dayjs().format('YYYY-MM-DD_hh-mm-A')}`
+    const filename = `${type || 'download'}-${dayjs().tz().format('YYYY-MM-DD_hh-mm-A')}`
     download({
       csvConfig,
       filename,
