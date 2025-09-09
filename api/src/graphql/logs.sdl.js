@@ -32,6 +32,7 @@ export const schema = gql`
   }
 
   input CreateLogInput {
+    time: DateTime!
     type: String
     notes: String
     needs_followup: Boolean

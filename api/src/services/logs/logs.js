@@ -68,7 +68,7 @@ const prepareData = ({ log, arrests, action_id, id }) => {
   }
   if (arrests !== undefined) {
     data.arrests = {
-      set: (arrests || []).map((id) => ({ id })),
+      [id ? 'set' : 'connect']: (arrests || []).map((id) => ({ id })),
     }
   }
   if (action_id !== undefined) {
