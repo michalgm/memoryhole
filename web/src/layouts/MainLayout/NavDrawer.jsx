@@ -10,6 +10,7 @@ import {
   Logout,
   ManageAccounts,
   People,
+  Settings,
   SettingsBrightness,
 } from '@mui/icons-material'
 import {
@@ -73,7 +74,7 @@ const NavDrawer = ({ navOpen }) => {
   ]
 
   if (currentUser && ['Admin', 'Coordinator'].includes(currentUser.roles[0])) {
-    pages.push(['admin', 'Admin', <ManageAccounts key="admin" />])
+    pages.push(['admin', 'Admin', <Settings key="admin" />])
   }
 
   const {
@@ -139,6 +140,11 @@ const NavDrawer = ({ navOpen }) => {
             <NavMenuItem key={route} route={route} label={label} Icon={Icon} />
           ))}
           <Divider component={'li'} sx={{ m: 1 }} />
+          <NavMenuItem
+            route="userProfile"
+            label="Profile"
+            Icon={<ManageAccounts key="userProfile" />}
+          />
           <Tooltip
             title={
               <Stack>

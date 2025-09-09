@@ -39,6 +39,7 @@ export function useFormManager({
   updateMutation,
   deleteMutation,
   fetchQuery,
+  displayText,
   transformInput = (input) => input,
   onCreate,
   onDelete,
@@ -66,7 +67,9 @@ export function useFormManager({
   const [retrieveTime, setRetrieveTime] = useState(null)
   const [formData, setFormData] = useState({})
   const resetPromiseRef = useRef(null)
-  const display_name = get(formData, namePath || 'name')
+  const display_name = displayText
+    ? displayText(formData)
+    : get(formData, namePath || 'name')
   const displayError = useDisplayError()
   const { openSnackbar } = useSnackbar()
 
