@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.23.0](https://github.com/michalgm/memoryhole/compare/v0.22.0...v0.23.0) (2025-09-09)
+
+### Features
+
+* Add global timezone setting for consistent time display ([3efe700](https://github.com/michalgm/memoryhole/commit/3efe7008c1709a8e600a75d6a57fd933bfa7cdaf)), closes [#30](https://github.com/michalgm/memoryhole/issues/30)
+* Add User profile page ([c0752ae](https://github.com/michalgm/memoryhole/commit/c0752ae34a5d72371f521cb157191d1df6864d67))
+* **Logs:** Make 'Filter on current arrest' persist ([03a3203](https://github.com/michalgm/memoryhole/commit/03a320385d741db657a9e2e90720246f2ff1f83f)), closes [#26](https://github.com/michalgm/memoryhole/issues/26)
+* **UI:** add buttons option to formSection ([5f4641d](https://github.com/michalgm/memoryhole/commit/5f4641d48ce8a5b0c58d25e9aa0c3ad4fd1c6925))
+* **ui:** improve error display ([5096469](https://github.com/michalgm/memoryhole/commit/50964699a9a8c83540305290c669b96ca8382b19))
+* Use AccountBox icon for arrests ([a65f24a](https://github.com/michalgm/memoryhole/commit/a65f24a9840cb48e83ec0f1a8d4d12d07e0b13b8))
+
+### Bug Fixes
+
+* **API:** fix log create issues ([27a6a81](https://github.com/michalgm/memoryhole/commit/27a6a8189b880e1855ee056ace801126f444f8f4))
+* **API:** More arrestee name display fixes ([86d5364](https://github.com/michalgm/memoryhole/commit/86d5364ae77bd24f0d98a07a317c053c40b5ff02)), closes [#27](https://github.com/michalgm/memoryhole/issues/27) [#28](https://github.com/michalgm/memoryhole/issues/28)
+* clean up errant console.log ([d11f90d](https://github.com/michalgm/memoryhole/commit/d11f90d9ce66790da6efd353c4e49d54629a3bf1))
+* export bug ([e9a4b35](https://github.com/michalgm/memoryhole/commit/e9a4b355ef417099a53da25201c2d44b7461bf9e))
+* **UI:** fix Rich text field label ([87614b2](https://github.com/michalgm/memoryhole/commit/87614b29b3cd10d473fc801d71c1a24108b8271b)), closes [#21](https://github.com/michalgm/memoryhole/issues/21)
+
 ## [0.22.0](https://github.com/michalgm/memoryhole/compare/v0.21.1...v0.22.0) (2025-09-07)
 
 ### Features
