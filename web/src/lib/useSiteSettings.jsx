@@ -31,7 +31,6 @@ export const useSiteSettings = (keys = null) => {
     loading,
     error,
     settings,
-    transformSettings,
     refetch: wrappedRefetch,
   }
 }

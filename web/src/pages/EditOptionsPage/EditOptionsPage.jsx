@@ -19,10 +19,10 @@ const EditOptionsPage = ({ id }) => {
     <>
       <h2>Edit Options Sets</h2>
       <Grid2 container spacing={8}>
-        <Grid2 xs={6}>
+        <Grid2 size={6}>
           <EditOptionsCell id={id} />
         </Grid2>
-        <Grid2 xs={6}>{rightPane}</Grid2>
+        <Grid2 size={6}>{rightPane}</Grid2>
       </Grid2>
     </>
   )
