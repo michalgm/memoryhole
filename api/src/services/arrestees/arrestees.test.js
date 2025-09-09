@@ -210,7 +210,17 @@ describe('updateDisplayField', () => {
       },
     }
     updateDisplayField(arrestee)
-    expect(arrestee.display_field).toEqual('NO NAME ENTERED *')
+    expect(arrestee.display_field).toEqual('Confidential (No preferred name) *')
+  })
+
+  test('replaces last name in preferred name when not confidential', () => {
+    const arrestee = {
+      first_name: 'John',
+      last_name: 'Doe',
+      preferred_name: 'Johnny Doe',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('Johnny (John) Doe')
   })
 
   test('does not update display field when no name fields are provided', () => {
