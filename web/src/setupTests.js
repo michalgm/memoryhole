@@ -95,11 +95,15 @@ jest.mock('@redwoodjs/router', () => {
   }
 })
 
-jest.mock('src/lib/useSiteSettings', () => ({
-  useSiteSettings: jest.fn(() => ({
-    settings: { timeZone: 'America/Los_Angeles' },
-    loading: false,
-  })),
-}))
+jest.mock('src/lib/useSiteSettings', () => {
+  const actual = { ...jest.requireActual('src/lib/useSiteSettings') }
+  return {
+    ...actual,
+    useSiteSettings: jest.fn(() => ({
+      settings: { timeZone: 'America/Los_Angeles' },
+      loading: false,
+    })),
+  }
+})
 
 export { customRender as render } from './test/utils/testUtils'
