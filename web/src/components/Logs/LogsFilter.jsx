@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import {
+  AccountBoxOutlined,
   FilterList,
   FilterListOff,
   Flag,
@@ -10,6 +11,7 @@ import {
 } from '@mui/icons-material'
 import {
   Box,
+  Chip,
   Collapse,
   Grid2,
   InputAdornment,
@@ -18,13 +20,16 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from '@mui/material'
-import { FormContainer } from 'react-hook-form-mui'
+import { get } from 'lodash-es'
+import { FormContainer, useFormContext } from 'react-hook-form-mui'
 
 import { useRoutePath } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
+import { formatLabel } from 'src/components/utils/BaseField'
 import FormSection from 'src/components/utils/FormSection'
 import IconText from 'src/components/utils/IconText'
+import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
 
@@ -69,6 +74,60 @@ function LogsFilterToggles({ toggles, sidebar, expanded, toggleButtons }) {
   )
 }
 
+const LogsFilterSummary = ({ filterFields, updateAndSubmit }) => {
+  const { watch } = useFormContext()
+
+  const values = watch()
+  const displayValue = (field_type, value) => {
+    switch (field_type) {
+      case 'checkbox':
+        return value ? 'Yes' : 'No'
+      case 'date-time':
+        return value.format('M/D/YYYY h:mm A')
+      case 'arrest_chooser':
+        return value.map((a) => a.arrestee.search_display_field).join(', ')
+      case 'action_chooser':
+        return value?.name || ''
+      case 'user_chooser':
+        return value.map((u) => u.name).join(', ')
+      default:
+        return value
+    }
+  }
+
+  return (
+    <Stack
+      direction="row"
+      spacing={1}
+      sx={{ width: '100%' }}
+      flexWrap={'wrap'}
+      useFlexGap
+    >
+      {filterFields.map(([name, { field_type = 'text', label }]) => {
+        const value = get(values, name)
+        if (
+          value &&
+          ((Array.isArray(value) && value.length) || !Array.isArray(value))
+        ) {
+          return (
+            <Chip
+              onDelete={() => updateAndSubmit(name, null)}
+              key={name}
+              label={
+                <span>
+                  <b>{label || formatLabel(name)}: </b>
+                  {displayValue(field_type, value) || ''}
+                </span>
+              }
+              size="small"
+            />
+          )
+        }
+      })}
+    </Stack>
+  )
+}
+
 const LogsFilter = ({
   sidebar = false,
   searchLogs,
@@ -76,6 +135,7 @@ const LogsFilter = ({
   loading = false,
 }) => {
   const [showFilters, setShowFilters] = useState(sidebar ? false : true)
+  const [filterCurrentArrest, setFilterCurrentArrest] = useState(false)
   const { currentAction, currentFormData } = useApp()
   const { currentUser } = useAuth()
   const path = useRoutePath()
@@ -103,9 +163,42 @@ const LogsFilter = ({
 
   const filterUser = users.filter((u) => u.id == currentUser?.id).length > 0
 
+  const updateAndSubmit = useCallback(
+    (field, value) => {
+      context.setValue(field, value)
+      context.handleSubmit(searchLogs)()
+    },
+    [context, searchLogs]
+  )
+
+  useEffect(() => {
+    if (sidebar) {
+      const shouldFilter =
+        path.includes('arrests') && currentFormData?.id && filterCurrentArrest
+      if (shouldFilter) {
+        if (context.getValues('arrests')?.[0]?.id !== currentFormData.id) {
+          updateAndSubmit('arrests', [currentFormData])
+        }
+      } else {
+        // if (context.getValues('arrests')?.length) {
+        //   updateAndSubmit('arrests', [])
+        // }
+      }
+    }
+  }, [
+    path,
+    currentFormData,
+    filterArrest,
+    filterCurrentArrest,
+    sidebar,
+    context,
+    searchLogs,
+    updateAndSubmit,
+  ])
+
   if (showFilters) toggles.push('showFilters')
   if (filterAction) toggles.push('action')
-  if (filterArrest) toggles.push('arrest')
+  if (filterCurrentArrest) toggles.push('arrest')
   if (filterUser) toggles.push('user')
   if (type === 'Shift Summary') toggles.push('shiftSummaries')
 
@@ -115,11 +208,10 @@ const LogsFilter = ({
       icon: Subject,
       value: 'shiftSummaries',
       action: () => {
-        context.setValue(
+        updateAndSubmit(
           'type',
           type === 'Shift Summary' ? null : 'Shift Summary'
         )
-        context.handleSubmit(searchLogs)()
       },
     },
     {
@@ -127,29 +219,29 @@ const LogsFilter = ({
       icon: Flag,
       value: 'action',
       action: () => {
-        context.setValue('action', filterAction ? null : currentAction)
-        context.handleSubmit(searchLogs)()
+        updateAndSubmit('action', filterAction ? null : currentAction)
       },
       disabled: !currentAction.id || currentAction.id === -1,
     },
     {
       label: 'Current Arrest',
-      icon: Person,
+      icon: AccountBoxOutlined,
       value: 'arrest',
       action: () => {
-        context.setValue('arrests', filterArrest ? [] : [currentFormData])
-        context.handleSubmit(searchLogs)()
+        setFilterCurrentArrest(!filterCurrentArrest)
+        if (filterCurrentArrest) {
+          updateAndSubmit('arrests', [])
+        }
       },
       disabled: !currentFormData?.id || !path.includes('arrests'),
-      hidden: !path.includes('arrests'),
+      hidden: !sidebar,
     },
     {
       label: 'Current User',
       icon: Person,
       value: 'user',
       action: () => {
-        context.setValue('users', filterUser ? [] : [currentUser])
-        context.handleSubmit(searchLogs)()
+        updateAndSubmit('users', filterUser ? [] : [currentUser])
       },
       disabled: !currentUser?.id,
     },
@@ -166,8 +258,8 @@ const LogsFilter = ({
   return (
     <FormContainer
       formContext={context}
-      onSuccess={(data) => {
-        searchLogs(data)
+      onSuccess={async (data) => {
+        await searchLogs(data)
       }}
     >
       <FormSection
@@ -207,6 +299,12 @@ const LogsFilter = ({
               sidebar={sidebar}
             />
           </Stack>
+          <Show when={!showFilters}>
+            <LogsFilterSummary
+              filterFields={filterFields}
+              updateAndSubmit={updateAndSubmit}
+            />
+          </Show>
           <Collapse in={showFilters}>
             <Grid2
               container

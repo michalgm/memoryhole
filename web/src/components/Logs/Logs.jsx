@@ -127,7 +127,7 @@ const Logs = ({ sidebar = false, newLogRequested, onNewLogComplete }) => {
           setHasMore(logs.data.logs.length === ITEMS_PER_PAGE)
         }
       })()
-    }, 1000)
+    }, 300)
   }, [fetchLogs, getValues])
 
   const searchLogs = useCallback(
