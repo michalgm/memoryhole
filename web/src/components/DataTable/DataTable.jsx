@@ -64,7 +64,7 @@ const defineColumns = (
     const type = fieldDef?.type || 'text'
     const label = fieldDef?.props?.label || formatLabel(field)
     if (!fieldDef) {
-      console.log(`Field definition not found for ${field}`)
+      console.warn(`Field definition not found for ${field}`)
     }
     const col = {
       accessorKey: field,

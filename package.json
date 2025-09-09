@@ -34,7 +34,17 @@
       "generated.ts"
     ],
     "rules": {
-      "camelcase": "off"
+      "camelcase": "off",
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "warn",
+            "error",
+            "info"
+          ]
+        }
+      ]
     }
   },
   "engines": {
