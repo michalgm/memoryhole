@@ -12,6 +12,9 @@ import {
 } from '@mui/material'
 import { useFormContext } from 'react-hook-form-mui'
 
+import LoadingButton from 'src/components/utils/LoadingButton'
+import Show from 'src/components/utils/Show'
+
 const FormSection = ({
   title,
   sectionActions = [],
@@ -19,6 +22,7 @@ const FormSection = ({
   small = false,
   sticky = true,
   disableCollapse = false,
+  buttons = [],
 }) => {
   const context = useFormContext()
   return (
@@ -82,6 +86,26 @@ const FormSection = ({
       <AccordionDetails>
         <Grid2 container spacing={2} sx={{ m: 0 }} size={12}>
           {children}
+          <Show when={buttons.length > 0}>
+            <Grid2 container justifyContent={'flex-end'} size={12}>
+              {buttons.map(({ children, tooltip, ...props }, index) => (
+                <Box key={index}>
+                  <Tooltip title={tooltip}>
+                    <span>
+                      <LoadingButton
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        {...props}
+                      >
+                        {children}
+                      </LoadingButton>
+                    </span>
+                  </Tooltip>
+                </Box>
+              ))}
+            </Grid2>
+          </Show>
         </Grid2>
       </AccordionDetails>
     </Accordion>
