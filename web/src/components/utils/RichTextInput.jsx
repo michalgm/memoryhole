@@ -88,7 +88,7 @@ const RichTextInput = (props) => {
         margin="dense"
         required={required}
         error={Boolean(error)}
-        sx={(theme) =>
+        sx={() =>
           merge(
             {
               '&& .MuiTiptap-FieldContainer-notchedOutline': {
@@ -106,20 +106,20 @@ const RichTextInput = (props) => {
                   right: 0,
                   height: '10px',
                   backgroundColor: 'background.paper',
-                  width: `${labelWidth + 12}px`,
+                  width: `${labelWidth + 12 + (required ? 6 : 0)}px`,
                   zIndex: 5,
                   borderRadius: '0 0 2px 2px',
                   border: 'none',
                   borderColor: 'action.disabled',
                   borderTop: 'none',
-                  ...theme.applyStyles('dark', {
-                    backgroundColor: '#2e2e2e',
-                    border: '1px solid',
-                  }),
                 },
                 "[data-theme='light'] &::before": {
                   border: 'none',
                   backgroundColor: 'white',
+                },
+                "[data-theme='dark'] &::before": {
+                  border: 'none',
+                  backgroundColor: 'red',
                 },
               },
             },
