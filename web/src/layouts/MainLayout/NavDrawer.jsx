@@ -9,7 +9,6 @@ import {
   LightMode,
   Logout,
   ManageAccounts,
-  People,
   Settings,
   SettingsBrightness,
 } from '@mui/icons-material'
@@ -31,6 +30,7 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
+import { AccountBoxMultipleOutline } from 'mdi-material-ui'
 
 import { Link, routes, useMatch } from '@redwoodjs/router'
 
@@ -62,7 +62,7 @@ const NavDrawer = ({ navOpen }) => {
   }
 
   const pages = [
-    ['arrests', 'Arrests', <People key="arrests" />],
+    ['arrests', 'Arrests', <AccountBoxMultipleOutline key="arrests" />],
     ['actions', 'Actions', <Flag key="actions" />],
     ['logs', 'Logs', <EditNote key="logs" />],
     ['docsHome', 'Help', <Help key="help" />],
