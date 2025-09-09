@@ -92,7 +92,6 @@ export const createUser = async ({ input }) => {
 
 const validateUserUpdate = async ({ id, input }) => {
   const currentUser = context.currentUser
-  console.log(input)
   if (input.email || input.role) {
     requireAdmin()
   }
