@@ -26,6 +26,9 @@ export const updateDisplayField = (arrestee, current = {}, force) => {
     if (preferred_name === `${first_name} ${last_name}`) {
       first_name = last_name = ''
     }
+    if (!confidential) {
+      preferred_name = preferred_name.replace(new RegExp(` ${last_name}$`), '')
+    }
 
     let fields = [
       preferred_name,
@@ -33,7 +36,7 @@ export const updateDisplayField = (arrestee, current = {}, force) => {
       last_name,
     ]
     if (confidential) {
-      fields = [preferred_name || 'NO NAME ENTERED', '*']
+      fields = [preferred_name || 'Confidential (No preferred name)', '*']
     }
 
     arrestee.display_field =
