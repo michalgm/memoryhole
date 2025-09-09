@@ -6,11 +6,12 @@ import {
   validateWith,
   validateWithSync,
 } from '@redwoodjs/api'
+import { hashPassword } from '@redwoodjs/auth-dbauth-api'
 
+import { passwordValidation } from 'src/functions/auth'
 import { requireAuth } from 'src/lib/auth'
 import { initUser, onboardUser } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
-
 export const ROLE_LEVELS = [null, 'Operator', 'Coordinator', 'Admin']
 
 export function getRoleLevel(role) {
@@ -91,7 +92,7 @@ export const createUser = async ({ input }) => {
 
 const validateUserUpdate = async ({ id, input }) => {
   const currentUser = context.currentUser
-
+  console.log(input)
   if (input.email || input.role) {
     requireAdmin()
   }
@@ -198,6 +199,50 @@ export const deleteUser = async ({ id }) => {
   return db.user.delete({
     where: { id },
   })
+}
+
+export const changePassword = async ({ input }) => {
+  const currentUserId = context.currentUser?.id
+  if (!currentUserId) {
+    throw new Error('You must be logged in to change your password')
+  }
+
+  const { currentPassword, newPassword } = input
+
+  // Get the current user with password data
+  const user = await db.user.findUnique({
+    where: { id: currentUserId },
+  })
+
+  if (!user || !user.hashedPassword || !user.salt) {
+    throw new Error('Password authentication is not available for this account')
+  }
+
+  const [hashedCurrentPassword] = hashPassword(currentPassword, {
+    salt: user.salt,
+  })
+
+  const [hashedPassword, salt] = hashPassword(newPassword)
+
+  if (hashedCurrentPassword !== user.hashedPassword) {
+    throw new Error('Current password is incorrect')
+  }
+
+  passwordValidation(newPassword)
+
+  // Generate new salt and hash for new password
+
+  await db.user.update({
+    data: {
+      hashedPassword,
+      salt,
+      resetToken: null,
+      resetTokenExpiresAt: null,
+    },
+    where: { id: currentUserId },
+  })
+
+  return { success: true }
 }
 
 export const User = {

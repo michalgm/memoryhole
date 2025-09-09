@@ -17,6 +17,13 @@ const validateUser = (user) => {
   return user
 }
 
+export const passwordValidation = (_password) => {
+  if (_password.length < 8) {
+    throw new PasswordValidationError('Password must be at least 8 characters')
+  }
+  return true
+}
+
 export const handler = async (event, context) => {
   const forgotPasswordOptions = {
     // handler() is invoked after verifying that a user was found with the given
@@ -164,14 +171,7 @@ export const handler = async (event, context) => {
     // Include any format checks for password here. Return `true` if the
     // password is valid, otherwise throw a `PasswordValidationError`.
     // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.
-    passwordValidation: (_password) => {
-      if (_password.length < 8) {
-        throw new PasswordValidationError(
-          'Password must be at least 8 characters'
-        )
-      }
-      return true
-    },
+    passwordValidation,
 
     errors: {
       // `field` will be either "username" or "password"

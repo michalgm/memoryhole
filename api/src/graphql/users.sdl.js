@@ -66,14 +66,24 @@ export const schema = gql`
     action_ids: [Int]
   }
 
+  input ChangePasswordInput {
+    currentPassword: String!
+    newPassword: String!
+  }
+
+  type ChangePasswordPayload {
+    success: Boolean!
+  }
+
   type Mutation {
     createUser(input: CreateUserInput!): User!
       @requireAuth(roles: ["Admin", "Coordinator"])
-    updateUser(id: Int!, input: UpdateUserInput!): User!
-      @requireAuth(roles: ["Admin", "Coordinator"])
+    updateUser(id: Int!, input: UpdateUserInput!): User! @requireAuth
     deleteUser(id: Int!): User! @requireAuth(roles: ["Admin", "Coordinator"])
     bulkUpdateUsers(ids: [Int]!, input: UpdateUserInput): BatchPayload
       @requireAuth(roles: ["Admin", "Coordinator"])
+    changePassword(input: ChangePasswordInput!): ChangePasswordPayload!
+      @requireAuth
     # emailUser(id: String!): User! @requireAuth
   }
 `
