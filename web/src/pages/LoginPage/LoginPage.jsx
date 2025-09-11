@@ -80,7 +80,7 @@ export const AuthManage = ({
     if (params.get('redirectTo')) {
       const redirectPath = params.get('redirectTo')
       if (redirectPath.includes('noRedirect')) {
-        console.log(`skipping additional redirects to ${redirectPath}`)
+        console.warn(`skipping additional redirects to ${redirectPath}`)
       } else {
         to = redirectPath
       }
@@ -111,7 +111,6 @@ export const AuthManage = ({
       })()
     } else {
       if (isAuthenticated) {
-        console.log('whoa we gettin redired')
         redirect()
       }
     }

@@ -68,7 +68,9 @@ export function useFormManager({
   const [formData, setFormData] = useState({})
   const resetPromiseRef = useRef(null)
   const display_name = displayText
-    ? displayText(formData)
+    ? typeof displayText === 'function'
+      ? displayText(formData)
+      : displayText
     : get(formData, namePath || 'name')
   const displayError = useDisplayError()
   const { openSnackbar } = useSnackbar()

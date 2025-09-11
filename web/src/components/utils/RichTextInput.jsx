@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Box, FormControl, FormHelperText, InputLabel } from '@mui/material'
-import Link from '@tiptap/extension-link'
-import TaskItem from '@tiptap/extension-task-item'
-import TaskList from '@tiptap/extension-task-list'
+import { TaskItem, TaskList } from '@tiptap/extension-list'
 import TextAlign from '@tiptap/extension-text-align'
-import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 import { merge } from 'lodash-es'
 import {
@@ -54,10 +51,13 @@ const RichTextInput = (props) => {
   }, [label])
 
   const extensions = [
-    StarterKit,
+    StarterKit.configure({
+      link: {
+        openOnClick: false,
+        enableClickSelection: true,
+      },
+    }),
     LinkBubbleMenuHandler,
-    Link,
-    Underline,
     TaskList,
     TaskItem,
     TextAlign.configure({
