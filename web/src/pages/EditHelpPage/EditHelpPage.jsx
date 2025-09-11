@@ -38,6 +38,7 @@ const EditHelpPage = () => {
       formConfig={{
         id: 'siteHelp',
         schema,
+        displayText: 'Site Help',
         title: 'Site Help',
         modelType: 'SiteSettings',
         namePath: 'Site Help',
