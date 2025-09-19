@@ -54,7 +54,7 @@ const analyzeRoutes = (paths) => {
         },
       })
     } catch (e) {
-      console.log('Error analyzing routes:', e)
+      console.error('Error analyzing routes:', e)
       // Skip routes that require parameters
     }
   })
@@ -101,7 +101,7 @@ const Breadcrumbs = ({ title, titleTo }) => {
 
       const route = routeMap.get(currentRouteName)
       if (!route) {
-        console.log('No route found for', currentRouteName)
+        console.warn('No route found for', currentRouteName)
         return
       }
 
