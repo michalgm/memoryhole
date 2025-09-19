@@ -9,7 +9,7 @@ import { db } from 'src/lib/db'
  */
 export const createCollabServer = (options = {}) => {
   const {
-    port = 1234,
+    port = process.env.HOCUSPOCUS_PORT || 1234,
     // enableRedis = false,
     // redisOptions = {},
   } = options
