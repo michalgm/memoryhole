@@ -1,5 +1,6 @@
 import { createServer } from '@redwoodjs/api-server'
 
+import { startCollabServer } from 'src/collab-server/collab-server'
 import { logger } from 'src/lib/logger'
 
 async function main() {
@@ -8,6 +9,9 @@ async function main() {
   })
 
   await server.start()
+  startCollabServer().catch((err) =>
+    logger.error('Collab server error: ' + err)
+  )
 }
 
 main()

@@ -83,6 +83,7 @@ const Routes = () => {
             <Route path="/actions" page={ActionActionsPage} name="actions" />
             <Route path="/actions/new" page={ActionActionPage} name="newAction" />
             <Route path="/actions/{id:Int}" page={ActionActionPage} name="action" />
+            <Route path="/actions/{id:Int}/whiteboard" page={ActionActionWhiteboardPage} name="actionWhiteboard" />
           </Set>
           <Set wrap={ModelLayout} title="Logs" titleTo="logs" buttonTo="logs" buttonParams={{ new: true }} buttonLabel="New Log">
             <Route path="/logs" page={LogLogsPage} name="logs" />
