@@ -666,6 +666,7 @@ fieldSchema.log = {
       'Support Call',
       'Out-of-Custody Call',
       'Email',
+      'Note',
       'Other',
     ],
     required: true,
