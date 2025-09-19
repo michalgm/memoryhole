@@ -129,7 +129,7 @@ const CompareArrestPage = ({ id, compareId }) => {
             },
           })
         } catch (err) {
-          console.debug('user cancelled')
+          console.warn('user cancelled')
           setMerging(false)
         }
       },
@@ -180,7 +180,7 @@ const CompareArrestPage = ({ id, compareId }) => {
             },
           })
         } catch (err) {
-          console.debug('user cancelled')
+          console.warn('user cancelled')
         }
       },
     }
