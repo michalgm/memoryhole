@@ -1,12 +1,15 @@
 import { useCallback, useRef } from 'react'
 
-import { Checkbox, FormControlLabel, Typography } from '@mui/material'
+import { Assignment } from '@mui/icons-material'
+import { Button, Checkbox, FormControlLabel, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import pluralize from 'pluralize'
+import { createPortal } from 'react-dom'
 
 import { navigate, routes } from '@redwoodjs/router'
 
 import FormContainer from 'src/components/utils/FormContainer'
+import Link from 'src/components/utils/Link'
 import { defaultAction, useApp } from 'src/lib/AppContext'
 import { ActionFields } from 'src/lib/FieldSchemas'
 import * as _fragments from 'src/lib/gql_fragments'
@@ -72,7 +75,7 @@ const ActionPage = ({ id }) => {
       setCurrentAction(defaultAction)
     }
     navigate(routes.actions())
-  }, [])
+  }, [currentAction.id, id, setCurrentAction])
 
   const onCreate = useCallback(
     (data) => navigate(routes.action({ id: data.id })),
@@ -82,6 +85,17 @@ const ActionPage = ({ id }) => {
   const getDeleteParams = useCallback(() => {
     return { deleteRelations: deleteRelations.current }
   }, [])
+  const whiteBoardTarget = document.getElementById(
+    'modal_layout_header_actions'
+  )
+  const whiteBoardPortal = createPortal(
+    <Link to={routes.actionWhiteboard({ id })}>
+      <Button startIcon={<Assignment />} size="medium" variant="outlined">
+        Whiteboard
+      </Button>
+    </Link>,
+    whiteBoardTarget
+  )
 
   return (
     <>
@@ -133,6 +147,7 @@ const ActionPage = ({ id }) => {
           getDeleteParams,
         }}
       />
+      {whiteBoardPortal}
     </>
   )
 }
