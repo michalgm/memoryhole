@@ -100,6 +100,11 @@ const ConnectedUsersDisplay = ({ users }) => {
     </Box>
   )
 }
+
+const DEFAULT_SERVER_URL =
+  process.env.NODE_ENV === 'production'
+    ? `${window.location.origin.replace(/^http/, 'ws')}/collab`
+    : 'ws://localhost:1234'
 /**
  * CollabEditor Component
  * A collaborative rich text editor that extends RichTextInput with real-time collaboration
@@ -117,7 +122,7 @@ const CollabEditor = (props) => {
     color,
     focus = false,
     sx = {},
-    serverUrl = 'ws://localhost:1234', // Hocuspocus server URL
+    serverUrl = DEFAULT_SERVER_URL,
     onConnect,
     onDisconnect,
     onSynced,
