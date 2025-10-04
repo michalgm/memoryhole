@@ -13,7 +13,7 @@ import dayjs from 'src/lib/dayjs'
 import { useSiteSettings } from 'src/lib/useSiteSettings'
 
 export const RIGHT_DRAWER_WIDTH = 450
-export const LEFT_DRAWER_WIDTH = 150
+export const LEFT_DRAWER_WIDTH = 170
 export const LEFT_DRAWER_WIDTH_SMALL = 64
 export const HEADER_HEIGHT = 48
 

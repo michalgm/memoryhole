@@ -90,6 +90,11 @@ const Routes = () => {
           </Set>
           <Route path="/docs" page={DocumentationPage} name="docsHome" />
           <Route path="/docs/{page:String}" page={DocumentationPage} name="docs" />
+          <Set wrap={ModelLayout} title="Documents" titleTo="documents">
+            <Route path="/documents" page={DocumentsDocumentsPage} name="documents" />
+            <Route path="/documents/{id:String}" page={DocumentsDocumentPage} name="document" />
+            <Route path="/documents/new" page={DocumentsDocumentPage} name="newDocument" />
+          </Set>
         </Set>
       </PrivateSet>
       <Route notfound page={NotFoundPage} />

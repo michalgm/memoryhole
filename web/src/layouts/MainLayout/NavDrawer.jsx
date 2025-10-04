@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import {
+  Article,
   DarkMode,
   EditNote,
   Error,
@@ -65,6 +66,7 @@ const NavDrawer = ({ navOpen }) => {
     ['arrests', 'Arrests', <AccountBoxMultipleOutline key="arrests" />],
     ['actions', 'Actions', <Flag key="actions" />],
     ['logs', 'Logs', <EditNote key="logs" />],
+    ['documents', 'Documents', <Article key="documents" />],
     ['docsHome', 'Help', <Help key="help" />],
   ]
   const themeModes = [

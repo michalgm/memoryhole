@@ -122,6 +122,35 @@ registerFragment(gql`
   }
 `)
 
+registerFragment(gql`
+  fragment CollabDocumentFields on CollabDocument {
+    id
+    name
+    title
+    type
+    html_content
+    parent_id
+    created_at
+    updated_at
+    created_by_id
+    last_edited_by
+    created_by {
+      id
+      name
+      email
+    }
+    last_editor {
+      id
+      name
+      email
+    }
+    parent {
+      id
+      title
+      name
+    }
+  }
+`)
 export const mockMutation = gql`
   mutation NoOp {
     __typename

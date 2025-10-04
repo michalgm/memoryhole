@@ -14,24 +14,7 @@ const ActionWhiteboardPage = ({ id }) => {
       }}
       className=""
     >
-      <CollabEditor
-        sx={{
-          mt: 0,
-          height: '100%',
-          '&& .editorPane .MuiBox-root': {
-            height: '100%',
-          },
-          '&& .MuiTiptap-RichTextContent-root': {
-            flexGrow: 1,
-            minHeight: 0,
-            height: '100%',
-            // height: 'calc(100% - 48px)',
-            // backgroundColor: 'blue',
-          },
-        }}
-        // editable={false}
-        documentName={`action:${id}`}
-      />
+      <CollabEditor documentName={`action:${id}`} />
     </Box>
   )
 }
