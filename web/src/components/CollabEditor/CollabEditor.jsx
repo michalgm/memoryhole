@@ -1,48 +1,67 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+// import { useApolloClient } from '@apollo/client'
 import { HocuspocusProvider } from '@hocuspocus/provider'
+import { Toc } from '@mui/icons-material'
 import {
   Avatar,
   Box,
-  FormControl,
   FormHelperText,
-  InputLabel,
+  Grid2,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import AvatarGroup from '@mui/material/AvatarGroup'
+import { Stack } from '@mui/system'
 import Collaboration from '@tiptap/extension-collaboration'
 import CollaborationCaret from '@tiptap/extension-collaboration-caret'
+// import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji'
+// import Mention from '@tiptap/extension-mention'
+import Highlight from '@tiptap/extension-highlight'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
+import {
+  getHierarchicalIndexes,
+  TableOfContents,
+} from '@tiptap/extension-table-of-contents'
 import TextAlign from '@tiptap/extension-text-align'
 import StarterKit from '@tiptap/starter-kit'
 import { merge } from 'lodash-es'
 import {
   LinkBubbleMenu,
   LinkBubbleMenuHandler,
-  MenuButtonAlignCenter,
-  MenuButtonAlignLeft,
-  MenuButtonAlignRight,
+  MenuButton,
+  MenuButtonBlockquote,
   MenuButtonBold,
   MenuButtonBulletedList,
   MenuButtonEditLink,
+  MenuButtonHighlightColor,
+  MenuButtonHighlightToggle,
   MenuButtonHorizontalRule,
+  MenuButtonIndent,
   MenuButtonItalic,
   MenuButtonOrderedList,
+  MenuButtonRedo,
+  MenuButtonStrikethrough,
   MenuButtonTaskList,
   MenuButtonUnderline,
+  MenuButtonUndo,
+  MenuButtonUnindent,
   MenuControlsContainer,
   MenuDivider,
   MenuSelectHeading,
+  MenuSelectTextAlign,
   RichTextEditor,
-  RichTextReadOnly,
 } from 'mui-tiptap'
 import * as Y from 'yjs'
 
 import { useAuth } from 'src/auth'
+// import { createMentionSuggestionOptions } from 'src/components/CollabEditor/mentionSuggestionOptions'
+import Show from 'src/components/utils/Show.jsx'
 
-/**
- * Generate user colors based on user ID or email for consistent colors across sessions
- */
+// import suggestion from './suggestion.jsx'
+// import suggestions from './suggestions.jsx'
+import { ToC } from './ToC.jsx'
+
 const generateUserColor = (userId, email) => {
   const colors = [
     '#FF6B6B',
@@ -105,18 +124,17 @@ const DEFAULT_SERVER_URL =
   process.env.NODE_ENV === 'production'
     ? `${window.location.origin.replace(/^http/, 'ws')}/collab`
     : 'ws://localhost:1234'
-/**
- * CollabEditor Component
- * A collaborative rich text editor that extends RichTextInput with real-time collaboration
- */
+
+const MemorizedToC = React.memo(ToC)
+
 const CollabEditor = (props) => {
+  // const apolloClient = useApolloClient()
   const {
     documentName, // Required: Document identifier for collaboration
     content = '',
     onChange,
     editable = true,
     disabled = false,
-    required = false,
     error,
     helperText,
     color,
@@ -139,12 +157,13 @@ const CollabEditor = (props) => {
   const [isSynced, setIsSynced] = useState(false)
   const [connectionError, setConnectionError] = useState(null)
   const [connectedUsers, setConnectedUsers] = useState([])
+  const [tocItems, setTocItems] = useState([])
+  const [showTOC, setShowTOC] = useState(true)
 
   // Label width calculation (reused from RichTextInput)
 
   // Create Yjs document and provider with authentication
   const ydoc = useMemo(() => new Y.Doc(), [])
-
   // Debug: Monitor Yjs document changes
   useEffect(() => {
     if (!ydoc) return
@@ -220,6 +239,21 @@ const CollabEditor = (props) => {
     ydoc,
   ])
 
+  useEffect(() => {
+    if (isSynced) {
+      const anchorId = window.location.hash?.replace('#', '')
+      if (anchorId) {
+        // Use a small delay to ensure DOM is updated
+        requestAnimationFrame(() => {
+          const el = document.getElementById(anchorId)
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' })
+          }
+        })
+      }
+    }
+  }, [isSynced])
+
   // Clean up provider on unmount
   useEffect(() => {
     const updateUsers = () => {
@@ -245,6 +279,34 @@ const CollabEditor = (props) => {
       color: generateUserColor(currentUser.id, currentUser.email),
     }
   }, [currentUser])
+
+  useEffect(() => {
+    if (!rteRef.current?.editor) return
+
+    const editor = rteRef.current.editor
+
+    const updateToc = () => {
+      const tocContent = editor.storage.tableOfContents?.content || []
+      setTocItems(tocContent)
+    }
+
+    editor.on('update', updateToc)
+    editor.on('selectionUpdate', updateToc)
+
+    // Initial update
+    updateToc()
+
+    return () => {
+      editor.off('update', updateToc)
+      editor.off('selectionUpdate', updateToc)
+    }
+  }, [rteRef.current?.editor])
+
+  useEffect(() => {
+    if (!editable) {
+      setShowTOC(true)
+    }
+  }, [editable])
 
   // Configure TipTap extensions with collaboration
   const extensions = useMemo(() => {
@@ -275,8 +337,27 @@ const CollabEditor = (props) => {
           'taskItem',
         ],
       }),
+      Highlight.configure({ multicolor: true }),
+      // Emoji.configure({
+      //   emojis: gitHubEmojis,
+      //   enableEmoticons: true,
+      //   suggestion,
+      // }),
+      TableOfContents.configure({
+        getIndex: getHierarchicalIndexes,
+      }),
+      // Mention.configure({
+      //   suggestion: createMentionSuggestionOptions(apolloClient),
+      //   renderHTML({ options, node }) {
+      //     console.log('renderHTML', options)
+      //     return [
+      //       'a',
+      //       mergeAttributes({ href: '' }, options.HTMLAttributes),
+      //       `@${node.attrs.label}`,
+      //     ]
+      //   },
+      // }),
     ]
-
     // Add collaboration extensions only if provider is available
     if (provider) {
       baseExtensions.push(
@@ -299,7 +380,7 @@ const CollabEditor = (props) => {
     }
 
     return baseExtensions
-  }, [provider, ydoc, enableHistory, enablePresence, userInfo])
+  }, [enableHistory, provider, ydoc, enablePresence, userInfo])
 
   // Show error if no document name provided
   if (!documentName) {
@@ -311,38 +392,27 @@ const CollabEditor = (props) => {
     )
   }
 
-  // Render readonly version if not editable
-  if (!editable) {
-    return (
-      <RichTextReadOnly
-        content={content}
-        extensions={extensions.filter(
-          (ext) =>
-            // Remove collaboration extensions for readonly mode
-            ext.name !== 'collaboration' && ext.name !== 'collaborationCaret'
-        )}
-      />
-    )
-  }
-
   return (
-    <FormControl
-      fullWidth
-      disabled={disabled}
+    <Box
       variant="outlined"
       size="small"
       margin="dense"
-      required={required}
-      error={Boolean(error || connectionError)}
       sx={() =>
         merge(
           {
             '&& .MuiTiptap-FieldContainer-notchedOutline': {
               // backgroundColor: 'background.paper',
+              border: 'none',
               borderColor:
                 error || connectionError ? 'error.main' : `${color}.main`,
             },
+            '& .MuiTiptap-MenuBar-root': {
+              width: showTOC ? 'calc(100% + 250px)' : '100%',
+            },
             '& .MuiTiptap-FieldContainer-root': {
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
               backgroundColor: color
                 ? `rgba(var(--mui-palette-${color}-lightChannel) / 0.1)`
                 : undefined,
@@ -375,39 +445,28 @@ const CollabEditor = (props) => {
         )
       }
     >
-      <InputLabel
-        size="small"
-        margin="dense"
-        sx={{
-          zIndex: 10,
-          color: connectionError ? 'error.main' : undefined,
-        }}
-        shrink
-        color={color}
-        variant="outlined"
-        htmlFor={`${props.name}`}
-        id={`${props.name}-label`}
-      >
-        <span>
-          {/* {label} */}
-          {isConnected && isSynced && <span style={{ color: 'green' }}>●</span>}
-          {isConnected && !isSynced && (
-            <span style={{ color: 'orange' }}>⟳</span>
-          )}
-          {connectionError && <span style={{ color: 'red' }}>⚠</span>}
-        </span>
-      </InputLabel>
-
       <Box
         sx={{
-          '&& .MuiTiptap-RichTextContent-root  a': {
-            color: 'secondary.main',
+          height: '100%',
+          border: '1px solid',
+          borderColor: 'divider',
+          // position: 'relative',
+          '&& .MuiTiptap-RichTextContent-root': {
+            // paddingRight: showTOC ? 0 : undefined,
+            a: {
+              color: 'secondary.main',
+            },
+            overflowY: 'auto',
+            scrollBehavior: 'smooth',
+            height: '100%',
           },
           '&& .ProseMirror': {
             minHeight: props.minRows * 24 || 100,
-            overflowY: 'auto',
+            'h1, h2, h3, h4, h5, h6': {
+              marginBottom: '0.5em',
+              marginTop: '0.25em',
+            },
           },
-          // Style collaborative cursors
           '& .collaboration-cursor__caret': {
             position: 'relative',
             marginLeft: '-1px',
@@ -433,64 +492,126 @@ const CollabEditor = (props) => {
           },
         }}
       >
-        <RichTextEditor
-          ref={rteRef}
-          extensions={extensions}
-          // Don't pass content when using collaboration - Yjs manages the content
-          content={provider ? undefined : content}
-          onUpdate={({ editor }) => {
-            const htmlContent = editor.getHTML()
-            onChange?.(htmlContent === '<p></p>' ? '' : htmlContent)
-          }}
-          onCreate={({ editor }) => {
-            if (focus) {
-              editor.commands.focus('end')
-            }
-          }}
-          autofocus={focus ? 'end' : false}
-          editable={!disabled && isConnected && isSynced}
-          editorProps={{
-            attributes: {
-              id: props.name,
-              'aria-labelledby': `${props.name}-label`,
-              class: 'ProseMirror',
-              tabindex: props?.inputProps?.tabIndex || 0,
-              ...textFieldProps,
-            },
-          }}
-          renderControls={() =>
-            !disabled &&
-            isConnected &&
-            isSynced && (
-              <MenuControlsContainer>
-                <MenuSelectHeading />
-                <MenuDivider />
-                <MenuButtonBold />
-                <MenuButtonItalic />
-                <MenuButtonUnderline />
-                <MenuDivider />
-                <MenuButtonAlignLeft />
-                <MenuButtonAlignCenter />
-                <MenuButtonAlignRight />
-                <MenuDivider />
-                <MenuButtonEditLink />
-                <MenuDivider />
-                <MenuButtonBulletedList />
-                <MenuButtonOrderedList />
-                <MenuButtonTaskList />
-                <MenuDivider />
-                <MenuButtonHorizontalRule />
-                <ConnectedUsersDisplay users={connectedUsers} />
-              </MenuControlsContainer>
-            )
-          }
+        {editable && !disabled && (
+          <span style={{ position: 'absolute', top: -12, left: 0, zIndex: 10 }}>
+            {/* {label} */}
+            {isConnected && isSynced && (
+              <span style={{ color: 'green' }}>●</span>
+            )}
+            {isConnected && !isSynced && (
+              <span style={{ color: 'orange' }}>⟳</span>
+            )}
+            {connectionError && <span style={{ color: 'red' }}>⚠</span>}
+          </span>
+        )}
+        <Grid2
+          container
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ height: '100%' }}
         >
-          {() => (
-            <>
-              <LinkBubbleMenu />
-            </>
-          )}
-        </RichTextEditor>
+          <Grid2 className="editorPane" size={'grow'} sx={{ height: '100%' }}>
+            <RichTextEditor
+              ref={rteRef}
+              extensions={extensions}
+              // Don't pass content when using collaboration - Yjs manages the content
+              content={provider ? undefined : content}
+              onUpdate={({ editor }) => {
+                const htmlContent = editor.getHTML()
+                onChange?.(htmlContent === '<p></p>' ? '' : htmlContent)
+              }}
+              onCreate={({ editor }) => {
+                if (focus) {
+                  editor.commands.focus('end')
+                }
+              }}
+              autofocus={focus ? 'end' : false}
+              editable={editable && !disabled && isConnected && isSynced}
+              editorProps={{
+                attributes: {
+                  id: props.name,
+                  'aria-labelledby': `${props.name}-label`,
+                  class: 'ProseMirror',
+                  tabindex: props?.inputProps?.tabIndex || 0,
+                  ...textFieldProps,
+                },
+              }}
+              renderControls={() =>
+                editable &&
+                !disabled &&
+                isConnected &&
+                isSynced && (
+                  <MenuControlsContainer>
+                    <MenuSelectHeading />
+                    <MenuDivider />
+                    <MenuButtonUndo />
+                    <MenuButtonRedo />
+                    <MenuDivider />
+                    <MenuButtonBold />
+                    <MenuButtonItalic />
+                    <MenuButtonUnderline />
+                    <MenuButtonStrikethrough />
+                    <MenuDivider />
+                    <MenuSelectTextAlign />
+                    <MenuDivider />
+                    <MenuButtonEditLink />
+                    <MenuDivider />
+                    <MenuButtonBulletedList />
+                    <MenuButtonOrderedList />
+                    <MenuButtonTaskList />
+                    <MenuDivider />
+                    <MenuButtonBlockquote />
+                    <MenuButtonIndent />
+                    <MenuButtonUnindent />
+                    <MenuDivider />
+                    <MenuButtonHighlightToggle />
+                    <MenuButtonHighlightColor />
+                    <MenuDivider />
+                    <MenuButtonHorizontalRule />
+                    <MenuDivider />
+                    <MenuButton
+                      IconComponent={Toc}
+                      onClick={() => setShowTOC(!showTOC)}
+                      value={showTOC}
+                      tooltipLabel="Toggle Table of Contents"
+                      selected={showTOC}
+                    />
+                    <ConnectedUsersDisplay users={connectedUsers} />
+                  </MenuControlsContainer>
+                )
+              }
+            >
+              {() => <>{<LinkBubbleMenu />}</>}
+            </RichTextEditor>
+          </Grid2>
+          <Show when={showTOC}>
+            <Grid2
+              sx={{
+                width: 250,
+                borderLeftColor: 'divider',
+                borderLeftWidth: '1px',
+                borderLeftStyle: 'solid',
+                height: '100%',
+                p: 1,
+                pt: editable ? '54px' : 1,
+              }}
+            >
+              <Stack
+                sx={{
+                  height: '100%',
+                }}
+              >
+                <Typography variant="overline" sx={{ fontWeight: 600 }}>
+                  Table of contents
+                </Typography>
+                <Box sx={{ overflowY: 'auto', height: '100%' }}>
+                  <MemorizedToC items={tocItems} />
+                </Box>
+              </Stack>
+            </Grid2>
+          </Show>
+        </Grid2>
       </Box>
 
       {((error?.message && !disabled) || connectionError || helperText) && (
@@ -501,7 +622,7 @@ const CollabEditor = (props) => {
           {connectionError || (error?.message && !disabled) || helperText}
         </FormHelperText>
       )}
-    </FormControl>
+    </Box>
   )
 }
 
