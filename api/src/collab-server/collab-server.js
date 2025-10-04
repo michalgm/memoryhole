@@ -18,6 +18,7 @@ export const createCollabServer = (options = {}) => {
     new JWTAuthExtension(),
     new Database({
       async store({ documentName, state, context }) {
+        const title = context?.title || documentName
         // Store Yjs state as binary in Postgres
         const now = new Date()
         const [type, _id] = documentName.split(/[:-]/, 2)
@@ -32,6 +33,7 @@ export const createCollabServer = (options = {}) => {
           },
           create: {
             name: documentName,
+            title: title || documentName,
             content: Buffer.from(state),
             created_at: now,
             updated_at: now,
@@ -60,6 +62,11 @@ export const createCollabServer = (options = {}) => {
 
     // Additional server configuration
     quiet: false, // Set to true in production to reduce logs
+    onConnect: ({ documentName, context, request }) => {
+      const url = new URL(request.url, `http://localhost:${port}`)
+      const title = url.searchParams.get('title') || documentName
+      context.title = title
+    },
     // onAuthenticate: AuthenticateRedwoodCookie,
     // Debug connection events
     // onConnect: ({ documentName, context: _context }) => {

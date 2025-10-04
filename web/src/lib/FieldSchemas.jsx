@@ -732,8 +732,35 @@ export const userSchema = sortObjectKeys(
   getSchema(UserFields, false),
   'props.label'
 )
+export const CollabDocumentFields = [
+  {
+    fields: [
+      ['name', { required: true, helperText: 'Unique document identifier' }],
+      ['title', { helperText: 'Human-readable document title' }],
+      [
+        'type',
+        {
+          field_type: 'select',
+          options: ['wiki', 'project', 'team-doc', 'meeting-notes', 'other'],
+          required: true,
+          helperText: 'Document category',
+        },
+      ],
+      ['html_content', { field_type: 'richtext', label: 'Content' }],
+      ['created_at', { field_type: 'date-time', disabled: true }],
+      ['updated_at', { field_type: 'date-time', disabled: true }],
+      ['created_by.name', { disabled: true }],
+      ['last_editor.name', { disabled: true }],
+    ],
+  },
+]
+
 export const actionSchema = sortObjectKeys(
   getSchema(ActionFields, false),
+  'props.label'
+)
+export const collabDocumentSchema = sortObjectKeys(
+  getSchema(CollabDocumentFields, false),
   'props.label'
 )
 export const duplicateArrestSchema = sortObjectKeys(

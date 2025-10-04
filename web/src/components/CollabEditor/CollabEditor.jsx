@@ -51,6 +51,7 @@ import {
   MenuSelectHeading,
   MenuSelectTextAlign,
   RichTextEditor,
+  slugify,
 } from 'mui-tiptap'
 import * as Y from 'yjs'
 
@@ -130,7 +131,8 @@ const MemorizedToC = React.memo(ToC)
 const CollabEditor = (props) => {
   // const apolloClient = useApolloClient()
   const {
-    documentName, // Required: Document identifier for collaboration
+    type = 'document',
+    title,
     content = '',
     onChange,
     editable = true,
@@ -159,6 +161,11 @@ const CollabEditor = (props) => {
   const [connectedUsers, setConnectedUsers] = useState([])
   const [tocItems, setTocItems] = useState([])
   const [showTOC, setShowTOC] = useState(true)
+
+  let documentName = props.documentName
+  if (!documentName && title && type) {
+    documentName = `${type}:${slugify(title)}`
+  }
 
   // Label width calculation (reused from RichTextInput)
 
@@ -191,7 +198,7 @@ const CollabEditor = (props) => {
     if (!documentName) return null
 
     const providerInstance = new HocuspocusProvider({
-      url: serverUrl,
+      url: `${serverUrl}?title=${encodeURIComponent(title || documentName)}`,
       name: documentName,
       document: ydoc,
       // token, // JWT token for authentication
@@ -237,6 +244,7 @@ const CollabEditor = (props) => {
     onSynced,
     serverUrl,
     ydoc,
+    title,
   ])
 
   useEffect(() => {
@@ -400,6 +408,18 @@ const CollabEditor = (props) => {
       sx={() =>
         merge(
           {
+            mt: 0,
+            height: '100%',
+            '&& .editorPane .MuiBox-root': {
+              height: '100%',
+            },
+            '&& .MuiTiptap-RichTextContent-root': {
+              flexGrow: 1,
+              minHeight: 0,
+              height: '100%',
+              // height: 'calc(100% - 48px)',
+              // backgroundColor: 'blue',
+            },
             '&& .MuiTiptap-FieldContainer-notchedOutline': {
               // backgroundColor: 'background.paper',
               border: 'none',
