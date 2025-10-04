@@ -18,20 +18,18 @@ const ActionWhiteboardPage = ({ id }) => {
         sx={{
           mt: 0,
           height: '100%',
-          '&& .MuiBox-root': {
+          '&& .editorPane .MuiBox-root': {
             height: '100%',
           },
           '&& .MuiTiptap-RichTextContent-root': {
-            height: 'calc(100% - 48px)',
+            flexGrow: 1,
+            minHeight: 0,
+            height: '100%',
+            // height: 'calc(100% - 48px)',
             // backgroundColor: 'blue',
           },
-          '&& .ProseMirror': {
-            height: '100%',
-            overflow: 'auto',
-            minHeight: 300,
-            // backgroundColor: 'yellow',
-          },
         }}
+        // editable={false}
         documentName={`action:${id}`}
       />
     </Box>
