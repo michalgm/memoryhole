@@ -138,13 +138,13 @@ const DocumentPage = ({ id }) => {
   }, [setPageTitle, title])
 
   if (loading) return <Loading />
+
   return (
     <Box
       sx={{
         backgroundColor: 'background.paper',
         display: 'flex',
         flexGrow: 1,
-        // overflow: 'auto',
         height: 'calc(100vh - var(--header-height) - 103px)',
       }}
       className=""
