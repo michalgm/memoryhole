@@ -15,7 +15,9 @@ export const standard = (/* vars, { ctx, req } */) => ({
         email: 'foo@bar.com',
         first_name: 'John',
         last_name: 'Doe',
+        __typename: 'Arrestee',
       },
+      __typename: 'DocketSheet',
     },
   ],
 })
