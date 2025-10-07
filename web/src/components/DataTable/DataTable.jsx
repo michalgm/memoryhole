@@ -500,7 +500,7 @@ const DataTable = ({
         table={table}
         reload={refetch && reload}
         disableDownload={disableDownload}
-        manageViews={!extraSmallLayout && manageViews}
+        manageViews={!smallLayout && manageViews}
         state={state}
         loadState={loadState}
         initialState={initialState}
@@ -578,23 +578,11 @@ const DataTable = ({
   properties.data = stateLoaded ? data : []
 
   if (globalFilter || tableProps?.initialState?.showGlobalFilter) {
-    properties.initialState.showGlobalFilter = globalFilter
-    // state.showGlobalFilter = !extraSmallLayout
-    if (extraSmallLayout) {
-      state.showGlobalFilter = false
-      properties.enableGlobalFilter = false
-    }
+    properties.initialState.showGlobalFilter = smallLayout
+      ? false
+      : globalFilter
+    properties.enableGlobalFilter = true
   }
-
-  // if (globalFilter || tableProps?.initialState?.showGlobalFilter) {
-  //   properties.initialState.showGlobalFilter = true
-  //   properties.enableGlobalFilter = true
-  //   state.showGlobalFilter = true
-
-  //   if (extraSmallLayout) {
-  //     state.showGlobalFilter = false
-  //   }
-  // }
 
   properties.state = state
 
