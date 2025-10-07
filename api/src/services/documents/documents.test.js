@@ -30,6 +30,7 @@ jest.mock('src/lib/auth', () => ({
 jest.mock('src/lib/utils', () => ({
   slugify: jest.fn((str) => str.toLowerCase().replace(/\s+/g, '-')),
   validateRoleLevel: jest.fn(() => true),
+  checkUserRole: jest.fn(() => true),
 }))
 
 jest.mock('@redwoodjs/graphql-server', () => ({
@@ -37,7 +38,7 @@ jest.mock('@redwoodjs/graphql-server', () => ({
     currentUser: {
       id: 1,
       name: 'Test User',
-      role: 'Admin',
+      roles: ['Admin'],
     },
   },
 }))
@@ -54,14 +55,14 @@ describe('documents', () => {
     context.currentUser = {
       id: 1,
       name: 'Test User',
-      role: 'Admin',
+      roles: ['Admin'],
     }
 
     mockUser = {
       id: 1,
       name: 'Test User',
       email: 'test@example.com',
-      role: 'Admin',
+      roles: ['Admin'],
     }
 
     mockDocument = {
@@ -93,6 +94,11 @@ describe('documents', () => {
       const result = await documents()
 
       expect(db.document.findMany).toHaveBeenCalledWith({
+        where: {
+          access_role: {
+            in: ['Restricted', 'Operator', 'Coordinator', 'Admin'],
+          },
+        },
         include: {
           created_by: true,
           updated_by: true,
@@ -180,7 +186,7 @@ describe('documents', () => {
 
   describe('createDocument()', () => {
     const { requireAuth } = require('src/lib/auth')
-    const { slugify } = require('src/lib/utils')
+    const { slugify, checkUserRole } = require('src/lib/utils')
 
     it('creates document with valid input', async () => {
       const input = {
