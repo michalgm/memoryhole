@@ -578,9 +578,23 @@ const DataTable = ({
   properties.data = stateLoaded ? data : []
 
   if (globalFilter || tableProps?.initialState?.showGlobalFilter) {
-    properties.initialState.showGlobalFilter = false
-    state.showGlobalFilter = !smallLayout
+    properties.initialState.showGlobalFilter = globalFilter
+    // state.showGlobalFilter = !extraSmallLayout
+    if (extraSmallLayout) {
+      state.showGlobalFilter = false
+      properties.enableGlobalFilter = false
+    }
   }
+
+  // if (globalFilter || tableProps?.initialState?.showGlobalFilter) {
+  //   properties.initialState.showGlobalFilter = true
+  //   properties.enableGlobalFilter = true
+  //   state.showGlobalFilter = true
+
+  //   if (extraSmallLayout) {
+  //     state.showGlobalFilter = false
+  //   }
+  // }
 
   properties.state = state
 

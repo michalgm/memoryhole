@@ -2,7 +2,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 // import { useApolloClient } from '@apollo/client'
 import { HocuspocusProvider } from '@hocuspocus/provider'
-import { Toc } from '@mui/icons-material'
+import {
+  ChangeCircle,
+  CheckCircle,
+  CloudCircle,
+  Error,
+  Settings,
+  Toc,
+} from '@mui/icons-material'
 import {
   Avatar,
   Box,
@@ -148,6 +155,7 @@ const CollabEditor = (props) => {
     onSynced,
     onAuthFailed,
     textFieldProps = {},
+    editDocumentProperties,
     // Additional collaboration options
     enablePresence = true, // Show other users' cursors
     enableHistory = true, // Enable collaborative history
@@ -400,6 +408,15 @@ const CollabEditor = (props) => {
     )
   }
 
+  let status = ['warning', ChangeCircle, 'Loading...']
+  if (isConnected && isSynced) {
+    status = ['success', CheckCircle, 'Connected']
+  } else if (isConnected && !isSynced) {
+    status = ['warning', CloudCircle, 'Syncing...']
+  } else if (connectionError) {
+    status = ['error', Error, `Error: ${connectionError}`]
+  }
+
   return (
     <Box
       variant="outlined"
@@ -410,6 +427,7 @@ const CollabEditor = (props) => {
           {
             mt: 0,
             height: '100%',
+            width: '100%',
             '&& .editorPane .MuiBox-root': {
               height: '100%',
             },
@@ -470,7 +488,7 @@ const CollabEditor = (props) => {
           height: '100%',
           border: '1px solid',
           borderColor: 'divider',
-          // position: 'relative',
+          position: 'relative',
           '&& .MuiTiptap-RichTextContent-root': {
             // paddingRight: showTOC ? 0 : undefined,
             a: {
@@ -512,17 +530,24 @@ const CollabEditor = (props) => {
           },
         }}
       >
-        {editable && !disabled && (
-          <span style={{ position: 'absolute', top: -12, left: 0, zIndex: 10 }}>
-            {/* {label} */}
-            {isConnected && isSynced && (
-              <span style={{ color: 'green' }}>●</span>
-            )}
-            {isConnected && !isSynced && (
-              <span style={{ color: 'orange' }}>⟳</span>
-            )}
-            {connectionError && <span style={{ color: 'red' }}>⚠</span>}
-          </span>
+        {editable && (
+          <Tooltip
+            title={`Connection status: ${status[2]}`}
+            arrow
+            placement="top"
+          >
+            <Box
+              sx={{
+                position: 'absolute',
+                top: -12,
+                left: -10,
+                zIndex: 10,
+                color: `${status[0]}.main`,
+              }}
+            >
+              {React.createElement(status[1])}
+            </Box>
+          </Tooltip>
         )}
         <Grid2
           container
@@ -591,6 +616,13 @@ const CollabEditor = (props) => {
                     <MenuButtonHorizontalRule />
                     <MenuDivider />
                     <MenuButton
+                      IconComponent={Settings}
+                      onClick={editDocumentProperties}
+                      // value={showTOC}
+                      tooltipLabel="Edit Document Title and Permissions"
+                      // selected={showTOC}
+                    />
+                    <MenuButton
                       IconComponent={Toc}
                       onClick={() => setShowTOC(!showTOC)}
                       value={showTOC}
@@ -632,16 +664,26 @@ const CollabEditor = (props) => {
             </Grid2>
           </Show>
         </Grid2>
-      </Box>
 
-      {((error?.message && !disabled) || connectionError || helperText) && (
-        <FormHelperText
-          id={props.name}
-          error={Boolean(error || connectionError)}
-        >
-          {connectionError || (error?.message && !disabled) || helperText}
-        </FormHelperText>
-      )}
+        {((error?.message && !disabled) || connectionError || helperText) && (
+          <FormHelperText
+            id={props.name}
+            error={Boolean(error || connectionError)}
+            sx={{
+              position: 'absolute',
+              bottom: '0px',
+              left: '-8px',
+              ml: 1,
+              backgroundColor: 'rgba(0,0,0,0.05)',
+              p: 1,
+              borderRadius: '0 4px 4px 0',
+            }}
+          >
+            Error:{' '}
+            {connectionError || (error?.message && !disabled) || helperText}
+          </FormHelperText>
+        )}
+      </Box>
     </Box>
   )
 }

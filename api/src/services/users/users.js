@@ -8,11 +8,11 @@ import {
 } from '@redwoodjs/api'
 import { hashPassword } from '@redwoodjs/auth-dbauth-api'
 
+import { ROLE_LEVELS } from 'src/config'
 import { passwordValidation } from 'src/functions/auth'
 import { requireAuth } from 'src/lib/auth'
 import { initUser, onboardUser } from 'src/lib/authHelpers'
 import { db } from 'src/lib/db'
-export const ROLE_LEVELS = [null, 'Operator', 'Coordinator', 'Admin']
 
 export function getRoleLevel(role) {
   return ROLE_LEVELS.indexOf(role) || 0
@@ -26,10 +26,12 @@ export function canManageRole(currentUser, targetRole) {
   const currentUserRole = getUserRole(currentUser)
   const userLevel = getRoleLevel(currentUserRole)
   const targetLevel = getRoleLevel(targetRole)
+  // User can manage the target role if their level is greater than or equal to the target level
+  // and both levels are valid (greater than or equal to 0)
   return userLevel >= targetLevel && userLevel >= 0 && targetLevel >= 0
 }
 
-const requireAdmin = () => requireAuth({ roles: ['Admin', 'Coordinator'] })
+const requireAdmin = () => requireAuth({ minRole: 'Coordinator' })
 
 export const users = () => {
   return db.user.findMany()

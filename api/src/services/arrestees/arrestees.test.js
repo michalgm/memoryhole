@@ -65,7 +65,7 @@ describe('updateDisplayField', () => {
       preferred_name: 'Johnny',
     }
     updateDisplayField(arrestee)
-    expect(arrestee.display_field).toEqual('Johnny (John) Doe')
+    expect(arrestee.display_field).toEqual('Johnny (John Doe)')
   })
 
   test('handles no preferred name', () => {
@@ -169,6 +169,16 @@ describe('updateDisplayField', () => {
     }
     updateDisplayField(arrestee)
     expect(arrestee.display_field).toEqual('Johnny Boy *')
+  })
+
+  test('handles legal name with preferred name containing space', () => {
+    const arrestee = {
+      first_name: 'John',
+      last_name: 'Doe',
+      preferred_name: 'Johnny Boy',
+    }
+    updateDisplayField(arrestee)
+    expect(arrestee.display_field).toEqual('Johnny Boy (John Doe)')
   })
 
   test('merges with current data', () => {

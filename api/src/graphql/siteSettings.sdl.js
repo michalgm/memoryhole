@@ -9,8 +9,9 @@ export const schema = gql`
   }
 
   type Query {
-    siteSettings(ids: [String]): [SiteSetting] @requireAuth
-    siteSetting(id: String!): SiteSetting @requireAuth
+    siteSettings(ids: [String]): [SiteSetting]
+      @requireAuth(minRole: "Restricted")
+    siteSetting(id: String!): SiteSetting @requireAuth(minRole: "Restricted")
   }
 
   input CreateSiteSettingInput {

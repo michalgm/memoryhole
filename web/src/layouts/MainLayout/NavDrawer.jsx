@@ -36,6 +36,7 @@ import { AccountBoxMultipleOutline } from 'mdi-material-ui'
 import { Link, routes, useMatch } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
+import HasRoleAccess from 'src/components/utils/HasRoleAccess'
 import { LEFT_DRAWER_WIDTH, LEFT_DRAWER_WIDTH_SMALL } from 'src/lib/AppContext'
 import dayjs from 'src/lib/dayjs'
 
@@ -63,11 +64,17 @@ const NavDrawer = ({ navOpen }) => {
   }
 
   const pages = [
-    ['arrests', 'Arrests', <AccountBoxMultipleOutline key="arrests" />],
-    ['actions', 'Actions', <Flag key="actions" />],
-    ['logs', 'Logs', <EditNote key="logs" />],
-    ['documents', 'Documents', <Article key="documents" />],
-    ['docsHome', 'Help', <Help key="help" />],
+    [
+      'arrests',
+      'Arrests',
+      <AccountBoxMultipleOutline key="arrests" />,
+      'Operator',
+    ],
+    ['actions', 'Actions', <Flag key="actions" />, 'Operator'],
+    ['logs', 'Logs', <EditNote key="logs" />, 'Operator'],
+    ['documents', 'Documents', <Article key="documents" />, 'Restricted'],
+    ['docsHome', 'Help', <Help key="help" />, 'Operator'],
+    ['admin', 'Admin', <Settings key="admin" />, 'Coordinator'],
   ]
   const themeModes = [
     ['light', LightMode],
@@ -75,30 +82,20 @@ const NavDrawer = ({ navOpen }) => {
     ['dark', DarkMode],
   ]
 
-  if (currentUser && ['Admin', 'Coordinator'].includes(currentUser.roles[0])) {
-    pages.push(['admin', 'Admin', <Settings key="admin" />])
-  }
-
-  const {
-    expiresAt,
-    roles: [role],
-  } = currentUser
+  const { expiresAt } = currentUser
 
   useEffect(() => {
     if (expiresAt) {
+      const expiringSoon = dayjs(expiresAt).isBefore(dayjs().add(1, 'week'))
+      const hasExpired = dayjs().isAfter(dayjs(expiresAt))
       setExpires({
-        expiring: `Your access will expire on ${dayjs.tz(expiresAt).format('lll')}`,
-        expiring_soon: dayjs(expiresAt).isBefore(dayjs().add(1, 'week')),
+        expiring: `Your access to arrestee data ${hasExpired ? 'expired' : 'will expire'} on ${dayjs.tz(expiresAt).format('lll')}`,
+        expiringSoon,
       })
     }
   }, [expiresAt, setExpires])
 
-  const LogoutIcon =
-    expires.expiring_soon && role !== 'Operator' ? (
-      <Error color="error" />
-    ) : (
-      <Logout />
-    )
+  const LogoutIcon = expires.expiringSoon ? <Error color="error" /> : <Logout />
   const width = effectiveNavOpen ? LEFT_DRAWER_WIDTH : LEFT_DRAWER_WIDTH_SMALL
 
   return (
@@ -138,8 +135,14 @@ const NavDrawer = ({ navOpen }) => {
         }}
       >
         <List sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          {pages.map(([route, label, Icon]) => (
-            <NavMenuItem key={route} route={route} label={label} Icon={Icon} />
+          {pages.map(([route, label, Icon, accessRole]) => (
+            <NavMenuItem
+              key={route}
+              route={route}
+              label={label}
+              Icon={Icon}
+              accessRole={accessRole}
+            />
           ))}
           <Divider component={'li'} sx={{ m: 1 }} />
           <NavMenuItem
@@ -212,41 +215,43 @@ const NavDrawer = ({ navOpen }) => {
   )
 }
 
-const NavMenuItem = ({ route, label, Icon, ...props }) => {
+const NavMenuItem = ({ route, label, Icon, accessRole, ...props }) => {
   const to = route && routes[route] ? routes[route]() : 'FAKE_ROUTE'
   const matchInfo = useMatch(to, { matchSubPaths: true })
   const isActive = matchInfo.match
   return (
-    <ListItem sx={{ px: 1, py: 0 }}>
-      <ListItemButton
-        selected={isActive}
-        component={to !== 'FAKE_ROUTE' ? Link : 'div'}
-        to={route ? to : undefined}
-        sx={{
-          borderRadius: 2,
-          px: 'calc(1.4* 8px)',
-          height: '48px',
-          '.MuiListItemIcon-root': {
-            flexShrink: 0,
-            display: 'inline-flex',
-            minWidth: '34px',
-            marginRight: 'calc(1.3* 8px)',
-          },
-          '&.Mui-selected': {
-            '& .MuiListItemIcon-root': {
-              color: 'primary.main',
+    <HasRoleAccess requiredRole={accessRole}>
+      <ListItem sx={{ px: 1, py: 0 }}>
+        <ListItemButton
+          selected={isActive}
+          component={to !== 'FAKE_ROUTE' ? Link : 'div'}
+          to={route ? to : undefined}
+          sx={{
+            borderRadius: 2,
+            px: 'calc(1.4* 8px)',
+            height: '48px',
+            '.MuiListItemIcon-root': {
+              flexShrink: 0,
+              display: 'inline-flex',
+              minWidth: '34px',
+              marginRight: 'calc(1.3* 8px)',
             },
-            '& .MuiListItemText-primary': {
-              color: 'primary.main',
+            '&.Mui-selected': {
+              '& .MuiListItemIcon-root': {
+                color: 'primary.main',
+              },
+              '& .MuiListItemText-primary': {
+                color: 'primary.main',
+              },
             },
-          },
-        }}
-        {...props}
-      >
-        <ListItemIcon>{Icon}</ListItemIcon>
-        <ListItemText primary={label} />
-      </ListItemButton>
-    </ListItem>
+          }}
+          {...props}
+        >
+          <ListItemIcon>{Icon}</ListItemIcon>
+          <ListItemText primary={label} />
+        </ListItemButton>
+      </ListItem>
+    </HasRoleAccess>
   )
 }
 

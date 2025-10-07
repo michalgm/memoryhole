@@ -4,54 +4,77 @@ import { Server } from '@hocuspocus/server'
 import { JWTAuthExtension } from 'src/collab-server/auth'
 import { db } from 'src/lib/db'
 
-/**
- * Create and configure the Hocuspocus server
- */
 export const createCollabServer = (options = {}) => {
-  const {
-    port = process.env.HOCUSPOCUS_PORT || 1234,
-    // enableRedis = false,
-    // redisOptions = {},
-  } = options
+  const { port = process.env.HOCUSPOCUS_PORT || 1234 } = options
 
   const extensions = [
     new JWTAuthExtension(),
     new Database({
       async store({ documentName, state, context }) {
-        const title = context?.title || documentName
-        // Store Yjs state as binary in Postgres
-        const now = new Date()
-        const [type, _id] = documentName.split(/[:-]/, 2)
-        const user = context?.user
-        await db.collabDocument.upsert({
-          where: { name: documentName },
-          update: {
-            content: Buffer.from(state),
-            updated_at: now,
-            last_edited_by: user?.id ?? null,
-            type: type ?? 'wiki',
-          },
-          create: {
-            name: documentName,
-            title: title || documentName,
-            content: Buffer.from(state),
-            created_at: now,
-            updated_at: now,
-            created_by_id: user?.id ?? 1,
-            last_edited_by: user?.id ?? null,
-            type: type ?? 'wiki',
-          },
-        })
-      },
-      async fetch({ documentName }) {
-        // Load Yjs state from Postgres
-        const doc = await db.collabDocument.findUnique({
-          where: { name: documentName },
-        })
-        if (doc?.content) {
-          return new Uint8Array(doc.content)
+        try {
+          // Check edit permissions (already validated in auth)
+          if (!context?.canEdit) {
+            // Don't throw - just silently ignore the save attempt
+            return
+          }
+
+          const title = context?.title || documentName
+          const now = new Date()
+          const [type] = documentName.split(/[:-]/, 2)
+          const user = context?.user
+
+          await db.document.upsert({
+            where: { name: documentName },
+            update: {
+              content: Buffer.from(state),
+              updated_at: now,
+              updated_by_id: user?.id ?? null,
+              type: type ?? 'wiki',
+            },
+            create: {
+              name: documentName,
+              title: title || documentName,
+              content: Buffer.from(state),
+              created_at: now,
+              updated_at: now,
+              created_by_id: user?.id ?? 1,
+              updated_by_id: user?.id ?? null,
+              type: type ?? 'wiki',
+              access_role: 'Restricted',
+              edit_role: 'Operator',
+            },
+          })
+        } catch (error) {
+          console.error('❌ Error storing document:', error)
+          // Optionally notify the client/user about the error
+          if (context && typeof context.notifySaveError === 'function') {
+            context.notifySaveError(`Failed to save document: ${error.message}`)
+          }
+          // Don't re-throw to prevent server crash
+          // Log the error but allow the server to continue
         }
-        return null
+      },
+
+      async fetch({ context }) {
+        try {
+          // Use cached document from auth (no second DB lookup!)
+          const doc = context?.document
+
+          if (!doc) {
+            // Document doesn't exist, return null (will be created on first save)
+            return null
+          }
+
+          // Permissions already checked in auth
+          if (!context?.canRead) {
+            return null // Return empty document instead of throwing
+          }
+
+          return doc.content ? new Uint8Array(doc.content) : null
+        } catch (error) {
+          console.error('❌ Error fetching document:', error)
+          return null // Return null instead of crashing
+        }
       },
     }),
   ]
@@ -59,49 +82,24 @@ export const createCollabServer = (options = {}) => {
   const server = new Server({
     port,
     extensions,
-
-    // Additional server configuration
-    quiet: false, // Set to true in production to reduce logs
+    quiet: false,
     onConnect: ({ documentName, context, request }) => {
       const url = new URL(request.url, `http://localhost:${port}`)
       const title = url.searchParams.get('title') || documentName
       context.title = title
     },
-    // onAuthenticate: AuthenticateRedwoodCookie,
-    // Debug connection events
-    // onConnect: ({ documentName, context: _context }) => {
-    //   console.log('🔗 Client connected to document:', documentName)
-    // },
-
-    // onDisconnect: ({ documentName, context: _context }) => {
-    //   console.log('� Client disconnected from document:', documentName)
-    // },
-
-    // onChange: ({ documentName, document: _document, context: _context }) => {
-    //   console.log('📝 Document changed:', documentName, 'Changes detected')
-    // },
+    // Add global error handler to prevent server crashes
+    onError: ({ error }) => {
+      console.error('🚨 Hocuspocus server error:', error)
+      // Log but don't crash the server
+    },
   })
 
   return server
 }
 
-/**
- * Start the collaboration server
- */
 export const startCollabServer = async (options = {}) => {
   const server = createCollabServer(options)
-
   await server.listen()
-
   return server
 }
-
-// // Auto-start server if this file is run directly
-// if (import.meta.url === `file://${process.argv[1]}`) {
-//   startCollabServer({
-//     port: process.env.COLLAB_PORT || 1234,
-//     enableRedis: process.env.REDIS_URL ? true : false,
-//     redisOptions: process.env.REDIS_URL ? { host: process.env.REDIS_URL } : {},
-//     accessControls: exampleAccessControls,
-//   }).catch(console.error)
-// }

@@ -1,28 +1,22 @@
 import { Add } from '@mui/icons-material'
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material'
+import { Button, Dialog } from '@mui/material'
 import { Stack } from '@mui/system'
 import { createPortal } from 'react-dom'
-import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
 
 import { navigate, routes } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
 
 import DataTable from 'src/components/DataTable/DataTable'
+import HasRoleAccess from 'src/components/utils/HasRoleAccess'
 import Link from 'src/components/utils/Link'
 import { useDisplayError } from 'src/components/utils/SnackBar'
-import { collabDocumentSchema } from 'src/lib/FieldSchemas'
+import { documentSchema } from 'src/lib/FieldSchemas'
+import { DocumentForm } from 'src/pages/Documents/DocumentPage/DocumentPage'
 
 export const QUERY = gql`
-  query CollabDocumentsQuery {
-    collabDocuments {
-      ...CollabDocumentFields
+  query DocumentsQuery {
+    documents {
+      ...DocumentFields
     }
   }
 `
@@ -32,12 +26,12 @@ export const CreateDocumentButton = ({ children }) => {
   const [open, setOpen] = React.useState(false)
   const handleClose = () => setOpen(false)
   const handleSubmit = (data) => {
-    navigate(routes.document({ id: 'new', title: data.title }))
+    navigate(routes.document({ id: data.id }))
   }
   if (!headerTarget) return null
 
   const createDocumentButton = createPortal(
-    <>
+    <HasRoleAccess requiredRole="Operator">
       <Stack direction="row" alignItems="center" spacing={2}>
         {children}
         <Button
@@ -51,30 +45,9 @@ export const CreateDocumentButton = ({ children }) => {
         </Button>
       </Stack>
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <FormContainer defaultValues={{ title: '' }} onSuccess={handleSubmit}>
-          <DialogTitle>New Document</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Enter a title for the new document.
-            </DialogContentText>
-            <TextFieldElement
-              name="title"
-              label="Document Title"
-              fullWidth
-              variant="outlined"
-              margin="normal"
-              required
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit" variant="contained" color="secondary">
-              Create Document
-            </Button>
-          </DialogActions>
-        </FormContainer>
+        <DocumentForm handleClose={handleClose} onCreate={handleSubmit} />
       </Dialog>
-    </>,
+    </HasRoleAccess>,
     headerTarget
   )
   return createDocumentButton
@@ -92,7 +65,7 @@ const DocumentsPage = () => {
     'created_at',
     'created_by.name',
     'updated_at',
-    'last_editor.name',
+    'updated_by.name',
   ]
 
   const tableProps = {
@@ -114,7 +87,9 @@ const DocumentsPage = () => {
       Cell: ({ row, renderedCellValue }) => (
         <Link
           color="secondary"
-          to={routes.document({ id: row.original.id, foo: 'bar' })}
+          to={routes.document({
+            id: row.original.id,
+          })}
         >
           {renderedCellValue || row.original.name}
         </Link>
@@ -125,16 +100,14 @@ const DocumentsPage = () => {
   return (
     <>
       <DataTable
-        data={(data?.collabDocuments || []).filter(
-          (d) => d.type === 'document'
-        )}
+        data={(data?.documents || []).filter((d) => d.type === 'document')}
         displayColumns={displayColumns}
         tableProps={tableProps}
         refetch={refetch}
         loading={loading}
-        schema={collabDocumentSchema}
+        schema={documentSchema}
         preColumns={preColumns}
-        type="collabDocuments"
+        type="documents"
         name="document"
       />
       <CreateDocumentButton />

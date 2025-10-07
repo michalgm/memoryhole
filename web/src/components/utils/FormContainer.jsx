@@ -41,7 +41,7 @@ export const FormContainerSectionFields = ({
   highlightDirty,
   fieldProps,
   fields,
-  baseIndex,
+  baseIndex = 0,
 }) => {
   return fields.map(([name, options = {}], index) => (
     <Grid2 size={12} key={name}>
@@ -56,7 +56,7 @@ export const FormContainerSectionFields = ({
   ))
 }
 
-const FormContainerFieldsLayout = ({
+export const FormContainerFieldsLayout = ({
   layout,
   schema,
   columnCount,

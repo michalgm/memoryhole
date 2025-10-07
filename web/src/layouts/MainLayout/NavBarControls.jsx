@@ -2,9 +2,11 @@ import { ChevronLeft, ChevronRight, Flag } from '@mui/icons-material'
 import { Box, Button, InputAdornment, Tooltip } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 
+import { useAuth } from 'src/auth'
 import { BaseField } from 'src/components/utils/BaseField'
 import QuickSearch from 'src/components/utils/QuickSearch'
 import ShortcutIndicator from 'src/components/utils/ShortcutIndicator'
+import Show from 'src/components/utils/Show'
 import { defaultAction } from 'src/lib/AppContext'
 
 const textFieldProps = {
@@ -66,53 +68,57 @@ const NavBarControls = ({
   setCurrentAction,
   logsOpen,
   setLogsOpen,
-}) => (
-  <>
-    <Box sx={{ flexGrow: 7, maxWidth: '250px', ml: 'auto !important' }}>
-      <QuickSearch />
-    </Box>
+}) => {
+  const { currentUser } = useAuth()
+  const { roles: [role = 'Restricted'] = [] } = currentUser || {}
+  return (
+    <Show when={role !== 'Restricted'}>
+      <Box sx={{ flexGrow: 7, maxWidth: '250px', ml: 'auto !important' }}>
+        <QuickSearch />
+      </Box>
 
-    <Box sx={{ flexGrow: 5, maxWidth: '200px' }}>
-      <BaseField
-        name="action"
-        color="inherit"
-        field_type="action_chooser"
-        label=""
-        value={currentAction}
-        onChange={setCurrentAction}
-        disableClearable
-        autoHighlight
-        autoComplete
-        placeholder="Type to search"
-        transformOptions={transformOptions}
-        textFieldProps={textFieldProps}
-      />
-    </Box>
-    <Tooltip
-      title={
-        <Box sx={{ p: 1 }}>
-          Toggle Logs Panel
-          <br />
-          <ShortcutIndicator combo="Alt+L" />
-          to quickly create a new log)
-        </Box>
-      }
-    >
-      <Button
-        onClick={() => setLogsOpen(!logsOpen)}
-        variant="outlined"
-        color="inherit"
-        // color="secondary"
-        sx={{
-          color: 'var(--mui-palette-contrast-main)',
-        }}
-        startIcon={logsOpen ? <ChevronRight /> : <ChevronLeft />}
-        size="small"
+      <Box sx={{ flexGrow: 5, maxWidth: '200px' }}>
+        <BaseField
+          name="action"
+          color="inherit"
+          field_type="action_chooser"
+          label=""
+          value={currentAction}
+          onChange={setCurrentAction}
+          disableClearable
+          autoHighlight
+          autoComplete
+          placeholder="Type to search"
+          transformOptions={transformOptions}
+          textFieldProps={textFieldProps}
+        />
+      </Box>
+      <Tooltip
+        title={
+          <Box sx={{ p: 1 }}>
+            Toggle Logs Panel
+            <br />
+            <ShortcutIndicator combo="Alt+L" />
+            to quickly create a new log)
+          </Box>
+        }
       >
-        Logs
-      </Button>
-    </Tooltip>
-  </>
-)
+        <Button
+          onClick={() => setLogsOpen(!logsOpen)}
+          variant="outlined"
+          color="inherit"
+          // color="secondary"
+          sx={{
+            color: 'var(--mui-palette-contrast-main)',
+          }}
+          startIcon={logsOpen ? <ChevronRight /> : <ChevronLeft />}
+          size="small"
+        >
+          Logs
+        </Button>
+      </Tooltip>
+    </Show>
+  )
+}
 
 export default NavBarControls

@@ -7,14 +7,14 @@ import { requireAuth as applicationRequireAuth } from 'src/lib/auth'
 export const schema = gql`
   """
   Use to check whether or not a user is authenticated and is associated
-  with an optional set of roles.
+  with an optional roles.
   """
-  directive @requireAuth(roles: [String]) on FIELD_DEFINITION
+  directive @requireAuth(minRole: String) on FIELD_DEFINITION
 `
 
 const validate = ({ directiveArgs }) => {
-  const { roles } = directiveArgs
-  applicationRequireAuth({ roles })
+  const { minRole } = directiveArgs
+  applicationRequireAuth({ minRole })
 }
 
 const requireAuth = createValidatorDirective(schema, validate)
