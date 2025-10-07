@@ -155,7 +155,7 @@ describe('updateDisplayField', () => {
       },
     }
     updateDisplayField(arrestee, {}, true)
-    expect(arrestee.display_field).toEqual('Johnny (John) Doe')
+    expect(arrestee.display_field).toEqual('Johnny (John Doe)')
   })
 
   test('handles legal name confidential with preferred name containing space', () => {
@@ -191,7 +191,7 @@ describe('updateDisplayField', () => {
       last_name: 'Smith',
     }
     updateDisplayField(arrestee, current)
-    expect(arrestee.display_field).toEqual('Johnny (John) Smith')
+    expect(arrestee.display_field).toEqual('Johnny (John Smith)')
   })
 
   test('handles extra whitespace in names', () => {
@@ -201,7 +201,7 @@ describe('updateDisplayField', () => {
       preferred_name: '  Johnny  ',
     }
     updateDisplayField(arrestee)
-    expect(arrestee.display_field).toEqual('Johnny (John) Doe')
+    expect(arrestee.display_field).toEqual('Johnny (John Doe)')
   })
 
   test('returns "no name entered" when blank', () => {
