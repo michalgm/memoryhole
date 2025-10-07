@@ -26,15 +26,28 @@ export const updateDisplayField = (arrestee, current = {}, force) => {
     if (preferred_name === `${first_name} ${last_name}`) {
       first_name = last_name = ''
     }
+    let last_name_in_preferred = false
     if (!confidential) {
-      preferred_name = preferred_name.replace(new RegExp(` ${last_name}$`), '')
+      const regex = new RegExp(` ${last_name}$`)
+      if (last_name && regex.test(preferred_name)) {
+        last_name_in_preferred = true
+        preferred_name = preferred_name.replace(
+          new RegExp(` ${last_name}$`),
+          ''
+        )
+      }
     }
 
     let fields = [
       preferred_name,
-      preferred_name && first_name ? `(${first_name})` : first_name,
-      last_name,
+      preferred_name && first_name
+        ? !last_name_in_preferred
+          ? `(${[first_name, last_name].join(' ')})`
+          : `(${first_name})`
+        : first_name,
+      preferred_name && first_name && !last_name_in_preferred ? '' : last_name,
     ]
+
     if (confidential) {
       fields = [preferred_name || 'Confidential (No preferred name)', '*']
     }
