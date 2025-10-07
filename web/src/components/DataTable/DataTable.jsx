@@ -316,7 +316,7 @@ const DataTable = ({
   const [reloading, setReloading] = useState(false)
   const mediumLayout = useContainerWidth(870)
   const smallLayout = useContainerWidth(680)
-  const extraSmallLayout = useContainerWidth(500)
+  // const extraSmallLayout = useContainerWidth(500)
 
   const visibleColumns = [
     ...displayColumns,
