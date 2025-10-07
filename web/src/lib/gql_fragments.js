@@ -128,14 +128,10 @@ registerFragment(gql`
     name
     title
     type
-    html_content
-    parent_id
     access_role
     edit_role
     created_at
     updated_at
-    created_by_id
-    updated_by_id
     created_by {
       id
       name
@@ -145,11 +141,6 @@ registerFragment(gql`
       id
       name
       email
-    }
-    parent {
-      id
-      title
-      name
     }
   }
 `)

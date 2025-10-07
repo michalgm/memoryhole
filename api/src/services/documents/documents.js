@@ -2,9 +2,10 @@ import * as Y from 'yjs'
 
 import { context } from '@redwoodjs/graphql-server'
 
+import { ROLE_LEVELS } from 'src/config'
 import { requireAuth } from 'src/lib/auth'
 import { db } from 'src/lib/db'
-import { slugify, validateRoleLevel } from 'src/lib/utils'
+import { checkUserRole, slugify, validateRoleLevel } from 'src/lib/utils'
 
 const createEmptyYjsDocument = () => {
   const ydoc = new Y.Doc()
@@ -36,8 +37,20 @@ const validateRoles = (input) => {
   }
 }
 
+const filterDocumentAccess = (baseWhere = {}) => {
+  const { currentUser } = context
+  const allowedRoles = ROLE_LEVELS.filter(
+    (role) => role && checkUserRole(role, currentUser)
+  )
+  return {
+    ...baseWhere,
+    access_role: { in: allowedRoles },
+  }
+}
+
 export const documents = async () => {
   return db.document.findMany({
+    where: filterDocumentAccess(),
     include: {
       created_by: true,
       updated_by: true,
