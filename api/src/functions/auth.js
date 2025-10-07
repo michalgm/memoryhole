@@ -10,7 +10,7 @@ import { db } from 'src/lib/db'
 const login_expire_hours = 6
 // const login_expire_hours = 1 / 60 / 10
 
-const validateUser = (user) => {
+export const validateUserExpiration = (user) => {
   if (user.expiresAt && new Date(user.expiresAt) < Date.now()) {
     return false
   }
@@ -75,11 +75,12 @@ export const handler = async (event, context) => {
     // by the `logIn()` function from `useAuth()` in the form of:
     // `{ message: 'Error message' }`
     handler: (user) => {
-      if (!validateUser(user)) {
-        throw Error(
-          'Your account has expired. Please contact an administrator to reactivate your account.'
-        )
-      }
+      // if (!validateUserExpiration(user)) {
+      //   // throw Error(
+      //   //   'Your account has expired. Please contact an administrator to reactivate your account.'
+      //   // )
+      //   user.roles = ['Restricted']
+      // }
 
       // Ensure the login attempt is from localhost
       const requestOrigin = event.headers['x-forwarded-for'] || event.clientIp
@@ -113,7 +114,7 @@ export const handler = async (event, context) => {
     // in. Return `false` otherwise, and in the Reset Password page redirect the
     // user to the login page.
     handler: (user) => {
-      if (!validateUser(user)) {
+      if (!validateUserExpiration(user)) {
         throw Error(
           'Your password has been reset successfully. However, your account has expired. Please contact an administrator to reactivate your account.'
         )

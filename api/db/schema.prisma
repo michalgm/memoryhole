@@ -10,6 +10,13 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
+enum Role {
+  Admin
+  Coordinator
+  Operator
+  Restricted
+}
+
 model OptionSet {
   id     Int              @id @default(autoincrement())
   name   String           @unique
@@ -135,35 +142,35 @@ model Arrest {
 }
 
 model User {
-  id                      Int                      @id @default(autoincrement())
-  email                   String                   @unique
-  name                    String
-  custom_fields           Json?
-  role                    String                   @default("Operator")
-  hashedPassword          String?
-  salt                    String?
-  expiresAt               DateTime?
-  resetToken              String?
-  resetTokenExpiresAt     DateTime?
-  action_ids              Int[] // Array of action IDs
-  access_date_min         DateTime?
-  access_date_max         DateTime?
-  access_date_threshold   Int?
-  created_arrests         Arrest[]                 @relation("CreatedArrest")
-  updated_arrests         Arrest[]                 @relation("ModifiedArrest")
-  created_arrestees       Arrestee[]               @relation("CreatedArrestee")
-  updated_arrestees       Arrestee[]               @relation("ModifiedArrestee")
-  updated_custom_schemas  CustomSchema[]
+  id                     Int                      @id @default(autoincrement())
+  email                  String                   @unique
+  name                   String
+  custom_fields          Json?
+  role                   Role                     @default(Operator)
+  hashedPassword         String?
+  salt                   String?
+  expiresAt              DateTime?
+  resetToken             String?
+  resetTokenExpiresAt    DateTime?
+  action_ids             Int[] // Array of action IDs
+  access_date_min        DateTime?
+  access_date_max        DateTime?
+  access_date_threshold  Int?
+  created_arrests        Arrest[]                 @relation("CreatedArrest")
+  updated_arrests        Arrest[]                 @relation("ModifiedArrest")
+  created_arrestees      Arrestee[]               @relation("CreatedArrestee")
+  updated_arrestees      Arrestee[]               @relation("ModifiedArrestee")
+  updated_custom_schemas CustomSchema[]
   // created_hotline_logs   HotlineLog[]   @relation("CreatedHotlineLog")
   // updated_hotline_logs   HotlineLog[]   @relation("ModifiedHotlineLog")
-  created_logs            Log[]                    @relation("CreatedLog")
-  updated_logs            Log[]                    @relation("ModifiedLog")
-  created_table_views     TableView[]              @relation("CreatedTableView")
-  updated_table_views     TableView[]              @relation("ModifiedTableView")
-  updated_site_settings   SiteSetting[]            @relation("ModifiedSiteSetting")
-  ignoredDuplicates       IgnoredDuplicateArrest[]
-  created_collab_docs     CollabDocument[]         @relation("CreatedCollabDocument")
-  last_edited_collab_docs CollabDocument[]         @relation("LastEditedCollabDocument")
+  created_logs           Log[]                    @relation("CreatedLog")
+  updated_logs           Log[]                    @relation("ModifiedLog")
+  created_table_views    TableView[]              @relation("CreatedTableView")
+  updated_table_views    TableView[]              @relation("ModifiedTableView")
+  updated_site_settings  SiteSetting[]            @relation("ModifiedSiteSetting")
+  ignoredDuplicates      IgnoredDuplicateArrest[]
+  created_documents      Document[]               @relation("CreatedDocument")
+  updated_documents      Document[]               @relation("LastEditedDocument")
 }
 
 model TableView {
@@ -215,28 +222,29 @@ model IgnoredDuplicateArrest {
   @@unique([arrest1_id, arrest2_id])
 }
 
-model CollabDocument {
-  id             String   @id @default(cuid())
-  name           String   @unique // Document identifier for collaboration (e.g., "project:123")
-  title          String? // Human-readable title
-  type           String // Document type (e.g., "project", "team-doc", "wiki", etc.)
-  content        Bytes // Yjs document state (binary)
-  html_content   String? // Cached HTML content for search/display
-  parent_id      String? // Optional parent document ID for hierarchical organization
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-  created_by_id  Int // User who created the document
-  last_edited_by Int? // User who last edited the document
+model Document {
+  id            String   @id @default(cuid())
+  name          String   @unique // Document identifier for collaboration (e.g., "project:123")
+  title         String?  @unique // Human-readable title
+  type          String // Document type (e.g., "project", "team-doc", "wiki", etc.)
+  content       Bytes // Yjs document state (binary)
+  html_content  String? // Cached HTML content for search/display
+  parent_id     String? // Optional parent document ID for hierarchical organization
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  created_by_id Int // User who created the document
+  updated_by_id Int? // User who last edited the document
 
   // Relations
-  created_by  User             @relation("CreatedCollabDocument", fields: [created_by_id], references: [id])
-  last_editor User?            @relation("LastEditedCollabDocument", fields: [last_edited_by], references: [id])
-  parent      CollabDocument?  @relation("DocumentHierarchy", fields: [parent_id], references: [id])
-  children    CollabDocument[] @relation("DocumentHierarchy")
+  created_by  User       @relation("CreatedDocument", fields: [created_by_id], references: [id])
+  updated_by  User?      @relation("LastEditedDocument", fields: [updated_by_id], references: [id])
+  parent      Document?  @relation("DocumentHierarchy", fields: [parent_id], references: [id])
+  children    Document[] @relation("DocumentHierarchy")
+  access_role Role       @default(Restricted)
+  edit_role   Role       @default(Coordinator)
 
   @@index([type])
   @@index([created_by_id])
   @@index([parent_id])
   @@index([created_at])
-  @@map("collab_documents")
 }

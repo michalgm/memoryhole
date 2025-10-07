@@ -123,23 +123,25 @@ registerFragment(gql`
 `)
 
 registerFragment(gql`
-  fragment CollabDocumentFields on CollabDocument {
+  fragment DocumentFields on Document {
     id
     name
     title
     type
     html_content
     parent_id
+    access_role
+    edit_role
     created_at
     updated_at
     created_by_id
-    last_edited_by
+    updated_by_id
     created_by {
       id
       name
       email
     }
-    last_editor {
+    updated_by {
       id
       name
       email

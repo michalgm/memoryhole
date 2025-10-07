@@ -1,5 +1,7 @@
 import { cloneDeep, fromPairs, sortBy, toPairs } from 'lodash-es'
 
+import { ROLE_LEVELS } from 'src/../../api/src/config'
+
 import { formatLabel } from '../components/utils/BaseField'
 
 export const usStates = [
@@ -732,11 +734,14 @@ export const userSchema = sortObjectKeys(
   getSchema(UserFields, false),
   'props.label'
 )
-export const CollabDocumentFields = [
+export const DocumentFields = [
   {
     fields: [
       ['name', { required: true, helperText: 'Unique document identifier' }],
-      ['title', { helperText: 'Human-readable document title' }],
+      [
+        'title',
+        { required: true, helperText: 'Human-readable document title' },
+      ],
       [
         'type',
         {
@@ -746,11 +751,47 @@ export const CollabDocumentFields = [
           helperText: 'Document category',
         },
       ],
+      [
+        'access_role',
+        {
+          field_type: 'select',
+          required: true,
+          default: 'Restricted',
+          helperText: 'Minimum role required to view this document',
+          options: [
+            { id: 'Restricted', label: 'Restricted' },
+            { id: 'Operator', label: 'Operator' },
+            { id: 'Coordinator', label: 'Coordinator' },
+            { id: 'Admin', label: 'Admin' },
+          ],
+        },
+      ],
+      [
+        'edit_role',
+        {
+          field_type: 'select',
+          required: true,
+          default: 'Operator',
+          helperText: 'Minimum role required to edit this document',
+          options: [
+            { id: 'Restricted', label: 'Restricted' },
+            { id: 'Operator', label: 'Operator' },
+            { id: 'Coordinator', label: 'Coordinator' },
+            { id: 'Admin', label: 'Admin' },
+          ],
+          rules: {
+            validate: (value, formValues) => {
+              const options = ROLE_LEVELS
+              return (
+                options.indexOf(value) >=
+                  options.indexOf(formValues.access_role) ||
+                'Edit role must be equal to or higher than access role'
+              )
+            },
+          },
+        },
+      ],
       ['html_content', { field_type: 'richtext', label: 'Content' }],
-      ['created_at', { field_type: 'date-time', disabled: true }],
-      ['updated_at', { field_type: 'date-time', disabled: true }],
-      ['created_by.name', { disabled: true }],
-      ['last_editor.name', { disabled: true }],
     ],
   },
 ]
@@ -759,8 +800,8 @@ export const actionSchema = sortObjectKeys(
   getSchema(ActionFields, false),
   'props.label'
 )
-export const collabDocumentSchema = sortObjectKeys(
-  getSchema(CollabDocumentFields, false),
+export const documentSchema = sortObjectKeys(
+  getSchema(DocumentFields, true),
   'props.label'
 )
 export const duplicateArrestSchema = sortObjectKeys(

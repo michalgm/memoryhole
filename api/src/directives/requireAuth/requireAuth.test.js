@@ -1,4 +1,4 @@
-import { mockRedwoodDirective, getDirectiveName } from '@redwoodjs/testing/api'
+import { getDirectiveName, mockRedwoodDirective } from '@redwoodjs/testing/api'
 
 import requireAuth from './requireAuth'
 
@@ -12,7 +12,13 @@ describe('requireAuth directive', () => {
     // If you want to set values in context, pass it through e.g.
     // mockRedwoodDirective(requireAuth, { context: { currentUser: { id: 1, name: 'Lebron McGretzky' } }})
     const mockExecution = mockRedwoodDirective(requireAuth, {
-      context: { currentUser: { id: 1, name: 'Lebron McGretzky' } },
+      context: {
+        currentUser: {
+          id: 1,
+          name: 'Lebron McGretzky',
+          roles: ['Coordinator'],
+        },
+      },
     })
 
     expect(mockExecution).not.toThrowError()

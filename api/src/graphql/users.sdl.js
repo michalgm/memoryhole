@@ -1,10 +1,17 @@
 export const schema = gql`
+  enum UserRole {
+    Admin
+    Coordinator
+    Operator
+    Restricted
+  }
+
   type User {
     id: Int!
     email: String!
     name: String!
     custom_fields: JSON
-    role: String!
+    role: UserRole!
     # hashedPassword: String
     # salt: String
     expiresAt: DateTime
@@ -77,13 +84,14 @@ export const schema = gql`
 
   type Mutation {
     createUser(input: CreateUserInput!): User!
-      @requireAuth(roles: ["Admin", "Coordinator"])
-    updateUser(id: Int!, input: UpdateUserInput!): User! @requireAuth
-    deleteUser(id: Int!): User! @requireAuth(roles: ["Admin", "Coordinator"])
+      @requireAuth(minRole: "Coordinator")
+    updateUser(id: Int!, input: UpdateUserInput!): User!
+      @requireAuth(minRole: "Operator")
+    deleteUser(id: Int!): User! @requireAuth(minRole: "Coordinator")
     bulkUpdateUsers(ids: [Int]!, input: UpdateUserInput): BatchPayload
-      @requireAuth(roles: ["Admin", "Coordinator"])
+      @requireAuth(minRole: "Coordinator")
     changePassword(input: ChangePasswordInput!): ChangePasswordPayload!
-      @requireAuth
+      @requireAuth(minRole: "Operator")
     # emailUser(id: String!): User! @requireAuth
   }
 `

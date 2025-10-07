@@ -5,14 +5,14 @@ export const mergeScenario = defineScenario({
       data: {
         email: 'merge-admin1@example.com',
         name: 'Merge Admin User',
-        role: 'Administrator',
+        role: 'Admin',
       },
     },
     restricted: {
       data: {
         email: 'merge-restricted1@example.com',
         name: 'Merge Restricted User',
-        role: 'User',
+        role: 'Operator',
       },
     },
   },

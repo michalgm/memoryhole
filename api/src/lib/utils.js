@@ -2,6 +2,7 @@ import { isPlainObject, startCase } from 'lodash'
 
 import { ForbiddenError, ValidationError } from '@redwoodjs/graphql-server'
 
+import { ROLE_LEVELS } from 'src/config'
 import dayjs from 'src/lib/dayjs'
 import { db } from 'src/lib/db'
 import { getSetting } from 'src/lib/settingsCache'
@@ -95,21 +96,19 @@ export const checkAccess = (dateField, action_id, type) => (item) => {
       `${idString} - ${uCaseType} ${dateField} ${item[dateField]} is before your minimum access date ${access_date_min}`
     )
   }
-  if (
-    settings.access_date_max &&
-    access_date_max &&
-    item[dateField] > dayjs(access_date_max).endOf('day')
-  ) {
+
+  const willExpire = item[dateField] > dayjs(access_date_max).endOf('day')
+
+  const hasExpired =
+    item[dateField] <
+    dayjs().subtract(access_date_threshold, 'day').startOf('day')
+
+  if (settings.access_date_max && access_date_max && willExpire) {
     throw new ForbiddenError(
       `${idString} - ${uCaseType} ${dateField} ${item[dateField]} is after your maximum access date ${access_date_max}`
     )
   }
-  if (
-    settings.access_date_threshold &&
-    access_date_threshold &&
-    item[dateField] <
-    dayjs().subtract(access_date_threshold, 'day').startOf('day')
-  ) {
+  if (settings.access_date_threshold && access_date_threshold && hasExpired) {
     throw new ForbiddenError(
       `${idString} - ${uCaseType} ${dateField} ${item[dateField]} is older than your access date threshold of ${access_date_threshold} days`
     )
@@ -155,4 +154,50 @@ export const filterAccess = (dateField, action_id) => {
     }
     return where
   }
+}
+
+export const validateRoleLevel = (minRole, role) => {
+  const roleLevel = ROLE_LEVELS.indexOf(role)
+  const minAccessLevel = ROLE_LEVELS.indexOf(minRole)
+
+  // console.log('checkUserRole', {
+  //   currentUserRole,
+  //   roleLevel,
+  //   minRole,
+  //   minAccessLevel,
+  // })
+
+  if (roleLevel <= 0) {
+    throw new Error(`Unknown user role ${role}`)
+  }
+
+  if (minAccessLevel <= 0) {
+    throw new Error(`Unknown role ${minRole}`)
+  }
+
+  return roleLevel >= minAccessLevel
+}
+
+export const checkUserRole = (minRole, user) => {
+  const currentUserRole = user?.roles?.[0]
+
+  return validateRoleLevel(minRole, currentUserRole)
+}
+
+export const slugify = (text) => {
+  return (
+    text
+      .trim()
+      .toLowerCase()
+      // Convert to nearest compatible ascii chars
+      // (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize)
+      .normalize('NFKD')
+      // Remove characters that aren’t alphanumerics, underscores, hyphens, or
+      // whitespace
+      .replace(/[^\w\s-]+/g, '')
+      // Replace any whitespace or repeated dashes with single dashes
+      .replace(/[-\s]+/g, '-')
+      // Remove leading and trailing whitespace, dashes, and underscores
+      .replace(/^[\s-_]+|[\s-_]+$/g, '')
+  )
 }
