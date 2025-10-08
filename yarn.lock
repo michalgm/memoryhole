@@ -4724,55 +4724,55 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hocuspocus/common@npm:^3.2.4":
-  version: 3.2.4
-  resolution: "@hocuspocus/common@npm:3.2.4"
+"@hocuspocus/common@npm:^3.2.5":
+  version: 3.2.5
+  resolution: "@hocuspocus/common@npm:3.2.5"
   dependencies:
     lib0: "npm:^0.2.87"
-  checksum: 10c0/2857c9b705815d81833c7bf7f76fab03c053d60a57ab23446d1e0ddec355fc1856878317e323d061f610aed7ac71af253b6b4542a9e212b1e7cda84fa5269e1c
+  checksum: 10c0/944cb559bba0a76ea195e829ade69e244c28c22fedc504a07e78373a3c658da70b1a8b058dd8b3624ea2401e2678e783bcf7b62bcaeb3f9127358e59cf1bdbd2
   languageName: node
   linkType: hard
 
-"@hocuspocus/extension-database@npm:^3.2.4":
-  version: 3.2.4
-  resolution: "@hocuspocus/extension-database@npm:3.2.4"
+"@hocuspocus/extension-database@npm:^3.2.5":
+  version: 3.2.5
+  resolution: "@hocuspocus/extension-database@npm:3.2.5"
   dependencies:
-    "@hocuspocus/server": "npm:^3.2.4"
+    "@hocuspocus/server": "npm:^3.2.5"
   peerDependencies:
     yjs: ^13.6.8
-  checksum: 10c0/530799c0d14f77e2dc15280b8c102d76a15dde51f89df94a8b98884a545574aa231bcf0b659b9dc091d839c5fdd7838fd24741cb2392618aaf530f2a5a989345
+  checksum: 10c0/0b67da819e69b3846c57330cd4db8de9782d5b12bcf96571ce32d29a62b3e0ffca1f4c80955ae4083c6c0c42368177894af657e3a44fe16c6e79b847ca24d7b6
   languageName: node
   linkType: hard
 
-"@hocuspocus/provider@npm:^3.2.4":
-  version: 3.2.4
-  resolution: "@hocuspocus/provider@npm:3.2.4"
+"@hocuspocus/provider@npm:^3.2.5":
+  version: 3.2.5
+  resolution: "@hocuspocus/provider@npm:3.2.5"
   dependencies:
-    "@hocuspocus/common": "npm:^3.2.4"
+    "@hocuspocus/common": "npm:^3.2.5"
     "@lifeomic/attempt": "npm:^3.0.2"
     lib0: "npm:^0.2.87"
     ws: "npm:^8.17.1"
   peerDependencies:
     y-protocols: ^1.0.6
     yjs: ^13.6.8
-  checksum: 10c0/8297ea57b6e52d7e61cd0778e445741c592c07b7d83ab885c58777c38bb829ba4f2effe4a10b3c60bcac184d56af9c9a0d3939300168655e058aa1fcfb84f0ef
+  checksum: 10c0/73d78d0c8dc4f905873834feee6cbbd391daf51885aba9f90b48b82897f90bb2a1d8295f68d1b65213094f14c72a517d2e6f9c8781ad6d6aa4cceafcbab94f37
   languageName: node
   linkType: hard
 
-"@hocuspocus/server@npm:^3.2.4":
-  version: 3.2.4
-  resolution: "@hocuspocus/server@npm:3.2.4"
+"@hocuspocus/server@npm:^3.2.5":
+  version: 3.2.5
+  resolution: "@hocuspocus/server@npm:3.2.5"
   dependencies:
-    "@hocuspocus/common": "npm:^3.2.4"
+    "@hocuspocus/common": "npm:^3.2.5"
     async-lock: "npm:^1.3.1"
+    async-mutex: "npm:^0.5.0"
     kleur: "npm:^4.1.4"
     lib0: "npm:^0.2.47"
-    uuid: "npm:^13.0.0"
     ws: "npm:^8.5.0"
   peerDependencies:
     y-protocols: ^1.0.6
     yjs: ^13.6.8
-  checksum: 10c0/da296720cb8089752b31ec9e7bd1b24f22b3edde29461de57b304a9ee076192acb215817d3902f52d119e54025f6f6bb8991a7883795f1c4597957e93aa7a964
+  checksum: 10c0/e087294efd5ff8ede0511183ea755726badd90bad5235c458e96a222d8e414e18fcfffbcbb9aa6bde734c9791856accaa54cc62828b7e8b1381878cb78b1634c
   languageName: node
   linkType: hard
 
@@ -10801,13 +10801,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:18.3.25":
-  version: 18.3.25
-  resolution: "@types/react@npm:18.3.25"
+"@types/react@npm:18.3.26":
+  version: 18.3.26
+  resolution: "@types/react@npm:18.3.26"
   dependencies:
     "@types/prop-types": "npm:*"
     csstype: "npm:^3.0.2"
-  checksum: 10c0/ef4fad7c845ce44cb454e47e826d1b04ff5081bccdac06d0260fc6e47de730268f8f9ff2ffc5085ee793d7466493c1175b2309b3d71c20916efefac0fd7612f1
+  checksum: 10c0/7b62d91c33758f14637311921c92db6045b6328e2300666a35ef8130d06385e39acada005eaf317eee93228edc10ea5f0cd34a0385654d2014d24699a65bfeef
   languageName: node
   linkType: hard
 
@@ -11733,8 +11733,8 @@ __metadata:
     "@babel/core": "npm:^7.28.4"
     "@babel/node": "npm:^7.28.0"
     "@babel/preset-env": "npm:^7.28.3"
-    "@hocuspocus/extension-database": "npm:^3.2.4"
-    "@hocuspocus/server": "npm:^3.2.4"
+    "@hocuspocus/extension-database": "npm:^3.2.5"
+    "@hocuspocus/server": "npm:^3.2.5"
     "@redwoodjs/api": "npm:8.8.1"
     "@redwoodjs/api-server": "npm:8.8.1"
     "@redwoodjs/auth-dbauth-api": "npm:8.8.1"
@@ -12177,6 +12177,15 @@ __metadata:
   version: 1.4.1
   resolution: "async-lock@npm:1.4.1"
   checksum: 10c0/f696991c7d894af1dc91abc81cc4f14b3785190a35afb1646d8ab91138238d55cabd83bfdd56c42663a008d72b3dc39493ff83797e550effc577d1ccbde254af
+  languageName: node
+  linkType: hard
+
+"async-mutex@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "async-mutex@npm:0.5.0"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: 10c0/9096e6ad6b674c894d8ddd5aa4c512b09bb05931b8746ebd634952b05685608b2b0820ed5c406e6569919ff5fe237ab3c491e6f2887d6da6b6ba906db3ee9c32
   languageName: node
   linkType: hard
 
@@ -29034,15 +29043,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^13.0.0":
-  version: 13.0.0
-  resolution: "uuid@npm:13.0.0"
-  bin:
-    uuid: dist-node/bin/uuid
-  checksum: 10c0/950e4c18d57fef6c69675344f5700a08af21e26b9eff2bf2180427564297368c538ea11ac9fb2e6528b17fc3966a9fd2c5049361b0b63c7d654f3c550c9b3d67
-  languageName: node
-  linkType: hard
-
 "uuid@npm:^3.3.2":
   version: 3.4.0
   resolution: "uuid@npm:3.4.0"
@@ -29440,7 +29440,7 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
     "@fontsource/roboto": "npm:^5.2.8"
-    "@hocuspocus/provider": "npm:^3.2.4"
+    "@hocuspocus/provider": "npm:^3.2.5"
     "@mui/icons-material": "npm:^6.5.0"
     "@mui/material": "npm:^6.5.0"
     "@mui/system": "npm:6.5.0"
@@ -29476,7 +29476,7 @@ __metadata:
     "@tiptap/starter-kit": "npm:^3.6.5"
     "@tiptap/suggestion": "npm:^3.6.5"
     "@tiptap/y-tiptap": "npm:^3.0.0"
-    "@types/react": "npm:18.3.25"
+    "@types/react": "npm:18.3.26"
     "@types/react-dom": "npm:18.3.7"
     babel-plugin-transform-imports: "npm:^2.0.0"
     babel-plugin-transform-vite-meta-env: "npm:^1.0.3"

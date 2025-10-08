@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@hocuspocus/extension-database": "^3.2.4",
-    "@hocuspocus/server": "^3.2.4",
+    "@hocuspocus/extension-database": "^3.2.5",
+    "@hocuspocus/server": "^3.2.5",
     "@redwoodjs/api": "8.8.1",
     "@redwoodjs/api-server": "8.8.1",
     "@redwoodjs/auth-dbauth-api": "8.8.1",
