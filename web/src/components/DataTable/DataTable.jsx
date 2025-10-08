@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
-import { Button, Chip, IconButton, Stack, Tooltip } from '@mui/material'
+import {
+  Button,
+  Chip,
+  IconButton,
+  ListItemIcon,
+  MenuItem,
+  Stack,
+  Tooltip,
+} from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import { difference, get, isArray, merge, sortBy } from 'lodash-es'
 import {
@@ -26,6 +34,33 @@ const csvConfig = mkConfig({
   prependHeader: true,
   useBom: true,
 })
+
+const dateFilter = (row, columnId, filterValue) => {
+  const rowDate = row.getValue(columnId)
+  if (!rowDate || !filterValue) return false
+
+  const rowDay = dayjs.tz(rowDate).startOf('day')
+  const filterDay = dayjs.tz(filterValue).startOf('day')
+  return rowDay.isSame(filterDay)
+}
+
+// const dateLessThan = (row, columnId, filterValue) => {
+//   const rowDate = row.getValue(columnId)
+//   if (!rowDate || !filterValue) return false
+
+//   const rowDay = dayjs.tz(rowDate).startOf('day')
+//   const filterDay = dayjs.tz(filterValue).startOf('day')
+//   return rowDay.isBefore(filterDay)
+// }
+
+// const dateGreaterThan = (row, columnId, filterValue) => {
+//   const rowDate = row.getValue(columnId)
+//   if (!rowDate || !filterValue) return false
+
+//   const rowDay = dayjs.tz(rowDate).startOf('day')
+//   const filterDay = dayjs.tz(filterValue).startOf('day')
+//   return rowDay.isAfter(filterDay)
+// }
 
 const extractTextFromJSXRender = (JSX) => {
   const tempDiv = document.createElement('div')
@@ -79,13 +114,36 @@ const defineColumns = (
         const val = get(originalRow, field) ?? null
         return val ? dayjs(val).toDate() : null
       }
-      col.Cell = ({ cell }) =>
-        cell.getValue()
-          ? type == 'date'
-            ? dayjs.utc(cell.getValue()).format('L')
-            : dayjs.tz(cell.getValue()).format('L hh:mm A')
-          : null
+      col.Cell = ({ cell }) => {
+        const v = cell.getValue()
+        if (!v) return null
+
+        return type === 'date'
+          ? dayjs.tz(v).format('L')
+          : dayjs.tz(v).format('L hh:mm A')
+      }
+
       col.filterVariant = 'date'
+      col.filterFn = 'dateFilter'
+      col.columnFilterModeOptions = [
+        'dateFilter',
+        'between',
+        'lessThan',
+        'greaterThan',
+      ] // Make it selectable
+
+      col.renderColumnFilterModeMenuItems = ({ onSelectFilterMode }) =>
+        [
+          ['dateFilter', 'Date Match', '='],
+          ['between', 'Between', '⇿'],
+          ['lessThan', 'Before', '<'],
+          ['greaterThan', 'After', '>'],
+        ].map(([mode, label, icon]) => (
+          <MenuItem key={mode} onClick={() => onSelectFilterMode(mode)}>
+            <ListItemIcon>{icon}</ListItemIcon>
+            {label}
+          </MenuItem>
+        ))
     } else if (type === 'checkbox') {
       col.id = field
       col.accessorFn = (originalRow) => !!get(originalRow, field)
@@ -451,6 +509,14 @@ const DataTable = ({
     onSortingChange: setSorting,
     onColumnOrderChange: setColumnOrder,
     onPaginationChange: setPagination,
+    filterFns: {
+      dateFilter,
+      // lessThan: dateLessThan,
+      // greaterThan: dateGreaterThan,
+    },
+    localization: {
+      filterDateFilter: 'Date Match', // Label for your custom filter
+    },
     muiFilterTextFieldProps: {
       placeholder: '',
     },
