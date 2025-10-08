@@ -186,7 +186,7 @@ describe('documents', () => {
 
   describe('createDocument()', () => {
     const { requireAuth } = require('src/lib/auth')
-    const { slugify, checkUserRole } = require('src/lib/utils')
+    const { slugify } = require('src/lib/utils')
 
     it('creates document with valid input', async () => {
       const input = {

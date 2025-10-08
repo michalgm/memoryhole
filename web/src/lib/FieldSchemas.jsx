@@ -737,16 +737,13 @@ export const userSchema = sortObjectKeys(
 export const DocumentFields = [
   {
     fields: [
-      ['name', { required: true, helperText: 'Unique document identifier' }],
-      [
-        'title',
-        { required: true, helperText: 'Human-readable document title' },
-      ],
+      ['name', { required: true }],
+      ['title', { required: true }],
       [
         'type',
         {
-          field_type: 'select',
-          options: ['wiki', 'project', 'team-doc', 'meeting-notes', 'other'],
+          // field_type: 'select',
+          // options: ['wiki', 'project', 'team-doc', 'meeting-notes', 'other'],
           required: true,
           helperText: 'Document category',
         },
