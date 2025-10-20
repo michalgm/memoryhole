@@ -10,6 +10,7 @@ import { navigate, routes } from '@redwoodjs/router'
 
 import FormContainer from 'src/components/utils/FormContainer'
 import Link from 'src/components/utils/Link'
+import Show from 'src/components/utils/Show'
 import { defaultAction, useApp } from 'src/lib/AppContext'
 import { ActionFields } from 'src/lib/FieldSchemas'
 import * as _fragments from 'src/lib/gql_fragments'
@@ -46,7 +47,7 @@ export const DELETE_MUTATION = gql`
   }
 `
 
-const ActionPage = ({ id }) => {
+const ActionPage = ({ id = 'new' }) => {
   const { setPageTitle, currentAction, setCurrentAction } = useApp()
   const deleteRelations = useRef(false)
 
@@ -88,8 +89,9 @@ const ActionPage = ({ id }) => {
   const whiteBoardTarget = document.getElementById(
     'modal_layout_header_actions'
   )
+
   const whiteBoardPortal = createPortal(
-    <Link to={routes.actionWhiteboard({ id })}>
+    <Link to={id === 'new' ? null : routes.actionWhiteboard({ id })}>
       <Button startIcon={<Assignment />} size="medium" variant="outlined">
         Whiteboard
       </Button>
@@ -147,7 +149,7 @@ const ActionPage = ({ id }) => {
           getDeleteParams,
         }}
       />
-      {whiteBoardPortal}
+      <Show when={id !== 'new'}>{whiteBoardPortal}</Show>
     </>
   )
 }
