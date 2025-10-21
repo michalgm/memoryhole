@@ -573,6 +573,9 @@ export const UserFields = [
         'access_date_threshold',
         {
           type: 'number',
+          rules: {
+            setValueAs: (v) => (v === '' ? null : Number(v)),
+          },
           label: 'Access Date Threshold',
           endAdornment: 'days',
           helperText:
