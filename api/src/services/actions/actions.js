@@ -1,15 +1,22 @@
 import { db } from 'src/lib/db'
+import { checkAccess, filterAccess } from 'src/lib/utils'
 
 import { filterArrestAccess } from '../arrests/arrests'
 
+export const checkActionAccess = checkAccess('start_date', 'id', 'action')
+
+export const filterActionAccess = filterAccess('start_date', 'id')
+
 export const actions = () => {
-  return db.action.findMany()
+  return db.action.findMany({ where: filterActionAccess({}) })
 }
 
-export const action = ({ id }) => {
-  return db.action.findUnique({
+export const action = async ({ id }) => {
+  const action = await db.action.findUnique({
     where: { id },
   })
+  await checkActionAccess(action)
+  return action
 }
 
 export const searchActions = ({ search = '' }) => {
@@ -22,7 +29,7 @@ export const searchActions = ({ search = '' }) => {
     })),
   }
   return db.action.findMany({
-    where,
+    where: filterActionAccess(where),
     take: 10,
     orderBy: [
       {
@@ -41,7 +48,8 @@ export const createAction = ({ input }) => {
   })
 }
 
-export const updateAction = ({ id, input }) => {
+export const updateAction = async ({ id, input }) => {
+  await checkActionAccess(await action({ id }))
   return db.action.update({
     data: input,
     where: { id },
@@ -49,6 +57,8 @@ export const updateAction = ({ id, input }) => {
 }
 
 export const deleteAction = async ({ id, deleteRelations = false }) => {
+  await checkActionAccess(await action({ id }))
+
   if (deleteRelations) {
     // First delete all associated arrests and logs in a transaction
     await db.$transaction([
