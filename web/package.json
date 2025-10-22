@@ -48,6 +48,7 @@
     "@tiptap/suggestion": "^3.6.5",
     "@tiptap/y-tiptap": "^3.0.0",
     "dayjs": "^1.11.18",
+    "encodeurl": "^2.0.0",
     "export-to-csv": "^1.4.0",
     "humanize-string": "2.1.0",
     "is-hotkey": "^0.2.0",
