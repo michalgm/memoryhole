@@ -32,6 +32,7 @@ import {
 } from '@tiptap/extension-table-of-contents'
 import TextAlign from '@tiptap/extension-text-align'
 import StarterKit from '@tiptap/starter-kit'
+import encodeurl from 'encodeurl'
 import { merge } from 'lodash-es'
 import {
   LinkBubbleMenu,
@@ -69,6 +70,17 @@ import Show from 'src/components/utils/Show.jsx'
 // import suggestion from './suggestion.jsx'
 // import suggestions from './suggestions.jsx'
 import { ToC } from './ToC.jsx'
+
+const CustomLinkBubbleMenuHandler = LinkBubbleMenuHandler.extend({
+  addKeyboardShortcuts() {
+    return {
+      'Mod-k': () => {
+        this.editor.commands.openLinkBubbleMenu()
+        return true
+      },
+    }
+  },
+})
 
 const generateUserColor = (userId, email) => {
   const colors = [
@@ -331,10 +343,13 @@ const CollabEditor = (props) => {
         link: {
           openOnClick: false,
           enableClickSelection: true,
+          HTMLAttributes: {
+            target: null,
+          },
         },
         undoRedo: !enableHistory,
       }),
-      LinkBubbleMenuHandler,
+      CustomLinkBubbleMenuHandler,
       TaskList,
       TaskItem,
       TextAlign.configure({
@@ -491,18 +506,24 @@ const CollabEditor = (props) => {
           position: 'relative',
           '&& .MuiTiptap-RichTextContent-root': {
             // paddingRight: showTOC ? 0 : undefined,
-            a: {
-              color: 'secondary.main',
-            },
             overflowY: 'auto',
             scrollBehavior: 'smooth',
             height: '100%',
           },
           '&& .ProseMirror': {
+            '>h1': {
+              marginTop: '0 !important',
+            },
+            'a:not([data-type="mention"])': {
+              color: 'secondary.main',
+            },
             minHeight: props.minRows * 24 || 100,
             'h1, h2, h3, h4, h5, h6': {
               marginBottom: '0.5em',
-              marginTop: '0.25em',
+              marginTop: '1em',
+            },
+            'p, li': {
+              marginBottom: '1em',
             },
           },
           '& .collaboration-cursor__caret': {
@@ -600,7 +621,7 @@ const CollabEditor = (props) => {
                     <MenuDivider />
                     <MenuSelectTextAlign />
                     <MenuDivider />
-                    <MenuButtonEditLink />
+                    <MenuButtonEditLink tooltipShortcutKeys={['mod', 'K']} />
                     <MenuDivider />
                     <MenuButtonBulletedList />
                     <MenuButtonOrderedList />
@@ -634,7 +655,30 @@ const CollabEditor = (props) => {
                 )
               }
             >
-              {() => <>{<LinkBubbleMenu />}</>}
+              {() => (
+                <>
+                  {
+                    <LinkBubbleMenu
+                      formatHref={(link) => {
+                        let currentHrefValue = link
+                          .replace(window.location.origin, '')
+                          .replace(window.location.pathname, '')
+                          .trim()
+                          .trim()
+                        if (
+                          currentHrefValue &&
+                          !/^(https?:\/\/|mailto:|tel:|sms:|\/|#)/.test(
+                            currentHrefValue
+                          )
+                        ) {
+                          currentHrefValue = `http://${currentHrefValue}`
+                        }
+                        return encodeurl(currentHrefValue)
+                      }}
+                    />
+                  }
+                </>
+              )}
             </RichTextEditor>
           </Grid2>
           <Show when={showTOC}>

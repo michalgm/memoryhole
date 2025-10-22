@@ -29481,6 +29481,7 @@ __metadata:
     babel-plugin-transform-imports: "npm:^2.0.0"
     babel-plugin-transform-vite-meta-env: "npm:^1.0.3"
     dayjs: "npm:^1.11.18"
+    encodeurl: "npm:^2.0.0"
     export-to-csv: "npm:^1.4.0"
     humanize-string: "npm:2.1.0"
     is-hotkey: "npm:^0.2.0"
