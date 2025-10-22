@@ -22,7 +22,7 @@ const getOperationName = (query) => {
 const Autocomplete = ({
   name,
   label,
-  textFieldProps,
+  textFieldProps = {},
   options: staticOptions,
   autocompleteProps: defaultAutocompleteProps,
   storeFullObject = false,
