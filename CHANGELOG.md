@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.24.0](https://github.com/michalgm/memoryhole/compare/v0.23.0...v0.24.0) (2025-10-22)
+
+### Features
+
+* add ability to browse + create documents ([e1b8a32](https://github.com/michalgm/memoryhole/commit/e1b8a3251b763463426c95a2002ba21603b6a525))
+* add collaberative action whiteboard ([adf187d](https://github.com/michalgm/memoryhole/commit/adf187df3e2637b9bc1e95f9575585ef94207982))
+* **API:** enforce user access restrictions on actions based on start date ([eabc7e9](https://github.com/michalgm/memoryhole/commit/eabc7e9aae1480fb20dd660380342a30cbcdbacf)), closes [#29](https://github.com/michalgm/memoryhole/issues/29)
+* **CollabEditor:** editor improvements ([26bef16](https://github.com/michalgm/memoryhole/commit/26bef161e46a5ab6c32baa6907757d673e62e536))
+* implement document access restrictions + document title management ([2972ea5](https://github.com/michalgm/memoryhole/commit/2972ea53df95ff855c4526a76246e07a76e3c362))
+* **UI:** Add collab editor improvements ([ef4daf6](https://github.com/michalgm/memoryhole/commit/ef4daf68cc65d3118e84eca55ab824a89b568fd3))
+
+### Bug Fixes
+
+* filter documents based on access role ([975c65d](https://github.com/michalgm/memoryhole/commit/975c65da9b44d0dc6cf0cdff0fb0292c546aae49))
+* fix collab server port config ([88f957c](https://github.com/michalgm/memoryhole/commit/88f957c4abb8975aec5ca4a2c241fb34b7db4101))
+* fix global filter behavior in table view (fixes [Bug] arrest table show-hide searchbar not working ([8e7c41f](https://github.com/michalgm/memoryhole/commit/8e7c41f5d2cf4af5eac2ea8cfe74130cf3a102d0)), closes [#48](https://github.com/michalgm/memoryhole/issues/48)
+* more name format tweaks ([17f8ca7](https://github.com/michalgm/memoryhole/commit/17f8ca758629c436b23208173c0455a9fa394845))
+* **UI:** allow clearing of user access date threshold ([efb3f9a](https://github.com/michalgm/memoryhole/commit/efb3f9ad603d947b6302f6a1629497ef3e23a175))
+* **UI:** don't show whiteboard link on new action page ([90107ac](https://github.com/michalgm/memoryhole/commit/90107ac91fe793226e395e21507247f3d3f4f2b0))
+* **UI:** fix date filtering functionality in DataTabkle ([a5f3cd1](https://github.com/michalgm/memoryhole/commit/a5f3cd1ad6b922c8c19a4030ef68db1da8658ddf)), closes [#13](https://github.com/michalgm/memoryhole/issues/13)
+
 ## [0.23.0](https://github.com/michalgm/memoryhole/compare/v0.22.0...v0.23.0) (2025-09-09)
 
 ### Features
