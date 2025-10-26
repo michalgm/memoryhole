@@ -31,7 +31,7 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
-import { AccountBoxMultipleOutline } from 'mdi-material-ui'
+import AccountBoxMultipleOutline from 'mdi-material-ui/AccountBoxMultipleOutline'
 
 import { Link, routes, useMatch } from '@redwoodjs/router'
 
