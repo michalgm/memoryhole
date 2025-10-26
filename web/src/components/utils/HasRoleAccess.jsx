@@ -1,7 +1,8 @@
 import { ROLE_LEVELS } from 'src/../../api/src/config'
 import { useAuth } from 'src/auth'
 
-export const validateRoleLevel = (requiredRole, userRole) => {
+export const validateRoleLevel = (requiredRole, currentUser) => {
+  const userRole = currentUser?.roles?.[0]
   const userRoleLevel = ROLE_LEVELS.indexOf(userRole)
   const requiredRoleLevel = ROLE_LEVELS.indexOf(requiredRole)
   if (requiredRole && requiredRoleLevel < 0) {
@@ -17,9 +18,8 @@ export const validateRoleLevel = (requiredRole, userRole) => {
 
 const HasRoleAccess = ({ children, requiredRole }) => {
   const { currentUser } = useAuth()
-  const userRole = currentUser?.roles?.[0]
 
-  if (validateRoleLevel(requiredRole, userRole)) {
+  if (validateRoleLevel(requiredRole, currentUser)) {
     return children
   }
 }
