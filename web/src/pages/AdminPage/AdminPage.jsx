@@ -1,10 +1,10 @@
 import { Gavel, Help, People, Settings } from '@mui/icons-material'
 import {
-  Divider,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Paper,
 } from '@mui/material'
 
 import { routes } from '@redwoodjs/router'
@@ -12,13 +12,13 @@ import { routes } from '@redwoodjs/router'
 import Link from 'src/components/utils/Link'
 
 const AdminPage = () => {
-  const admin_routes = [
-    // 'users',
-    // 'customSchemata',
-    'logs',
-    'tableViews',
-    // 'actions',
-  ]
+  // const admin_routes = [
+  //   // 'users',
+  //   // 'customSchemata',
+  //   'logs',
+  //   'tableViews',
+  //   // 'actions',
+  // ]
 
   const route_links = [
     {
@@ -44,7 +44,7 @@ const AdminPage = () => {
   ]
 
   return (
-    <>
+    <Paper>
       <List>
         {route_links.map((route) => (
           <Link key={route.to} to={route.to}>
@@ -57,15 +57,15 @@ const AdminPage = () => {
       </List>
       {/* <Link to={routes.editOptions()}>Edit Options</Link> */}
 
-      <Divider />
+      {/* <Divider />
       <ul>
         {admin_routes.map((route) => (
           <li key={route}>
             <Link to={routes[route]()}>{route}</Link>
           </li>
         ))}
-      </ul>
-    </>
+      </ul> */}
+    </Paper>
   )
 }
 
