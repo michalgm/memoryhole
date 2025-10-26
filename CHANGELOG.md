@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.24.3](https://github.com/michalgm/memoryhole/compare/v0.24.2...v0.24.3) (2025-10-26)
+
+### Bug Fixes
+
+* **UI:** fix icon import ([f4f5e36](https://github.com/michalgm/memoryhole/commit/f4f5e36c50815e34a146d6b929515bd0cb0680c2))
+
 ## [0.24.2](https://github.com/michalgm/memoryhole/compare/v0.24.1...v0.24.2) (2025-10-26)
 
 ### Bug Fixes
