@@ -79,15 +79,11 @@ export const AuthManage = ({
     let to = routes.home()
     if (params.get('redirectTo')) {
       const redirectPath = params.get('redirectTo')
-      if (redirectPath.includes('noRedirect')) {
-        console.warn(`skipping additional redirects to ${redirectPath}`)
-      } else {
-        to = redirectPath
-      }
+      to = redirectPath
     }
     params.delete('redirectTo')
-    params.append('noRedirect', 'true')
-    navigate(`${to}?${params.toString()}`)
+    const query = params.toString()
+    navigate(`${to}${query ? `?${query}` : ''}`)
   }, [search])
 
   useEffect(() => {

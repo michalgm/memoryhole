@@ -73,7 +73,7 @@ const NavDrawer = ({ navOpen }) => {
     ['actions', 'Actions', <Flag key="actions" />, 'Operator'],
     ['logs', 'Logs', <EditNote key="logs" />, 'Operator'],
     ['documents', 'Documents', <Article key="documents" />, 'Restricted'],
-    ['docsHome', 'Help', <Help key="help" />, 'Operator'],
+    ['help', 'Help', <Help key="help" />, 'Restricted'],
     ['admin', 'Admin', <Settings key="admin" />, 'Coordinator'],
   ]
   const themeModes = [
