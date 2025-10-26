@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.24.1](https://github.com/michalgm/memoryhole/compare/v0.24.0...v0.24.1) (2025-10-26)
+
+### Bug Fixes
+
+* **Form:** minor props fix ([e9b8655](https://github.com/michalgm/memoryhole/commit/e9b8655f997ef9ba9383ada5abfc38e5cd193832))
+* **UI:** clean up admin page ([422d7e8](https://github.com/michalgm/memoryhole/commit/422d7e8ccacfa7a93fe56d9be9195e0f80f167a0))
+* **UI:** disable CSV download on arrests page for roles < Coordinator ([221a33b](https://github.com/michalgm/memoryhole/commit/221a33b743ea9fed3a999d6728016b76b353a87f)), closes [#47](https://github.com/michalgm/memoryhole/issues/47)
+* **UI:** Fix default route for expired logins ([89fd1ac](https://github.com/michalgm/memoryhole/commit/89fd1ac7dd1e16d403e9cbcb048ef9b85b093feb))
+
 ## [0.24.0](https://github.com/michalgm/memoryhole/compare/v0.23.0...v0.24.0) (2025-10-22)
 
 ### Features
