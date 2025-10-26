@@ -109,6 +109,7 @@ const DocumentsPage = () => {
         preColumns={preColumns}
         type="documents"
         name="document"
+        disableDownload
       />
       <CreateDocumentButton />
     </>
