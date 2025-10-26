@@ -9,8 +9,10 @@ import { createPortal } from 'react-dom'
 import { navigate, routes } from '@redwoodjs/router'
 import { useMutation, useQuery } from '@redwoodjs/web'
 
+import { useAuth } from 'src/auth'
 import DataTable from 'src/components/DataTable/DataTable'
 import BulkUpdateModal from 'src/components/utils/BulkUpdateModal'
+import { validateRoleLevel } from 'src/components/utils/HasRoleAccess'
 import Link from 'src/components/utils/Link'
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
@@ -78,6 +80,7 @@ const preColumns = [
 ]
 
 const ArrestsPage = () => {
+  const { currentUser } = useAuth()
   const { currentAction } = useApp()
   const filters = []
   if (currentAction?.id && currentAction.id !== -1) {
@@ -172,6 +175,7 @@ const ArrestsPage = () => {
       displayError(error)
     }
   }
+
   return (
     <>
       <Stack spacing={0} direction="column">
@@ -184,6 +188,7 @@ const ArrestsPage = () => {
           preColumns={preColumns}
           bulkUpdate={bulkUpdate}
           bulkDelete={bulkDelete}
+          disableDownload={!validateRoleLevel('Coordinator', currentUser)}
           manageViews
           loading={loading}
           type="arrestees"
