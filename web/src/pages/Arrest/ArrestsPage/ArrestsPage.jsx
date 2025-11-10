@@ -140,7 +140,7 @@ const ArrestsPage = () => {
           {`${row.original?.arrestee?.display_field}`}
         </Grid2>,
         <Grid2 key={`${row.id}-date`} size={4}>
-          {`${dayjs.tz(row.original?.date).format('L hh:mm A')}`}
+          {`${dayjs(row.original?.date).tz().format('L hh:mm A')}`}
         </Grid2>,
       ]
     })

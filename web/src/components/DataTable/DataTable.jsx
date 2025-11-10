@@ -39,8 +39,8 @@ const dateFilter = (row, columnId, filterValue) => {
   const rowDate = row.getValue(columnId)
   if (!rowDate || !filterValue) return false
 
-  const rowDay = dayjs.tz(rowDate).startOf('day')
-  const filterDay = dayjs.tz(filterValue).startOf('day')
+  const rowDay = dayjs(rowDate).tz().startOf('day')
+  const filterDay = dayjs(filterValue).tz().startOf('day')
   return rowDay.isSame(filterDay)
 }
 
@@ -119,8 +119,8 @@ const defineColumns = (
         if (!v) return null
 
         return type === 'date'
-          ? dayjs.tz(v).format('L')
-          : dayjs.tz(v).format('L hh:mm A')
+          ? dayjs(v).tz().format('L')
+          : dayjs(v).tz().format('L hh:mm A')
       }
 
       col.filterVariant = 'date'

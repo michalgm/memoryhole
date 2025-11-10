@@ -36,7 +36,7 @@ export const displayItemProps = ({ item = {}, type = 'arrest' }) => {
     const { date, arrest_city } = item || {}
     title = item?.arrestee?.search_display_field || 'Unknown'
     const separator = date && arrest_city ? ' | ' : ''
-    subtitle = `${date ? dayjs.tz(date).format('L') : ''}${separator}${arrest_city ? arrest_city : ''}`
+    subtitle = `${date ? dayjs(date).tz().format('L') : ''}${separator}${arrest_city ? arrest_city : ''}`
     icon = <Person />
   }
 

@@ -91,7 +91,9 @@ describe('ArrestPage - Create', () => {
     })
     expect(screen.queryByText('Delete Arrest')).not.toBeInTheDocument()
     const nameField = await screen.findByLabelText('Legal First Name')
-    const dateField = await screen.findByLabelText('Arrest Date *')
+    const dateField = await screen.findByLabelText('Arrest Date *', {
+      selector: 'input',
+    })
     const cityField = await screen.findByLabelText('Arrest City *')
     const custodyField = await screen.findByLabelText('Custody Status *')
 

@@ -639,9 +639,7 @@ const CollabEditor = (props) => {
                     <MenuButton
                       IconComponent={Settings}
                       onClick={editDocumentProperties}
-                      // value={showTOC}
                       tooltipLabel="Edit Document Title and Permissions"
-                      // selected={showTOC}
                     />
                     <MenuButton
                       IconComponent={Toc}

@@ -68,7 +68,7 @@ const BulkUpdateModal = ({
             if (isBoolean(value)) {
               value = field_value ? 'Yes' : 'No'
             } else if (dayjs.isDayjs(value)) {
-              value = dayjs.tz(value).format('L hh:mm A')
+              value = dayjs(value).tz().format('L hh:mm A')
             } else if (typeof value === 'object') {
               value = value.name || value.label || 'ERROR - unknown type'
             }
