@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.24.4](https://github.com/michalgm/memoryhole/compare/v0.24.3...v0.24.4) (2025-11-10)
+
+### Bug Fixes
+
+* update dayjs timezone handling across components ([ec382cb](https://github.com/michalgm/memoryhole/commit/ec382cb37883e05dc1344692726301400c4a2349)), closes [#61](https://github.com/michalgm/memoryhole/issues/61)
+
 ## [0.24.3](https://github.com/michalgm/memoryhole/compare/v0.24.2...v0.24.3) (2025-10-26)
 
 ### Bug Fixes
