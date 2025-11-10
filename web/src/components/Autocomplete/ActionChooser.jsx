@@ -19,7 +19,7 @@ const QUERY = gql`
 const autocompleteProps = {
   getOptionLabel: (option) => option?.name || '',
   renderOption: (props, { id, start_date, city, jurisdiction, name }) => {
-    const date = start_date && dayjs.tz(start_date).format('L LT')
+    const date = start_date && dayjs(start_date).tz().format('L LT')
     const location = city || jurisdiction
     return (
       <li {...props} key={id}>

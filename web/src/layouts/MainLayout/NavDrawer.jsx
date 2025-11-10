@@ -89,7 +89,7 @@ const NavDrawer = ({ navOpen }) => {
       const expiringSoon = dayjs(expiresAt).isBefore(dayjs().add(1, 'week'))
       const hasExpired = dayjs().isAfter(dayjs(expiresAt))
       setExpires({
-        expiring: `Your access to arrestee data ${hasExpired ? 'expired' : 'will expire'} on ${dayjs.tz(expiresAt).format('lll')}`,
+        expiring: `Your access to arrestee data ${hasExpired ? 'expired' : 'will expire'} on ${dayjs(expiresAt).tz().format('lll')}`,
         expiringSoon,
       })
     }
