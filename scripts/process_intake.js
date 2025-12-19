@@ -45,6 +45,7 @@ const fieldMap = {
   charges: 'charges',
   felonies: 'arrestee.custom_fields.felony_charges',
   abuse: 'custom_fields.jail_notes',
+  injured_during_arrest: 'arrestee.custom_fields.violent_arrest',
   prn: 'custom_fields.jail_id',
   docket: 'custom_fields.docket_number',
   court_date: 'custom_fields.next_court_date',
@@ -187,6 +188,8 @@ const importRecord = async (data) => {
           val = dayjs(val, 'YYYY-MM-DD').format()
         }
         set(arrest, path, val)
+      } else if (key === 'court_date_tbd') {
+        set(arrest, 'custom_fields.case_notes', 'Court date to be determined')
       } else {
         console.error(`unknown key ${key}`)
       }
@@ -212,6 +215,7 @@ export default async ({ args }) => {
     await importRecord(json)
     await logout()
   } catch (err) {
+    // console.error('Error during import:', err)
     await sendEmail({
       to: process.env.IMPORT_USERNAME,
       subject: 'Arrest Intake Import error',
