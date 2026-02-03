@@ -13,7 +13,7 @@ Note - the dev setup is not secure and should not be used with actual arrestee d
 
 ### Database setup
 
-1. cd postgres
+1. cd deployment
 2. `echo "POSTGRES_PASSWORD=memoryhole" > .env.db`
 3. `docker compose up -dV`
    - this will fetch the docker image, create a persistent data volume, and launch the database container
