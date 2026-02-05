@@ -31,7 +31,6 @@ import FormSection from 'src/components/utils/FormSection'
 import IconText from 'src/components/utils/IconText'
 import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
-import { fieldSchema } from 'src/lib/FieldSchemas'
 
 import { Field } from '../utils/Field'
 import LoadingButton from '../utils/LoadingButton'
@@ -141,7 +140,7 @@ const LogsFilter = ({
   const path = useRoutePath()
   const filterFields = [
     ['needs_followup', { field_type: 'checkbox' }],
-    ['type', { field_type: 'select', options: fieldSchema.log.type.options }],
+    ['type', { field_type: 'select', optionSet: 'log_type' }],
     ['after_date', { field_type: 'date-time', label: 'Created After' }],
     ['before_date', { field_type: 'date-time', label: 'Created Before' }],
     ['action', { field_type: 'action_chooser' }],
