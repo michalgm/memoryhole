@@ -63,24 +63,27 @@ const FormSection = ({
           <Typography variant={small ? 'body1' : 'h5'} component="h3">
             {title}
           </Typography>
-          {sectionActions.map((action) => (
-            <Box key={action.label}>
-              <Tooltip title={action.tooltip}>
-                <Button
-                  component="div"
-                  variant="contained"
-                  size="small"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    action.onClick(e, context)
-                  }}
-                >
-                  {action.label}
-                </Button>
-              </Tooltip>
-            </Box>
-          ))}
+          <Stack direction="row" spacing={1}>
+            {sectionActions.map((action) => (
+              <Box key={action.label}>
+                <Tooltip title={action.tooltip}>
+                  <Button
+                    component="div"
+                    variant="contained"
+                    size="small"
+                    startIcon={action.icon ? <action.icon /> : null}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      action.onClick(e, context)
+                    }}
+                  >
+                    {action.label}
+                  </Button>
+                </Tooltip>
+              </Box>
+            ))}
+          </Stack>
         </Stack>
       </AccordionSummary>
       <AccordionDetails>

@@ -8,7 +8,6 @@ import Form from 'src/components/Form/Form'
 import { Field } from 'src/components/utils/Field'
 import FormSection from 'src/components/utils/FormSection'
 import dayjs from 'src/lib/dayjs'
-import { schema } from 'src/lib/FieldSchemas'
 
 const DocketSheetsPage = () => {
   const [search, setSearch] = useState({
@@ -23,7 +22,6 @@ const DocketSheetsPage = () => {
   const onSubmit = (data) => {
     setSearch(data)
   }
-  const jurisdictions = schema['jurisdiction'].props.options
   return (
     <Stack spacing={4} sx={{ mb: 3 }}>
       <FormSection title={'Docket Sheet Search'}>
@@ -37,7 +35,7 @@ const DocketSheetsPage = () => {
               <Field
                 field_type="select"
                 name="jurisdiction"
-                options={jurisdictions}
+                optionSet="jurisdictions"
                 // fullWidth={false}
               />
             </Grid2>
@@ -54,7 +52,7 @@ const DocketSheetsPage = () => {
               <Field
                 field_type="select"
                 name="arrest_city"
-                options={schema['arrest_city'].props.options}
+                optionSet="cities"
                 // fullWidth={false}
               />
             </Grid2>

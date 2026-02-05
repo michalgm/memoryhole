@@ -28,10 +28,13 @@ model OptionSetValue {
   option_set_id      Int
   label              String
   value              String
+  is_static          Boolean   @default(false)
+  order              Int       @default(0)
   option_set_details OptionSet @relation(fields: [option_set_id], references: [id])
 
   @@unique([option_set_id, value])
   @@index([option_set_id, label])
+  @@index([option_set_id, order])
 }
 
 model Arrestee {

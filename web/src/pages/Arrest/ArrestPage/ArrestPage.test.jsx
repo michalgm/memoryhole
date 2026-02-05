@@ -2,7 +2,12 @@ import userEvent from '@testing-library/user-event'
 import { ConfirmProvider } from 'material-ui-confirm'
 
 import { navigate } from '@redwoodjs/router'
-import { mockGraphQLQuery, screen, waitFor } from '@redwoodjs/testing/web'
+import {
+  mockGraphQLMutation,
+  mockGraphQLQuery,
+  screen,
+  waitFor,
+} from '@redwoodjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
@@ -62,16 +67,21 @@ describe('ArrestPage', () => {
 })
 
 describe('ArrestPage - Create', () => {
-  mockGraphQLMutation('CreateArrestMutation', (variables) => {
-    createMutationSpy(variables) // Call the spy with the variables
+  beforeEach(() => {
+    mockGraphQLMutation('CreateArrestMutation', (variables) => {
+      createMutationSpy(variables)
 
-    return {
-      createArrest: {
-        id: 123,
-        ...variables.input,
-      },
-    }
+      return {
+        createArrest: {
+          id: 123,
+          ...variables.input,
+          // Ensure we return a string for the date, preventing "zombie" DayJS objects
+          date: '2023-10-28T12:00:00.000Z',
+        },
+      }
+    })
   })
+
   it('renders create successfully', async () => {
     expect(() => {
       renderArrestPage()
@@ -84,6 +94,8 @@ describe('ArrestPage - Create', () => {
   })
 
   it('runs save successfully', async () => {
+    const { _getMockDisplayError } = require('src/components/utils/SnackBar')
+    const displayErrorMock = _getMockDisplayError()
     renderArrestPage({})
 
     await waitFor(() => {
@@ -127,6 +139,13 @@ describe('ArrestPage - Create', () => {
     await waitFor(async () => {
       await new Promise((resolve) => setTimeout(resolve, 300))
     })
+
+    const errors = screen.queryAllByText(/required|invalid|must be/i)
+
+    expect(errors.length).toBe(0)
+
+    expect(displayErrorMock).not.toHaveBeenCalled()
+
     await waitFor(() => {
       navigate(`/foo`)
     })

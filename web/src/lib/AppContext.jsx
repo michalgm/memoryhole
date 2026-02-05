@@ -10,6 +10,7 @@ import {
 import { useMediaQuery } from '@mui/material'
 
 import dayjs from 'src/lib/dayjs'
+import { useOptionSets } from 'src/lib/useOptionSets'
 import { useSiteSettings } from 'src/lib/useSiteSettings'
 
 export const RIGHT_DRAWER_WIDTH = 450
@@ -43,6 +44,17 @@ const AppProvider = ({ children }) => {
   }, [])
 
   const { settings } = useSiteSettings()
+  const {
+    optionSets,
+    loading: optionSetsLoading,
+    error: optionSetsError,
+    refetch: refetchOptionSets,
+  } = useOptionSets()
+
+  const getOptionSetOptions = useCallback(
+    (name) => optionSets?.[name] || [],
+    [optionSets]
+  )
 
   useEffect(() => {
     if (settings.timeZone) {
@@ -67,6 +79,11 @@ const AppProvider = ({ children }) => {
     loading,
     setLoading,
     settings,
+    optionSets,
+    optionSetsLoading,
+    optionSetsError,
+    refetchOptionSets,
+    getOptionSetOptions,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

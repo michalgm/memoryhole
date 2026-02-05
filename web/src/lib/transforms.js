@@ -4,6 +4,9 @@ import dayjs from 'src/lib/dayjs'
 
 const dateTimeTransformer = (value) => {
   if (!value) return null
+
+  if (dayjs.isDayjs(value)) return value
+
   const date = dayjs(value)
   return date.isValid() ? date : null
 }

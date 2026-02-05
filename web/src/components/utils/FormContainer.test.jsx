@@ -1,5 +1,3 @@
-import React from 'react'
-
 import userEvent from '@testing-library/user-event'
 import { ConfirmProvider } from 'material-ui-confirm'
 
@@ -245,7 +243,8 @@ test('submits only changed fields', async () => {
     },
   }
   await waitFor(() => {
-    expect(transformInputMock).toHaveBeenCalledWith(expectedInput)
+    expect(transformInputMock).toHaveBeenCalled()
+    expect(transformInputMock.mock.calls[0][0]).toEqual(expectedInput)
   })
 
   await waitFor(() => {
@@ -255,7 +254,6 @@ test('submits only changed fields', async () => {
     expect(updateCalled).toBe(true)
   })
 })
-
 test('prevents submission if record has been updated by another user', async () => {
   const { _getMockDisplayError } = require('src/components/utils/SnackBar')
   const displayErrorMock = _getMockDisplayError()
@@ -629,7 +627,8 @@ test('resets form state after successful save', async () => {
   }
 
   await waitFor(() => {
-    expect(transformInputMock).toHaveBeenCalledWith(expectedInput)
+    expect(transformInputMock).toHaveBeenCalled()
+    expect(transformInputMock.mock.calls[0][0]).toEqual(expectedInput)
   })
 
   await waitFor(() => {

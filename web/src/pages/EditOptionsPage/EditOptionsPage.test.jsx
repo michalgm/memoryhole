@@ -1,5 +1,7 @@
 import { render } from '@redwoodjs/testing/web'
 
+import AppProvider from 'src/lib/AppContext'
+
 import EditOptionsPage from './EditOptionsPage'
 
 //   Improve this test with help from the Redwood Testing Doc:
@@ -8,7 +10,11 @@ import EditOptionsPage from './EditOptionsPage'
 describe('EditOptionsPage', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<EditOptionsPage />)
+      render(
+        <AppProvider>
+          <EditOptionsPage />
+        </AppProvider>
+      )
     }).not.toThrow()
   })
 })

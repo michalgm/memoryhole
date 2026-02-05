@@ -22,7 +22,7 @@ import pluralize from 'pluralize'
 import { flushSync } from 'react-dom'
 import ReactDOM from 'react-dom/client'
 
-import { useContainerWidth } from 'src/lib/AppContext'
+import { useApp, useContainerWidth } from 'src/lib/AppContext'
 import dayjs from 'src/lib/dayjs'
 
 import { formatLabel } from '../utils/BaseField'
@@ -83,7 +83,8 @@ const defineColumns = (
   schema,
   displayColumns,
   visibleColumns,
-  customFields = {}
+  customFields = {},
+  optionSets = {}
 ) => {
   const mergedSchema = { ...schema, ...customFields }
   const columnNames = sortBy(
@@ -163,8 +164,24 @@ const defineColumns = (
       )
     } else if (type === 'select') {
       col.filterVariant = 'multi-select'
-      col.filterSelectOptions = fieldDef?.options || []
-      col.filterSelectOptions = fieldDef.props.options
+      const optionSetName = fieldDef?.props?.optionSet
+      const rawOptions = optionSetName
+        ? optionSets?.[optionSetName] || []
+        : fieldDef?.props?.options || fieldDef?.options || []
+      col.filterSelectOptions = rawOptions
+        .map((option) => {
+          if (typeof option === 'string' || typeof option === 'number') {
+            return option
+          }
+          if (option?.value != null) {
+            return option.value
+          }
+          if (option?.id != null) {
+            return option.id
+          }
+          return option?.label
+        })
+        .filter((option) => option != null && option !== '')
     } else if (type === 'action_chooser') {
       col.accessorFn = (originalRow) => {
         return get(originalRow, field)?.name ?? null
@@ -372,6 +389,7 @@ const DataTable = ({
   footerNotes,
 }) => {
   const [reloading, setReloading] = useState(false)
+  const { optionSets } = useApp() || {}
   const mediumLayout = useContainerWidth(870)
   const smallLayout = useContainerWidth(680)
   // const extraSmallLayout = useContainerWidth(500)
@@ -392,7 +410,13 @@ const DataTable = ({
 
   const columns = [
     ...preColumns.map((col) => ({ ...col, isPre: true })),
-    ...defineColumns(schema, displayColumns, visibleColumns, customFields),
+    ...defineColumns(
+      schema,
+      displayColumns,
+      visibleColumns,
+      customFields,
+      optionSets
+    ),
     ...postColumns.map((col) => ({ ...col, isPost: true })),
   ]
   const columnsRef = useRef(columns)

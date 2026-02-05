@@ -2,7 +2,6 @@ import { PrivateSet, Route, Router, Set } from '@redwoodjs/router'
 
 import MainLayout from 'src/layouts/MainLayout/MainLayout'
 import ModelLayout from 'src/layouts/ModelLayout/ModelLayout'
-import * as _fragments from 'src/lib/gql_fragments'
 
 import { useAuth } from './auth'
 // import DocumentationPage from './pages/Documentation/DocumentationPage'
@@ -43,9 +42,11 @@ const Routes = () => {
             <Set wrap={ModelLayout} title="Docket Sheets" titleTo="docketSheets">
               <Route path="/admin/docket-sheets" page={DocketSheetsPage} name="docketSheets" />
             </Set>
-            <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
-            <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
-            <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
+            <Set wrap={ModelLayout} title="Edit Option Sets" titleTo="editOptions">
+              <Route path="/admin/editOptions" page={EditOptionsPage} name="editOptions" />
+              <Route path="/admin/editOptions/{id:Int}" page={EditOptionsPage} name="editOptionSet" />
+              <Route path="/admin/editOptions/new" page={EditOptionsPage} name="createOptionSet" />
+            </Set>
             <Set wrap={ModelLayout} title="Edit Site Help">
               <Route path="/admin/edit-help" page={EditHelpPage} name="editHelp" />
             </Set>
