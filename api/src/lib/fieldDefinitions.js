@@ -571,3 +571,13 @@ export const SiteSettingsLayout = [
     fields: ['id', 'value'],
   },
 ]
+
+export const fieldDefinitions = {
+  arrest: ArrestDefinitions,
+  user: UserDefinitions,
+  action: ActionDefinitions,
+  document: DocumentDefinitions,
+  duplicate_arrest: DuplicateArrestDefinitions,
+  log: LogDefinitions,
+  site_settings: SiteSettingsDefinitions,
+}
