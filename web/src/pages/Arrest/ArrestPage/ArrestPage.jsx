@@ -7,11 +7,12 @@ import { createPortal } from 'react-dom'
 
 import { navigate, routes, useLocation, useRouteName } from '@redwoodjs/router'
 
+import { ArrestLayout } from 'src/../../api/src/lib/fieldDefinitions'
 import { BaseField } from 'src/components/utils/BaseField'
 import FormContainer from 'src/components/utils/FormContainer'
 import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
-import ArrestFields from 'src/lib/FieldSchemas'
+
 export const QUERY = gql`
   query EditArrestById($id: Int!) {
     arrest: arrest(id: $id) {
@@ -171,7 +172,7 @@ const ArrestPage = ({ id, children, ...props }) => {
   return (
     <>
       <FormContainer
-        fields={ArrestFields}
+        layout={ArrestLayout}
         id={id === 'new' ? null : id}
         fieldProps={fieldProps}
         displayConfig={{

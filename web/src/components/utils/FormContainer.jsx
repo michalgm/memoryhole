@@ -106,7 +106,6 @@ export const FormContainerFieldsLayout = ({
 }
 
 const FormContainer = ({
-  fields,
   displayConfig,
   columnCount = 2,
   createMutation,
@@ -131,13 +130,6 @@ const FormContainer = ({
 }) => {
   const smallLayout = useContainerWidth(860)
   const schema = get(fieldSchema, displayConfig?.type?.toLowerCase(), {})
-
-  if (!layout) {
-    layout = fields.map((section) => ({
-      ...section,
-      fields: section.fields.map(([name]) => name),
-    }))
-  }
 
   return (
     <BaseForm

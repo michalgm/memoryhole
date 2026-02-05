@@ -17,7 +17,7 @@ import Link from 'src/components/utils/Link'
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import dayjs from 'src/lib/dayjs'
-import { schema } from 'src/lib/FieldSchemas'
+import { arrestSchema } from 'src/lib/FieldSchemas'
 
 export const QUERY = gql`
   query ArrestsQuery($filters: [GenericFilterInput]) {
@@ -181,7 +181,7 @@ const ArrestsPage = () => {
       <Stack spacing={0} direction="column">
         <DataTable
           data={data}
-          schema={schema}
+          schema={arrestSchema}
           displayColumns={displayColumns}
           tableProps={tableProps}
           refetch={refetch}
@@ -213,7 +213,7 @@ const ArrestsPage = () => {
         bulkUpdateRows={bulkUpdateRows}
         setBulkUpdateRows={setBulkUpdateRows}
         mutation={BULK_UPDATE_ARRESTS}
-        schema={schema}
+        schema={arrestSchema}
         name="arrest"
         onSuccess={() => {
           refetch()

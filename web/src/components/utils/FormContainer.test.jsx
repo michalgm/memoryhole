@@ -28,41 +28,35 @@ const WrappedFormContainer = (props) => {
 const transformInputMock = jest.fn((input) => input)
 
 // Sample fields configuration
-const fields = [
+const layout = [
   {
     title: 'Personal Information',
-    fields: [
-      [
-        'arrestee.first_name',
-        {
-          label: 'Legal First Name',
-          placeholder: 'Enter first name',
-          rules: {
-            required: 'First name is required',
-          },
-        },
-      ],
-      [
-        'arrestee.last_name',
-        {
-          label: 'Last Name',
-          placeholder: 'Enter last name',
-        },
-      ],
-      [
-        'arrestee.email',
-        {
-          label: 'Email',
-          placeholder: 'Enter email',
-          rules: {
-            validate: (value) =>
-              !value ||
-              /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value) ||
-              'Email must be formatted like an email',
-          },
-        },
-      ],
-    ],
+    fields: ['arrestee.first_name', 'arrestee.last_name', 'arrestee.email'],
+    // {
+    //   name: 'arrestee.first_name',
+    //   label: 'Legal First Name',
+    //   placeholder: 'Enter first name',
+    //   rules: {
+    //     required: 'First name is required',
+    //   },
+    // },
+    // {
+    //   name: 'arrestee.last_name',
+    //   label: 'Last Name',
+    //   placeholder: 'Enter last name',
+    // },
+    // {
+    //   name: 'arrestee.email',
+    //   label: 'Email',
+    //   placeholder: 'Enter email',
+    //   rules: {
+    //     validate: (value) =>
+    //       !value ||
+    //       /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value) ||
+    //       'Email must be formatted like an email',
+    //   },
+    // },
+    // ],
   },
 ]
 
@@ -142,7 +136,7 @@ test('renders form fields correctly', async () => {
   render(
     <SnackBarProvider>
       <FormContainer
-        fields={fields}
+        layout={layout}
         id={1}
         displayConfig={displayConfig}
         createMutation={CREATE_ENTITY_MUTATION}
@@ -214,7 +208,7 @@ test('submits only changed fields', async () => {
 
   render(
     <WrappedFormContainer
-      fields={fields}
+      layout={layout}
       id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
@@ -284,7 +278,7 @@ test('prevents submission if record has been updated by another user', async () 
 
   render(
     <WrappedFormContainer
-      fields={fields}
+      layout={layout}
       id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
@@ -338,7 +332,7 @@ test('shows warning when navigating away with unsaved changes', async () => {
 
   render(
     <WrappedFormContainer
-      fields={fields}
+      layout={layout}
       id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
@@ -402,7 +396,7 @@ test('does not warn on nav from new entry', async () => {
   const onCreateMock = jest.fn((input) => input)
   render(
     <WrappedFormContainer
-      fields={fields}
+      layout={layout}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
       updateMutation={UPDATE_ENTITY_MUTATION}
@@ -462,7 +456,7 @@ test('shows confirmation dialog when deleting entity', async () => {
 
   render(
     <WrappedFormContainer
-      fields={fields}
+      layout={layout}
       id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
@@ -508,7 +502,7 @@ test('shows validation errors for invalid fields', async () => {
   })
   render(
     <WrappedFormContainer
-      fields={fields}
+      layout={layout}
       id={entity.id}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
@@ -598,7 +592,7 @@ test('resets form state after successful save', async () => {
   render(
     <WrappedFormContainer
       id={entity.id}
-      fields={fields}
+      layout={layout}
       displayConfig={displayConfig}
       createMutation={CREATE_ENTITY_MUTATION}
       updateMutation={UPDATE_ENTITY_MUTATION}
@@ -644,7 +638,7 @@ test('resets form state after successful save', async () => {
 
 //   const { debug } = render(
 //     <WrappedFormContainer
-//       fields={fields}
+//       layout={layout}
 //       entity={entity}
 //       displayConfig={displayConfig}
 //       createMutation={CREATE_ENTITY_MUTATION}

@@ -116,7 +116,7 @@ function DataCard({ title, subtitle, data, stats, route, id }) {
 
 const CompareForm = ({
   compareData: inputData,
-  fields,
+  layout,
   schema,
   loading,
   formManagerContext,
@@ -165,10 +165,10 @@ const CompareForm = ({
     return null
   }
 
-  const layout = fields.map((section) => ({
-    ...section,
-    fields: section.fields.map(([name]) => name),
-  }))
+  // const layout = dataLayout.map((section) => ({
+  //   ...section,
+  //   fields: section.fields.map(([name]) => name),
+  // }))
 
   const sections = layout.map((section, groupIndex) => {
     return (
