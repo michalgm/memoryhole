@@ -8,12 +8,11 @@ import { createPortal } from 'react-dom'
 
 import { navigate, routes } from '@redwoodjs/router'
 
+import { ActionLayout } from 'src/../../api/src/lib/fieldDefinitions'
 import FormContainer from 'src/components/utils/FormContainer'
 import Link from 'src/components/utils/Link'
 import Show from 'src/components/utils/Show'
 import { defaultAction, useApp } from 'src/lib/AppContext'
-import { ActionFields } from 'src/lib/FieldSchemas'
-import * as _fragments from 'src/lib/gql_fragments'
 
 export const QUERY = gql`
   query EditAction($id: Int!) {
@@ -102,7 +101,7 @@ const ActionPage = ({ id = 'new' }) => {
   return (
     <>
       <FormContainer
-        fields={ActionFields}
+        layout={ActionLayout}
         id={id === 'new' ? null : id}
         displayConfig={{
           type: 'Action',

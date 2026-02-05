@@ -136,9 +136,9 @@ describe('ArrestPage - Create', () => {
     await waitFor(async () => {
       expect(createMutationSpy).toHaveBeenCalledTimes(1)
     })
-    await waitFor(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300))
-    })
+    // await waitFor(async () => {
+    //   await new Promise((resolve) => setTimeout(resolve, 300))
+    // })
 
     const errors = screen.queryAllByText(/required|invalid|must be/i)
 
@@ -150,9 +150,9 @@ describe('ArrestPage - Create', () => {
       navigate(`/foo`)
     })
 
-    await waitFor(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300))
-    })
+    // await waitFor(async () => {
+    //   await new Promise((resolve) => setTimeout(resolve, 300))
+    // })
 
     const dialog = screen.queryByText(/are you sure/i, {
       selector: '.MuiTypography-root',

@@ -6,10 +6,11 @@ import { useConfirm } from 'material-ui-confirm'
 import { navigate, routes, useRouteName } from '@redwoodjs/router'
 import { useMutation, useQuery } from '@redwoodjs/web'
 
+import { ArrestLayout } from 'src/../../api/src/lib/fieldDefinitions'
 import CompareForm from 'src/components/CompareForm/CompareForm'
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
-import ArrestFields, { fieldSchema } from 'src/lib/FieldSchemas'
+import { fieldSchema } from 'src/lib/FieldSchemas'
 import { displayItem } from 'src/lib/utils'
 import ArrestPage, { QUERY } from 'src/pages/Arrest/ArrestPage/ArrestPage'
 
@@ -201,7 +202,8 @@ const CompareArrestPage = ({ id, compareId }) => {
           loading={loading}
           formManagerContext={formManagerContext}
           schema={fieldSchema.arrest}
-          fields={ArrestFields}
+          // fields={ArrestFields}
+          layout={ArrestLayout}
           compareData={compareData}
         />
       )}

@@ -1,4 +1,4 @@
-import { schema } from 'src/lib/FieldSchemas'
+import { arrestSchema } from 'src/lib/FieldSchemas'
 
 import DataTable from '../DataTable/DataTable'
 
@@ -80,9 +80,9 @@ export const Success = ({
     'custom_fields.release_type',
   ]
 
-  const docketSchema = Object.keys(schema).reduce((acc, key) => {
+  const docketSchema = Object.keys(arrestSchema).reduce((acc, key) => {
     if (displayColumns.includes(key)) {
-      acc[key] = schema[key]
+      acc[key] = arrestSchema[key]
     }
     return acc
   }, [])
