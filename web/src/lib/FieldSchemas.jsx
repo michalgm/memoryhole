@@ -4,107 +4,6 @@ import { ROLE_LEVELS } from 'src/../../api/src/config'
 
 import { formatLabel } from '../components/utils/BaseField'
 
-export const usStates = [
-  'Alabama',
-  'Alaska',
-  'Arizona',
-  'Arkansas',
-  'California',
-  'Colorado',
-  'Connecticut',
-  'Delaware',
-  'Florida',
-  'Georgia',
-  'Hawaii',
-  'Idaho',
-  'Illinois',
-  'Indiana',
-  'Iowa',
-  'Kansas',
-  'Kentucky',
-  'Louisiana',
-  'Maine',
-  'Maryland',
-  'Massachusetts',
-  'Michigan',
-  'Minnesota',
-  'Mississippi',
-  'Missouri',
-  'Montana',
-  'Nebraska',
-  'Nevada',
-  'New Hampshire',
-  'New Jersey',
-  'New Mexico',
-  'New York',
-  'North Carolina',
-  'North Dakota',
-  'Ohio',
-  'Oklahoma',
-  'Oregon',
-  'Pennsylvania',
-  'Rhode Island',
-  'South Carolina',
-  'South Dakota',
-  'Tennessee',
-  'Texas',
-  'Utah',
-  'Vermont',
-  'Virginia',
-  'Washington',
-  'West Virginia',
-  'Wisconsin',
-  'Wyoming',
-]
-
-const release_types = [
-  'Unknown/In Custody',
-  'Unknown Released',
-  'Own Recognizance',
-  'Bail',
-  'Cited Out',
-  'Arraigned',
-  'Dismissed',
-  'Charges Dropped',
-  'Charges Pending',
-  'Guilty Plea',
-  'Out With No Complaint',
-]
-
-const cities = [
-  'Oakland',
-  'San Francisco',
-  'Berkeley',
-  'Emeryville',
-  'Dublin',
-  'Hayward',
-  'Richmond',
-  'San Jose',
-  'San Leandro',
-  'San Mateo',
-  'Santa Cruz',
-  'Walnut Creek',
-  'Sacramento',
-  'Other',
-]
-
-const jurisdictions = [
-  'San Francisco',
-  'Alameda',
-  'Federal',
-  'Contra Costa',
-  'San Mateo',
-  'Santa Clara',
-  'Santa Cruz',
-  'Marin',
-  'Yolo',
-  'Humboldt',
-  'Sacramento',
-  'Solano',
-  'Sonoma',
-  'Napa',
-]
-
 const ArrestFields = [
   {
     title: 'Arrestee',
@@ -235,7 +134,7 @@ const ArrestFields = [
       ['arrestee.custom_fields.affinity_group/support_org'],
       ['arrestee.address'],
       ['arrestee.city'],
-      ['arrestee.state', { field_type: 'select', options: usStates }],
+      ['arrestee.state', { field_type: 'select', optionSet: 'states' }],
       ['arrestee.zip'],
       [
         'arrestee.custom_fields.contact/support_notes',
@@ -261,7 +160,7 @@ const ArrestFields = [
         'arrest_city',
         {
           field_type: 'select',
-          options: cities,
+          optionSet: 'cities',
           required: true,
         },
       ],
@@ -289,7 +188,7 @@ const ArrestFields = [
         'custom_fields.custody_status',
         {
           field_type: 'select',
-          options: ['Unknown/Unconfirmed', 'In Custody', 'Out of Custody'],
+          optionSet: 'arrest_custody_status',
           required: true,
           rules: {
             validate: (value, formValues) => {
@@ -310,12 +209,7 @@ const ArrestFields = [
         {
           label: 'jail population_assignment',
           field_type: 'select',
-          options: [
-            'Male',
-            'Female',
-            'Transgender/Gender Variant/Non-Binary',
-            'Unknown',
-          ],
+          optionSet: 'jail_population',
           default: 'Unknown',
         },
       ],
@@ -326,7 +220,7 @@ const ArrestFields = [
         'custom_fields.release_type',
         {
           field_type: 'select',
-          options: release_types,
+          optionSet: 'arrest_release_type',
           default: 'Unknown/In Custody',
           rules: {
             validate: (value, formValues) => {
@@ -352,21 +246,14 @@ const ArrestFields = [
         {
           field_type: 'select',
           default: 'Pre-Arraignment',
-          options: [
-            'Pre-Arraignment',
-            'No Charges Filed',
-            'Pre-Trial',
-            'Trial',
-            'Resolved',
-            'Unknown',
-          ],
+          optionSet: 'arrest_case_status',
         },
       ],
       [
         'jurisdiction',
         {
           field_type: 'select',
-          options: jurisdictions,
+          optionSet: 'jurisdictions',
         },
       ],
       [
@@ -380,21 +267,7 @@ const ArrestFields = [
         {
           field_type: 'select',
           default: 'Open',
-          options: [
-            'Open',
-            'Discharged w/o Prejudice',
-            'Discharged w/ Prejudice',
-            'Guilty Plea',
-            'Dismissed',
-            'Acquitted',
-            'Guilty Verdict',
-            'No Action',
-            'Continued for Dismissal',
-            'Bench Warrant',
-            'No Complaint FIled',
-            'Warrant Letter',
-            'No Contest',
-          ],
+          optionSet: 'arrest_disposition',
         },
       ],
       ['custom_fields.next_court_date', { field_type: 'date-time' }],
@@ -624,7 +497,7 @@ export const ActionFields = [
         'jurisdiction',
         {
           field_type: 'select',
-          options: jurisdictions,
+          optionSet: 'jurisdictions',
           helperText:
             'Sets the default jurisdiction for new arrests created in this action',
         },
@@ -633,7 +506,7 @@ export const ActionFields = [
         'city',
         {
           field_type: 'select',
-          options: cities,
+          optionSet: 'cities',
           helperText:
             'Sets the default city for new arrests created in this action',
         },
@@ -664,16 +537,11 @@ fieldSchema.log = {
   },
   type: {
     field_type: 'select',
-    options: [
-      'Shift Summary',
-      'Jail Call',
-      'Witness Call',
-      'Support Call',
-      'Out-of-Custody Call',
-      'Email',
-      'Note',
-      'Other',
-    ],
+    optionSet: 'log_type',
+    // options: [
+    //   { id: 'Call', label: 'Call' },
+    //   { id: 'Email', label: 'Email' },
+    // ],
     required: true,
   },
   needs_followup: { field_type: 'checkbox' },

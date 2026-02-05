@@ -1,3 +1,5 @@
+// Also mock the .jsx extension in case some imports use it
+jest.mock('src/lib/useOptionSets.jsx', () => require('src/lib/useOptionSets'))
 import {
   afterAll,
   afterEach,
@@ -47,7 +49,7 @@ jest.mock('src/components/utils/BaseField', () => {
         return (
           <div
             className="tiptap"
-            dangerouslySetInnerHTML={{ __html: props.value }}
+            dangerouslySetInnerHTML={{ __html: props.id }}
           />
         )
       }
@@ -102,6 +104,95 @@ jest.mock('src/lib/useSiteSettings', () => {
     useSiteSettings: jest.fn(() => ({
       settings: { timeZone: 'America/Los_Angeles' },
       loading: false,
+    })),
+  }
+})
+
+jest.mock('src/lib/useOptionSets', () => {
+  const actual = { ...jest.requireActual('src/lib/useOptionSets') }
+  // Provide default test data for all real optionSets
+  return {
+    ...actual,
+    useOptionSets: jest.fn(() => ({
+      optionSets: {
+        states: [
+          {
+            label: 'California',
+            id: 'California',
+          },
+          {
+            label: 'New York',
+            id: 'New York',
+          },
+        ],
+        arrest_release_type: [
+          {
+            label: 'Unknown/In Custody',
+            id: 'Unknown/In Custody',
+          },
+        ],
+        cities: [
+          {
+            label: 'Oakland',
+            id: 'Oakland',
+          },
+          {
+            label: 'San Francisco',
+            id: 'San Francisco',
+          },
+        ],
+        jurisdictions: [
+          {
+            label: 'San Francisco',
+            id: 'San Francisco',
+          },
+          {
+            label: 'Alameda',
+            id: 'Alameda',
+          },
+        ],
+        arrest_custody_status: [
+          {
+            label: 'Unknown/Unconfirmed',
+            id: 'Unknown/Unconfirmed',
+          },
+          {
+            label: 'In Custody',
+            id: 'In Custody',
+          },
+        ],
+        jail_population: [
+          {
+            label: 'Female',
+            id: 'Female',
+          },
+        ],
+        arrest_case_status: [
+          {
+            label: 'Pre-Arraignment',
+            id: 'Pre-Arraignment',
+          },
+        ],
+        arrest_disposition: [
+          {
+            label: 'Dismissed',
+            id: 'Dismissed',
+          },
+        ],
+        log_type: [
+          {
+            label: 'Shift Summary',
+            id: 'Shift Summary',
+          },
+          {
+            label: 'Email',
+            id: 'Email',
+          },
+        ],
+      },
+      loading: false,
+      error: null,
+      refetch: jest.fn(),
     })),
   }
 })

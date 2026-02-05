@@ -1,4 +1,4 @@
-import { Gavel, Help, People, Settings } from '@mui/icons-material'
+import { Gavel, Help, ListAlt, People, Settings } from '@mui/icons-material'
 import {
   List,
   ListItemButton,
@@ -12,14 +12,6 @@ import { routes } from '@redwoodjs/router'
 import Link from 'src/components/utils/Link'
 
 const AdminPage = () => {
-  // const admin_routes = [
-  //   // 'users',
-  //   // 'customSchemata',
-  //   'logs',
-  //   'tableViews',
-  //   // 'actions',
-  // ]
-
   const route_links = [
     {
       to: routes.users(),
@@ -30,6 +22,11 @@ const AdminPage = () => {
       to: routes.settings(),
       label: 'Edit Site Settings',
       icon: <Settings />,
+    },
+    {
+      to: routes.editOptions(),
+      label: 'Edit Option Lists',
+      icon: <ListAlt />,
     },
     {
       to: routes.docketSheets(),
@@ -55,16 +52,6 @@ const AdminPage = () => {
           </Link>
         ))}
       </List>
-      {/* <Link to={routes.editOptions()}>Edit Options</Link> */}
-
-      {/* <Divider />
-      <ul>
-        {admin_routes.map((route) => (
-          <li key={route}>
-            <Link to={routes[route]()}>{route}</Link>
-          </li>
-        ))}
-      </ul> */}
     </Paper>
   )
 }

@@ -3,7 +3,7 @@ export const schema = gql`
     id: Int!
     name: String!
     description: String
-    values: [OptionSetValue]!
+    values: [OptionSetValue]
   }
 
   type Query {
@@ -14,6 +14,17 @@ export const schema = gql`
   input CreateOptionSetInputValueInput {
     label: String!
     value: String!
+    is_static: Boolean
+    order: Int
+  }
+
+  input UpdateOptionSetInputValueInput {
+    id: Int
+    label: String
+    value: String
+    is_static: Boolean
+    order: Int
+    deleted: Boolean
   }
 
   input CreateOptionSetInput {
@@ -23,12 +34,12 @@ export const schema = gql`
 
   input UpdateOptionSetInput {
     name: String
-    values: [CreateOptionSetValueInput]!
+    values: [UpdateOptionSetInputValueInput]!
   }
 
   type Mutation {
     createOptionSet(input: CreateOptionSetInput!): OptionSet! @requireAuth
-    updateOptionSet(id: Int!, input: UpdateOptionSetInput!): OptionSet!
+    updateOptionSetValues(id: Int!, input: UpdateOptionSetInput!): OptionSet!
       @requireAuth
     deleteOptionSet(id: Int!): OptionSet! @requireAuth
   }

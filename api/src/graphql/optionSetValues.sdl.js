@@ -4,6 +4,8 @@ export const schema = gql`
     option_set_id: Int!
     label: String!
     value: String!
+    is_static: Boolean!
+    order: Int!
     option_set_details: OptionSet!
   }
 
@@ -16,12 +18,16 @@ export const schema = gql`
     option_set_id: Int!
     label: String!
     value: String!
+    is_static: Boolean
+    order: Int!
   }
 
   input UpdateOptionSetValueInput {
     option_set_id: Int
     label: String
     value: String
+    is_static: Boolean
+    order: Int
   }
 
   type Mutation {

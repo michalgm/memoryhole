@@ -166,7 +166,11 @@ export const SnackBarProvider = ({ children }) => {
   const [snackbar, setSnackbar] = useState(DEFAULT_SNACKBAR_STATE)
 
   const openSnackbar = useCallback(
-    (message, severity = 'success', duration = 4000) => {
+    (
+      message,
+      severity = 'success',
+      duration = DEFAULT_SNACKBAR_STATE.duration
+    ) => {
       setSnackbar({ open: true, message, severity, duration })
     },
     []

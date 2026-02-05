@@ -32,6 +32,7 @@ import {
   DateTimePickerElement,
 } from 'react-hook-form-mui/date-pickers'
 
+import { useApp } from 'src/lib/AppContext'
 import { convertSvgToDataUrl } from 'src/lib/utils'
 
 import ActionChooser from '../Autocomplete/ActionChooser'
@@ -58,6 +59,16 @@ const transformOptions = (options) => {
     if (typeof option === 'string' || typeof option === 'number') {
       return { id: option, label: formatLabel(`${option}`) }
     }
+    if (option?.id != null) {
+      return option
+    }
+    if (option?.value != null) {
+      return {
+        id: option.value,
+        label: option.label ?? formatLabel(`${option.value}`),
+        ...option,
+      }
+    }
     return option
   })
 }
@@ -69,6 +80,7 @@ export const BaseField = ({
   fullWidth = true,
   helperText = '',
   options: defaultOptions,
+  optionSet,
   value,
   onChange,
   isRHF,
@@ -79,6 +91,10 @@ export const BaseField = ({
   textFieldProps: defaultTextFieldProps,
   ...props
 }) => {
+  const appContext = useApp()
+  const resolvedOptions = optionSet
+    ? appContext?.optionSets?.[optionSet] || []
+    : defaultOptions
   // const { setValue, getValues } = useFormContext()
 
   props.label = props.label === '' ? null : props.label || formatLabel(name)
@@ -153,7 +169,7 @@ export const BaseField = ({
   }
 
   const renderAutocomplete = (extraProps = {}) => {
-    const options = transformOptions(defaultOptions)
+    const options = transformOptions(resolvedOptions)
 
     return (
       <Autocomplete
@@ -241,7 +257,7 @@ export const BaseField = ({
   }
 
   const renderRadio = () => {
-    const options = transformOptions(defaultOptions)
+    const options = transformOptions(resolvedOptions)
     return (
       <RadioButtonGroup
         name={name}
@@ -277,12 +293,13 @@ export const BaseField = ({
             color="primary"
             name={name}
             label={props.label}
-            options={transformOptions(defaultOptions)}
+            options={transformOptions(resolvedOptions)}
             {...props}
           />
         </Box>
       )
     }
+    const checkboxOptions = transformOptions(resolvedOptions) || []
     return (
       <Grid2 container spacing={2}>
         <FormControl
@@ -294,11 +311,11 @@ export const BaseField = ({
         >
           <FormLabel component="legend">{props.label}</FormLabel>
           <FormGroup>
-            {defaultOptions.map((option) => (
-              <Grid2 key={option} size={6}>
+            {checkboxOptions.map((option) => (
+              <Grid2 key={option.id} size={6}>
                 <FormControlLabel
-                  control={<Checkbox name={`${name}_${option}`} />}
-                  label={option}
+                  control={<Checkbox name={`${name}_${option.id}`} />}
+                  label={option.label}
                 />
               </Grid2>
             ))}
@@ -393,7 +410,7 @@ export const BaseField = ({
   }
 
   const renderToggleButton = () => {
-    const options = transformOptions(defaultOptions)
+    const options = transformOptions(resolvedOptions)
     if (isRHF) {
       return (
         <ToggleButtonGroupElement

@@ -67,7 +67,7 @@ const CompareChooser = () => {
           sx={{ width: 250 }}
           textFieldProps={{
             label: 'Select arrest to compare',
-            sx: { backgroundColor: 'background.paper' },
+            sx: { backgroundColor: 'background.paper', px: 1 },
             variant: 'standard',
             size: 'x-small',
           }}

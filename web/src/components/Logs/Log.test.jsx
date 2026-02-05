@@ -3,8 +3,6 @@ import userEvent from '@testing-library/user-event'
 
 import { navigate } from '@redwoodjs/router'
 
-import { SnackBarProvider } from 'src/components/utils/SnackBar'
-import AppProvider from 'src/lib/AppContext'
 import { render } from 'src/setupTests'
 
 import { generateMockData } from '../../test/mocks/generateMockData'
@@ -16,11 +14,7 @@ const mockLog = generateMockData('aLog', 'LogFields', [
 ])[0]
 
 const renderLog = (log) => {
-  return render(
-    <AppProvider>
-      <SnackBarProvider>{log}</SnackBarProvider>
-    </AppProvider>
-  )
+  return render(log)
 }
 
 describe('Log', () => {

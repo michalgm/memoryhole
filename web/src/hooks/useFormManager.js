@@ -16,6 +16,20 @@ const dataFromResult = (result) => {
   return result[Object.keys(result)[0]]
 }
 
+const stripTypename = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(stripTypename)
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const { __typename, ...rest } = obj
+    return Object.keys(rest).reduce((acc, key) => {
+      acc[key] = stripTypename(rest[key])
+      return acc
+    }, {})
+  }
+  return obj
+}
+
 const getChangedFields = (input, dirtyFields) => {
   if (!dirtyFields || typeof dirtyFields !== 'object') {
     return input
@@ -209,7 +223,8 @@ export function useFormManager({
       displayError('No changes to save')
       return
     }
-    const transformedInput = await transformInput(changedFields)
+    const transformedInput = await transformInput(changedFields, context)
+    const cleanedInput = stripTypename(transformedInput)
     if (id) {
       if (!skipUpdatedCheck) {
         const { data: currentRecord = {} } = await fetchEntity({
@@ -232,7 +247,7 @@ export function useFormManager({
         }
       }
     }
-    return { id, input: transformedInput }
+    return { id, input: cleanedInput }
   }
 
   const onSave = async (rawInput) => {
