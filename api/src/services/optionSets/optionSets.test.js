@@ -77,4 +77,80 @@ describe('optionSets', () => {
       )
     ).toBe(true)
   })
+
+  describe('validation', () => {
+    scenario(
+      'prevents deleting an option value that is in use',
+      async (scenario) => {
+        // "MyLogType" is used by scenario.log.one
+        const original = await optionSet({ id: scenario.optionSet.logType.id })
+        const valueToDelete = original.values.find(
+          (v) => v.value === 'MyLogType'
+        )
+
+        await expect(
+          updateOptionSetValues({
+            id: original.id,
+            input: {
+              values: [{ id: valueToDelete.id, deleted: true }],
+            },
+          })
+        ).rejects.toThrow(/is currently used by 1 log\(s\)/)
+      }
+    )
+
+    scenario(
+      'prevents renaming an option value that is in use',
+      async (scenario) => {
+        const original = await optionSet({ id: scenario.optionSet.logType.id })
+        const valueToRename = original.values.find(
+          (v) => v.value === 'MyLogType'
+        )
+
+        await expect(
+          updateOptionSetValues({
+            id: original.id,
+            input: {
+              values: [{ ...valueToRename, value: 'RenamedType' }],
+            },
+          })
+        ).rejects.toThrow(/is currently used by 1 log\(s\)/)
+      }
+    )
+
+    scenario(
+      'prevents deleting an option value that is a default',
+      async (scenario) => {
+        // "Unknown" is the default for jail_population (arrestee.custom_fields.jail_population)
+        const original = await optionSet({
+          id: scenario.optionSet.jailPopulation.id,
+        })
+        const valueToDelete = original.values.find((v) => v.value === 'Unknown')
+
+        await expect(
+          updateOptionSetValues({
+            id: original.id,
+            input: {
+              values: [{ id: valueToDelete.id, deleted: true }],
+            },
+          })
+        ).rejects.toThrow(/is the default value/)
+      }
+    )
+
+    scenario('allows deleting unused values', async (scenario) => {
+      const original = await optionSet({ id: scenario.optionSet.logType.id })
+      const unusedValue = original.values.find(
+        (v) => v.value === 'OtherLogType'
+      )
+
+      const result = await updateOptionSetValues({
+        id: original.id,
+        input: {
+          values: [{ id: unusedValue.id, deleted: true }],
+        },
+      })
+      expect(result.values.find((v) => v.id === unusedValue.id)).toBeUndefined()
+    })
+  })
 })
