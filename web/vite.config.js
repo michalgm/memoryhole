@@ -17,6 +17,11 @@ const viteConfig = {
     'process.env.BUILD_TIMESTAMP': JSON.stringify(new Date()),
     'process.env.APP_VERSION': JSON.stringify(version),
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['src/setupTests.js'],
+  },
 }
 
 export default defineConfig(viteConfig)
