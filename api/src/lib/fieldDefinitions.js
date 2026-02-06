@@ -379,6 +379,7 @@ export const ActionDefinitions = {
   description: { field_type: 'richtext' },
   start_date: { field_type: 'date-time', required: true },
   end_date: { field_type: 'date-time' },
+  location: {},
   jurisdiction: {
     field_type: 'select',
     optionSet: 'jurisdictions',
@@ -401,6 +402,7 @@ export const ActionLayout = [
       'end_date',
       'jurisdiction',
       'city',
+      'location',
     ],
   },
 ]
@@ -534,6 +536,7 @@ export const LogDefinitions = {
     field_type: 'arrest_chooser',
     multiple: true,
   },
+  contact: {},
 }
 
 export const LogLayout = [
@@ -549,6 +552,7 @@ export const LogLayout = [
       'shift.operators',
       'action',
       'arrests',
+      'contact',
     ],
   },
 ]

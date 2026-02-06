@@ -3,10 +3,10 @@ import { ConfirmProvider } from 'material-ui-confirm'
 
 import { navigate } from '@cedarjs/router'
 import {
-    mockGraphQLMutation,
-    mockGraphQLQuery,
-    screen,
-    waitFor,
+  mockGraphQLMutation,
+  mockGraphQLQuery,
+  screen,
+  waitFor,
 } from '@cedarjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
@@ -76,7 +76,7 @@ describe('ArrestPage - Create', () => {
           id: 123,
           ...variables.input,
           // Ensure we return a string for the date, preventing "zombie" DayJS objects
-          date: '2023-10-28T12:00:00.000Z',
+          // date: '2023-10-28T12:00:00.000Z',
         },
       }
     })

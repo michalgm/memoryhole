@@ -96,6 +96,7 @@ model Log {
   action         Action?   @relation(fields: [action_id], references: [id])
   shift          Json?
   action_id      Int?
+  contact        String?
 }
 
 // model HotlineLog {
@@ -198,6 +199,7 @@ model Action {
   jurisdiction  String?
   city          String?
   custom_fields Json?
+  location      String?
   Arrest        Arrest[]
   Log           Log[]
 }

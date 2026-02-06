@@ -21,7 +21,13 @@ const ActionsPage = () => {
     onError: displayError,
   })
 
-  const displayColumns = ['start_date', 'end_date', 'city', 'jurisdiction']
+  const displayColumns = [
+    'start_date',
+    'end_date',
+    'city',
+    'jurisdiction',
+    'location',
+  ]
 
   const tableProps = {
     enableColumnFilterModes: true,
