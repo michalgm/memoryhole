@@ -7,6 +7,7 @@ import './index.css'
 import * as React from 'react'
 
 import { ApolloLink } from '@apollo/client'
+import { removeTypenameFromVariables } from '@apollo/client/link/remove-typename'
 import { CssBaseline } from '@mui/material'
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 import { ThemeProvider } from '@mui/material/styles'
@@ -25,10 +26,14 @@ import { AuthProvider, useAuth } from './auth'
 import { SnackBarProvider } from './components/utils/SnackBar'
 import ErrorHandler from './lib/ErrorHandler'
 import theme from './theme'
-
+const removeTypenameLink = removeTypenameFromVariables()
 // Inject error handler into Apollo Link chain
 const link = (rwlinks) =>
-  ApolloLink.from([ErrorHandler, ...rwlinks.map((l) => l.link)])
+  ApolloLink.from([
+    ErrorHandler,
+    removeTypenameLink,
+    ...rwlinks.map((l) => l.link),
+  ])
 
 const graphQLClientConfig = {
   link,
