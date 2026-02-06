@@ -6,12 +6,12 @@ import { defineConfig } from 'vite'
 // So that Vite will load on local instead of 127.0.0.1
 dns.setDefaultResultOrder('verbatim')
 
-import redwood from '@redwoodjs/vite'
+import { cedar } from '@cedarjs/vite'
 
 import { version } from '../package.json'
 
 const viteConfig = {
-  plugins: [redwood()],
+  plugins: [cedar()],
   define: {
     // Note: These aren't real env vars - just using process.env.* pattern for safe string replacement
     'process.env.BUILD_TIMESTAMP': JSON.stringify(new Date()),

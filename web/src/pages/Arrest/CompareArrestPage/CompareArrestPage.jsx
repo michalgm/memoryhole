@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { DialogContentText } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 
-import { navigate, routes, useRouteName } from '@redwoodjs/router'
-import { useMutation, useQuery } from '@redwoodjs/web'
+import { navigate, routes, useRouteName } from '@cedarjs/router'
+import { useMutation, useQuery } from '@cedarjs/web'
 
 import { ArrestLayout } from 'src/../../api/src/lib/fieldDefinitions'
 import CompareForm from 'src/components/CompareForm/CompareForm'

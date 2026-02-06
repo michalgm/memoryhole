@@ -2,7 +2,7 @@
 
 const config = {
   rootDir: '../',
-  preset: '@redwoodjs/testing/config/jest/web',
+  preset: '@cedarjs/testing/config/jest/web',
   transformIgnorePatterns: [
     '/node_modules/(?!(@mui|lodash-es|export-to-csv|material-ui-confirm))',
   ],

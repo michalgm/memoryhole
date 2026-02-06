@@ -9,7 +9,7 @@ import {
   jest,
 } from '@jest/globals'
 
-import { waitFor } from '@redwoodjs/testing/web'
+import { waitFor } from '@cedarjs/testing/web'
 
 import './test/setup/browserMocks'
 
@@ -85,12 +85,12 @@ afterAll(async () => {
   })
 })
 
-jest.mock('@redwoodjs/router', () => {
-  const actual = { ...jest.requireActual('@redwoodjs/router') }
+jest.mock('@cedarjs/router', () => {
+  const actual = { ...jest.requireActual('@cedarjs/router') }
   const navigateSpy = jest.spyOn(actual, 'navigate')
   return {
     ...actual,
-    // ...jest.requireActual('@redwoodjs/router'),
+    // ...jest.requireActual('@cedarjs/router'),
     navigate: navigateSpy,
     useRoutePath: jest.fn(() => '/mock-route-path'),
     useRouteName: jest.fn((path) => `${path}-route-name`),

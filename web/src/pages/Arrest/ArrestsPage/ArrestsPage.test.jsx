@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@redwoodjs/testing/web'
+import { screen, waitFor } from '@cedarjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'

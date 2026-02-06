@@ -1,4 +1,4 @@
-// import { Link, routes } from '@redwoodjs/router'
+// import { Link, routes } from '@cedarjs/router'
 
 import { Divider, Grid2, Typography } from '@mui/material'
 import { Stack } from '@mui/system'

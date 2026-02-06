@@ -1,7 +1,7 @@
 import {
   DbAuthHandler,
   PasswordValidationError,
-} from '@redwoodjs/auth-dbauth-api'
+} from '@cedarjs/auth-dbauth-api'
 
 import { cookieName } from 'src/lib/auth'
 import { sendReset, tokenExpireHours } from 'src/lib/authHelpers'
@@ -171,7 +171,7 @@ export const handler = async (event, context) => {
 
     // Include any format checks for password here. Return `true` if the
     // password is valid, otherwise throw a `PasswordValidationError`.
-    // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.
+    // Import the error along with `DbAuthHandler` from `@cedarjs/api` above.
     passwordValidation,
 
     errors: {

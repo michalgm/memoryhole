@@ -4,7 +4,7 @@ import { Box, Container } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import isHotkey from 'is-hotkey'
 
-import { navigate, routes, useRouteName } from '@redwoodjs/router'
+import { navigate, routes, useRouteName } from '@cedarjs/router'
 
 import Loading from 'src/components/Loading/Loading'
 import LogsDrawer from 'src/components/Logs/LogsDrawer'

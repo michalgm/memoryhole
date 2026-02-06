@@ -7,8 +7,8 @@ import { startCase } from 'lodash-es'
 import { createPortal } from 'react-dom'
 import { useFieldArray } from 'react-hook-form'
 
-import { navigate, routes } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
+import { navigate, routes } from '@cedarjs/router'
+import { useQuery } from '@cedarjs/web'
 
 import { BaseField } from 'src/components/utils/BaseField'
 import { BaseForm } from 'src/components/utils/BaseForm'

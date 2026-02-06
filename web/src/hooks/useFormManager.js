@@ -5,7 +5,7 @@ import { get, isEmpty } from 'lodash-es'
 import { useConfirm } from 'material-ui-confirm'
 import { useForm } from 'react-hook-form-mui'
 
-import { useBlocker } from '@redwoodjs/router'
+import { useBlocker } from '@cedarjs/router'
 
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
 import dayjs from 'src/lib/dayjs'

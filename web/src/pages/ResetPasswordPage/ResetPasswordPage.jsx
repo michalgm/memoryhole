@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import { TextFieldElement } from 'react-hook-form-mui'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@cedarjs/router'
 
 import { useAuth } from 'src/auth'
 import { useDisplayError } from 'src/components/utils/SnackBar'

@@ -1,9 +1,9 @@
-import { getPaths, importStatementPath } from '@redwoodjs/project-config'
+import { getPaths, importStatementPath } from '@cedarjs/project-config'
 
 const redwoodProjectPaths = getPaths()
 
 const config = {
-  framework: 'storybook-framework-redwoodjs-vite',
+  framework: 'storybook-framework-cedarjs',
 
   stories: [
     `${importStatementPath(

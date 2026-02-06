@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 import { Box, Button, Grid2, Stack, Tooltip } from '@mui/material'
 
-import { useParams, useRoutePath } from '@redwoodjs/router'
+import { useParams, useRoutePath } from '@cedarjs/router'
 
 import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'

@@ -14,8 +14,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { ConfirmProvider } from 'material-ui-confirm'
 
-import { FatalErrorBoundary, RedwoodProvider } from '@redwoodjs/web'
-import { RedwoodApolloProvider } from '@redwoodjs/web/apollo'
+import { FatalErrorBoundary, RedwoodProvider } from '@cedarjs/web'
+import { RedwoodApolloProvider } from '@cedarjs/web/apollo'
 
 import possibleTypes from 'src/graphql/possibleTypes'
 import FatalErrorPage from 'src/pages/FatalErrorPage'

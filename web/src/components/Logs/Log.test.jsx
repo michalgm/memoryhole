@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { navigate } from '@redwoodjs/router'
+import { navigate } from '@cedarjs/router'
 
 import { render } from 'src/setupTests'
 

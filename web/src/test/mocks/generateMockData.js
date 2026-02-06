@@ -1,7 +1,7 @@
 import { visit } from 'graphql'
 import { cloneDeep, merge } from 'lodash'
 
-import { fragmentRegistry } from '@redwoodjs/web/apollo'
+import { fragmentRegistry } from '@cedarjs/web/apollo'
 
 import * as _fragments from 'src/lib/gql_fragments'
 

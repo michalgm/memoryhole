@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import md5 from 'md5'
 import { v4 as uuidv4 } from 'uuid'
 
-import { hashPassword, hashToken } from '@redwoodjs/auth-dbauth-api'
+import { hashPassword, hashToken } from '@cedarjs/auth-dbauth-api'
 
 import { sendEmail } from 'src/lib/email'
 
