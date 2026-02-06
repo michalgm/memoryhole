@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react'
 import { Box, Typography } from '@mui/material'
 import { startCase, upperCase } from 'lodash-es'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@cedarjs/router'
 
 import { useAuth } from 'src/auth'
 import FormContainer from 'src/components/utils/FormContainer'

@@ -10,7 +10,7 @@ import {
 } from '@mui/material'
 import { Stack } from '@mui/system'
 
-import { useQuery } from '@redwoodjs/web'
+import { useQuery } from '@cedarjs/web'
 
 import RichTextInput from 'src/components/utils/RichTextInput'
 

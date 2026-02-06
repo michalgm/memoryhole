@@ -1,7 +1,7 @@
-import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
+import { Link, routes } from '@cedarjs/router'
+import { useMutation } from '@cedarjs/web'
 
-import { toast } from '@redwoodjs/web/toast'
+import { toast } from '@cedarjs/web/toast'
 
 import { QUERY } from 'src/components/TableView/TableViewsCell'
 import { timeTag, truncate } from 'src/lib/formatters'

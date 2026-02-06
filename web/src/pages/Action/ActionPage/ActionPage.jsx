@@ -6,7 +6,7 @@ import { Box } from '@mui/system'
 import pluralize from 'pluralize'
 import { createPortal } from 'react-dom'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@cedarjs/router'
 
 import { ActionLayout } from 'src/../../api/src/lib/fieldDefinitions'
 import FormContainer from 'src/components/utils/FormContainer'

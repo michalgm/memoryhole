@@ -1,6 +1,6 @@
 import * as Y from 'yjs'
 
-import { context } from '@redwoodjs/graphql-server'
+import { context } from '@cedarjs/graphql-server'
 
 import { ROLE_LEVELS } from 'src/config'
 import { requireAuth } from 'src/lib/auth'

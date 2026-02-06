@@ -1,4 +1,4 @@
-import { Link, routes } from '@redwoodjs/router'
+import { Link, routes } from '@cedarjs/router'
 
 import TableViews from 'src/components/TableView/TableViews'
 

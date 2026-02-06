@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from '.prisma/client'
 
-import { emitLogLevels, handlePrismaLogging } from '@redwoodjs/api/logger'
+import { emitLogLevels, handlePrismaLogging } from '@cedarjs/api/logger'
 
 import { logger } from 'src/lib/logger'
 import { updateSettingsCache } from 'src/lib/settingsCache'

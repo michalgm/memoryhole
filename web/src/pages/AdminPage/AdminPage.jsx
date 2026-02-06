@@ -7,7 +7,7 @@ import {
   Paper,
 } from '@mui/material'
 
-import { routes } from '@redwoodjs/router'
+import { routes } from '@cedarjs/router'
 
 import Link from 'src/components/utils/Link'
 

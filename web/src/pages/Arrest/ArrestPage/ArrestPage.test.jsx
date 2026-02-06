@@ -1,13 +1,13 @@
 import userEvent from '@testing-library/user-event'
 import { ConfirmProvider } from 'material-ui-confirm'
 
-import { navigate } from '@redwoodjs/router'
+import { navigate } from '@cedarjs/router'
 import {
-  mockGraphQLMutation,
-  mockGraphQLQuery,
-  screen,
-  waitFor,
-} from '@redwoodjs/testing/web'
+    mockGraphQLMutation,
+    mockGraphQLQuery,
+    screen,
+    waitFor,
+} from '@cedarjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'

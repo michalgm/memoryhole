@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 
-import { useMutation, useQuery } from '@redwoodjs/web'
+import { useMutation, useQuery } from '@cedarjs/web'
 
 const CREATE_TABLE_VIEW_MUTATION = gql`
   mutation CreateTableViewMutation($input: CreateTableViewInput!) {

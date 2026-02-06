@@ -3,8 +3,8 @@ import { Button, Dialog } from '@mui/material'
 import { Stack } from '@mui/system'
 import { createPortal } from 'react-dom'
 
-import { navigate, routes } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
+import { navigate, routes } from '@cedarjs/router'
+import { useQuery } from '@cedarjs/web'
 
 import DataTable from 'src/components/DataTable/DataTable'
 import HasRoleAccess from 'src/components/utils/HasRoleAccess'

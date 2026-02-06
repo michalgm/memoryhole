@@ -1,4 +1,4 @@
-import { UserInputError } from '@redwoodjs/graphql-server'
+import { UserInputError } from '@cedarjs/graphql-server'
 
 import { db } from 'src/lib/db'
 import * as Definitions from 'src/lib/fieldDefinitions'
@@ -54,25 +54,15 @@ const getOptionSetUsages = (optionSetName) => {
 
 export const optionSets = () => {
   return db.optionSet.findMany({
-    orderBy: {
-      name: 'asc',
-    },
-    include: {
-      values: {
-        orderBy: { order: 'asc' },
-      },
-    },
+    orderBy: { name: 'asc' },
+    include: { values: { orderBy: { order: 'asc' } } },
   })
 }
 
 export const optionSet = ({ id }) => {
   return db.optionSet.findUnique({
     where: { id },
-    include: {
-      values: {
-        orderBy: { order: 'asc' },
-      },
-    },
+    include: { values: { orderBy: { order: 'asc' } } },
   })
 }
 
@@ -137,10 +127,7 @@ export const updateOptionSetValues = async ({ id, input: { values = [] } }) => {
             // where: { custom_fields: { path: ['key'], equals: 'value' } }
             // Note: usage.path is array ['key']
             const where = {
-              [usage.col]: {
-                path: usage.path,
-                equals: valueToCheck,
-              },
+              [usage.col]: { path: usage.path, equals: valueToCheck },
             }
             count = await db[usage.model].count({ where })
           } else {
@@ -163,11 +150,7 @@ export const updateOptionSetValues = async ({ id, input: { values = [] } }) => {
     // Delete values explicitly marked for deletion
     const idsToDelete = values.filter((v) => v.deleted && v.id).map((v) => v.id)
     if (idsToDelete.length > 0) {
-      await db.optionSetValue.deleteMany({
-        where: {
-          id: { in: idsToDelete },
-        },
-      })
+      await db.optionSetValue.deleteMany({ where: { id: { in: idsToDelete } } })
     }
 
     // Update or create values (skip deleted ones)
@@ -192,11 +175,7 @@ export const updateOptionSetValues = async ({ id, input: { values = [] } }) => {
     // Fetch and return the complete option set with values
     const updatedOptionSet = await db.optionSet.findUnique({
       where: { id },
-      include: {
-        values: {
-          orderBy: { order: 'asc' },
-        },
-      },
+      include: { values: { orderBy: { order: 'asc' } } },
     })
 
     return updatedOptionSet

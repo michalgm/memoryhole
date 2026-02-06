@@ -6,8 +6,8 @@ import { Stack } from '@mui/system'
 import { useConfirm } from 'material-ui-confirm'
 import { createPortal } from 'react-dom'
 
-import { navigate, routes } from '@redwoodjs/router'
-import { useMutation, useQuery } from '@redwoodjs/web'
+import { navigate, routes } from '@cedarjs/router'
+import { useMutation, useQuery } from '@cedarjs/web'
 
 import { useAuth } from 'src/auth'
 import DataTable from 'src/components/DataTable/DataTable'

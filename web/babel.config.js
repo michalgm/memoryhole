@@ -11,7 +11,9 @@ const plugins = [
     },
   ],
   'babel-plugin-transform-vite-meta-env',
-  '@babel/plugin-proposal-class-properties',
+  ['@babel/plugin-proposal-class-properties', { loose: true }],
+  ['@babel/plugin-proposal-private-methods', { loose: true }],
+  ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
   'babel-plugin-graphql-tag',
 ]
 

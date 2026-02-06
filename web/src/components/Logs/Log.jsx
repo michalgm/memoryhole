@@ -20,7 +20,7 @@ import {
   Typography,
 } from '@mui/material'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@cedarjs/router'
 
 import LogsForm from 'src/components/Logs/LogsForm'
 import RichTextInput from 'src/components/utils/RichTextInput'
