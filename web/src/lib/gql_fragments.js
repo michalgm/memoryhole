@@ -31,6 +31,7 @@ registerFragment(gql`
     end_date
     jurisdiction
     city
+    location
     arrests_count
     logs_count
   }
@@ -96,6 +97,7 @@ registerFragment(gql`
     time
     notes
     needs_followup
+    contact
     arrests {
       id
       arrestee {

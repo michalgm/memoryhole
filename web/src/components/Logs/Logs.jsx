@@ -84,6 +84,12 @@ const processQuery = (values) => {
       ...(values.before_date && { lte: values.before_date }),
     }
   }
+  if (values.contact) {
+    where.contact = {
+      contains: values.contact,
+      mode: 'insensitive',
+    }
+  }
   if (queries.length) {
     where.AND = queries
   }
