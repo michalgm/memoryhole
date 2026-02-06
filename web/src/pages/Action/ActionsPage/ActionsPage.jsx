@@ -1,5 +1,5 @@
-import { routes } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
+import { routes } from '@cedarjs/router'
+import { useQuery } from '@cedarjs/web'
 
 import DataTable from 'src/components/DataTable/DataTable'
 import Link from 'src/components/utils/Link'

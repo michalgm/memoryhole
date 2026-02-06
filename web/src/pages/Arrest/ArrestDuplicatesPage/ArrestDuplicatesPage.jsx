@@ -15,8 +15,8 @@ import {
 } from '@mui/material'
 import { Box, Stack } from '@mui/system'
 
-import { navigate, routes } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
+import { navigate, routes } from '@cedarjs/router'
+import { useQuery } from '@cedarjs/web'
 
 import DataTable from 'src/components/DataTable/DataTable'
 import { BaseField } from 'src/components/utils/BaseField'

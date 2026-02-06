@@ -3,7 +3,7 @@
 
 import { PrismaClient } from '@prisma/client'
 
-import { emitLogLevels, handlePrismaLogging } from '@redwoodjs/api/logger'
+import { emitLogLevels, handlePrismaLogging } from '@cedarjs/api/logger'
 
 import { applyExtensions } from 'src/lib/db_extensions'
 

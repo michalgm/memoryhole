@@ -1,9 +1,9 @@
-import { Link, routes } from '@redwoodjs/router'
+import { Link, routes } from '@cedarjs/router'
 import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
 
 import { QUERY } from 'src/components/CustomSchema/CustomSchemataCell'
-import { toast } from '@redwoodjs/web/toast'
-import { useMutation } from '@redwoodjs/web'
+import { toast } from '@cedarjs/web/toast'
+import { useMutation } from '@cedarjs/web'
 
 const DELETE_CUSTOM_SCHEMA_MUTATION = gql`
   mutation DeleteCustomSchemaMutation($id: Int!) {

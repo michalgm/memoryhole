@@ -1,7 +1,7 @@
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
-import { render, screen, waitFor } from '@redwoodjs/testing/web'
+import { render, screen, waitFor } from '@cedarjs/testing/web'
 
 import AppProvider from 'src/lib/AppContext'
 

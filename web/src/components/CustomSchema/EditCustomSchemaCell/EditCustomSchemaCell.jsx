@@ -1,8 +1,8 @@
-import { navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@cedarjs/router'
 
 import CustomSchemaForm from 'src/components/CustomSchema/CustomSchemaForm'
-import { toast } from '@redwoodjs/web/toast'
-import { useMutation } from '@redwoodjs/web'
+import { toast } from '@cedarjs/web/toast'
+import { useMutation } from '@cedarjs/web'
 
 export const QUERY = gql`
   query EditCustomSchemaById($id: Int!) {

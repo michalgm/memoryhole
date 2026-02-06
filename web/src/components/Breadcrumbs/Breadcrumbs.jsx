@@ -10,8 +10,8 @@ import {
   useParams,
   useRouteName,
   useRoutePaths,
-} from '@redwoodjs/router'
-import { Metadata } from '@redwoodjs/web'
+} from '@cedarjs/router'
+import { Metadata } from '@cedarjs/web'
 
 import Link from 'src/components/utils/Link'
 import { useApp } from 'src/lib/AppContext'

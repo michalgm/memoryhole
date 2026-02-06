@@ -1,6 +1,6 @@
 # MemoryHole
 
-MemoryHole is a database application for tracking arrestees arrested at political actions. It is built using the [RedwoodJS framework](https://redwoodjs.com/)
+MemoryHole is a database application for tracking arrestees arrested at political actions. It is built using the [CedarJS framework](https://cedarjs.com/)
 
 ## Dev Setup
 
@@ -28,12 +28,12 @@ Note - the dev setup is not secure and should not be used with actual arrestee d
    - install nodejs dependencies
 4. `cp .env.dev .env`
 5. edit .env and replace `SEED_USER_NAME`, `SEED_USER_PASSWORD`, and `SEED_USER_EMAIL` with actual values
-6. `echo SESSION_SECRET=$(yarn rw g secret --raw) >> .env`
-7. `yarn rw prisma migrate dev`
+6. `echo SESSION_SECRET=$(yarn cedar g secret --raw) >> .env`
+7. `yarn cedar prisma migrate dev`
    - initializes the database
-8. `yarn rw prisma db seed`
+8. `yarn cedar prisma db seed`
    - seed the db with the user/password set in the .env file
-9. `yarn rw dev`
+9. `yarn cedar dev`
 
 The app will start on `http://localhost:8910/`, and you can log in using the email and password you set in `.env`
 
@@ -43,8 +43,8 @@ make sure you have a `deploy.toml` file in the root directory with info about th
 
 Deployments will deploy the code from github in the `main` brach, so make sure to push and commit your changes
 
-- to deploy to staging, run `yarn rw deploy baremetal staging`
-- to deploy to production, run `yarn rw deploy baremetal production`
+- to deploy to staging, run `yarn cedar deploy baremetal staging`
+- to deploy to production, run `yarn cedar deploy baremetal production`
 
 ### managing deploys
 

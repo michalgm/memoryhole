@@ -1,7 +1,7 @@
 import { get, startCase } from 'lodash'
 
-import { validate, validateWithSync } from '@redwoodjs/api'
-import { ForbiddenError } from '@redwoodjs/graphql-server'
+import { validate, validateWithSync } from '@cedarjs/api'
+import { ForbiddenError } from '@cedarjs/graphql-server'
 
 import { db } from 'src/lib/db'
 import { checkAccess, filterAccess, prepareJsonUpdate } from 'src/lib/utils'

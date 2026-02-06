@@ -1,6 +1,6 @@
 import { isPlainObject, startCase } from 'lodash'
 
-import { ForbiddenError, ValidationError } from '@redwoodjs/graphql-server'
+import { ForbiddenError, ValidationError } from '@cedarjs/graphql-server'
 
 import { ROLE_LEVELS } from 'src/config'
 import dayjs from 'src/lib/dayjs'

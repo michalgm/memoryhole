@@ -12,8 +12,8 @@ import {
 } from '@mui/material'
 import { Stack } from '@mui/system'
 
-import { navigate, routes, useLocation } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
+import { navigate, routes, useLocation } from '@cedarjs/router'
+import { useQuery } from '@cedarjs/web'
 
 import CollabEditor from 'src/components/CollabEditor/CollabEditor'
 import Loading from 'src/components/Loading/Loading'

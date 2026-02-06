@@ -5,8 +5,8 @@ import {
   validateUniqueness,
   validateWith,
   validateWithSync,
-} from '@redwoodjs/api'
-import { hashPassword } from '@redwoodjs/auth-dbauth-api'
+} from '@cedarjs/api'
+import { hashPassword } from '@cedarjs/auth-dbauth-api'
 
 import { ROLE_LEVELS } from 'src/config'
 import { passwordValidation } from 'src/functions/auth'

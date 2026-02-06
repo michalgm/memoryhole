@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 
-import { Link, routes } from '@redwoodjs/router'
+import { Link, routes } from '@cedarjs/router'
 
 import NavBarControls from 'src/layouts/MainLayout/NavBarControls'
 import { useApp } from 'src/lib/AppContext'

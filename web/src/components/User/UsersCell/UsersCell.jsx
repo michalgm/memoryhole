@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { routes } from '@redwoodjs/router'
+import { routes } from '@cedarjs/router'
 
 import DataTable from 'src/components/DataTable/DataTable'
 import BulkUpdateModal from 'src/components/utils/BulkUpdateModal'

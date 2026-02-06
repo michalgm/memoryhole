@@ -33,14 +33,8 @@ jest.mock('src/lib/utils', () => ({
   checkUserRole: jest.fn(() => true),
 }))
 
-jest.mock('@redwoodjs/graphql-server', () => ({
-  context: {
-    currentUser: {
-      id: 1,
-      name: 'Test User',
-      roles: ['Admin'],
-    },
-  },
+jest.mock('@cedarjs/graphql-server', () => ({
+  context: { currentUser: { id: 1, name: 'Test User', roles: ['Admin'] } },
 }))
 
 describe('documents', () => {
@@ -51,7 +45,7 @@ describe('documents', () => {
     jest.clearAllMocks()
 
     // Reset context mock
-    const { context } = require('@redwoodjs/graphql-server')
+    const { context } = require('@cedarjs/graphql-server')
     context.currentUser = {
       id: 1,
       name: 'Test User',

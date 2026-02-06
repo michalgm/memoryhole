@@ -2,7 +2,7 @@ import { Add } from '@mui/icons-material'
 import { Box, Button, Stack, Tooltip } from '@mui/material'
 import { startCase } from 'lodash-es'
 
-import { navigate, routes, useRouteName } from '@redwoodjs/router'
+import { navigate, routes, useRouteName } from '@cedarjs/router'
 
 import Breadcrumbs from 'src/components/Breadcrumbs/Breadcrumbs'
 import ShortcutIndicator from 'src/components/utils/ShortcutIndicator'

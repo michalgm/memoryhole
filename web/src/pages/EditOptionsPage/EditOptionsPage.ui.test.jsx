@@ -28,8 +28,8 @@ const optionSetMocks = [
   },
 ]
 // Mock GraphQL queries
-// jest.mock('@redwoodjs/web', () => {
-//   const actual = jest.requireActual('@redwoodjs/web')
+// jest.mock('@cedarjs/web', () => {
+//   const actual = jest.requireActual('@cedarjs/web')
 //   return {
 //     ...actual,
 //     useQuery: jest.fn(() => ({

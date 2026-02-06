@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@cedarjs/router'
 
 import { useApp } from 'src/lib/AppContext'
 import { displayItemProps } from 'src/lib/utils'
