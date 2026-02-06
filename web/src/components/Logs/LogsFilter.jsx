@@ -1,24 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import {
-    AccountBoxOutlined,
-    FilterList,
-    FilterListOff,
-    Flag,
-    Person,
-    Search,
-    Subject,
+  AccountBoxOutlined,
+  FilterList,
+  FilterListOff,
+  Flag,
+  Person,
+  Search,
+  Subject,
 } from '@mui/icons-material'
 import {
-    Box,
-    Chip,
-    Collapse,
-    Grid2,
-    InputAdornment,
-    Stack,
-    ToggleButton,
-    ToggleButtonGroup,
-    Tooltip,
+  Box,
+  Chip,
+  Collapse,
+  Grid2,
+  InputAdornment,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
 } from '@mui/material'
 import { get } from 'lodash-es'
 import { FormContainer, useFormContext } from 'react-hook-form-mui'
@@ -146,6 +146,7 @@ const LogsFilter = ({
     ['action', { field_type: 'action_chooser' }],
     ['arrests', { field_type: 'arrest_chooser', multiple: true }],
     ['users', { field_type: 'user_chooser', multiple: true }],
+    ['contact', {}],
   ]
 
   const action = context.watch('action') || {}
