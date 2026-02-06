@@ -149,6 +149,15 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
               </Box>
               <Row>
                 <Field name="time" {...schema.time} />
+                <Show when={!isSummary}>
+                  <Field
+                    name="contact"
+                    {...schema.contact}
+                    highlightDirty
+                    width="50%"
+                    sx={{ width: '20px' }}
+                  />
+                </Show>
               </Row>
               <Row>
                 <Field name="type" {...schema.type} highlightDirty />
@@ -210,6 +219,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
                   Link Current Arrest
                 </Button>
               </Row>
+
               <Stack direction="row" spacing={2} justifyContent={'flex-end'}>
                 <Button disabled={disabled} onClick={() => callback()}>
                   Cancel

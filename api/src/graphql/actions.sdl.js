@@ -11,6 +11,7 @@ export const schema = gql`
     Arrest: [Arrest]!
     arrests_count: Int
     logs_count: Int
+    location: String
   }
 
   type Query {
@@ -27,6 +28,7 @@ export const schema = gql`
     jurisdiction: String
     city: String
     custom_fields: JSON
+    location: String
   }
 
   input UpdateActionInput {
@@ -37,6 +39,7 @@ export const schema = gql`
     jurisdiction: String
     city: String
     custom_fields: JSON
+    location: String
   }
 
   type Mutation {

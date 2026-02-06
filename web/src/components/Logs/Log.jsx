@@ -87,6 +87,9 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
                 </span>
               </Show>
             </Stack>
+            <Show when={item.contact}>
+              <Box>Contact: {item.contact}</Box>
+            </Show>
             <Show when={isSummary}>
               <Stack
                 direction="row"
