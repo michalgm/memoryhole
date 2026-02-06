@@ -1,6 +1,6 @@
 import { onError } from '@apollo/client/link/error'
 
-import { navigate } from '@redwoodjs/router'
+import { navigate } from '@cedarjs/router'
 
 import { globalDisplayError } from 'src/components/utils/SnackBar'
 const INVALID_AUTH_HEADER_ERROR =

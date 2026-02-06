@@ -1,7 +1,7 @@
 import { db } from 'api/src/lib/db'
 
 // import { hashPassword } from 'api/src/lib/auth'
-import { hashPassword } from '@redwoodjs/auth-dbauth-api'
+import { hashPassword } from '@cedarjs/auth-dbauth-api'
 
 export default async () => {
   try {
@@ -38,11 +38,7 @@ export default async () => {
       data.map(async ({ password, ...data }) => {
         const [hashedPassword, salt] = await hashPassword(password)
         const _record = await db.user.create({
-          data: {
-            ...data,
-            hashedPassword,
-            salt,
-          },
+          data: { ...data, hashedPassword, salt },
         })
       })
     )
@@ -51,7 +47,7 @@ export default async () => {
     // and associated `salt` to their record. Here's how to create them using
     // the same algorithm that dbAuth uses internally:
     //
-    //   import { hashPassword } from '@redwoodjs/auth-dbauth-api'
+    //   import { hashPassword } from '@cedarjs/auth-dbauth-api'
     //
     //   const users = [
     //     { name: 'john', email: 'john@example.com', password: 'secret1' },

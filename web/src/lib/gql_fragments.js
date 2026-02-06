@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-import { registerFragment } from '@redwoodjs/web/apollo'
+import { registerFragment } from '@cedarjs/web/apollo'
 
 registerFragment(gql`
   fragment UserFields on User {

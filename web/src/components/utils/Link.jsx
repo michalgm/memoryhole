@@ -1,6 +1,6 @@
 import { Link as MUILink } from '@mui/material'
 
-import { Link as RouterLink } from '@redwoodjs/router'
+import { Link as RouterLink } from '@cedarjs/router'
 
 const Link = ({ to, ...rest }) => {
   if (!to && rest.href) {

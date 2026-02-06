@@ -1,4 +1,4 @@
-import { getDirectiveName, mockRedwoodDirective } from '@redwoodjs/testing/api'
+import { getDirectiveName, mockRedwoodDirective } from '@cedarjs/testing/api'
 
 import requireAuth from './requireAuth'
 

@@ -16,7 +16,7 @@ import { Stack } from '@mui/system'
 import { get, isEqual, isObject } from 'lodash-es'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
-import { Link, routes, useParams } from '@redwoodjs/router'
+import { Link, routes, useParams } from '@cedarjs/router'
 
 import CompositeIcon from 'src/components/utils/CompositeIcon'
 import { Field } from 'src/components/utils/Field'

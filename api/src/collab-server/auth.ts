@@ -1,6 +1,6 @@
 import { Extension, onAuthenticatePayload } from '@hocuspocus/server'
 
-import { decryptSession, UserType } from '@redwoodjs/auth-dbauth-api'
+import { decryptSession, UserType } from '@cedarjs/auth-dbauth-api'
 
 import { getCurrentUser } from 'src/lib/auth.js'
 import { db } from 'src/lib/db.js'

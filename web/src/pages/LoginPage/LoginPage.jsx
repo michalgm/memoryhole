@@ -4,8 +4,8 @@ import { Key } from '@mui/icons-material'
 import { Box, Container, Paper, Stack, Typography } from '@mui/material'
 import { FormContainer, TextFieldElement } from 'react-hook-form-mui'
 
-import { navigate, routes, useLocation } from '@redwoodjs/router'
-import { Metadata } from '@redwoodjs/web'
+import { navigate, routes, useLocation } from '@cedarjs/router'
+import { Metadata } from '@cedarjs/web'
 
 import { useAuth } from 'src/auth'
 import Link from 'src/components/utils/Link'

@@ -6,7 +6,7 @@ import {
   NumberField,
   Submit,
   TextField,
-} from '@redwoodjs/forms'
+} from '@cedarjs/forms'
 
 const TableViewForm = (props) => {
   const onSubmit = (data) => {

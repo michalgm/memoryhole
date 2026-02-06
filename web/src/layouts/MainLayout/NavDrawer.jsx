@@ -33,7 +33,7 @@ import {
 import { useConfirm } from 'material-ui-confirm'
 import AccountBoxMultipleOutline from 'mdi-material-ui/AccountBoxMultipleOutline'
 
-import { Link, routes, useMatch } from '@redwoodjs/router'
+import { Link, routes, useMatch } from '@cedarjs/router'
 
 import { useAuth } from 'src/auth'
 import HasRoleAccess from 'src/components/utils/HasRoleAccess'

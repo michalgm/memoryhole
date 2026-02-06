@@ -1,7 +1,7 @@
 import { Grid2 } from '@mui/material'
 import { Stack } from '@mui/system'
 
-import { gql } from '@redwoodjs/web'
+import { gql } from '@cedarjs/web'
 
 import { useAuth } from 'src/auth'
 import { BaseForm } from 'src/components/utils/BaseForm'

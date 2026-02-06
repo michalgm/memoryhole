@@ -6,7 +6,7 @@ import { Box, Button, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form-mui'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { navigate, routes, useLocation } from '@redwoodjs/router'
+import { navigate, routes, useLocation } from '@cedarjs/router'
 
 import LogsFilter from 'src/components/Logs/LogsFilter'
 import LogsForm from 'src/components/Logs/LogsForm'

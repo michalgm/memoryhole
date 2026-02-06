@@ -1,4 +1,4 @@
-import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
+import { AuthenticationError, ForbiddenError } from '@cedarjs/graphql-server'
 
 import { validateUserExpiration } from 'src/functions/auth'
 import { checkUserRole } from 'src/lib/utils'
@@ -51,10 +51,7 @@ export const getCurrentUser = async (session) => {
   })
   const roles = validateUserExpiration(user) ? [role] : ['Restricted']
 
-  return {
-    ...user,
-    roles,
-  }
+  return { ...user, roles }
 }
 
 /**

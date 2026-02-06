@@ -1,4 +1,4 @@
-import { expect, renderHook, useAuth, waitFor } from '@redwoodjs/testing/web'
+import { renderHook, useAuth, waitFor } from '@cedarjs/testing/web'
 // Define your own mock data here:
 export const standard = (/* vars, { ctx, req } */) => ({
   currentUser: { email: 'foo@bar.com', name: 'Mr. FDoo', roles: 'Operator' },

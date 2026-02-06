@@ -7,7 +7,7 @@ import {
   Submit,
   TextAreaField,
   TextField,
-} from '@redwoodjs/forms'
+} from '@cedarjs/forms'
 
 const CustomSchemaForm = (props) => {
   const onSubmit = (data) => {
