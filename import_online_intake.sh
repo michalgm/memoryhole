@@ -50,7 +50,7 @@ cd /var/www/memoryhole/current || exit
 
 for file in $(ls -p $IMPORT_DIR | grep -v /); do
   echo "importing ${file}"
-  if yarn rw exec process_intake "${IMPORT_DIR}/${file}"; then
+  if yarn cedar exec process_intake "${IMPORT_DIR}/${file}"; then
     mv "${IMPORT_DIR}/${file}" "${IMPORTED_DIR}/${file}"
   else
     echo "import failed - moving file to ${ERROR_DIR}"
