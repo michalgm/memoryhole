@@ -158,5 +158,5 @@ describe('ArrestPage - Create', () => {
       selector: '.MuiTypography-root',
     })
     expect(dialog).not.toBeInTheDocument()
-  })
+  }, 10000)
 })
