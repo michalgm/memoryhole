@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.25.0](https://github.com/michalgm/memoryhole/compare/v0.24.4...v0.25.0) (2026-02-10)
+
+### Features
+
+* **apollo:** integrate removeTypenameFromVariables in Apollo Link chain ([a182038](https://github.com/michalgm/memoryhole/commit/a18203869458ba8bc5a50bf7a89840ebf696b4ed))
+* **logs:** enhance action label to include city and location details ([8691e1a](https://github.com/michalgm/memoryhole/commit/8691e1a28fe34330d0db24182da3ac1c9050a853))
+* **logs:** enhance search functionality to include contact, arrest, and action fields ([41d9995](https://github.com/michalgm/memoryhole/commit/41d9995cec2543e5124d4c3d18dbba7b62208c1f))
+* **optionSets:** implement validation for deleting and renaming option values in use ([43b46c3](https://github.com/michalgm/memoryhole/commit/43b46c3617789bb33298723afe3964b97a41985a))
+* **schema:** add location and contact fields to Action and Log models ([67d8505](https://github.com/michalgm/memoryhole/commit/67d85058ae49438f9b36ed51f8e86af98c1398d8))
+* **UI:** Move field options into the database and add a UI to allow editing of option values ([b9639aa](https://github.com/michalgm/memoryhole/commit/b9639aa62db8f9fb53a8c533822101a84ef9d0fb))
+* **vite:** add test configuration for jsdom environment ([f439fae](https://github.com/michalgm/memoryhole/commit/f439fae8aea1a659c518ff5024fb1a58ca6d6052))
+
+### Bug Fixes
+
+* add injured_during_arrest field  court_date_tbd to process_intake ([afd0ded](https://github.com/michalgm/memoryhole/commit/afd0dedfda6b984103525c8dcfec23cd8f1bbf01))
+* **dependencies:** update brace-expansion, node types, typescript-eslint, minimatch, pino, and undici versions ([870467c](https://github.com/michalgm/memoryhole/commit/870467cbc5b43a0e67a9ae1bb940d253dc96e413))
+* **dependencies:** update prosemirror-view to version 1.41.6 and axios to version 1.13.5 ([a2126b9](https://github.com/michalgm/memoryhole/commit/a2126b9d77ba9b4de591decf06767c994a6ef2b0))
+* **import:** update command to use cedar for processing intake files ([7e8b7a9](https://github.com/michalgm/memoryhole/commit/7e8b7a996b6f51d09ee9ef2d1de9a20077c692ae))
+* **tests:** increase timeout for ArrestPage create tests ([5de98ed](https://github.com/michalgm/memoryhole/commit/5de98ed77a5b4bfb7caca45510fdaee6588543f8))
+* update directory path in database setup instructions ([509ad7e](https://github.com/michalgm/memoryhole/commit/509ad7e191df3c6d187483c8c93a9c0d4af00b75))
+* update LogsFilter to use optionSet for log type ([9140d10](https://github.com/michalgm/memoryhole/commit/9140d1078e3cfea1cb812ba20e1cd0a46751197b))
+
 ## [0.24.4](https://github.com/michalgm/memoryhole/compare/v0.24.3...v0.24.4) (2025-11-10)
 
 ### Bug Fixes
