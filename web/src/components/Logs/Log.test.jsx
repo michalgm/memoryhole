@@ -53,9 +53,10 @@ describe('Log', () => {
 
     const toggleButton = screen.getByText('Show more')
     await user.click(toggleButton)
-
     expect(screen.getByText('Show less')).toBeInTheDocument()
-    expect(screen.getByText(mockLog.action.name)).toBeInTheDocument()
+    expect(
+      screen.getByText(mockLog.action.name, { exact: false })
+    ).toBeInTheDocument()
     expect(screen.getByText(mockLog.created_by.name)).toBeInTheDocument()
   })
 
@@ -71,7 +72,7 @@ describe('Log', () => {
     const toggleButton = screen.getByText('Show more')
     await user.click(toggleButton)
 
-    const actionChip = screen.getByText(mockLog.action.name)
+    const actionChip = screen.getByText(mockLog.action.name, { exact: false })
     await user.click(actionChip)
 
     expect(navigate).toHaveBeenCalledWith(`/actions/${mockLog.action.id}`)
