@@ -151,7 +151,15 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
                         size="small"
                         variant="outlined"
                         icon={<Flag />}
-                        label={item?.action?.name}
+                        label={[
+                          item?.action?.name,
+                          item?.action?.start_date &&
+                            `${dayjs(item.action.start_date).tz().format('MM/DD/YY, LT')}`,
+                          item?.action?.city,
+                          item?.action?.location,
+                        ]
+                          .filter(Boolean)
+                          .join(' - ')}
                         onClick={() => {
                           navigate(routes.action({ id: item.action.id }))
                         }}

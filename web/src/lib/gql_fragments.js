@@ -110,6 +110,8 @@ registerFragment(gql`
     action {
       id
       name
+      city
+      location
       start_date
     }
     shift
