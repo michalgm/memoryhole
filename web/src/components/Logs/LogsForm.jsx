@@ -109,6 +109,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
         }) => {
           const disabled = isLoading
           const isSummary = watch('type') === 'Shift Summary'
+          const isNote = watch('type') === 'Note'
 
           const enableArrestLink =
             id &&
@@ -149,7 +150,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
               </Box>
               <Row>
                 <Field name="time" {...schema.time} />
-                <Show when={!isSummary}>
+                <Show when={!isSummary && !isNote}>
                   <Field
                     name="contact"
                     {...schema.contact}

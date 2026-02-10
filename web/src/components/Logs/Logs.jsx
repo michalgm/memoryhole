@@ -31,10 +31,40 @@ const processQuery = (values) => {
   const where = {}
   const queries = []
   if (values.searchString) {
-    where.notes = {
-      contains: values.searchString,
-      mode: 'insensitive',
-    }
+    where.OR = [
+      {
+        notes: {
+          contains: values.searchString,
+          mode: 'insensitive',
+        },
+      },
+      {
+        contact: {
+          contains: values.searchString,
+          mode: 'insensitive',
+        },
+      },
+      {
+        action: {
+          name: {
+            contains: values.searchString,
+            mode: 'insensitive',
+          },
+        },
+      },
+      {
+        arrests: {
+          some: {
+            arrestee: {
+              display_field: {
+                contains: values.searchString,
+                mode: 'insensitive',
+              },
+            },
+          },
+        },
+      },
+    ]
   }
   if (values.action) {
     where.action = {

@@ -10,7 +10,7 @@ import {
   Subject,
 } from '@mui/icons-material'
 import {
-  Box,
+  Button,
   Chip,
   Collapse,
   Grid2,
@@ -318,7 +318,10 @@ const LogsFilter = ({
               ))}
             </Grid2>
           </Collapse>
-          <Box sx={{ textAlign: 'right' }}>
+          <Stack direction="row" justifyContent={'flex-end'} spacing={1}>
+            <Button size="small" onClick={() => context.reset()} sx={{ ml: 1 }}>
+              Clear Filters
+            </Button>
             <LoadingButton
               size="small"
               variant="outlined"
@@ -328,7 +331,7 @@ const LogsFilter = ({
             >
               Filter Logs
             </LoadingButton>
-          </Box>
+          </Stack>
         </Stack>
       </FormSection>
     </FormContainer>
