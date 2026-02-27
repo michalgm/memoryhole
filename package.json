@@ -6,11 +6,11 @@
     "web"
   ],
   "devDependencies": {
-    "@cedarjs/cli-data-migrate": "2.5.1",
-    "@cedarjs/cli-storybook-vite": "2.5.1",
-    "@cedarjs/core": "2.5.1",
-    "@cedarjs/project-config": "2.5.1",
-    "@cedarjs/realtime": "2.5.1",
+    "@cedarjs/cli-data-migrate": "2.6.0",
+    "@cedarjs/cli-storybook-vite": "2.6.0",
+    "@cedarjs/core": "2.6.0",
+    "@cedarjs/project-config": "2.6.0",
+    "@cedarjs/realtime": "2.6.0",
     "@cedarjs/studio": "^2.0.1",
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript": "^4.1.6",
