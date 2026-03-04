@@ -3,6 +3,7 @@
 import { Prisma } from 'src/lib/db'
 // import { logger } from 'src/lib/logger'
 import { updateSettingsCache } from 'src/lib/settingsCache'
+
 // import { filterArrestAccess } from 'src/services/arrests/arrests'
 // import { filterLogAccess } from 'src/services/logs/logs'
 
