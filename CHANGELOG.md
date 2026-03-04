@@ -39,6 +39,12 @@
 
 - add GitHub Actions workflow for publishing Docker images ([760f230](https://github.com/michalgm/memoryhole/commit/760f230352d61241e75f2d8241b62ed897f25ced))
 
+## [0.25.2](https://github.com/michalgm/memoryhole/compare/v0.25.1...v0.25.2) (2026-03-04)
+
+### Features
+
+- add GitHub Actions workflow for publishing Docker images ([413cb50](https://github.com/michalgm/memoryhole/commit/413cb50fdbfa409df05ffb673afb71b7a9c25ce2))
+
 ## [0.25.1](https://github.com/michalgm/memoryhole/compare/v0.25.0...v0.25.1) (2026-03-04)
 
 ### Features
