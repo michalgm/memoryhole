@@ -154,7 +154,7 @@ CMD "node_modules/.bin/rw-web-server" "--api-proxy-target" "$API_PROXY_TARGET"
 FROM caddy:latest AS caddy_serve
 
 COPY --from=web_build /home/node/app/web/dist /var/www/html
-COPY ./Caddyfile /etc/caddy/Caddyfile
+COPY ./deployment/Caddyfile /etc/caddy/Caddyfile
 
 # migrate
 # -------
