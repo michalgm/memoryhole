@@ -1,0 +1,32 @@
+# Build-from-source override. Use instead of pre-built images:
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml build migrate
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d
+
+services:
+  migrate:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile
+      target: migrate
+    image: null
+
+  api:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile
+      target: api_serve
+    image: null
+
+  web:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile
+      target: caddy_serve
+    image: null
+
+  console:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile
+      target: console
+    image: null
