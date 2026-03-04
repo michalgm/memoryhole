@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.26.1](https://github.com/michalgm/memoryhole/compare/v0.26.0...v0.26.1) (2026-03-04)
+
+### Features
+
+* add default formatter for Caddyfile in VSCode settings ([4042302](https://github.com/michalgm/memoryhole/commit/404230219a39ef9469323afb8be3104b24580c5f))
+* add Dockerfile for multi-stage builds and production setup ([2c37777](https://github.com/michalgm/memoryhole/commit/2c37777e8940e62a0c93fd937749d72c44c9ffbf))
+
 ## [0.26.0](https://github.com/michalgm/memoryhole/compare/v0.25.0...v0.26.0) (2026-03-04)
 
 ### Features
