@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.26.0](https://github.com/michalgm/memoryhole/compare/v0.25.0...v0.26.0) (2026-03-04)
+
+### Features
+
+* add GitHub Actions workflow for publishing Docker images ([760f230](https://github.com/michalgm/memoryhole/commit/760f230352d61241e75f2d8241b62ed897f25ced))
+
 ## [0.25.0](https://github.com/michalgm/memoryhole/compare/v0.24.4...v0.25.0) (2026-02-10)
 
 ### Features
