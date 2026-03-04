@@ -25,7 +25,11 @@ tryouts/
 deploy.toml
 deployment/nginx.conf
 deployment/linode.txt
+deployment/config.txt
+linode-token
 coverage
 
 # Million Lint
 .million
+
+postgres

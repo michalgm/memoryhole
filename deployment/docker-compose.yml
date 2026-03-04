@@ -26,10 +26,7 @@ services:
       - protonmail:/root
 
   migrate:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile
-      target: migrate
+    image: ghcr.io/michalgm/memoryhole-migrate:${IMAGE_TAG:-latest}
     env_file:
       - .env
     environment:
@@ -40,10 +37,7 @@ services:
     restart: "no"
 
   api:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile
-      target: api_serve
+    image: ghcr.io/michalgm/memoryhole-api:${IMAGE_TAG:-latest}
     env_file:
       - .env
     ports:
@@ -59,10 +53,7 @@ services:
       - TEST_DATABASE_URL=postgresql://$PG_USER:$PG_PASS@db:5432/memoryhole_test
 
   web:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile
-      target: caddy_serve
+    image: ghcr.io/michalgm/memoryhole-web:${IMAGE_TAG:-latest}
     ports:
       - '80:80'
       - '443:443'
@@ -76,11 +67,8 @@ services:
     stop_grace_period: 5s
 
   console:
+    image: ghcr.io/michalgm/memoryhole-api:${IMAGE_TAG:-latest}
     user: root
-    build:
-      context: ../
-      dockerfile: ./Dockerfile
-      target: console
     tmpfs:
       - /tmp
     command: 'true'
