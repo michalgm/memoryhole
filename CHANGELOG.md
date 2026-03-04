@@ -1,32 +1,10 @@
 # Changelog
 
-## [0.25.4](https://github.com/michalgm/memoryhole/compare/v0.25.3...v0.25.4) (2026-03-05)
-
-### Bug Fixes
-
-* update Prisma import path to use '@prisma/client' ([55ff362](https://github.com/michalgm/memoryhole/commit/55ff362f6e1c4c3779f9cac3a2f79cd16f8d8f60))
-
-## [0.25.3](https://github.com/michalgm/memoryhole/compare/v0.25.2...v0.25.3) (2026-03-04)
+## [0.26.0](https://github.com/michalgm/memoryhole/compare/v0.25.0...v0.26.0) (2026-03-04)
 
 ### Features
 
-* add scripts directory to Dockerfile ([de48bb8](https://github.com/michalgm/memoryhole/commit/de48bb8060a90b0c07614bdd30cc9b172a1fa81f))
-
-## [0.25.2](https://github.com/michalgm/memoryhole/compare/v0.25.1...v0.25.2) (2026-03-04)
-
-### Features
-
-* add GitHub Actions workflow for publishing Docker images ([413cb50](https://github.com/michalgm/memoryhole/commit/413cb50fdbfa409df05ffb673afb71b7a9c25ce2))
-
-## [0.25.1](https://github.com/michalgm/memoryhole/compare/v0.25.0...v0.25.1) (2026-03-04)
-
-### Features
-
-* update docker-compose configuration for build-from-source and add new services ([37b44ab](https://github.com/michalgm/memoryhole/commit/37b44abb79aee4b849dd05f04cafbf26fee42021))
-
-### Bug Fixes
-
-* update Caddyfile path for deployment ([7c9ebc3](https://github.com/michalgm/memoryhole/commit/7c9ebc33807d322d46ee1fa601895216c0669c60))
+* add GitHub Actions workflow for publishing Docker images ([760f230](https://github.com/michalgm/memoryhole/commit/760f230352d61241e75f2d8241b62ed897f25ced))
 
 ## [0.25.0](https://github.com/michalgm/memoryhole/compare/v0.24.4...v0.25.0) (2026-02-10)
 
