@@ -1,0 +1,27 @@
+{$DOMAIN} {
+	root * /var/www/html
+
+	encode gzip
+
+	# WebSocket upgrade for /collab
+	handle /collab* {
+		reverse_proxy api:1234 {
+			header_up Upgrade {http.request.header.Upgrade}
+			header_up Connection {http.request.header.Connection}
+			header_up Host {host}
+			header_up Cookie {http.request.header.Cookie}
+		}
+	}
+
+	# Redwood functions proxy
+	handle_path /.redwood/functions/* {
+		reverse_proxy api:8911
+	}
+
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
+
+	log
+}
