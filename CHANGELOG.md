@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.25.1](https://github.com/michalgm/memoryhole/compare/v0.25.0...v0.25.1) (2026-03-04)
+
+### Features
+
+* update docker-compose configuration for build-from-source and add new services ([37b44ab](https://github.com/michalgm/memoryhole/commit/37b44abb79aee4b849dd05f04cafbf26fee42021))
+
+### Bug Fixes
+
+* update Caddyfile path for deployment ([7c9ebc3](https://github.com/michalgm/memoryhole/commit/7c9ebc33807d322d46ee1fa601895216c0669c60))
+
 ## [0.25.0](https://github.com/michalgm/memoryhole/compare/v0.24.4...v0.25.0) (2026-02-10)
 
 ### Features
