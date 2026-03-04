@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.26.2](https://github.com/michalgm/memoryhole/compare/v0.26.1...v0.26.2) (2026-03-04)
+
+### Features
+
+* add GraphQL configuration file ([bcf26ef](https://github.com/michalgm/memoryhole/commit/bcf26ef6db6adb75a646da44707bf5f26f269131))
+
 ## [0.26.1](https://github.com/michalgm/memoryhole/compare/v0.26.0...v0.26.1) (2026-03-04)
 
 ### Features
