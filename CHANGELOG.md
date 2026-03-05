@@ -20,6 +20,8 @@
 - update scripts to ESM format ([f664517](https://github.com/michalgm/memoryhole/commit/f6645177afb5bd84da7e4ce4ef644524cbbf1414))
 - update transformIgnorePatterns to include [@tiptap](https://github.com/tiptap) and uuid ([84a0f3a](https://github.com/michalgm/memoryhole/commit/84a0f3ad4a2c21d90f62b5269f0cdf836fbc023e))
 
+## [0.27.2](https://github.com/michalgm/memoryhole/compare/v0.27.1...v0.27.2) (2026-03-05)
+
 ## [0.27.1](https://github.com/michalgm/memoryhole/compare/v0.27.0...v0.27.1) (2026-03-05)
 
 ### Bug Fixes
