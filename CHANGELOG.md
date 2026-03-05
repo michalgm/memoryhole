@@ -39,6 +39,12 @@
 
 - add GitHub Actions workflow for publishing Docker images ([760f230](https://github.com/michalgm/memoryhole/commit/760f230352d61241e75f2d8241b62ed897f25ced))
 
+## [0.25.4](https://github.com/michalgm/memoryhole/compare/v0.25.3...v0.25.4) (2026-03-05)
+
+### Bug Fixes
+
+- update Prisma import path to use '@prisma/client' ([55ff362](https://github.com/michalgm/memoryhole/commit/55ff362f6e1c4c3779f9cac3a2f79cd16f8d8f60))
+
 ## [0.25.3](https://github.com/michalgm/memoryhole/compare/v0.25.2...v0.25.3) (2026-03-04)
 
 ### Features
