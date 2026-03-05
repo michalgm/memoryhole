@@ -106,19 +106,17 @@ COPY --chown=node:node .env.defaults .env.defaults
 COPY --chown=node:node --from=api_build /home/node/app/api/dist /home/node/app/api/dist
 COPY --chown=node:node --from=api_build /home/node/app/api/db /home/node/app/api/db
 COPY --chown=node:node --from=api_build /home/node/app/node_modules/.prisma /home/node/app/node_modules/.prisma
+COPY --chown=node:node --from=api_build /home/node/app/api/prisma.config.cjs /home/node/app/api/prisma.config.cjs
+COPY --chown=node:node --from=api_build /home/node/app/node_modules/prisma /home/node/app/node_modules/prisma
+COPY --chown=node:node --from=api_build /home/node/app/node_modules/.bin/prisma /home/node/app/node_modules/.bin/prisma
 
 COPY --chown=node:node --from=web_build /home/node/app/web/dist /home/node/app/web/dist
 
 ENV NODE_ENV=production
 
-# default api serve command
-# ---------
-# If you are using a custom server file, you must use the following
-# command to launch your server instead of the default api-server below.
-# This is important if you intend to configure GraphQL to use Realtime.
-#
+COPY deployment/docker-entrypoint.sh docker-entrypoint.sh
+ENTRYPOINT ["sh", "docker-entrypoint.sh"]
 CMD [ "./api/dist/server.js" , "serve api"]
-# CMD [ "node_modules/.bin/cedarjs-server", "api" ]
 
 # web serve
 # ---------
@@ -156,12 +154,6 @@ FROM caddy:latest AS caddy_serve
 
 COPY --from=web_build /home/node/app/web/dist /var/www/html
 COPY ./Caddyfile /etc/caddy/Caddyfile
-
-# migrate
-# -------
-FROM api_build AS migrate
-
-CMD ["yarn", "cedar", "prisma", "migrate", "deploy"]
 
 # console
 # -------

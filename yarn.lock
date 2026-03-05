@@ -10520,6 +10520,7 @@ __metadata:
     "@cedarjs/api": "npm:2.6.0"
     "@cedarjs/api-server": "npm:2.6.0"
     "@cedarjs/auth-dbauth-api": "npm:2.6.0"
+    "@cedarjs/core": "npm:2.6.0"
     "@cedarjs/graphql-server": "npm:2.6.0"
     "@hocuspocus/extension-database": "npm:^3.4.4"
     "@hocuspocus/server": "npm:^3.4.4"

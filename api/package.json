@@ -6,6 +6,7 @@
     "@cedarjs/api": "2.6.0",
     "@cedarjs/api-server": "2.6.0",
     "@cedarjs/auth-dbauth-api": "2.6.0",
+    "@cedarjs/core": "2.6.0",
     "@cedarjs/graphql-server": "2.6.0",
     "@hocuspocus/extension-database": "^3.4.4",
     "@hocuspocus/server": "^3.4.4",
