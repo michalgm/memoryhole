@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.27.1](https://github.com/michalgm/memoryhole/compare/v0.27.0...v0.27.1) (2026-03-05)
+
+### Bug Fixes
+
+* update Caddyfile path in Dockerfile for correct serving configuration ([51a3598](https://github.com/michalgm/memoryhole/commit/51a3598c82c4955118adb5ca3d8f72963412e920))
+
 ## [0.27.0](https://github.com/michalgm/memoryhole/compare/v0.25.4...v0.27.0) (2026-03-05)
 
 ### Features
