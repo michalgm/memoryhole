@@ -35,24 +35,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push migrate image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          target: migrate
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/memoryhole-migrate:${{ steps.meta.outputs.tag }}
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/memoryhole-migrate:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Build and push api image
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./deployment/Dockerfile
           target: api_serve
           push: true
           tags: |
@@ -65,7 +52,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./deployment/Dockerfile
           target: caddy_serve
           push: true
           tags: |
