@@ -20,6 +20,13 @@
 - update scripts to ESM format ([f664517](https://github.com/michalgm/memoryhole/commit/f6645177afb5bd84da7e4ce4ef644524cbbf1414))
 - update transformIgnorePatterns to include [@tiptap](https://github.com/tiptap) and uuid ([84a0f3a](https://github.com/michalgm/memoryhole/commit/84a0f3ad4a2c21d90f62b5269f0cdf836fbc023e))
 
+## [0.27.0](https://github.com/michalgm/memoryhole/compare/v0.25.4...v0.27.0) (2026-03-05)
+
+### Features
+
+- add default formatter for Caddyfile in VSCode settings ([47a5c4c](https://github.com/michalgm/memoryhole/commit/47a5c4c5e0ec5fc1e2975911e8e59c48af32ba85))
+- update Dockerfile structure and add entrypoint script for deployment ([d87d518](https://github.com/michalgm/memoryhole/commit/d87d518466cb377dbdad1137dd1f56b0a24a1006))
+
 ## [0.26.0](https://github.com/michalgm/memoryhole/compare/v0.25.4...v0.26.0) (2026-03-05)
 
 ### Features
