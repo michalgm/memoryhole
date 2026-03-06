@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.27.4](https://github.com/michalgm/memoryhole/compare/v0.27.3...v0.27.4) (2026-03-06)
+
+### Bug Fixes
+
+* update CMD in Dockerfile to use node for server execution ([16d8922](https://github.com/michalgm/memoryhole/commit/16d8922e46b8d29bd9b79f00dc023f346e8af60e))
+
 ## [0.27.3](https://github.com/michalgm/memoryhole/compare/v0.27.2...v0.27.3) (2026-03-06)
 
 ## [0.27.2](https://github.com/michalgm/memoryhole/compare/v0.27.1...v0.27.2) (2026-03-05)
