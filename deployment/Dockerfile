@@ -109,8 +109,7 @@ COPY --chown=node:node --from=api_build /home/node/app/node_modules/.prisma /hom
 COPY --chown=node:node --from=api_build /home/node/app/api/prisma.config.cjs /home/node/app/api/prisma.config.cjs
 COPY --chown=node:node --from=api_build /home/node/app/node_modules/prisma /home/node/app/node_modules/prisma
 COPY --chown=node:node --from=api_build /home/node/app/node_modules/.bin/prisma /home/node/app/node_modules/.bin/prisma
-
-COPY --chown=node:node --from=web_build /home/node/app/web/dist /home/node/app/web/dist
+COPY --chown=node:node --from=api_build /home/node/app/scripts /home/node/app/scripts
 
 ENV NODE_ENV=production
 
