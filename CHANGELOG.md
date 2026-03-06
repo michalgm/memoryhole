@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.27.8](https://github.com/michalgm/memoryhole/compare/v0.27.7...v0.27.8) (2026-03-06)
+
+### Bug Fixes
+
+* update seed command in prisma configuration ([23b1760](https://github.com/michalgm/memoryhole/commit/23b1760f67afb0d939aad81a6fcc5f48379cd7d8))
+
 ## [0.27.7](https://github.com/michalgm/memoryhole/compare/v0.27.6...v0.27.7) (2026-03-06)
 
 ## [0.27.6](https://github.com/michalgm/memoryhole/compare/v0.27.5...v0.27.6) (2026-03-06)
