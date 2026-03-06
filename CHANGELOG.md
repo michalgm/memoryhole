@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.27.5](https://github.com/michalgm/memoryhole/compare/v0.27.4...v0.27.5) (2026-03-06)
+
 ## [0.27.4](https://github.com/michalgm/memoryhole/compare/v0.27.3...v0.27.4) (2026-03-06)
 
 ### Bug Fixes
