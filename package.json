@@ -33,7 +33,7 @@
     "tough-cookie": "^5.1.2"
   },
   "scripts": {
-    "release": "git stash && release-it --no-npm.publish && git stash pop",
+    "release": "if git diff-index --quiet HEAD --; then release-it --no-npm.publish ${INCREMENT:+--increment=$INCREMENT}; else git stash && release-it --no-npm.publish ${INCREMENT:+--increment=$INCREMENT} && git stash pop; fi",
     "refresh-mocks": "yarn graphql-codegen"
   }
 }

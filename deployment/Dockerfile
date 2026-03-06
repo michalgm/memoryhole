@@ -103,10 +103,8 @@ COPY --chown=node:node cedar.toml* redwood.toml* ./
 COPY --chown=node:node graphql.config.cjs .
 COPY --chown=node:node .env.defaults .env.defaults
 
-COPY --chown=node:node --from=api_build /home/node/app/api/dist /home/node/app/api/dist
-COPY --chown=node:node --from=api_build /home/node/app/api/db /home/node/app/api/db
+COPY --chown=node:node --from=api_build /home/node/app/api/ /home/node/app/api
 COPY --chown=node:node --from=api_build /home/node/app/node_modules/.prisma /home/node/app/node_modules/.prisma
-COPY --chown=node:node --from=api_build /home/node/app/api/prisma.config.cjs /home/node/app/api/prisma.config.cjs
 COPY --chown=node:node --from=api_build /home/node/app/node_modules/prisma /home/node/app/node_modules/prisma
 COPY --chown=node:node --from=api_build /home/node/app/node_modules/.bin/prisma /home/node/app/node_modules/.bin/prisma
 COPY --chown=node:node --from=api_build /home/node/app/scripts /home/node/app/scripts
