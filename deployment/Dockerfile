@@ -116,7 +116,7 @@ ENV NODE_ENV=production
 
 COPY deployment/docker-entrypoint.sh docker-entrypoint.sh
 ENTRYPOINT ["sh", "docker-entrypoint.sh"]
-CMD [ "./api/dist/server.js" , "serve api"]
+CMD [ "node", "./api/dist/server.js" , "serve api"]
 
 # web serve
 # ---------
