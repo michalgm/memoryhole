@@ -20,6 +20,12 @@
 - update scripts to ESM format ([f664517](https://github.com/michalgm/memoryhole/commit/f6645177afb5bd84da7e4ce4ef644524cbbf1414))
 - update transformIgnorePatterns to include [@tiptap](https://github.com/tiptap) and uuid ([84a0f3a](https://github.com/michalgm/memoryhole/commit/84a0f3ad4a2c21d90f62b5269f0cdf836fbc023e))
 
+## [0.27.6](https://github.com/michalgm/memoryhole/compare/v0.27.5...v0.27.6) (2026-03-06)
+
+### Bug Fixes
+
+- update Dockerfile to copy scripts from api_build instead of web_build ([34e9552](https://github.com/michalgm/memoryhole/commit/34e955222a3f4f3e70331070be3e664cb5c33a95))
+
 ## [0.27.5](https://github.com/michalgm/memoryhole/compare/v0.27.4...v0.27.5) (2026-03-06)
 
 ## [0.27.4](https://github.com/michalgm/memoryhole/compare/v0.27.3...v0.27.4) (2026-03-06)
