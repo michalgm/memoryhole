@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.28.0](https://github.com/michalgm/memoryhole/compare/v0.27.9...v0.28.0) (2026-03-08)
+
+### Features
+
+* implement optionSetByName function and enhance seed logic for options ([c1b4fe2](https://github.com/michalgm/memoryhole/commit/c1b4fe22917a70edd08ea4e1a16722997c856f20))
+
+### Bug Fixes
+
+* add shell execution to release script for proper command execution ([1849948](https://github.com/michalgm/memoryhole/commit/18499489726ea95707b2f8ab68c1e11508dde0c8))
+
 ## [0.27.9](https://github.com/michalgm/memoryhole/compare/v0.27.8...v0.27.9) (2026-03-06)
 
 ### Bug Fixes
