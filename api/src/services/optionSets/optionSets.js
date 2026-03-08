@@ -66,6 +66,13 @@ export const optionSet = ({ id }) => {
   })
 }
 
+export const optionSetByName = ({ name }) => {
+  return db.optionSet.findUnique({
+    where: { name },
+    include: { values: { orderBy: { order: 'asc' } } },
+  })
+}
+
 // export const createOptionSet = ({ input: { values = [], ...input } }) => {
 //   return db.$transaction(async (db) => {
 //     const optionSet = await db.optionSet.create({
