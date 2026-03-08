@@ -1,7 +1,72 @@
 import { db } from 'api/src/lib/db'
+import {
+  optionSetByName,
+  updateOptionSetValues,
+} from 'api/src/services/optionSets/optionSets'
 
-// import { hashPassword } from 'api/src/lib/auth'
 import { hashPassword } from '@cedarjs/auth-dbauth-api'
+
+async function seedOptions(setName) {
+  const envName = `SEED_${setName.toUpperCase()}`
+  // eslint-disable-next-line @cedarjs/process-env-computed
+  const envValue = process.env[envName] // dynamic key — dot notation not possible here
+  if (!envValue) {
+    console.error(
+      `No ${envName} environment variable found, skipping seeding ${setName}`
+    )
+    return
+  }
+
+  const { id, values } = await optionSetByName({
+    name: setName,
+  })
+  if (values.length !== 0) {
+    console.error(`Option set already has values, skipping seeding ${setName}`)
+    return
+  }
+  const items = envValue.split(',').map((value, index) => {
+    return {
+      value: value.trim(),
+      label: value.trim(),
+      option_set_id: id,
+      order: index + 1,
+    }
+  })
+
+  updateOptionSetValues({
+    id,
+    input: {
+      values: items,
+    },
+  })
+}
+
+async function seedUsers() {
+  const users = [
+    {
+      email: process.env.SEED_USER_EMAIL,
+      role: 'Admin',
+      password: process.env.SEED_USER_PASSWORD,
+      name: process.env.SEED_USER_NAME,
+    },
+  ]
+  const currentUsers = await db.user.findMany()
+  if (currentUsers.length > 0) {
+    console.warn('Users already exist in the database, skipping seeding users.')
+    return
+  }
+
+  // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
+  // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
+  await Promise.all(
+    users.map(async ({ password, ...data }) => {
+      const [hashedPassword, salt] = await hashPassword(password)
+      const _record = await db.user.create({
+        data: { ...data, hashedPassword, salt },
+      })
+    })
+  )
+}
 
 export default async () => {
   try {
@@ -9,62 +74,9 @@ export default async () => {
     // Manually seed via `yarn rw prisma db seed`
     // Seeds automatically with `yarn rw prisma migrate dev` and `yarn rw prisma migrate reset`
     //
-    // Update "const data = []" to match your data model and seeding needs
-    //
-    const data = [
-      // To try this example data with the UserExample model in schema.prisma,
-      // uncomment the lines below and run 'yarn rw prisma migrate dev'
-      //
-      {
-        email: process.env.SEED_USER_EMAIL,
-        role: 'Admin',
-        password: process.env.SEED_USER_PASSWORD,
-        name: process.env.SEED_USER_NAME,
-      },
-      // { name: 'mark', email: 'mark@example.com' },
-      // { name: 'jackie', email: 'jackie@example.com' },
-      // { name: 'bob', email: 'bob@example.com' },
-    ]
-    console.log(
-      "\nUsing the default './scripts/seed.{js,ts}' template\nEdit the file to add seed data\n"
-    )
-
-    // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
-    // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
-    await Promise.all(
-      //
-      // Change to match your data model and seeding needs
-      //
-      data.map(async ({ password, ...data }) => {
-        const [hashedPassword, salt] = await hashPassword(password)
-        const _record = await db.user.create({
-          data: { ...data, hashedPassword, salt },
-        })
-      })
-    )
-
-    // If using dbAuth and seeding users, you'll need to add a `hashedPassword`
-    // and associated `salt` to their record. Here's how to create them using
-    // the same algorithm that dbAuth uses internally:
-    //
-    //   import { hashPassword } from '@cedarjs/auth-dbauth-api'
-    //
-    //   const users = [
-    //     { name: 'john', email: 'john@example.com', password: 'secret1' },
-    //     { name: 'jane', email: 'jane@example.com', password: 'secret2' }
-    //   ]
-    //
-    //   for (const user of users) {
-    //     const [hashedPassword, salt] = hashPassword(user.password)
-    //     await db.user.create({
-    //       data: {
-    //         name: user.name,
-    //         email: user.email,
-    //         hashedPassword,
-    //         salt
-    //       }
-    //     })
-    //   }
+    await seedUsers()
+    await seedOptions('jurisdictions')
+    await seedOptions('cities')
   } catch (error) {
     console.warn('Please define your seed data.')
     console.error(error)
