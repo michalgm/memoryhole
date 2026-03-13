@@ -117,22 +117,3 @@
           APT::Periodic::Unattended-Upgrade "1";
         mode: '0644'
       when: auto_updates_enabled | default(true)
-
-    # ==========================================================================
-    # SUMMARY
-    # ==========================================================================
-
-    - name: Display setup summary
-      debug:
-        msg:
-          - '=========================================='
-          - 'Server Initialization Complete'
-          - '=========================================='
-          - 'Admin User: {{ linux_username }}'
-          - 'Timezone: UTC'
-          - ''
-          - 'NEXT STEPS:'
-          - '1. Test SSH login: ssh {{ linux_username }}@{{ ansible_host }}'
-          - '2. Run encryption setup: ansible-playbook -i inventory.yml 02-setup-fde.yml'
-          - '3. Run security hardening: ansible-playbook -i inventory.yml 03-security-hardening.yml'
-          - '=========================================='

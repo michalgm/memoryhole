@@ -352,9 +352,6 @@
              cryptsetup luksOpen {{ encrypted_volume_device }} {{ encrypted_volume_name }}
              mount /dev/mapper/{{ encrypted_volume_name }} {{ encrypted_volume_mount }}
           {% endif %}
-
-          NEXT STEPS:
-          Run security hardening: ansible-playbook -i inventory.yml 03-security-hardening.yml
           ==========================================
 
     - name: Save encryption info to file
