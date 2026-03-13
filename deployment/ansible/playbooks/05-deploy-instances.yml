@@ -110,13 +110,14 @@
         enabled: yes
         state: started
 
-    - name: Configure Docker log rotation
+    - name: Configure Docker daemon
       copy:
         dest: /etc/docker/daemon.json
         content: |
           {
             "log-driver": "json-file",
-            "log-opts": { "max-size": "10m", "max-file": "3" }
+            "log-opts": { "max-size": "10m", "max-file": "3" },
+            "dns": ["127.0.0.53"]
           }
         mode: '0644'
       notify: restart docker
