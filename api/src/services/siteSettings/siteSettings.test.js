@@ -1,17 +1,21 @@
+import { decrypt, isEncrypted } from 'src/lib/crypto'
+import { db } from 'src/lib/db'
+
 import {
+  bulkUpsertSiteSetting,
   createSiteSetting,
   deleteSiteSetting,
+  ENCRYPTED_SETTING_SENTINEL,
+  sendTestEmail,
   siteSetting,
   siteSettings,
   updateSiteSetting,
   upsertSiteSetting,
 } from './siteSettings'
 
-// Generated boilerplate tests do not account for all circumstances
-// and can fail without adjustments, e.g. Float.
-//           Please refer to the RedwoodJS Testing Docs:
-//       https://redwoodjs.com/docs/testing#testing-services
-// https://redwoodjs.com/docs/testing#jest-expect-type-considerations
+jest.mock('src/lib/email', () => ({
+  sendEmail: jest.fn().mockResolvedValue({}),
+}))
 
 describe('siteSettings', () => {
   scenario('returns all siteSettings', async (scenario) => {
@@ -86,5 +90,108 @@ describe('siteSettings', () => {
     const result = await siteSetting({ id: original.id })
 
     expect(result).toEqual(null)
+  })
+})
+
+describe('smtp_pass encryption', () => {
+  beforeEach(() => {
+    process.env.SETTINGS_ENCRYPTION_KEY =
+      'a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8'
+    jest.clearAllMocks()
+  })
+
+  scenario('siteSettings returns sentinel for smtp_pass when set', async () => {
+    await db.siteSetting.create({ data: { id: 'smtp_pass', value: 'stored-value' } })
+
+    const result = await siteSettings()
+    const setting = result.find((s) => s.id === 'smtp_pass')
+
+    expect(setting.value).toEqual(ENCRYPTED_SETTING_SENTINEL)
+  })
+
+  scenario(
+    'siteSettings returns empty string for smtp_pass when not set',
+    async () => {
+      const result = await siteSettings()
+      const setting = result.find((s) => s.id === 'smtp_pass')
+
+      expect(setting.value).toEqual('')
+    }
+  )
+
+  scenario(
+    'bulkUpsertSiteSetting encrypts smtp_pass before storing',
+    async () => {
+      mockCurrentUser({ name: 'Rob', id: 1 })
+
+      await bulkUpsertSiteSetting({
+        input: [{ id: 'smtp_pass', value: 'my-secret-password' }],
+      })
+
+      const stored = await db.siteSetting.findUnique({
+        where: { id: 'smtp_pass' },
+      })
+
+      expect(stored.value).not.toEqual('my-secret-password')
+      expect(isEncrypted(stored.value)).toBe(true)
+      expect(decrypt(stored.value)).toEqual('my-secret-password')
+    }
+  )
+
+  scenario(
+    'bulkUpsertSiteSetting skips smtp_pass when value is blank',
+    async () => {
+      mockCurrentUser({ name: 'Rob', id: 1 })
+
+      await bulkUpsertSiteSetting({
+        input: [{ id: 'smtp_pass', value: 'original-password' }],
+      })
+      const before = await db.siteSetting.findUnique({
+        where: { id: 'smtp_pass' },
+      })
+
+      await bulkUpsertSiteSetting({
+        input: [{ id: 'smtp_pass', value: '' }],
+      })
+      const after = await db.siteSetting.findUnique({
+        where: { id: 'smtp_pass' },
+      })
+
+      expect(after.value).toEqual(before.value)
+    }
+  )
+
+  scenario(
+    'bulkUpsertSiteSetting skips smtp_pass when value is the sentinel',
+    async () => {
+      mockCurrentUser({ name: 'Rob', id: 1 })
+
+      await bulkUpsertSiteSetting({
+        input: [{ id: 'smtp_pass', value: 'original-password' }],
+      })
+      const before = await db.siteSetting.findUnique({
+        where: { id: 'smtp_pass' },
+      })
+
+      await bulkUpsertSiteSetting({
+        input: [{ id: 'smtp_pass', value: ENCRYPTED_SETTING_SENTINEL }],
+      })
+      const after = await db.siteSetting.findUnique({
+        where: { id: 'smtp_pass' },
+      })
+
+      expect(after.value).toEqual(before.value)
+    }
+  )
+
+  scenario('sendTestEmail calls sendEmail and returns true', async () => {
+    const { sendEmail } = require('src/lib/email')
+
+    const result = await sendTestEmail({ to: 'test@example.com' })
+
+    expect(result).toBe(true)
+    expect(sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ to: 'test@example.com' })
+    )
   })
 })

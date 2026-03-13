@@ -370,6 +370,7 @@ export type Mutation = {
   deleteTableView: TableView;
   deleteUser: User;
   mergeArrests: Arrest;
+  sendTestEmail: Scalars['Boolean']['output'];
   unIgnoreDuplicateArrest: IgnoredDuplicate;
   updateAction: Action;
   /** Update an existing arrest record */
@@ -524,6 +525,11 @@ export type MutationMergeArrestsArgs = {
   id: Scalars['Int']['input'];
   input: UpdateArrestInput;
   merge_id: Scalars['Int']['input'];
+};
+
+
+export type MutationSendTestEmailArgs = {
+  to: Scalars['String']['input'];
 };
 
 
@@ -1353,6 +1359,7 @@ export type DocumentResolvers<ContextType = any, ParentType extends ResolversPar
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   updated_by?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   updated_by_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface FileScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['File'], any> {
@@ -1425,6 +1432,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteTableView?: Resolver<ResolversTypes['TableView'], ParentType, ContextType, RequireFields<MutationDeleteTableViewArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   mergeArrests?: Resolver<ResolversTypes['Arrest'], ParentType, ContextType, RequireFields<MutationMergeArrestsArgs, 'id' | 'input' | 'merge_id'>>;
+  sendTestEmail?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSendTestEmailArgs, 'to'>>;
   unIgnoreDuplicateArrest?: Resolver<ResolversTypes['IgnoredDuplicate'], ParentType, ContextType, RequireFields<MutationUnIgnoreDuplicateArrestArgs, 'arrest1_id' | 'arrest2_id'>>;
   updateAction?: Resolver<ResolversTypes['Action'], ParentType, ContextType, RequireFields<MutationUpdateActionArgs, 'id' | 'input'>>;
   updateArrest?: Resolver<ResolversTypes['Arrest'], ParentType, ContextType, RequireFields<MutationUpdateArrestArgs, 'id' | 'input'>>;
@@ -1444,6 +1452,7 @@ export type OptionSetResolvers<ContextType = any, ParentType extends ResolversPa
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   values?: Resolver<Maybe<Array<Maybe<ResolversTypes['OptionSetValue']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type OptionSetValueResolvers<ContextType = any, ParentType extends ResolversParentTypes['OptionSetValue'] = ResolversParentTypes['OptionSetValue']> = {
@@ -2012,6 +2021,7 @@ export const aMutation = (overrides?: Partial<Mutation>, _relationshipsToOmit: S
         deleteTableView: overrides && overrides.hasOwnProperty('deleteTableView') ? overrides.deleteTableView! : relationshipsToOmit.has('TableView') ? {} as TableView : aTableView({}, relationshipsToOmit),
         deleteUser: overrides && overrides.hasOwnProperty('deleteUser') ? overrides.deleteUser! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
         mergeArrests: overrides && overrides.hasOwnProperty('mergeArrests') ? overrides.mergeArrests! : relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit),
+        sendTestEmail: overrides && overrides.hasOwnProperty('sendTestEmail') ? overrides.sendTestEmail! : faker.datatype.boolean(),
         unIgnoreDuplicateArrest: overrides && overrides.hasOwnProperty('unIgnoreDuplicateArrest') ? overrides.unIgnoreDuplicateArrest! : relationshipsToOmit.has('IgnoredDuplicate') ? {} as IgnoredDuplicate : anIgnoredDuplicate({}, relationshipsToOmit),
         updateAction: overrides && overrides.hasOwnProperty('updateAction') ? overrides.updateAction! : relationshipsToOmit.has('Action') ? {} as Action : anAction({}, relationshipsToOmit),
         updateArrest: overrides && overrides.hasOwnProperty('updateArrest') ? overrides.updateArrest! : relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit),
