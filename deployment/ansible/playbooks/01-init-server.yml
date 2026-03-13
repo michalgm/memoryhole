@@ -28,7 +28,6 @@
         that:
           - linux_username is defined
           - linux_user_ssh_key_file is defined
-          - server_hostname is defined
         fail_msg: 'Required variables not set. Check group_vars/all.yml'
 
   tasks:
@@ -68,24 +67,9 @@
           - lvm2
         state: present
 
-    # ==========================================================================
-    # HOSTNAME AND TIMEZONE
-    # ==========================================================================
-
-    - name: Set hostname
-      hostname:
-        name: '{{ server_hostname }}'
-
-    - name: Update /etc/hosts with hostname
-      lineinfile:
-        path: /etc/hosts
-        regexp: '^127\.0\.1\.1'
-        line: '127.0.1.1 {{ server_hostname }}'
-        state: present
-
-    - name: Set timezone
+    - name: Set timezone to UTC
       timezone:
-        name: '{{ server_timezone }}'
+        name: UTC
 
     # ==========================================================================
     # USER MANAGEMENT
@@ -144,9 +128,8 @@
           - '=========================================='
           - 'Server Initialization Complete'
           - '=========================================='
-          - 'Hostname: {{ server_hostname }}'
           - 'Admin User: {{ linux_username }}'
-          - 'Timezone: {{ server_timezone }}'
+          - 'Timezone: UTC'
           - ''
           - 'NEXT STEPS:'
           - '1. Test SSH login: ssh {{ linux_username }}@{{ ansible_host }}'

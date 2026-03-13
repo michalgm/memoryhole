@@ -61,7 +61,7 @@ Then follow the [Deployment](#2-deployment) section below — skip the inventory
 
 Skip this section if your server already exists.
 
-This creates a new Linode VPS, attaches a volume (to be encrypted), configures a firewall, and generate an `inventory.yml` file automatically. By default, it will provision a $5/month nanode in the eu-central region, and a 20GB volume. Edit 'provision.yml' if you want to change any of these settings.  The playbook will prompt for a Linode API token, which can be created here: https://cloud.linode.com/profile/tokens.
+This creates a new Linode VPS, attaches a volume (to be encrypted), configures a firewall, and generate an `inventory.yml` file automatically. By default, it will provision a $5/month nanode in the eu-central region called 'memoryhole', and a 20GB volume. Edit 'provision.yml' if you want to change any of these settings.  The playbook will prompt for a Linode API token, which can be created here: https://cloud.linode.com/profile/tokens.
 
 ```bash
 cd deployment/ansible
@@ -79,7 +79,6 @@ After it completes, your `inventory.yml` will be populated with the new server's
 ```bash
 cd deployment/ansible
 cp group_vars/all.example.yml group_vars/all.yml
-cp inventory.example.yml inventory.yml
 ```
 
 Edit `group_vars/all.yml`. It only needs the values specific to your deployment — everything else has sensible defaults in `defaults.yml`.
