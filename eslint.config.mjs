@@ -1,7 +1,10 @@
+import eslintConfigPrettier from 'eslint-config-prettier/flat'
+
 import cedarConfig from '@cedarjs/eslint-config'
 
 export default [
   ...(await cedarConfig()),
+  eslintConfigPrettier,
   {
     rules: {
       camelcase: 'off',
