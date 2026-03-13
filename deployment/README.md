@@ -40,7 +40,20 @@ git clone https://github.com/michalgm/memoryhole.git
 cd memoryhole/deployment/ansible
 ```
 
-Use the localhost inventory example in the [Deployment](#2-deployment) section below.
+Instead of `inventory.example.yml`, create `inventory.yml` with this content:
+
+```yaml
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_host: localhost
+      ansible_user: root
+      server_hostname: memoryhole
+      encrypted_volume_device: /dev/sdc  # check with: lsblk
+```
+
+Then follow the [Deployment](#2-deployment) section below — skip the inventory.yml step.
 
 ---
 
@@ -97,7 +110,7 @@ Edit `group_vars/all.yml`. The variables you must set:
 | `seed_user_name` | no | Display name for the initial admin (default: `Admin`) |
 | `seed_jurisdictions` | no | Comma-separated list of jurisdictions to pre-load |
 | `seed_cities` | no | Comma-separated list of cities to pre-load |
-| `image_tag` | no | Pin to a specific release, e.g. `v0.28.0` (default: `latest`) |
+| `image_tag` | no | Pin to a specific memoryhole release, e.g. `v0.28.0` (default: `latest`) |
 | `backup_enabled` | no | Enable nightly database backups (default: `true`) |
 | `backup_retention_days` | no | Days to keep backups (default: `7`) |
 
@@ -110,20 +123,7 @@ instances:
 
 Multiple instances can run on the same server — just add more entries to the list.
 
-Edit `inventory.yml` — set `ansible_host` to your server's IP address.
-
-**If running Ansible on the server itself**, use this inventory instead:
-
-```yaml
-all:
-  hosts:
-    localhost:
-      ansible_connection: local
-      ansible_host: localhost
-      ansible_user: root
-      server_hostname: memoryhole
-      encrypted_volume_device: /dev/sdb  # check with: lsblk
-```
+Edit `inventory.yml` — set `ansible_host` to your server's IP address. (Skip this if you're running Ansible on the server itself — you already created `inventory.yml` above.)
 
 ### Step 2: Run
 
