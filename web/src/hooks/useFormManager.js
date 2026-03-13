@@ -137,7 +137,9 @@ export function useFormManager({
     updateMutation || mockMutation,
     {
       onCompleted: async (result) => {
-        openSnackbar(`${modelType} "${display_name}" updated`)
+        openSnackbar(
+          `${modelType} ${display_name ? `"${display_name}"` : ''} updated`
+        )
         const data = await resetForm(result, formState.isDirty)
         onUpdate && (await onUpdate(data))
       },
@@ -191,7 +193,7 @@ export function useFormManager({
       ...customConfirmOptions
     } = deleteOptions
 
-    onConfirm && onConfirm()
+    onConfirm?.()
     const confirmOptions = {
       title: `Confirm Delete of ${modelType} "${display_name}"`,
       description: `Are you sure you want to delete the ${modelType.toLowerCase()} "${display_name}"?`,
@@ -206,7 +208,7 @@ export function useFormManager({
       await confirm(confirmOptions)
       const params = getDeleteParams?.() || {}
       await deleteEntity({ variables: { id, ...params } })
-    } catch (e) {
+    } catch (_e) {
       // console.log('delete confirmation cancelled')
     }
   }
