@@ -21,6 +21,8 @@ ssh_max_auth_tries: 3
 ssh_client_alive_interval: 300
 ssh_client_alive_count_max: 2
 
+disable_root_login: false
+
 # ==============================================================================
 # FIREWALL (UFW)
 # ==============================================================================

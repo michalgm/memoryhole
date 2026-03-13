@@ -77,11 +77,11 @@
           ╔═══════════════════════════════════════════════════════════════╗
           ║                      ⚠️  WARNING  ⚠️                          ║
           ╠═══════════════════════════════════════════════════════════════╣
-          ║  This playbook will DESTROY ALL DATA on:                     ║
-          ║  {{ encrypted_volume_device }}                               ║
+          ║  This playbook will DESTROY ALL DATA on:                      ║
+          ║  {{ encrypted_volume_device }}                                ║
           ║                                                               ║
-          ║  Press Ctrl+C and then 'A' to abort                          ║
-          ║  Press ENTER to continue (THIS CANNOT BE UNDONE)             ║
+          ║  Press Ctrl+C and then 'A' to abort                           ║
+          ║  Press ENTER to continue (THIS CANNOT BE UNDONE)              ║
           ╚═══════════════════════════════════════════════════════════════╝
       when: is_luks.rc != 0
 
