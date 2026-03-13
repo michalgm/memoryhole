@@ -66,8 +66,8 @@ const EMAIL_SERVER_PRESETS = {
 }
 
 const inferEmailServer = (smtpHost) => {
-  if (!smtpHost || smtpHost.startsWith('protonmail_bridge'))
-    return 'Protonmail Bridge'
+  if (!smtpHost) return 'None'
+  if (smtpHost.startsWith('protonmail-bridge')) return 'Protonmail Bridge'
   if (smtpHost.startsWith('smtp.gmail.com')) return 'Gmail'
   return 'custom_smtp'
 }
@@ -167,7 +167,7 @@ const EmailSettingsSection = ({ formContext }) => {
   const [sending, setSending] = useState(false)
   const localForm = useForm({
     defaultValues: {
-      email_server: 'Protonmail Bridge',
+      email_server: 'None',
       test_email_address: '',
     },
   })
