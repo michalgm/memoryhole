@@ -41,6 +41,12 @@
         - name: End play - Encrypted volume not configured
           meta: end_play
 
+    - name: Check if encrypted volume is already mounted
+      command: mountpoint -q {{ encrypted_volume_mount }}
+      register: _volume_mounted
+      failed_when: false
+      changed_when: false
+
     - name: Verify required encryption variables
       assert:
         that:
@@ -53,6 +59,7 @@
           use_encrypted_volume is true but required encryption variables are missing or have placeholder values.
           Check group_vars/all.yml for: encrypted_volume_device, encrypted_volume_name,
           encrypted_volume_mount, encrypted_volume_passphrase
+      when: _volume_mounted.rc != 0
 
     - name: Check if device exists
       stat:
