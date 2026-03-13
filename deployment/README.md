@@ -78,10 +78,10 @@ After it completes, your `inventory.yml` will be populated with the new server's
 
 ```bash
 cd deployment/ansible
-cp group_vars/all.example.yml group_vars/all.yml
+cp group_vars/all.example.yml group_vars/all/main.yml
 ```
 
-Edit `group_vars/all.yml`. It only needs the values specific to your deployment — everything else has sensible defaults in `defaults.yml`.
+Edit `group_vars/all/main.yml`. It only needs the values specific to your deployment — everything else has sensible defaults in `group_vars/all/defaults.yml`.
 
 **Required**
 
@@ -169,7 +169,7 @@ ansible-playbook -i inventory.yml upgrade-instances.yml -e global_image_tag=v0.2
 
 **SSH access:** The server is configured for key-only root SSH. Password authentication is disabled.
 
-**group_vars/all.yml** is gitignored and stays local. Never commit it — it contains your secrets.
+**group_vars/all/main.yml** is gitignored and stays local. Never commit it — it contains your secrets.
 
 ---
 

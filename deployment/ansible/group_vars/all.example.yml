@@ -1,6 +1,6 @@
 ---
-# Ansible Variables — copy this to group_vars/all.yml and fill in the values below.
-# Everything else has sensible defaults in defaults.yml and rarely needs changing.
+# Ansible Variables — copy this to group_vars/all/main.yml and fill in the values below.
+# Everything else has sensible defaults in group_vars/all/defaults.yml and rarely needs changing.
 
 # Initial admin user — also used for Let's Encrypt cert notifications, fail2ban alerts, and monitoring.
 # Password is prompted interactively when deploy.yml runs.

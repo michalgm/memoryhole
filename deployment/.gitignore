@@ -1,6 +1,6 @@
 # Ansible deployment config (site-specific, contains secrets)
 ansible/inventory*.yml
-ansible/group_vars/all.yml
+ansible/group_vars/all/main.yml
 ansible/*.retry
 ansible/credentials/
 # ansible/
