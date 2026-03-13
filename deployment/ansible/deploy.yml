@@ -22,6 +22,13 @@
   gather_facts: false
   tags: [always]
   tasks:
+    - name: Check if encrypted volume is already mounted
+      command: mountpoint -q {{ encrypted_volume_mount }}
+      register: _volume_mounted
+      failed_when: false
+      changed_when: false
+      when: use_encrypted_volume | default(true)
+
     - name: Prompt for disk encryption passphrase
       pause:
         prompt: |
@@ -38,7 +45,9 @@
           Passphrase
         echo: false
       register: _passphrase_result
-      when: use_encrypted_volume | default(true)
+      when:
+        - use_encrypted_volume | default(true)
+        - _volume_mounted.rc | default(1) != 0
 
     - name: Confirm disk encryption passphrase
       pause:
@@ -47,6 +56,7 @@
       register: _passphrase_confirm
       when:
         - use_encrypted_volume | default(true)
+        - _volume_mounted.rc | default(1) != 0
         - _passphrase_result.user_input | default('') | length > 0
 
     - name: Fail if passphrases do not match
@@ -54,6 +64,7 @@
         msg: "Passphrases do not match. Re-run deploy.yml and try again."
       when:
         - use_encrypted_volume | default(true)
+        - _volume_mounted.rc | default(1) != 0
         - _passphrase_result.user_input | default('') | length > 0
         - _passphrase_result.user_input != _passphrase_confirm.user_input
 
@@ -62,6 +73,7 @@
         encrypted_volume_passphrase: "{{ _passphrase_result.user_input }}"
       when:
         - use_encrypted_volume | default(true)
+        - _volume_mounted.rc | default(1) != 0
         - _passphrase_result.user_input | default('') | length > 0
 
     - name: Prompt for initial admin password
