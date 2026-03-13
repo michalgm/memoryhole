@@ -1,0 +1,87 @@
+---
+# ============================================================================
+# Bare-Metal Caddy Setup
+# ============================================================================
+# Installs Caddy on the host to handle TLS termination and routing for all
+# tenant instances. Run this once before deploying instances.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml 04-setup-caddy.yml
+# ============================================================================
+
+- name: Set up bare-metal Caddy
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Install Caddy apt dependencies
+      apt:
+        name:
+          - debian-keyring
+          - debian-archive-keyring
+          - apt-transport-https
+          - curl
+        state: present
+        update_cache: yes
+
+    - name: Add Caddy GPG key
+      apt_key:
+        url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+        state: present
+
+    - name: Add Caddy apt repository
+      apt_repository:
+        repo: 'deb [trusted=yes] https://apt.fury.io/caddy/ /'
+        state: present
+        filename: caddy
+
+    - name: Install Caddy
+      apt:
+        name: caddy
+        state: present
+        update_cache: yes
+
+    - name: Create Caddy conf.d directory
+      file:
+        path: /etc/caddy/conf.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Deploy global Caddyfile
+      template:
+        src: templates/Caddyfile.global.j2
+        dest: /etc/caddy/Caddyfile
+        owner: root
+        group: root
+        mode: '0644'
+      notify: reload caddy
+
+    - name: Deploy per-instance Caddy configs
+      template:
+        src: templates/Caddyfile.instance.j2
+        dest: '/etc/caddy/conf.d/{{ instance.domain }}.caddy'
+        owner: root
+        group: root
+        mode: '0644'
+      vars:
+        instance_port: '{{ 8080 + ansible_loop.index0 }}'
+      loop: '{{ instances }}'
+      loop_control:
+        loop_var: instance
+        extended: true
+      notify: reload caddy
+
+    - name: Enable and start Caddy
+      systemd:
+        name: caddy
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: reload caddy
+      systemd:
+        name: caddy
+        state: reloaded

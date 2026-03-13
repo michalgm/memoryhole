@@ -1,0 +1,151 @@
+---
+# ============================================================================
+# Instance Deployment Playbook
+# ============================================================================
+# Deploys all instances defined in the `instances` group var.
+# Each instance gets its own directory, compose stack, and systemd service.
+# Re-running is idempotent — existing instances are updated, not recreated.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml 05-deploy-instances.yml
+#
+# To deploy a single instance:
+#   ansible-playbook -i inventory.yml 05-deploy-instances.yml \
+#     -e '{"instances": [{"domain": "example.com", ...}]}'
+#
+# Prerequisites:
+#   - Encrypted volume mounted (02-setup-fde.yml)
+#   - Caddy installed (04-setup-caddy.yml)
+# ============================================================================
+
+- name: Deploy Instances
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    instances_base: '/home/{{ linux_username }}/instances'
+    credentials_dir: '{{ playbook_dir }}/credentials'
+
+  pre_tasks:
+    - name: Verify encrypted volume is mounted
+      stat:
+        path: '{{ encrypted_volume_mount }}'
+      register: volume_check
+      failed_when: not volume_check.stat.exists or not volume_check.stat.isdir
+
+    - name: Verify instances are defined
+      assert:
+        that: instances is defined and instances | length > 0
+        fail_msg: 'No instances defined in group_vars'
+
+    # Generate secrets once per instance and store in credentials/ on the
+    # control machine. On re-runs the same values are returned from the files.
+    - name: Generate or load instance credentials
+      set_fact:
+        instance_credentials: >-
+          {{ instance_credentials | default({}) | combine({
+            instance.domain: {
+              'db_password':       lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/db_password    length=32 chars=ascii_letters,digits'),
+              'session_secret':    lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/session_secret length=64 chars=ascii_letters,digits'),
+              'db_encryption_key':       lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/db_encryption_key       length=32 chars=ascii_letters,digits'),
+              'settings_encryption_key': lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/settings_encryption_key length=64 chars=0123456789abcdef'),
+              'seed_password':           lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/seed_password           length=16 chars=ascii_letters,digits'),
+              'port':      8080 + ansible_loop.index0
+            }
+          }) }}
+      loop: '{{ instances }}'
+      loop_control:
+        loop_var: instance
+        extended: true
+        label: 'Configuring {{ instance.domain }}'
+      no_log: true
+
+  tasks:
+    # ==========================================================================
+    # DOCKER INSTALLATION (idempotent, runs once per host)
+    # ==========================================================================
+
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: yes
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_facts["distribution_release"] }} stable'
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: Add admin user to docker group
+      user:
+        name: '{{ linux_username }}'
+        groups: docker
+        append: yes
+
+    - name: Enable and start Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Configure Docker log rotation
+      copy:
+        dest: /etc/docker/daemon.json
+        content: |
+          {
+            "log-driver": "json-file",
+            "log-opts": { "max-size": "10m", "max-file": "3" }
+          }
+        mode: '0644'
+      notify: restart docker
+
+    - name: Create instances base directory
+      file:
+        path: '{{ instances_base }}'
+        state: directory
+        owner: '{{ linux_username }}'
+        group: '{{ linux_username }}'
+        mode: '0750'
+
+    # ==========================================================================
+    # PER-INSTANCE DEPLOYMENT
+    # ==========================================================================
+
+    - name: Deploy instance
+      include_tasks: tasks/deploy-instance.yml
+      loop: '{{ instances }}'
+      loop_control:
+        loop_var: instance
+        label: 'Deploying {{ instance.domain }}'
+
+  handlers:
+    - name: restart docker
+      systemd:
+        name: docker
+        state: restarted
+
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes

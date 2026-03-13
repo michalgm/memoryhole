@@ -1,0 +1,158 @@
+---
+# ============================================================================
+# Initial Server Setup Playbook
+# ============================================================================
+# This playbook performs the initial configuration of a fresh server:
+# - Creates admin user with sudo access
+# - Sets up SSH key-based authentication
+# - Configures basic security settings
+# - Sets timezone and hostname
+#
+# Usage:
+#   ansible-playbook -i inventory.yml 01-init-server.yml
+#
+# Requirements:
+#   - Root SSH access to target server
+#   - Updated inventory.yml with server details
+#   - Updated group_vars/all.yml with your configuration
+# ============================================================================
+
+- name: Initialize New Server
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify required variables are set
+      assert:
+        that:
+          - linux_username is defined
+          - linux_user_ssh_public_keys is defined
+          - linux_user_ssh_public_keys | length > 0
+          - server_hostname is defined
+        fail_msg: 'Required variables not set. Check group_vars/all.yml'
+
+  tasks:
+    # ==========================================================================
+    # SYSTEM UPDATES
+    # ==========================================================================
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+        autoremove: yes
+        autoclean: yes
+
+    - name: Install essential packages
+      apt:
+        name:
+          - curl
+          - wget
+          - git
+          - vim
+          - tmux
+          - htop
+          - net-tools
+          - build-essential
+          - python3
+          - python3-pip
+          - ufw
+          - fail2ban
+          - unattended-upgrades
+          - apt-listchanges
+          - cryptsetup
+          - lvm2
+        state: present
+
+    # ==========================================================================
+    # HOSTNAME AND TIMEZONE
+    # ==========================================================================
+
+    - name: Set hostname
+      hostname:
+        name: '{{ server_hostname }}'
+
+    - name: Update /etc/hosts with hostname
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.1\.1'
+        line: '127.0.1.1 {{ server_hostname }}'
+        state: present
+
+    - name: Set timezone
+      timezone:
+        name: '{{ server_timezone }}'
+
+    # ==========================================================================
+    # USER MANAGEMENT
+    # ==========================================================================
+
+    - name: Create admin user
+      user:
+        name: '{{ linux_username }}'
+        password: '{{ linux_user_password_hash }}'
+        shell: /bin/bash
+        create_home: yes
+        state: present
+
+    - name: Create .ssh directory for admin user
+      file:
+        path: '/home/{{ linux_username }}/.ssh'
+        state: directory
+        owner: '{{ linux_username }}'
+        group: '{{ linux_username }}'
+        mode: '0700'
+
+    - name: Add SSH public keys for admin user
+      authorized_key:
+        user: '{{ linux_username }}'
+        key: '{{ item }}'
+        state: present
+      loop: '{{ linux_user_ssh_public_keys }}'
+
+    # ==========================================================================
+    # AUTOMATIC UPDATES CONFIGURATION
+    # ==========================================================================
+
+    - name: Configure unattended-upgrades
+      template:
+        src: templates/50unattended-upgrades.j2
+        dest: /etc/apt/apt.conf.d/50unattended-upgrades
+        mode: '0644'
+      when: auto_updates_enabled | default(true)
+
+    - name: Enable automatic updates
+      copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Download-Upgradeable-Packages "1";
+          APT::Periodic::AutocleanInterval "7";
+          APT::Periodic::Unattended-Upgrade "1";
+        mode: '0644'
+      when: auto_updates_enabled | default(true)
+
+    # ==========================================================================
+    # SUMMARY
+    # ==========================================================================
+
+    - name: Display setup summary
+      debug:
+        msg:
+          - '=========================================='
+          - 'Server Initialization Complete'
+          - '=========================================='
+          - 'Hostname: {{ server_hostname }}'
+          - 'Admin User: {{ linux_username }}'
+          - 'Timezone: {{ server_timezone }}'
+          - ''
+          - 'NEXT STEPS:'
+          - '1. Test SSH login: ssh {{ linux_username }}@{{ ansible_host }}'
+          - '2. Run encryption setup: ansible-playbook -i inventory.yml 02-setup-fde.yml'
+          - '3. Run security hardening: ansible-playbook -i inventory.yml 03-security-hardening.yml'
+          - '=========================================='

@@ -1,0 +1,30 @@
+---
+# ============================================================================
+# Memoryhole Full Server Setup
+# ============================================================================
+# Runs all setup steps in order. Individual playbooks can still be run
+# standalone for partial re-runs or targeted changes.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml deploy.yml
+#
+# To run only specific steps, use tags:
+#   ansible-playbook -i inventory.yml deploy.yml --tags init,fde
+#
+# Available tags: init, fde, security, caddy, deploy
+# ============================================================================
+
+- import_playbook: playbooks/01-init-server.yml
+  tags: [init]
+
+- import_playbook: playbooks/02-setup-fde.yml
+  tags: [fde]
+
+- import_playbook: playbooks/03-security-hardening.yml
+  tags: [security]
+
+- import_playbook: playbooks/04-setup-caddy.yml
+  tags: [caddy]
+
+- import_playbook: playbooks/05-deploy-instances.yml
+  tags: [deploy]

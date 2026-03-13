@@ -1,0 +1,286 @@
+---
+# ============================================================================
+# DEPROVISION PLAYBOOK - Delete All Linode Infrastructure
+# ============================================================================
+#
+# This playbook deletes:
+# - Linode instance
+# - Block storage volumes
+#
+# This action CANNOT BE UNDONE. All data will be lost.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml deprovision.yml --extra-vars "confirm_destroy=yes"
+#
+# Prerequisites:
+#   - Linode API token set in LINODE_TOKEN env var
+#   - confirm_destroy=yes must be explicitly passed
+# ============================================================================
+
+- name: DEPROVISION - Delete All Linode Infrastructure
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    linode_label: 'memoryhole-encrypted'
+    volume_label: '{{ linode_label }}-volume'
+
+  pre_tasks:
+    - name: Require explicit confirmation
+      assert:
+        that:
+          - confirm_destroy is defined
+          - confirm_destroy | bool
+        fail_msg: |
+          ⚠️  DESTRUCTION CONFIRMATION REQUIRED ⚠️
+
+          You are about to PERMANENTLY DELETE:
+          - Linode instance
+          - Block storage volumes
+          - All data
+
+          THIS CANNOT BE UNDONE.
+
+          To proceed, run with: --extra-vars "confirm_destroy=yes"
+
+    - name: Final warning - pause for 10 seconds
+      pause:
+        seconds: 10
+        prompt: |
+
+          ╔════════════════════════════════════════════════════════════════╗
+          ║                 ⚠️  LAST WARNING  ⚠️                           ║
+          ╠════════════════════════════════════════════════════════════════╣
+          ║  This playbook will DELETE:                                   ║
+          ║  - Linode instance: {{ linode_label }}                        ║
+          ║  - Block storage volume: {{ volume_label }}                   ║
+          ║  - ALL DATA                                                    ║
+          ║                                                                ║
+          ║  Resuming in 10 seconds... Press Ctrl+C to cancel             ║
+          ║  (pressing Ctrl+C TWICE will abort this playbook)             ║
+          ╚════════════════════════════════════════════════════════════════╝
+
+
+  tasks:
+    - name: Set Linode API token from environment
+      set_fact:
+        linode_api_token: '{{ lookup("env", "LINODE_TOKEN") }}'
+
+    - name: Verify Linode token is available
+      assert:
+        that:
+          - linode_api_token != ''
+        fail_msg: 'LINODE_TOKEN environment variable not set. Export it and try again.'
+
+    # ==========================================================================
+    # DELETE LINODE INSTANCE
+    # ==========================================================================
+
+    - name: Delete Linode instance (memoryhole-encrypted)
+      linode.api.instance:
+        api_token: '{{ linode_api_token }}'
+        label: '{{ linode_label }}'
+        state: absent
+      ignore_errors: yes
+
+    # ==========================================================================
+    # DELETE BLOCK STORAGE VOLUME
+    # ==========================================================================
+
+    - name: Delete block storage volume (memoryhole-encrypted-volume)
+      linode.api.volume:
+        api_token: '{{ linode_api_token }}'
+        label: '{{ volume_label }}'
+        state: absent
+      ignore_errors: yes
+
+    # ==========================================================================
+    # SUMMARY
+    # ==========================================================================
+
+    - name: Display deprovision complete message
+      debug:
+        msg:
+          - ''
+          - '=========================================='
+          - '✓ Deprovision Complete'
+          - '=========================================='
+          - ''
+          - 'The following have been deleted:'
+          - '- Linode instance: {{ linode_label }}'
+          - '- Block storage volume: {{ volume_label }}'
+          - '- All associated data'
+          - ''
+          - 'To provision fresh infrastructure:'
+          - 'Review and run deployment/linode-cli/provision-linode.sh'
+          - ''
+          - '=========================================='
+    - name: Require explicit confirmation
+      assert:
+        that:
+          - confirm_destroy is defined
+          - confirm_destroy | bool
+        fail_msg: |
+          ⚠️  DESTRUTION CONFIRMATION REQUIRED ⚠️
+
+          You are about to PERMANENTLY DELETE:
+          - All data on {{ ansible_host }}
+          - Block storage volumes
+          - Linode instance
+          - DNS records
+
+          THIS CANNOT BE UNDONE.
+
+          To proceed, run with: --extra-vars "confirm_destroy=yes"
+
+    - name: Final warning - pause for 10 seconds
+      pause:
+        seconds: 10
+        prompt: |
+
+          ╔════════════════════════════════════════════════════════════════╗
+          ║                 ⚠️  LAST WARNING  ⚠️                           ║
+          ╠════════════════════════════════════════════════════════════════╣
+          ║  This playbook will DELETE:                                   ║
+          ║  - ALL DATA on this server                                    ║
+          ║  - Block storage volumes                                      ║
+          ║                                                                ║
+          ║  Resuming in 10 seconds... Press Ctrl+C to cancel             ║
+          ║  (pressing Ctrl+C TWICE will abort this playbook)             ║
+          ╚════════════════════════════════════════════════════════════════╝
+
+  tasks:
+    - name: Display what will be deleted
+      debug:
+        msg:
+          - ''
+          - '=========================================='
+          - 'Server Information:'
+          - '=========================================='
+          - 'Label: {{ linode_label }}'
+          - 'IP: {{ ansible_host }}'
+          - 'Encrypted Volume: {{ volume_label }}'
+          - 'Device: {{ encrypted_volume_device }}'
+          - ''
+
+    # ==========================================================================
+    # PREPARE FOR DELETION (Local Tasks)
+    # ==========================================================================
+
+    - name: Block for local Linode CLI operations
+      block:
+        - name: Set fact for Linode token
+          set_fact:
+            linode_token: '{{ lookup("env", "LINODE_TOKEN") }}'
+
+        - name: Verify Linode token is available
+          assert:
+            that:
+              - linode_token != ''
+            fail_msg: 'LINODE_TOKEN environment variable not set. Cannot delete Linode resources.'
+
+        - name: Get Linode instance ID by label
+          shell: |
+            linode-cli linodes list --json | \
+            jq -r ".[] | select(.label == \"{{ linode_label }}\") | .id" | \
+            head -1
+          register: linode_id
+          environment:
+            LINODE_TOKEN: '{{ linode_token }}'
+          delegate_to: localhost
+          become: no
+
+        - name: Display Linode instance ID
+          debug:
+            msg: 'Found Linode instance: {{ linode_id.stdout }}'
+
+        - name: Verify instance found
+          assert:
+            that:
+              - linode_id.stdout != '' and linode_id.stdout != 'null'
+            fail_msg: 'Could not find Linode instance with label "{{ linode_label }}". Check the label and LINODE_TOKEN.'
+
+        - name: Get block storage volume ID by label
+          shell: |
+            linode-cli volumes list --json | \
+            jq -r ".[] | select(.label == \"{{ volume_label }}\") | .id" | \
+            head -1
+          register: volume_id
+          environment:
+            LINODE_TOKEN: '{{ linode_token }}'
+          delegate_to: localhost
+          become: no
+          ignore_errors: yes
+
+        - name: Display block storage volume ID
+          debug:
+            msg: 'Found block storage volume: {{ volume_id.stdout }}'
+
+      rescue:
+        - name: Warn about Linode CLI issues
+          debug:
+            msg:
+              - 'Warning: Could not perform Linode API operations'
+              - 'You may need to manually delete the Linode instance and volumes:'
+              - '- Instance label: {{ linode_label }}'
+              - '- Volume label: {{ volume_label }}'
+              - 'Use the Linode console at https://cloud.linode.com to delete these resources'
+
+    # ==========================================================================
+    # DELETE LINODE RESOURCES
+    # ==========================================================================
+
+    - name: Delete block storage volume via Linode API
+      shell: |
+        linode-cli volumes delete {{ volume_id.stdout }} --no-headers 2>/dev/null && \
+        echo "Volume deleted successfully" || \
+        echo "Volume deletion failed or volume does not exist"
+      environment:
+        LINODE_TOKEN: '{{ linode_token }}'
+      delegate_to: localhost
+      become: no
+      when:
+        - volume_id.stdout is defined
+        - volume_id.stdout != '' and volume_id.stdout != 'null'
+      ignore_errors: yes
+
+    - name: Delete Linode instance via API
+      shell: |
+        linode-cli linodes delete {{ linode_id.stdout }} --no-headers 2>/dev/null && \
+        echo "Instance deleted successfully" || \
+        echo "Instance deletion failed or already deleted"
+      environment:
+        LINODE_TOKEN: '{{ linode_token }}'
+      delegate_to: localhost
+      become: no
+      when:
+        - linode_id.stdout is defined
+        - linode_id.stdout != '' and linode_id.stdout != 'null'
+      ignore_errors: yes
+
+    # ==========================================================================
+    # SUMMARY
+    # ==========================================================================
+
+    - name: Display deprovision complete message
+      debug:
+        msg:
+          - ''
+          - '=========================================='
+          - '✓ Deprovision Complete'
+          - '=========================================='
+          - ''
+          - 'The following have been deleted:'
+          - '- Linode instance: {{ linode_label }}'
+          - '- Block storage volume: {{ volume_label }}'
+          - '- All data on {{ ansible_host }}'
+          - ''
+          - 'To start fresh:'
+          - '1. ansible-playbook -i inventory.yml linode-cli/provision-linode.sh'
+          - '2. Update inventory.yml with new IP'
+          - '3. ansible-playbook -i inventory.yml 01-init-server.yml'
+          - '4. ansible-playbook -i inventory.yml 02-setup-fde.yml'
+          - '5. ansible-playbook -i inventory.yml 03-security-hardening.yml'
+          - '6. ansible-playbook -i inventory.yml 04-deploy-app.yml'
+          - ''
+          - '=========================================='

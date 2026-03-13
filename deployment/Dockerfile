@@ -37,6 +37,7 @@ COPY --chown=node:node api/src/lib/dayjs.js api/src/lib/dayjs.js
 COPY --chown=node:node api/src/config.js api/src/config.js
 COPY --chown=node:node web/src/Routes.* web/src/
 COPY --chown=node:node scripts scripts
+COPY --chown=node:node docs docs
 
 
 

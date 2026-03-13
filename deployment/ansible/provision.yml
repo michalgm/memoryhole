@@ -1,0 +1,215 @@
+---
+- name: Provision Memoryhole Infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    # Force use of the python interpreter that's running ansible-playbook
+    # This ensures dependencies installed in the pipx venv (like linode_api4) are found
+    ansible_python_interpreter: '{{ ansible_playbook_python }}'
+
+    # Defaults (override via -e or environment vars)
+    linode_label: 'memoryhole-encrypted'
+    linode_region: 'eu-central'
+    linode_type: 'g6-nanode-1'
+    linode_image: 'linode/ubuntu24.04'
+    linode_tags: ['memoryhole', 'encrypted', 'production']
+
+    # Volume Configuration
+    volume_label: '{{ linode_label }}-volume'
+    volume_size: 20
+
+    # Firewall Configuration
+    firewall_label: '{{ linode_label }}-firewall'
+    ssh_allowed_ips: ['0.0.0.0/0']
+    ssh_port: 22
+
+    # Authentication
+    ssh_public_key_path: '~/.ssh/id_rsa.pub'
+    root_password: "{{ lookup('env', 'ROOT_PASSWORD') }}"
+
+    # Try environment variable first, then fallback to ~/.config/linode-cli
+    # Finally, try reading from linode-token file in project root if present
+    # We take the first line of linode-token file to avoid newline issues
+    linode_token: "{{ lookup('env', 'LINODE_TOKEN') }}"
+
+    # Alerts (optional)
+    alert_email: "{{ lookup('env', 'ALERT_EMAIL') | default('', true) }}"
+
+  tasks:
+    # -------------------------------------------------------------------------
+    # Prerequisites Checks
+    # -------------------------------------------------------------------------
+    - name: Verify Linode API Token
+      fail:
+        msg: 'LINODE_TOKEN environment variable is required.'
+      when: linode_token == ""
+
+    - name: Check for SSH public key
+      stat:
+        path: '{{ ssh_public_key_path }}'
+      register: ssh_key_check
+
+    - name: Fail if SSH key missing
+      fail:
+        msg: 'SSH public key not found at {{ ssh_public_key_path }}'
+      when: not ssh_key_check.stat.exists
+
+    - name: Ensure ROOT_PASSWORD is set (if creating new instance)
+      fail:
+        msg: 'ROOT_PASSWORD environment variable is required for new instance creation.'
+      when: root_password == ""
+
+    # -------------------------------------------------------------------------
+    # SSH Key Content
+    # -------------------------------------------------------------------------
+    - name: Read SSH public key
+      set_fact:
+        ssh_key_content: "{{ lookup('file', ssh_public_key_path) }}"
+
+    # -------------------------------------------------------------------------
+    # Linode Instance Provisioning
+    # -------------------------------------------------------------------------
+    - name: Create or Get Linode Instance
+      linode.cloud.instance:
+        api_token: '{{ linode_token }}'
+        label: '{{ linode_label }}'
+        type: '{{ linode_type }}'
+        region: '{{ linode_region }}'
+        image: '{{ linode_image }}'
+        root_pass: '{{ root_password }}'
+        authorized_keys: ['{{ ssh_key_content }}']
+        tags: '{{ linode_tags }}'
+        state: present
+        booted: true
+        private_ip: true
+      register: linode_instance
+
+    - name: Wait for Linode to be running
+      linode.cloud.instance:
+        api_token: '{{ linode_token }}'
+        label: '{{ linode_label }}'
+        state: present
+      register: instance_status
+      until: instance_status.instance.status == 'running'
+      retries: 30
+      delay: 10
+
+    - name: Extract Instance Details
+      set_fact:
+        linode_ip: '{{ linode_instance.instance.ipv4[0] }}'
+        linode_id: '{{ linode_instance.instance.id }}'
+
+    - name: Display Instance IP
+      debug:
+        msg: 'Instance running at: {{ linode_ip }}'
+
+    # -------------------------------------------------------------------------
+    # Block Storage Volume
+    # -------------------------------------------------------------------------
+    - name: Create and Attach Volume
+      linode.cloud.volume:
+        api_token: '{{ linode_token }}'
+        label: '{{ volume_label }}'
+        size: '{{ volume_size }}'
+        region: '{{ linode_region }}'
+        linode_id: '{{ linode_id }}'
+        state: present
+        encryption: disabled # We will handle encryption at the OS level
+      register: volume
+      when: volume_size | int > 0
+
+    # -------------------------------------------------------------------------
+    # Cloud Firewall
+    # -------------------------------------------------------------------------
+    - name: Create Firewall
+      linode.cloud.firewall:
+        api_token: '{{ linode_token }}'
+        label: '{{ firewall_label }}'
+        rules:
+          inbound:
+            - label: 'allow-ssh'
+              action: 'ACCEPT'
+              protocol: 'TCP'
+              ports: '{{ ssh_port }}'
+              addresses:
+                ipv4: '{{ ssh_allowed_ips }}'
+            - label: 'allow-http'
+              action: 'ACCEPT'
+              protocol: 'TCP'
+              ports: '80'
+              addresses:
+                ipv4: ['0.0.0.0/0']
+                ipv6: ['::/0']
+            - label: 'allow-https'
+              action: 'ACCEPT'
+              protocol: 'TCP'
+              ports: '443'
+              addresses:
+                ipv4: ['0.0.0.0/0']
+                ipv6: ['::/0']
+          inbound_policy: 'DROP'
+          # outbound:
+          #   - label: 'allow-all-outbound'
+          #     action: 'ACCEPT'
+          #     protocol: 'TCP'
+          #     ports: '1-65535'
+          #     addresses:
+          #       ipv4: ['0.0.0.0/0']
+          #       ipv6: ['::/0']
+          #   - label: 'allow-all-outbound-udp'
+          #     action: 'ACCEPT'
+          #     protocol: 'UDP'
+          #     ports: '1-65535'
+          #     addresses:
+          #       ipv4: ['0.0.0.0/0']
+          #       ipv6: ['::/0']
+          outbound_policy: 'ACCEPT'
+        tags: '{{ linode_tags }}'
+        devices:
+          - id: '{{ linode_id }}'
+        state: present
+      register: firewall
+
+    # -------------------------------------------------------------------------
+    # Output & Next Steps
+    # -------------------------------------------------------------------------
+    - name: Define Volume Facts
+      set_fact:
+        volume_device_path: "{{ volume.volume.filesystem_path if (volume_size | int > 0) else '/dev/sda' }}"
+        volume_note: "{{ 'Encrypted Volume attached.' if (volume_size | int > 0) else 'Using local disk /dev/sda.' }}"
+
+    - name: Generate Inventory File
+      copy:
+        content: |
+          all:
+            children:
+              production:
+                hosts:
+                  {{ linode_label }}:
+                    ansible_host: {{ linode_ip }}
+                    ansible_user: root
+                    ansible_port: 22
+                    server_hostname: {{ linode_label }}.local
+                    encrypted_volume_device: {{ volume_device_path }}
+                    encrypted_volume_name: {{ linode_label }}_data
+                    encrypted_volume_mount: /mnt/{{ linode_label }}_data
+                    postgres_data_path: /mnt/{{ linode_label }}_data/postgresql
+        dest: './inventory.yml'
+
+    - name: Provisioning Summary
+      debug:
+        msg:
+          - '--------------------------------------------------------'
+          - ' PROVISIONING COMPLETE'
+          - '--------------------------------------------------------'
+          - 'Instance: {{ linode_label }} ({{ linode_id }})'
+          - 'IP Address: {{ linode_ip }}'
+          - 'Volume: {{ volume_label }} ({{ volume_device_path }})'
+          - 'Firewall: {{ firewall_label }}'
+          - '--------------------------------------------------------'
+          - 'A generated inventory file has been saved to inventory.yml'
+          - 'To proceed with configuration:'
+          - 'ansible-playbook -i inventory.yml site.yml'
+          - '(or run individual steps from the playbooks/ directory)'
