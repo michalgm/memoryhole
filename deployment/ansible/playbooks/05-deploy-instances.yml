@@ -117,7 +117,7 @@
           {
             "log-driver": "json-file",
             "log-opts": { "max-size": "10m", "max-file": "3" },
-            "dns": ["127.0.0.53"]
+            "dns": ["1.1.1.1"]
           }
         mode: '0644'
       notify: restart docker
