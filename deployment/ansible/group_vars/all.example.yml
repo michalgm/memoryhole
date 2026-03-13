@@ -1,147 +1,49 @@
 ---
-# Ansible Variables Template
-# Copy this to group_vars/all.yml and customize
+# Ansible Variables — copy this to group_vars/all.yml and fill in the values below.
+# Everything else has sensible defaults in defaults.yml and rarely needs changing.
 
-# Email for system notifications
-admin_email: admin@example.com
+# Initial admin user — also used for Let's Encrypt cert notifications, fail2ban alerts, and monitoring.
+# Password is prompted interactively when deploy.yml runs.
+admin_user_email: admin@example.com
+admin_user_name: Admin
 
-# ==============================================================================
-# USER CONFIGURATION
-# ==============================================================================
-
-# Service account for running Docker instances (default is fine for most deployments)
-linux_username: memoryhole
-
-# SSH public key(s) that will be authorized for root login on the server.
-# Run: cat ~/.ssh/id_ed25519.pub  (or id_rsa.pub) to get your key.
-linux_user_ssh_public_keys:
-  - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... user@laptop' # Replace with your public key
+# Path to your SSH public key on the control machine (the machine running Ansible)
+linux_user_ssh_key_file: ~/.ssh/id_ed25519.pub
 
 # ==============================================================================
-# SSH CONFIGURATION
+# DISK ENCRYPTION
 # ==============================================================================
 
-ssh_port: 22
-ssh_allow_password_auth: false # Only allow key-based authentication
-ssh_permit_root_login: 'yes' # Root SSH is kept enabled — Ansible connects as root (key-only)
-ssh_max_auth_tries: 3
-ssh_client_alive_interval: 300
-ssh_client_alive_count_max: 2
-
-# ==============================================================================
-# FIREWALL (UFW) CONFIGURATION
-# ==============================================================================
-
-firewall_allowed_tcp_ports:
-  - '{{ ssh_port }}' # SSH
-  - '80' # HTTP (for Let's Encrypt challenges)
-  - '443' # HTTPS
-
-firewall_allowed_udp_ports: []
-
-firewall_rate_limit_ssh: true # Rate limit SSH connections
-
-# ==============================================================================
-# FAIL2BAN CONFIGURATION
-# ==============================================================================
-
-fail2ban_enabled: true
-fail2ban_bantime: 3600 # 1 hour
-fail2ban_findtime: 600 # 10 minutes
-fail2ban_maxretry: 5
-fail2ban_destemail: '{{ admin_email }}' # Alert email
-fail2ban_sender: fail2ban@{{ server_hostname }}
-
-# ==============================================================================
-# ENCRYPTED VOLUME CONFIGURATION
-# ==============================================================================
-
-# Set to false to skip LUKS encryption entirely (not recommended for production)
+# Set to false to skip LUKS encryption (not recommended for production)
 use_fde: true
 
-# Block device to encrypt. Check available devices with: lsblk
-# On Linode, an attached volume is typically /dev/sdc or /dev/disk/by-id/...
+# Block device to encrypt. Check with: lsblk
 encrypted_volume_device: /dev/sdc
 
-# Where to mount the encrypted volume
-encrypted_volume_mount: /mnt/encrypted
-
-# Passphrase for the encrypted volume.
-# IMPORTANT: Store this in a password manager and an offline backup.
-# There is NO recovery if you lose it. Generate with: openssl rand -base64 32
-encrypted_volume_passphrase: 'CHANGE_ME_GENERATE_STRONG_PASSPHRASE'
-
-# Whether to store passphrase in a keyfile for auto-mount on boot (less secure)
-# Set to false (default) for maximum security — requires manual unlock after reboot
-use_luks_keyfile: false
-
-# Advanced LUKS settings (defaults are fine)
-luks_cipher: aes-xts-plain64
-luks_key_size: 512
-luks_hash: sha512
-luks_iter_time: 5000
-
-# ==============================================================================
-# DOCKER CONFIGURATION
-# ==============================================================================
-
-docker_users:
-  - '{{ linux_username }}'
-
-# ==============================================================================
-# CADDY CONFIGURATION
-# ==============================================================================
-
-# Email for Let's Encrypt certificate notifications
-caddy_acme_email: '{{ admin_email }}'
+# Strong passphrase — store in a password manager and offline backup.
+# There is NO recovery if you lose it. You can leave this unset and enter it
+# interactively when deploy.yml runs instead.
+# encrypted_volume_passphrase: ''
 
 # ==============================================================================
 # INSTANCES
 # ==============================================================================
-# Each entry deploys one isolated Memoryhole stack. Add more entries for
-# additional tenants or environments (staging, prod, etc.).
+# Each entry deploys one isolated Memoryhole stack.
+# Multiple instances can run on the same server — add more entries to the list.
 #
-# Required per instance:
-#   domain     - fully qualified domain name
-#   port       - unique host port for the web container (bare-metal Caddy proxies here)
-#
-# Auto-generated (stored in credentials/<domain>/ on your control machine):
-#   db_password, session_secret, db_encryption_key
-#
-# Optional per instance:
-#   image_tag             - pin to a release (e.g. v0.26.0), defaults to latest
-#   seed_user_name        - display name for initial admin user
-#   seed_user_email       - email for initial admin (leave blank to skip seed)
-#   seed_user_password    - login password for initial admin (set this intentionally)
-#   seed_jurisdictions    - comma-separated list of jurisdictions to seed (optional)
-#   seed_cities           - comma-separated list of cities to seed (optional)
-#   backup_enabled        - default true
-#   backup_retention_days - default 7
+# Per-instance options:
+#   domain              - required: fully qualified domain name
+#   seed_jurisdictions  - comma-separated list of jurisdiction values to pre-load
+#   seed_cities         - comma-separated list of city values to pre-load
+#   image_tag           - pin to a release, e.g. v0.28.0 (default: latest)
+#   backup_enabled      - enable nightly database backups (default: true)
+#   backup_retention_days - days to keep backups (default: 7)
 
 instances:
   - domain: memoryhole.example.com
-    seed_user_name: 'Admin'
-    seed_user_email: 'admin@example.com'
-    seed_user_password: 'CHANGE_ME'
     seed_jurisdictions: 'County Court,Federal Court'
     seed_cities: 'Springfield,Shelbyville'
 
   # Example: staging instance on the same server
   # - domain: staging.example.com
   #   image_tag: main  # track a branch instead of releases
-
-# ==============================================================================
-# SECURITY & MONITORING
-# ==============================================================================
-
-# Automatic security updates
-auto_updates_enabled: true
-auto_updates_reboot: false # Don't auto-reboot (requires manual unlock)
-auto_updates_time: '03:00'
-
-# System monitoring
-enable_monitoring: true
-monitoring_email: '{{ admin_email }}'
-
-# Log retention
-log_retention_days: 30

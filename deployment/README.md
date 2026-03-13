@@ -61,11 +61,10 @@ Then follow the [Deployment](#2-deployment) section below — skip the inventory
 
 Skip this section if your server already exists.
 
-This creates a new Linode VPS, attaches a volume (to be encrypted), and configures a firewall. It requires a Linode API token and generates an `inventory.yml` automatically.
+This creates a new Linode VPS, attaches a volume (to be encrypted), configures a firewall, and generate an `inventory.yml` file automatically. By default, it will provision a $5/month nanode in the eu-central region, and a 20GB volume. Edit 'provision.yml' if you want to change any of these settings.  The playbook will prompt for a Linode API token, which can be created here: https://cloud.linode.com/profile/tokens.
 
 ```bash
 cd deployment/ansible
-export LINODE_TOKEN=your_linode_api_token
 ansible-playbook provision.yml
 ```
 
@@ -83,33 +82,31 @@ cp group_vars/all.example.yml group_vars/all.yml
 cp inventory.example.yml inventory.yml
 ```
 
-Edit `group_vars/all.yml`. The variables you must set:
+Edit `group_vars/all.yml`. It only needs the values specific to your deployment — everything else has sensible defaults in `defaults.yml`.
 
-**General**
-
-| Variable | Description |
-|---|---|
-| `admin_email` | Used for Let's Encrypt cert notifications and fail2ban alerts |
-| `linux_user_ssh_public_keys` | Your SSH public key(s) — run `cat ~/.ssh/id_ed25519.pub` to get it |
-
-**Disk encryption** (skip if `use_fde: false`)
+**Required**
 
 | Variable | Description |
 |---|---|
+| `admin_user_email` | Initial admin account email — also used for Let's Encrypt cert notifications and fail2ban alerts |
+| `admin_user_name` | Initial admin display name (default: `Admin`) |
+| `linux_user_ssh_key_file` | Path to your SSH public key, e.g. `~/.ssh/id_ed25519.pub` |
 | `use_fde` | `true` to encrypt the data volume, `false` to skip |
 | `encrypted_volume_device` | Block device to encrypt, e.g. `/dev/sdc` — check with `lsblk` on the server |
-| `encrypted_volume_passphrase` | Strong passphrase — store in a password manager and offline backup, there is no recovery |
+
+The admin password is prompted interactively when `deploy.yml` runs.
+
+**Disk encryption passphrase**
+
+You can set `encrypted_volume_passphrase` in `all.yml`, or leave it out and enter it interactively when `deploy.yml` runs. Either way, store it offline — there is no recovery without it.
 
 **Instances** — one entry per Memoryhole deployment:
 
 | Variable | Required | Description |
 |---|---|---|
 | `domain` | yes | Fully qualified domain name, e.g. `memoryhole.example.com` |
-| `seed_user_email` | no | Email for the initial admin account (leave blank to skip seeding) |
-| `seed_user_password` | no | Password for the initial admin account |
-| `seed_user_name` | no | Display name for the initial admin (default: `Admin`) |
-| `seed_jurisdictions` | no | Comma-separated list of jurisdictions to pre-load |
-| `seed_cities` | no | Comma-separated list of cities to pre-load |
+| `seed_jurisdictions` | no | Comma-separated list of jurisdictions values to pre-load |
+| `seed_cities` | no | Comma-separated list of city values to pre-load |
 | `image_tag` | no | Pin to a specific memoryhole release, e.g. `v0.28.0` (default: `latest`) |
 | `backup_enabled` | no | Enable nightly database backups (default: `true`) |
 | `backup_retention_days` | no | Days to keep backups (default: `7`) |
@@ -117,8 +114,8 @@ Edit `group_vars/all.yml`. The variables you must set:
 ```yaml
 instances:
   - domain: memoryhole.example.com
-    seed_user_email: admin@example.com
-    seed_user_password: changeme
+    seed_jurisdictions: 'County Court,Federal Court'
+    seed_cities: 'Springfield,Shelbyville'
 ```
 
 Multiple instances can run on the same server — just add more entries to the list.

@@ -94,14 +94,14 @@
   retries: 30
   delay: 5
   until: user_count.rc == 0
-  when: instance.seed_user_email | default('') != ''
+  when: (instance.admin_user_email | default(admin_user_email | default(''))) != ''
 
 - name: Seed database
   shell: >
     docker compose exec -T
-    -e SEED_USER_NAME="{{ instance.seed_user_name | default('Admin') }}"
-    -e SEED_USER_PASSWORD="{{ instance.seed_user_password }}"
-    -e SEED_USER_EMAIL="{{ instance.seed_user_email }}"
+    -e SEED_USER_NAME="{{ instance.admin_user_name | default(admin_user_name | default('Admin')) }}"
+    -e SEED_USER_PASSWORD="{{ instance.admin_user_password | default(admin_user_password | default('')) }}"
+    -e SEED_USER_EMAIL="{{ instance.admin_user_email | default(admin_user_email | default('')) }}"
     -e SEED_JURISDICTIONS="{{ instance.seed_jurisdictions | default('') }}"
     -e SEED_CITIES="{{ instance.seed_cities | default('') }}"
     api node_modules/.bin/cedar prisma db seed

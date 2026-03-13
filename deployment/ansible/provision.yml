@@ -3,6 +3,10 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  vars_prompt:
+    - name: linode_token
+      prompt: "Linode API token (create one at https://cloud.linode.com/profile/tokens)"
+      private: true
 
   vars:
     # Force use of the python interpreter that's running ansible-playbook
@@ -10,7 +14,7 @@
     ansible_python_interpreter: '{{ ansible_playbook_python }}'
 
     # Defaults (override via -e or environment vars)
-    linode_label: 'memoryhole-encrypted'
+    linode_label: 'memoryhole'
     linode_region: 'eu-central'
     linode_type: 'g6-nanode-1'
     linode_image: 'linode/ubuntu24.04'
@@ -27,7 +31,7 @@
 
     # Authentication
     ssh_public_key_path: '~/.ssh/id_rsa.pub'
-    root_password: "{{ lookup('env', 'ROOT_PASSWORD') }}"
+    root_password: "{{ lookup('env', 'ROOT_PASSWORD') | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32'), true) }}"
 
     # Try environment variable first, then fallback to ~/.config/linode-cli
     # Finally, try reading from linode-token file in project root if present
@@ -55,11 +59,6 @@
       fail:
         msg: 'SSH public key not found at {{ ssh_public_key_path }}'
       when: not ssh_key_check.stat.exists
-
-    - name: Ensure ROOT_PASSWORD is set (if creating new instance)
-      fail:
-        msg: 'ROOT_PASSWORD environment variable is required for new instance creation.'
-      when: root_password == ""
 
     # -------------------------------------------------------------------------
     # SSH Key Content
@@ -209,7 +208,9 @@
           - 'Volume: {{ volume_label }} ({{ volume_device_path }})'
           - 'Firewall: {{ firewall_label }}'
           - '--------------------------------------------------------'
+          - 'Root password: {{ root_password }}'
+          - 'Save this — it cannot be recovered after this point.'
+          - '--------------------------------------------------------'
           - 'A generated inventory file has been saved to inventory.yml'
           - 'To proceed with configuration:'
-          - 'ansible-playbook -i inventory.yml site.yml'
-          - '(or run individual steps from the playbooks/ directory)'
+          - 'ansible-playbook -i inventory.yml deploy.yml'
