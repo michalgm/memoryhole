@@ -381,7 +381,7 @@
         content: |
           LUKS Encrypted Volume Information
           ==================================
-          Created: {{ ansible_date_time.iso8601 }}
+          Created: {{ ansible_facts['date_time']['iso8601'] }}
           Device: {{ encrypted_volume_device }}
           Mapper Name: {{ encrypted_volume_name }}
           Mount Point: {{ encrypted_volume_mount }}
