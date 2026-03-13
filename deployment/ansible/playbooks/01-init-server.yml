@@ -27,8 +27,7 @@
       assert:
         that:
           - linux_username is defined
-          - linux_user_ssh_public_keys is defined
-          - linux_user_ssh_public_keys | length > 0
+          - linux_user_ssh_key_file is defined
           - server_hostname is defined
         fail_msg: 'Required variables not set. Check group_vars/all.yml'
 
@@ -107,12 +106,11 @@
         group: '{{ linux_username }}'
         mode: '0700'
 
-    - name: Add SSH public keys for admin user
+    - name: Add SSH public key for admin user
       authorized_key:
         user: '{{ linux_username }}'
-        key: '{{ item }}'
+        key: "{{ lookup('file', linux_user_ssh_key_file) }}"
         state: present
-      loop: '{{ linux_user_ssh_public_keys }}'
 
     # ==========================================================================
     # AUTOMATIC UPDATES CONFIGURATION

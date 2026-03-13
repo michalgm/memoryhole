@@ -1,0 +1,84 @@
+---
+# Default values for all deployments.
+# These are sensible defaults that rarely need changing.
+# Override any of these in group_vars/all.yml if needed.
+
+# ==============================================================================
+# USER CONFIGURATION
+# ==============================================================================
+
+# Service account for running Docker instances
+linux_username: memoryhole
+
+# ==============================================================================
+# SSH CONFIGURATION
+# ==============================================================================
+
+ssh_port: 22
+ssh_allow_password_auth: false
+ssh_permit_root_login: 'yes'  # Intentionally kept enabled — Ansible connects as root (key-only)
+ssh_max_auth_tries: 3
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+
+# ==============================================================================
+# FIREWALL (UFW)
+# ==============================================================================
+
+firewall_allowed_tcp_ports:
+  - '{{ ssh_port }}'
+  - '80'
+  - '443'
+
+firewall_allowed_udp_ports: []
+firewall_rate_limit_ssh: true
+
+# ==============================================================================
+# FAIL2BAN
+# ==============================================================================
+
+fail2ban_enabled: true
+fail2ban_bantime: 3600    # 1 hour
+fail2ban_findtime: 600    # 10 minutes
+fail2ban_maxretry: 5
+fail2ban_destemail: '{{ admin_user_email }}'
+fail2ban_sender: fail2ban@{{ server_hostname }}
+
+# ==============================================================================
+# ENCRYPTED VOLUME
+# ==============================================================================
+
+encrypted_volume_mount: /mnt/encrypted
+use_luks_keyfile: false
+
+# Advanced LUKS settings
+luks_cipher: aes-xts-plain64
+luks_key_size: 512
+luks_hash: sha512
+luks_iter_time: 5000
+
+# ==============================================================================
+# DOCKER
+# ==============================================================================
+
+docker_users:
+  - '{{ linux_username }}'
+
+# ==============================================================================
+# CADDY
+# ==============================================================================
+
+caddy_acme_email: '{{ admin_user_email }}'
+
+# ==============================================================================
+# SECURITY & MONITORING
+# ==============================================================================
+
+auto_updates_enabled: true
+auto_updates_reboot: false
+auto_updates_time: '03:00'
+
+enable_monitoring: true
+monitoring_email: '{{ admin_user_email }}'
+
+log_retention_days: 30

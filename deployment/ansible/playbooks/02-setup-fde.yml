@@ -311,12 +311,11 @@
         create_home: yes
         password_lock: yes # Disable password login
 
-    - name: Set up SSH authorized keys for admin-unlock
+    - name: Set up SSH authorized key for admin-unlock
       authorized_key:
         user: admin-unlock
         state: present
-        key: '{{ item }}'
-      loop: '{{ linux_user_ssh_public_keys }}'
+        key: "{{ lookup('file', linux_user_ssh_key_file) }}"
 
     - name: Allow admin-unlock to run unlock script without password
       copy:
