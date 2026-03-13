@@ -90,20 +90,20 @@
 
     - name: Set admin password fact
       set_fact:
-        admin_user_password: "{{ _admin_password_result.user_input }}"
-      when:
-        - (admin_user_email | default('')) | length > 0
-        - _admin_password_result.user_input | default('') | length > 0
+        admin_user_password: "{{ _admin_password_result.user_input | default('') }}"
+      when: (admin_user_email | default('')) | length > 0
 
-    - name: Validate required admin credentials are set
+    - name: Validate admin_user_email is set
       assert:
-        that:
-          - admin_user_email is defined and admin_user_email | length > 0
-          - admin_user_password is defined and admin_user_password | length > 0
-        fail_msg: |
-          admin_user_email and admin_user_password are required.
-          Set admin_user_email (and optionally admin_user_name) in group_vars/all.yml,
-          then re-run deploy.yml — you will be prompted for the password.
+        that: admin_user_email is defined and admin_user_email | length > 0
+        fail_msg: >-
+          admin_user_email is required. Set it in group_vars/all/main.yml and re-run.
+
+    - name: Validate admin_user_password is set
+      assert:
+        that: admin_user_password is defined and admin_user_password | length > 0
+        fail_msg: >-
+          admin_user_password is required. Re-run deploy.yml and enter a password at the prompt.
 
 - import_playbook: playbooks/01-init-server.yml
   tags: [init]

@@ -298,7 +298,7 @@
 
     - name: Create unlock and restore script
       template:
-        src: ../scripts/unlock_data.sh
+        src: scripts/unlock_data.sh
         dest: /usr/local/bin/unlock_data.sh
         mode: '0755'
 
