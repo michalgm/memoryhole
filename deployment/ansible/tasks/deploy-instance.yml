@@ -1,0 +1,175 @@
+---
+# Per-instance deployment tasks. Called via include_tasks with loop_var: instance.
+# Variables in scope: instance, instance_credentials, instances_base, linux_username,
+#                     encrypted_volume_mount, playbook_dir
+
+- name: Create instance directory
+  file:
+    path: '{{ instances_base }}/{{ instance.domain }}'
+    state: directory
+    owner: '{{ linux_username }}'
+    group: '{{ linux_username }}'
+    mode: '0750'
+
+- name: Create postgres data directory (owned by postgres uid inside container)
+  file:
+    path: '{{ instances_base }}/{{ instance.domain }}/data/postgres'
+    state: directory
+    owner: '999'
+    group: '999'
+    mode: '0700'
+
+- name: Create protonmail data directory
+  file:
+    path: '{{ instances_base }}/{{ instance.domain }}/data/protonmail'
+    state: directory
+    owner: '{{ linux_username }}'
+    group: '{{ linux_username }}'
+    mode: '0750'
+
+# Workaround — remove when https://github.com/shenxn/protonmail-bridge-docker/issues/141 is fixed
+- name: Copy bridge Dockerfile workaround
+  copy:
+    src: Dockerfile.bridge
+    dest: '{{ instances_base }}/{{ instance.domain }}/Dockerfile.bridge'
+    owner: '{{ linux_username }}'
+    group: '{{ linux_username }}'
+    mode: '0640'
+
+- name: Template docker-compose.yml
+  template:
+    src: templates/docker-compose.instance.yml.j2
+    dest: '{{ instances_base }}/{{ instance.domain }}/docker-compose.yml'
+    owner: '{{ linux_username }}'
+    group: '{{ linux_username }}'
+    mode: '0640'
+
+- name: Template .env
+  template:
+    src: templates/env.j2
+    dest: '{{ instances_base }}/{{ instance.domain }}/.env'
+    owner: '{{ linux_username }}'
+    group: '{{ linux_username }}'
+    mode: '0600'
+
+- name: Template .env.db
+  template:
+    src: templates/env.db.j2
+    dest: '{{ instances_base }}/{{ instance.domain }}/.env.db'
+    owner: '{{ linux_username }}'
+    group: '{{ linux_username }}'
+    mode: '0600'
+
+- name: Pull Docker images
+  shell: docker compose pull
+  args:
+    chdir: '{{ instances_base }}/{{ instance.domain }}'
+  become_user: '{{ linux_username }}'
+
+- name: Start instance stack
+  shell: docker compose up -d
+  args:
+    chdir: '{{ instances_base }}/{{ instance.domain }}'
+  become_user: '{{ linux_username }}'
+
+- name: Deploy bridge init script
+  copy:
+    src: scripts/init-bridge.sh
+    dest: /usr/local/bin/init-bridge.sh
+    mode: '0755'
+
+# ------------------------------------------------------------------
+# DATABASE SEED (first deploy only — skipped if users exist)
+# ------------------------------------------------------------------
+
+- name: Wait for migrations and check if any users exist
+  shell: >
+    docker compose exec -T db
+    psql -U memoryhole -d memoryhole -tAc 'SELECT COUNT(*) FROM "User";'
+  args:
+    chdir: '{{ instances_base }}/{{ instance.domain }}'
+  become_user: '{{ linux_username }}'
+  register: user_count
+  changed_when: false
+  retries: 30
+  delay: 5
+  until: user_count.rc == 0
+  when: instance.seed_user_email | default('') != ''
+
+- name: Seed database
+  shell: >
+    docker compose exec -T
+    -e SEED_USER_NAME="{{ instance.seed_user_name | default('Admin') }}"
+    -e SEED_USER_PASSWORD="{{ instance.seed_user_password }}"
+    -e SEED_USER_EMAIL="{{ instance.seed_user_email }}"
+    -e SEED_JURISDICTIONS="{{ instance.seed_jurisdictions | default('') }}"
+    -e SEED_CITIES="{{ instance.seed_cities | default('') }}"
+    api node_modules/.bin/cedar prisma db seed
+  args:
+    chdir: '{{ instances_base }}/{{ instance.domain }}'
+  become_user: '{{ linux_username }}'
+  # no_log: true
+
+# ------------------------------------------------------------------
+# SYSTEMD SERVICE
+# ------------------------------------------------------------------
+
+- name: Create systemd service
+  copy:
+    dest: '/etc/systemd/system/memoryhole-{{ instance.domain | replace(".", "-") }}.service'
+    content: |
+      [Unit]
+      Description=Memoryhole ({{ instance.domain }})
+      Requires=docker.service
+      After=docker.service network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      WorkingDirectory={{ instances_base }}/{{ instance.domain }}
+      ExecStart=/usr/bin/docker compose up -d
+      ExecStop=/usr/bin/docker compose down
+      User={{ linux_username }}
+      Group={{ linux_username }}
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+  notify: reload systemd
+
+- name: Enable instance service
+  systemd:
+    name: 'memoryhole-{{ instance.domain | replace(".", "-") }}'
+    enabled: yes
+    daemon_reload: yes
+
+# ------------------------------------------------------------------
+# BACKUP
+# ------------------------------------------------------------------
+
+- name: Create backup script
+  copy:
+    dest: '/usr/local/bin/backup-{{ instance.domain | replace(".", "-") }}.sh'
+    mode: '0750'
+    content: |
+      #!/bin/bash
+      set -e
+      BACKUP_DIR="{{ encrypted_volume_mount }}/backups/{{ instance.domain }}"
+      BACKUP_DATE=$(date +%Y%m%d_%H%M%S)
+      mkdir -p "$BACKUP_DIR"
+      docker compose -f {{ instances_base }}/{{ instance.domain }}/docker-compose.yml \
+        exec -T db pg_dump -U memoryhole memoryhole \
+        | gzip > "$BACKUP_DIR/db_${BACKUP_DATE}.sql.gz"
+      find "$BACKUP_DIR" -name "db_*.sql.gz" -mtime +{{ instance.backup_retention_days | default(7) }} -delete
+      echo "Backup complete: $BACKUP_DIR/db_${BACKUP_DATE}.sql.gz"
+  when: instance.backup_enabled | default(true)
+
+- name: Schedule backup cron
+  cron:
+    name: 'Memoryhole backup ({{ instance.domain }})'
+    minute: '0'
+    hour: '2'
+    job: '/usr/local/bin/backup-{{ instance.domain | replace(".", "-") }}.sh >> /var/log/memoryhole-backup.log 2>&1'
+    user: root
+  when: instance.backup_enabled | default(true)

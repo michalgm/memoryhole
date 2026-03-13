@@ -1,0 +1,4 @@
+# Workaround for https://github.com/shenxn/protonmail-bridge-docker/issues/141
+# Remove this file and revert docker-compose.instance.yml.j2 once upstream is patched
+FROM shenxn/protonmail-bridge
+RUN apt-get update && apt-get install -y libfido2-1 && rm -rf /var/lib/apt/lists/*

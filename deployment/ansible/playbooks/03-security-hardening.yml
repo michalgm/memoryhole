@@ -1,0 +1,374 @@
+---
+# ============================================================================
+# Security Hardening Playbook
+# ============================================================================
+# This playbook implements comprehensive security hardening:
+# - SSH hardening (key-only auth, custom port, rate limiting)
+# - UFW firewall configuration
+# - fail2ban intrusion prevention
+# - System security settings (sysctl)
+# - Audit logging
+#
+# Usage:
+#   ansible-playbook -i inventory.yml 03-security-hardening.yml
+#
+# Prerequisites:
+#   - Server initialized with 01-init-server.yml
+#   - Admin user created and SSH key authentication tested
+# ============================================================================
+
+- name: Security Hardening
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify SSH key authentication works
+      assert:
+        that:
+          - ansible_user != "root" or disable_root_login == false
+        fail_msg: 'Ensure you can login as {{ linux_username }} before disabling root'
+
+  tasks:
+    # ==========================================================================
+    # SSH HARDENING
+    # ==========================================================================
+
+    - name: Backup original sshd_config
+      copy:
+        src: /etc/ssh/sshd_config
+        dest: /etc/ssh/sshd_config.backup
+        remote_src: yes
+        force: no
+
+    - name: Configure SSH daemon security settings
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '{{ item.regexp }}'
+        line: '{{ item.line }}'
+        state: present
+        validate: '/usr/sbin/sshd -t -f %s'
+      loop:
+        - { regexp: '^#?Port ', line: 'Port {{ ssh_port }}' }
+        - {
+            regexp: '^#?PermitRootLogin ',
+            line: 'PermitRootLogin {{ ssh_permit_root_login }}',
+          }
+        - {
+            regexp: '^#?PasswordAuthentication ',
+            line: 'PasswordAuthentication {{ "yes" if ssh_allow_password_auth else "no" }}',
+          }
+        - {
+            regexp: '^#?PubkeyAuthentication ',
+            line: 'PubkeyAuthentication yes',
+          }
+        - {
+            regexp: '^#?ChallengeResponseAuthentication ',
+            line: 'ChallengeResponseAuthentication no',
+          }
+        - { regexp: '^#?UsePAM ', line: 'UsePAM yes' }
+        - { regexp: '^#?X11Forwarding ', line: 'X11Forwarding no' }
+        - {
+            regexp: '^#?MaxAuthTries ',
+            line: 'MaxAuthTries {{ ssh_max_auth_tries }}',
+          }
+        - {
+            regexp: '^#?ClientAliveInterval ',
+            line: 'ClientAliveInterval {{ ssh_client_alive_interval }}',
+          }
+        - {
+            regexp: '^#?ClientAliveCountMax ',
+            line: 'ClientAliveCountMax {{ ssh_client_alive_count_max }}',
+          }
+        - {
+            regexp: '^#?PermitEmptyPasswords ',
+            line: 'PermitEmptyPasswords no',
+          }
+        - { regexp: '^#?Protocol ', line: 'Protocol 2' }
+        - { regexp: '^#?LogLevel ', line: 'LogLevel VERBOSE' }
+      notify: restart sshd
+
+    - name: Disable SSH protocol 1
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Protocol '
+        line: 'Protocol 2'
+        state: present
+      notify: restart sshd
+
+    # - name: Configure allowed SSH users
+    #   lineinfile:
+    #     path: /etc/ssh/sshd_config
+    #     regexp: '^#?AllowUsers '
+    #     line: 'AllowUsers {{ linux_username }} admin-unlock'
+    #     state: present
+    #   notify: restart sshd
+    #   when: linux_username is defined
+
+    # ==========================================================================
+    # FIREWALL CONFIGURATION (UFW)
+    # ==========================================================================
+
+    - name: Reset UFW to default
+      ufw:
+        state: reset
+      when: firewall_reset | default(false)
+
+    - name: Set UFW default policies
+      ufw:
+        direction: '{{ item.direction }}'
+        policy: '{{ item.policy }}'
+      loop:
+        - { direction: 'incoming', policy: 'deny' }
+        - { direction: 'outgoing', policy: 'allow' }
+        - { direction: 'routed', policy: 'deny' }
+
+    - name: Allow SSH on custom port
+      ufw:
+        rule: allow
+        port: '{{ ssh_port }}'
+        proto: tcp
+      when: ssh_port is defined
+
+    - name: Rate limit SSH connections
+      ufw:
+        rule: limit
+        port: '{{ ssh_port }}'
+        proto: tcp
+      when:
+        - ssh_port is defined
+        - firewall_rate_limit_ssh | default(true)
+
+    - name: Allow TCP ports
+      ufw:
+        rule: allow
+        port: '{{ item }}'
+        proto: tcp
+      loop: '{{ firewall_allowed_tcp_ports }}'
+      when: item != ssh_port # SSH already configured above
+
+    - name: Allow UDP ports
+      ufw:
+        rule: allow
+        port: '{{ item }}'
+        proto: udp
+      loop: '{{ firewall_allowed_udp_ports | default([]) }}'
+
+    - name: Enable UFW logging
+      ufw:
+        logging: 'low'
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+
+    # ==========================================================================
+    # FAIL2BAN CONFIGURATION
+    # ==========================================================================
+
+    - name: Create fail2ban local configuration directory
+      file:
+        path: /etc/fail2ban/jail.d
+        state: directory
+        mode: '0755'
+
+    - name: Configure fail2ban jail settings
+      copy:
+        dest: /etc/fail2ban/jail.d/custom.conf
+        content: |
+          [DEFAULT]
+          bantime = {{ fail2ban_bantime }}
+          findtime = {{ fail2ban_findtime }}
+          maxretry = {{ fail2ban_maxretry }}
+          action = %(action_mwl)s
+
+          [sshd]
+          enabled = true
+          port = {{ ssh_port }}
+          filter = sshd
+          logpath = /var/log/auth.log
+          maxretry = {{ fail2ban_maxretry }}
+
+          [sshd-ddos]
+          enabled = true
+          port = {{ ssh_port }}
+          filter = sshd-ddos
+          logpath = /var/log/auth.log
+          maxretry = 2
+        mode: '0644'
+      notify: restart fail2ban
+
+    - name: Enable and start fail2ban
+      systemd:
+        name: fail2ban
+        enabled: yes
+        state: started
+
+    # ==========================================================================
+    # SYSTEM SECURITY SETTINGS (sysctl)
+    # ==========================================================================
+
+    - name: Apply kernel security settings
+      sysctl:
+        name: '{{ item.name }}'
+        value: '{{ item.value }}'
+        state: present
+        reload: yes
+        sysctl_file: /etc/sysctl.d/99-security.conf
+      loop:
+        # IP Forwarding (disable unless needed)
+        - { name: 'net.ipv4.ip_forward', value: '0' }
+        - { name: 'net.ipv6.conf.all.forwarding', value: '0' }
+
+        # SYN flood protection
+        - { name: 'net.ipv4.tcp_syncookies', value: '1' }
+        - { name: 'net.ipv4.tcp_max_syn_backlog', value: '2048' }
+        - { name: 'net.ipv4.tcp_synack_retries', value: '2' }
+        - { name: 'net.ipv4.tcp_syn_retries', value: '5' }
+
+        # IP spoofing protection
+        - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
+        - { name: 'net.ipv4.conf.default.rp_filter', value: '1' }
+
+        # Ignore ICMP redirects
+        - { name: 'net.ipv4.conf.all.accept_redirects', value: '0' }
+        - { name: 'net.ipv6.conf.all.accept_redirects', value: '0' }
+        - { name: 'net.ipv4.conf.all.send_redirects', value: '0' }
+
+        # Ignore ICMP ping requests
+        - { name: 'net.ipv4.icmp_echo_ignore_all', value: '0' }
+
+        # Disable source packet routing
+        - { name: 'net.ipv4.conf.all.accept_source_route', value: '0' }
+        - { name: 'net.ipv6.conf.all.accept_source_route', value: '0' }
+
+        # Log Martians
+        - { name: 'net.ipv4.conf.all.log_martians', value: '1' }
+
+        # Kernel security
+        - { name: 'kernel.dmesg_restrict', value: '1' }
+        - { name: 'kernel.kptr_restrict', value: '2' }
+        - { name: 'kernel.yama.ptrace_scope', value: '1' }
+
+    # ==========================================================================
+    # AUDIT LOGGING
+    # ==========================================================================
+
+    - name: Install auditd
+      apt:
+        name: auditd
+        state: present
+
+    - name: Configure auditd rules for security monitoring
+      copy:
+        dest: /etc/audit/rules.d/security.rules
+        content: |
+          # Delete all existing rules
+          -D
+
+          # Buffer Size
+          -b 8192
+
+          # Failure Mode (0=silent 1=printk 2=panic)
+          -f 1
+
+          # Audit system calls
+          -a always,exit -F arch=b64 -S execve -k exec
+
+          # Monitor authentication
+          -w /etc/passwd -p wa -k passwd_changes
+          -w /etc/group -p wa -k group_changes
+          -w /etc/shadow -p wa -k shadow_changes
+          -w /etc/sudoers -p wa -k sudoers_changes
+
+          # Monitor SSH
+          -w /etc/ssh/sshd_config -p wa -k sshd_config
+          -w /var/log/auth.log -p wa -k auth_log
+
+          # Monitor network configuration
+          -w /etc/network/ -p wa -k network_changes
+          -w /etc/hosts -p wa -k hosts_changes
+
+          # Monitor LUKS operations
+          -w /sbin/cryptsetup -p x -k luks_operations
+
+          # Make configuration immutable
+          -e 2
+        mode: '0640'
+      notify: restart auditd
+
+    - name: Enable auditd
+      systemd:
+        name: auditd
+        enabled: yes
+        state: started
+
+    # ==========================================================================
+    # ADDITIONAL SECURITY TOOLS
+    # ==========================================================================
+
+    - name: Install security tools
+      apt:
+        name:
+          - rkhunter # Rootkit detection
+          - lynis # Security auditing
+          - aide # File integrity monitoring
+          - logwatch # Log analysis
+          - psad # Port scan attack detection
+        state: present
+
+    # - name: Initialize AIDE database
+    #   shell: aideinit
+    #   args:
+    #     creates: /var/lib/aide/aide.db.new
+
+    # - name: Move AIDE database to production location
+    #   shell: mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db
+    #   args:
+    #     creates: /var/lib/aide/aide.db
+
+    # ==========================================================================
+    # SUMMARY
+    # ==========================================================================
+
+    - name: Display security hardening summary
+      debug:
+        msg:
+          - '=========================================='
+          - 'Security Hardening Complete'
+          - '=========================================='
+          - 'SSH Port: {{ ssh_port }}'
+          - 'Root Login: {{ ssh_permit_root_login }}'
+          - 'Password Auth: {{ ssh_allow_password_auth }}'
+          - 'Firewall: Enabled (UFW)'
+          - 'IDS: Enabled (fail2ban)'
+          - 'Audit Logging: Enabled (auditd)'
+          - ''
+          - '⚠️  IMPORTANT:'
+          - '1. Update your SSH client config:'
+          - '   Host {{ server_hostname }}'
+          - '     Port {{ ssh_port }}'
+          - '     User {{ linux_username }}'
+          - ''
+          - '2. Test SSH connection BEFORE closing this session:'
+          - '   ssh -p {{ ssh_port }} {{ linux_username }}@{{ ansible_host }}'
+          - ''
+          - '3. Monitor fail2ban: sudo fail2ban-client status sshd'
+          - '4. Check firewall: sudo ufw status verbose'
+          - '=========================================='
+
+  handlers:
+    - name: restart ssh
+      systemd:
+        name: ssh
+        state: restarted
+
+    - name: restart fail2ban
+      systemd:
+        name: fail2ban
+        state: restarted
+
+    - name: restart auditd
+      systemd:
+        name: auditd
+        state: restarted

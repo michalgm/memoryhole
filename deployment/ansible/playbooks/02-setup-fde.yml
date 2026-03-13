@@ -1,0 +1,383 @@
+---
+# ============================================================================
+# Encrypted Volume Setup Playbook
+# ============================================================================
+# This playbook sets up a LUKS-encrypted volume for sensitive data storage.
+#
+# SECURITY WARNINGS:
+# - This playbook will FORMAT the specified device - ALL DATA WILL BE LOST
+# - The encrypted volume passphrase is handled during this playbook
+# - For maximum security, use manual unlock (use_luks_keyfile=false)
+# - Store the passphrase in a secure location (password manager, offline)
+#
+# Usage:
+#   ansible-playbook -i inventory.yml 02-setup-fde.yml
+#
+# Prerequisites:
+#   - Server initialized with 01-init-server.yml
+#   - Block device available (check with lsblk)
+#   - Passphrase set in group_vars/all.yml
+# ============================================================================
+
+- name: Setup Encrypted Volume with LUKS
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Notify user that FDE is disabled and skip
+      when: not (use_fde | default(false))
+      block:
+        - name: FDE not enabled
+          debug:
+            msg: |
+              Full disk encryption is disabled (use_fde is false or not set).
+              Skipping encrypted volume setup. To enable, set in group_vars/all.yml:
+                use_fde: true
+                encrypted_volume_device: /dev/sdX
+                encrypted_volume_passphrase: <strong-passphrase>
+                encrypted_volume_mount: /mnt/encrypted
+
+        - name: End play - FDE not configured
+          meta: end_play
+
+    - name: Verify required encryption variables
+      assert:
+        that:
+          - encrypted_volume_device is defined and encrypted_volume_device | length > 0
+          - encrypted_volume_name is defined and encrypted_volume_name | length > 0
+          - encrypted_volume_mount is defined and encrypted_volume_mount | length > 0
+          - encrypted_volume_passphrase is defined and encrypted_volume_passphrase | length > 0
+          - encrypted_volume_passphrase != "CHANGE_ME_GENERATE_STRONG_PASSPHRASE"
+        fail_msg: |
+          use_fde is true but required encryption variables are missing or have placeholder values.
+          Check group_vars/all.yml for: encrypted_volume_device, encrypted_volume_name,
+          encrypted_volume_mount, encrypted_volume_passphrase
+
+    - name: Check if device exists
+      stat:
+        path: '{{ encrypted_volume_device }}'
+      register: device_check
+
+    - name: Fail if device does not exist
+      fail:
+        msg: 'Device {{ encrypted_volume_device }} not found. Check lsblk output.'
+      when: not device_check.stat.exists
+
+    - name: Check if device is already LUKS formatted
+      shell: cryptsetup isLuks {{ encrypted_volume_device }}
+      register: is_luks
+      failed_when: false
+      changed_when: false
+
+    - name: WARNING - Data will be destroyed
+      pause:
+        prompt: |
+
+          ╔═══════════════════════════════════════════════════════════════╗
+          ║                      ⚠️  WARNING  ⚠️                          ║
+          ╠═══════════════════════════════════════════════════════════════╣
+          ║  This playbook will DESTROY ALL DATA on:                     ║
+          ║  {{ encrypted_volume_device }}                               ║
+          ║                                                               ║
+          ║  Press Ctrl+C and then 'A' to abort                          ║
+          ║  Press ENTER to continue (THIS CANNOT BE UNDONE)             ║
+          ╚═══════════════════════════════════════════════════════════════╝
+      when: is_luks.rc != 0
+
+  tasks:
+    # ==========================================================================
+    # LUKS ENCRYPTION SETUP
+    # ==========================================================================
+
+    - name: Format device with LUKS
+      shell: |
+        printf '%s' "{{ encrypted_volume_passphrase }}" | \
+        cryptsetup luksFormat \
+          --cipher {{ luks_cipher }} \
+          --key-size {{ luks_key_size }} \
+          --hash {{ luks_hash }} \
+          --iter-time {{ luks_iter_time }} \
+          --use-urandom \
+          --batch-mode \
+          {{ encrypted_volume_device }} -
+      when: is_luks.rc != 0
+      no_log: true # Don't log passphrase
+
+    - name: Check if already opened
+      shell: cryptsetup status {{ encrypted_volume_name }}
+      register: luks_status
+      failed_when: false
+      changed_when: false
+
+    - name: Open LUKS volume if not already open
+      shell: |
+        printf '%s' "{{ encrypted_volume_passphrase }}" | \
+        cryptsetup luksOpen {{ encrypted_volume_device }} {{ encrypted_volume_name }} -
+      when:
+        - luks_status.rc != 0
+    # ==========================================================================
+    # FILESYSTEM CREATION
+    # ==========================================================================
+
+    - name: Check if filesystem exists
+      shell: blkid /dev/mapper/{{ encrypted_volume_name }} | grep ext4
+      register: has_filesystem
+      failed_when: false
+      changed_when: false
+
+    - name: Create ext4 filesystem on encrypted volume
+      filesystem:
+        fstype: ext4
+        dev: /dev/mapper/{{ encrypted_volume_name }}
+        opts: -L {{ encrypted_volume_name }}
+      when: has_filesystem.rc != 0
+
+    - name: Create mount point directory
+      file:
+        path: '{{ encrypted_volume_mount }}'
+        state: directory
+        mode: '0755'
+
+    - name: Mount encrypted volume
+      mount:
+        path: '{{ encrypted_volume_mount }}'
+        src: /dev/mapper/{{ encrypted_volume_name }}
+        fstype: ext4
+        opts: defaults,noatime,nofail,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s
+        state: mounted
+
+    # ==========================================================================
+    # DIRECTORY STRUCTURE & BIND MOUNTS
+    # ==========================================================================
+
+    - name: Create base directories on encrypted volume
+      file:
+        path: '{{ encrypted_volume_mount }}/{{ item.path }}'
+        state: directory
+        mode: "{{ item.mode | default('0755') }}"
+      loop:
+        - { path: 'home', mode: '0755' }
+        - { path: 'var/www', mode: '0755' }
+        - { path: 'var/lib/docker', mode: '0710' }
+
+    - name: Sync existing /home to encrypted volume
+      shell: rsync -aHAX /home/ {{ encrypted_volume_mount }}/home/
+      args:
+        creates: '{{ encrypted_volume_mount }}/home/{{ linux_username }}'
+
+    - name: Sync existing /var/www to encrypted volume
+      shell: rsync -aHAX /var/www/ {{ encrypted_volume_mount }}/var/www/
+      args:
+        creates: '{{ encrypted_volume_mount }}/var/www/html'
+      ignore_errors: true
+
+    - name: Bind mount /home
+      mount:
+        path: /home
+        src: '{{ encrypted_volume_mount }}/home'
+        opts: bind,nofail,x-systemd.mount-timeout=5s
+        state: mounted
+        fstype: none
+
+    - name: Bind mount /var/www
+      mount:
+        path: /var/www
+        src: '{{ encrypted_volume_mount }}/var/www'
+        opts: bind,nofail,x-systemd.mount-timeout=5s
+        state: mounted
+        fstype: none
+
+    - name: Create /var/lib/docker directory
+      file:
+        path: /var/lib/docker
+        state: directory
+        mode: '0710'
+
+    - name: Bind mount /var/lib/docker
+      mount:
+        path: /var/lib/docker
+        src: '{{ encrypted_volume_mount }}/var/lib/docker'
+        opts: bind,nofail,x-systemd.mount-timeout=5s
+        state: mounted
+        fstype: none
+
+    # ==========================================================================
+    # SWAPFILE SETUP
+    # ==========================================================================
+
+    - name: Setup swapfile on encrypted volume
+      block:
+        - name: Create swapfile
+          command: dd if=/dev/zero of={{ encrypted_volume_mount }}/swapfile bs=1M count=4096
+          args:
+            creates: '{{ encrypted_volume_mount }}/swapfile'
+
+        - name: Set swapfile permissions
+          file:
+            path: '{{ encrypted_volume_mount }}/swapfile'
+            mode: '0600'
+
+        - name: Format swapfile
+          command: mkswap {{ encrypted_volume_mount }}/swapfile
+          when: ansible_swaptotal_mb < 1
+
+        - name: Enable swapfile
+          command: swapon {{ encrypted_volume_mount }}/swapfile
+          when: ansible_swaptotal_mb < 1
+
+        - name: Add swapfile to fstab
+          mount:
+            path: none
+            src: '{{ encrypted_volume_mount }}/swapfile'
+            fstype: swap
+            opts: sw
+            state: present
+
+    # ==========================================================================
+    # KEYFILE SETUP (Optional - Less Secure)
+    # ==========================================================================
+
+    - name: Create LUKS keyfile (if enabled)
+      block:
+        - name: Generate keyfile
+          shell: dd if=/dev/urandom of={{ luks_keyfile_path }} bs=1024 count=4
+          args:
+            creates: '{{ luks_keyfile_path }}'
+
+        - name: Secure keyfile permissions
+          file:
+            path: '{{ luks_keyfile_path }}'
+            mode: '0400'
+            owner: root
+            group: root
+
+        - name: Add keyfile to LUKS
+          shell: |
+            echo "{{ encrypted_volume_passphrase }}" | \
+            cryptsetup luksAddKey {{ encrypted_volume_device }} {{ luks_keyfile_path }} -
+          no_log: true
+
+        - name: Create crypttab entry for auto-mount
+          lineinfile:
+            path: /etc/crypttab
+            line: '{{ encrypted_volume_name }} {{ encrypted_volume_device }} {{ luks_keyfile_path }} luks'
+            create: yes
+
+        - name: Add to fstab for auto-mount
+          mount:
+            path: '{{ encrypted_volume_mount }}'
+            src: /dev/mapper/{{ encrypted_volume_name }}
+            fstype: ext4
+            opts: defaults,noatime
+            state: present
+
+      when: use_luks_keyfile | default(false)
+
+    # ==========================================================================
+    # POSTGRESQL DATA DIRECTORY SETUP
+    # ==========================================================================
+
+    - name: Create PostgreSQL data directory
+      file:
+        path: '{{ postgres_data_path }}'
+        state: directory
+        mode: '0700'
+      when: postgres_data_path is defined
+
+    - name: Create backup directory
+      file:
+        path: '{{ postgres_backup_path }}'
+        state: directory
+        mode: '0700'
+      when: postgres_backup_path is defined
+
+    # ==========================================================================
+    # UNLOCK & RESTORE SCRIPT (Admin Access)
+    # ==========================================================================
+
+    - name: Create unlock and restore script
+      template:
+        src: ../scripts/unlock_data.sh
+        dest: /usr/local/bin/unlock_data.sh
+        mode: '0755'
+
+    - name: Create admin-unlock user
+      user:
+        name: admin-unlock
+        comment: 'Encrypted Volume Unlock Admin'
+        shell: /bin/bash
+        home: /home-unenc/admin-unlock
+        create_home: yes
+        password_lock: yes # Disable password login
+
+    - name: Set up SSH authorized keys for admin-unlock
+      authorized_key:
+        user: admin-unlock
+        state: present
+        key: '{{ item }}'
+      loop: '{{ linux_user_ssh_public_keys }}'
+
+    - name: Allow admin-unlock to run unlock script without password
+      copy:
+        dest: /etc/sudoers.d/admin-unlock
+        content: |
+          admin-unlock ALL=(root) NOPASSWD: /usr/local/bin/unlock_data.sh
+        mode: '0440'
+        validate: 'visudo -cf %s'
+
+    # ==========================================================================
+    # SUMMARY AND NEXT STEPS
+    # ==========================================================================
+
+    - name: Display encryption summary
+      debug:
+        msg: "{{ encryption_summary.split('\n') }}"
+      vars:
+        encryption_summary: |
+          ==========================================
+          Encrypted Volume Setup Complete
+          ==========================================
+          Device: {{ encrypted_volume_device }}
+          Mapper: /dev/mapper/{{ encrypted_volume_name }}
+          Mount: {{ encrypted_volume_mount }}
+          Auto-mount on boot: {{ use_luks_keyfile | default(false) }}
+
+          ⚠️  CRITICAL SECURITY REMINDERS:
+          1. BACKUP YOUR PASSPHRASE - Store it securely offline
+          2. Without the passphrase, data is PERMANENTLY INACCESSIBLE
+          3. Test emergency unmount: /usr/local/bin/unmount-encrypted-volume.sh
+
+          {% if not use_luks_keyfile | default(false) %}
+          ⚠️  Manual unlock required on boot:
+             cryptsetup luksOpen {{ encrypted_volume_device }} {{ encrypted_volume_name }}
+             mount /dev/mapper/{{ encrypted_volume_name }} {{ encrypted_volume_mount }}
+          {% endif %}
+
+          NEXT STEPS:
+          Run security hardening: ansible-playbook -i inventory.yml 03-security-hardening.yml
+          ==========================================
+
+    - name: Save encryption info to file
+      copy:
+        dest: '{{ encrypted_volume_mount }}/.encryption-info.txt'
+        content: |
+          LUKS Encrypted Volume Information
+          ==================================
+          Created: {{ ansible_date_time.iso8601 }}
+          Device: {{ encrypted_volume_device }}
+          Mapper Name: {{ encrypted_volume_name }}
+          Mount Point: {{ encrypted_volume_mount }}
+          Cipher: {{ luks_cipher }}
+          Key Size: {{ luks_key_size }}
+          Hash: {{ luks_hash }}
+
+          Manual Unlock Commands:
+          -----------------------
+          cryptsetup luksOpen {{ encrypted_volume_device }} {{ encrypted_volume_name }}
+          mount /dev/mapper/{{ encrypted_volume_name }} {{ encrypted_volume_mount }}
+
+          Emergency Lock Commands:
+          ------------------------
+          /usr/local/bin/unmount-encrypted-volume.sh
+        mode: '0600'

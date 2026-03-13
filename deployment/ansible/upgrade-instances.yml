@@ -1,0 +1,60 @@
+---
+# ============================================================================
+# Instance Upgrade Playbook
+# ============================================================================
+# Pulls latest images and restarts all instances. Migrations run automatically.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml 06-upgrade-instances.yml
+#
+# To pin a specific image tag for all instances:
+#   ansible-playbook -i inventory.yml 06-upgrade-instances.yml \
+#     -e global_image_tag=v0.26.0
+# ============================================================================
+
+- name: Upgrade Instances
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    instances_base: '/home/{{ linux_username }}/instances'
+
+  tasks:
+    - name: Pull latest images
+      shell: docker compose pull
+      args:
+        chdir: '{{ instances_base }}/{{ instance.domain }}'
+      become_user: '{{ linux_username }}'
+      loop: '{{ instances }}'
+      loop_control:
+        label: '{{ instance.domain }}'
+        loop_var: instance
+
+    - name: Restart stacks
+      shell: docker compose up -d --remove-orphans
+      args:
+        chdir: '{{ instances_base }}/{{ instance.domain }}'
+      become_user: '{{ linux_username }}'
+      loop: '{{ instances }}'
+      loop_control:
+        label: '{{ instance.domain }}'
+        loop_var: instance
+
+    - name: Show container status
+      shell: docker compose ps
+      args:
+        chdir: '{{ instances_base }}/{{ instance.domain }}'
+      become_user: '{{ linux_username }}'
+      register: compose_ps
+      loop: '{{ instances }}'
+      loop_control:
+        label: '{{ instance.domain }}'
+        loop_var: instance
+
+    - name: Display status
+      debug:
+        msg: '{{ item.stdout_lines }}'
+      loop: '{{ compose_ps.results }}'
+      loop_control:
+        label: '{{ item.instance.domain }}'
