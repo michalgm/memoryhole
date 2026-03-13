@@ -86,7 +86,7 @@
           }
         - { regexp: '^#?Protocol ', line: 'Protocol 2' }
         - { regexp: '^#?LogLevel ', line: 'LogLevel VERBOSE' }
-      notify: restart sshd
+      notify: restart ssh
 
     - name: Disable SSH protocol 1
       lineinfile:
@@ -94,7 +94,7 @@
         regexp: '^#?Protocol '
         line: 'Protocol 2'
         state: present
-      notify: restart sshd
+      notify: restart ssh
 
     # - name: Configure allowed SSH users
     #   lineinfile:
