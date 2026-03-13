@@ -17,7 +17,9 @@
     "@graphql-codegen/typescript-resolvers": "^4.5.2",
     "@release-it/conventional-changelog": "^10.0.5",
     "conventional-changelog-cli": "^5.0.0",
+    "eslint-config-prettier": "^10.1.8",
     "graphql-codegen-typescript-mock-data": "^4.4.0",
+    "marked": "^15.0.0",
     "node-ssh": "^13.2.1",
     "release-it": "^18.1.2"
   },

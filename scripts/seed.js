@@ -1,3 +1,7 @@
+import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { join } from 'node:path'
+
 import { db } from 'api/src/lib/db'
 import {
   optionSetByName,
@@ -50,7 +54,7 @@ async function seedUsers() {
       name: process.env.SEED_USER_NAME,
     },
   ]
-  const currentUsers = await db.user.findMany()
+  const currentUsers = (await db.user.findMany()) || []
   if (currentUsers.length > 0) {
     console.warn('Users already exist in the database, skipping seeding users.')
     return
@@ -68,6 +72,29 @@ async function seedUsers() {
   )
 }
 
+async function seedSiteHelp() {
+  const existing = await db.siteSetting.findUnique({
+    where: { id: 'siteHelp' },
+  })
+  if (existing?.value && existing.value !== '"Help"') {
+    console.warn('siteHelp already has content, skipping.')
+    return
+  }
+
+  // Load marked via CJS require to bypass vite-node's ESM transform,
+  // which mangles class-expression exports from marked's ESM bundle.
+  const _require = createRequire(import.meta.url)
+  const { marked } = _require('marked')
+
+  const mdPath = join(process.cwd(), 'docs', 'README.md')
+  const html = marked.parse(readFileSync(mdPath, 'utf8'))
+  await db.siteSetting.upsert({
+    where: { id: 'siteHelp' },
+    update: { value: html },
+    create: { id: 'siteHelp', value: html },
+  })
+}
+
 export default async () => {
   try {
     //
@@ -77,6 +104,7 @@ export default async () => {
     await seedUsers()
     await seedOptions('jurisdictions')
     await seedOptions('cities')
+    await seedSiteHelp()
   } catch (error) {
     console.warn('Please define your seed data.')
     console.error(error)
