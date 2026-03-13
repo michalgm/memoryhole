@@ -1,0 +1,29 @@
+# Ansible deployment config (site-specific, contains secrets)
+ansible/inventory*.yml
+ansible/group_vars/all.yml
+ansible/*.retry
+ansible/credentials/
+# ansible/
+# Linode CLI config
+linode-cli/config.env
+
+# Setup output files
+setup-summary-*.txt
+linode-output-*.txt
+
+# Sensitive data
+*.pem
+*.key
+*.crt
+*_rsa
+*_ed25519
+*.vault_pass
+
+# Logs
+*.log
+
+# Backup files
+*~
+*.swp
+*.swo
+.DS_Store

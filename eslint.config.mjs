@@ -1,5 +1,6 @@
 import vitest from 'eslint-plugin-vitest'
 import globals from 'globals'
+import eslintConfigPrettier from 'eslint-config-prettier/flat'
 
 import cedarConfig from '@cedarjs/eslint-config'
 
@@ -12,6 +13,7 @@ export default [
     ],
   },
   ...(await cedarConfig()),
+  eslintConfigPrettier,
   {
     rules: {
       camelcase: 'off',
