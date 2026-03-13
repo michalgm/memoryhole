@@ -48,7 +48,7 @@ Use the localhost inventory example in the [Deployment](#2-deployment) section b
 
 Skip this section if your server already exists.
 
-This creates a new Linode VPS, attaches an encrypted volume, and configures a firewall. It requires a Linode API token and generates an `inventory.yml` automatically.
+This creates a new Linode VPS, attaches a volume (to be encrypted), and configures a firewall. It requires a Linode API token and generates an `inventory.yml` automatically.
 
 ```bash
 cd deployment/ansible
@@ -70,17 +70,45 @@ cp group_vars/all.example.yml group_vars/all.yml
 cp inventory.example.yml inventory.yml
 ```
 
-Edit `group_vars/all.yml` — the key things to set:
+Edit `group_vars/all.yml`. The variables you must set:
+
+**General**
 
 | Variable | Description |
 |---|---|
-| `linux_username` | Service account name on the server |
-| `linux_user_ssh_public_keys` | Your SSH public key(s) for root access |
-| `instances` | List of domains to deploy (see example file) |
-| `encrypted_volume_passphrase` | LUKS passphrase — store this somewhere safe |
-| `use_fde` | Set to `false` to skip disk encryption entirely |
+| `admin_email` | Used for Let's Encrypt cert notifications and fail2ban alerts |
+| `linux_user_ssh_public_keys` | Your SSH public key(s) — run `cat ~/.ssh/id_ed25519.pub` to get it |
 
-The example file has comments explaining every option.
+**Disk encryption** (skip if `use_fde: false`)
+
+| Variable | Description |
+|---|---|
+| `use_fde` | `true` to encrypt the data volume, `false` to skip |
+| `encrypted_volume_device` | Block device to encrypt, e.g. `/dev/sdc` — check with `lsblk` on the server |
+| `encrypted_volume_passphrase` | Strong passphrase — store in a password manager and offline backup, there is no recovery |
+
+**Instances** — one entry per Memoryhole deployment:
+
+| Variable | Required | Description |
+|---|---|---|
+| `domain` | yes | Fully qualified domain name, e.g. `memoryhole.example.com` |
+| `seed_user_email` | no | Email for the initial admin account (leave blank to skip seeding) |
+| `seed_user_password` | no | Password for the initial admin account |
+| `seed_user_name` | no | Display name for the initial admin (default: `Admin`) |
+| `seed_jurisdictions` | no | Comma-separated list of jurisdictions to pre-load |
+| `seed_cities` | no | Comma-separated list of cities to pre-load |
+| `image_tag` | no | Pin to a specific release, e.g. `v0.28.0` (default: `latest`) |
+| `backup_enabled` | no | Enable nightly database backups (default: `true`) |
+| `backup_retention_days` | no | Days to keep backups (default: `7`) |
+
+```yaml
+instances:
+  - domain: memoryhole.example.com
+    seed_user_email: admin@example.com
+    seed_user_password: changeme
+```
+
+Multiple instances can run on the same server — just add more entries to the list.
 
 Edit `inventory.yml` — set `ansible_host` to your server's IP address.
 

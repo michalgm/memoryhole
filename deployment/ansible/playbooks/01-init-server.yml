@@ -95,7 +95,6 @@
     - name: Create admin user
       user:
         name: '{{ linux_username }}'
-        password: '{{ linux_user_password_hash }}'
         shell: /bin/bash
         create_home: yes
         state: present

@@ -9,23 +9,21 @@ admin_email: admin@example.com
 # USER CONFIGURATION
 # ==============================================================================
 
-# Primary linux user (will be created and given sudo access)
+# Service account for running Docker instances (default is fine for most deployments)
 linux_username: memoryhole
-linux_user_password_hash: '$6$rounds=656000$CHANGEME' # Generate with: mkpasswd --method=sha-512
+
+# SSH public key(s) that will be authorized for root login on the server.
+# Run: cat ~/.ssh/id_ed25519.pub  (or id_rsa.pub) to get your key.
 linux_user_ssh_public_keys:
   - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... user@laptop' # Replace with your public key
-  - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... user@desktop'
-
-# Disable root login after linux user is created
-disable_root_login: true
 
 # ==============================================================================
 # SSH CONFIGURATION
 # ==============================================================================
 
-ssh_port: 2222 # Non-standard port to reduce automated attacks
+ssh_port: 22
 ssh_allow_password_auth: false # Only allow key-based authentication
-ssh_permit_root_login: 'no'
+ssh_permit_root_login: 'yes' # Root SSH is kept enabled — Ansible connects as root (key-only)
 ssh_max_auth_tries: 3
 ssh_client_alive_interval: 300
 ssh_client_alive_count_max: 2
@@ -58,20 +56,30 @@ fail2ban_sender: fail2ban@{{ server_hostname }}
 # ENCRYPTED VOLUME CONFIGURATION
 # ==============================================================================
 
-# LUKS encryption settings
+# Set to false to skip LUKS encryption entirely (not recommended for production)
+use_fde: true
+
+# Block device to encrypt. Check available devices with: lsblk
+# On Linode, an attached volume is typically /dev/sdc or /dev/disk/by-id/...
+encrypted_volume_device: /dev/sdc
+
+# Where to mount the encrypted volume
+encrypted_volume_mount: /mnt/encrypted
+
+# Passphrase for the encrypted volume.
+# IMPORTANT: Store this in a password manager and an offline backup.
+# There is NO recovery if you lose it. Generate with: openssl rand -base64 32
+encrypted_volume_passphrase: 'CHANGE_ME_GENERATE_STRONG_PASSPHRASE'
+
+# Whether to store passphrase in a keyfile for auto-mount on boot (less secure)
+# Set to false (default) for maximum security — requires manual unlock after reboot
+use_luks_keyfile: false
+
+# Advanced LUKS settings (defaults are fine)
 luks_cipher: aes-xts-plain64
 luks_key_size: 512
 luks_hash: sha512
-luks_iter_time: 5000 # Milliseconds for PBKDF2 iteration
-
-# Passphrase for encrypted volume
-# IMPORTANT: Store this securely! Generate with: openssl rand -base64 32
-encrypted_volume_passphrase: 'CHANGE_ME_GENERATE_STRONG_PASSPHRASE'
-
-# Whether to store passphrase in a keyfile (less secure but allows auto-mount)
-# Set to false for maximum security (requires manual unlock on boot)
-use_luks_keyfile: false
-luks_keyfile_path: /root/.luks-key # Only if use_luks_keyfile=true
+luks_iter_time: 5000
 
 # ==============================================================================
 # DOCKER CONFIGURATION
