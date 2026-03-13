@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.29.0](https://github.com/michalgm/memoryhole/compare/v0.28.0...v0.29.0) (2026-03-13)
+
+### Features
+
+* add Ansible playbooks for Caddy setup and instance deployment ([aadd970](https://github.com/michalgm/memoryhole/commit/aadd9709ebed4637e2a741499b8db23d9cb594d6))
+* add email config + testing to setttings UI ([8ddecc9](https://github.com/michalgm/memoryhole/commit/8ddecc9d91bc4c30a24f56f73c851ddc7648603e))
+* add marked library for Markdown parsing and enhance seed logic for siteHelp ([370201e](https://github.com/michalgm/memoryhole/commit/370201ee7fe207814339b87cf8462cb2fe281576))
+* update environment configuration and add .gitignore for Ansible deployment ([ebb2c54](https://github.com/michalgm/memoryhole/commit/ebb2c544fc9c6b0c00f40e9f84111bbd379073a2))
+* update README and add architecture documentation for deployment clarity ([2b7c324](https://github.com/michalgm/memoryhole/commit/2b7c324e0e8afb49879376cbdb9ee477f9011fdd))
+* update README and example configuration for improved clarity and security settings ([b585bc3](https://github.com/michalgm/memoryhole/commit/b585bc3304b859554b8a4256ece2cde1fc84c37d))
+
 ## [0.28.0](https://github.com/michalgm/memoryhole/compare/v0.27.9...v0.28.0) (2026-03-08)
 
 ### Features
