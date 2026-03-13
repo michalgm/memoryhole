@@ -35,6 +35,7 @@ export type Action = {
   end_date?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['Int']['output'];
   jurisdiction?: Maybe<Scalars['String']['output']>;
+  location?: Maybe<Scalars['String']['output']>;
   logs_count?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   start_date: Scalars['DateTime']['output'];
@@ -121,12 +122,38 @@ export type BatchPayload = {
   count: Scalars['Int']['output'];
 };
 
+/**
+ * The Cedar Root Schema
+ *
+ * Defines details about Cedar such as the current user and version information.
+ */
+export type Cedar = {
+  __typename?: 'Cedar';
+  /** The current user. */
+  currentUser?: Maybe<Scalars['JSON']['output']>;
+  /** The version of Prisma. */
+  prismaVersion?: Maybe<Scalars['String']['output']>;
+  /** The version of CedarJS. */
+  version?: Maybe<Scalars['String']['output']>;
+};
+
+export type ChangePasswordInput = {
+  currentPassword: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
+};
+
+export type ChangePasswordPayload = {
+  __typename?: 'ChangePasswordPayload';
+  success: Scalars['Boolean']['output'];
+};
+
 export type CreateActionInput = {
   city?: InputMaybe<Scalars['String']['input']>;
   custom_fields?: InputMaybe<Scalars['JSON']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   end_date?: InputMaybe<Scalars['DateTime']['input']>;
   jurisdiction?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   start_date: Scalars['DateTime']['input'];
 };
@@ -177,14 +204,23 @@ export type CreateCustomSchemaInput = {
   updated_by_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type CreateDocumentInput = {
+  access_role?: InputMaybe<UserRole>;
+  edit_role?: InputMaybe<UserRole>;
+  title: Scalars['String']['input'];
+  type: Scalars['String']['input'];
+};
+
 export type CreateLogInput = {
   action_id?: InputMaybe<Scalars['Int']['input']>;
   arrests?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  contact?: InputMaybe<Scalars['String']['input']>;
   created_by_id?: InputMaybe<Scalars['Int']['input']>;
   custom_fields?: InputMaybe<Scalars['JSON']['input']>;
   needs_followup?: InputMaybe<Scalars['Boolean']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
   shift?: InputMaybe<Scalars['JSON']['input']>;
+  time: Scalars['DateTime']['input'];
   type?: InputMaybe<Scalars['String']['input']>;
   updated_by_id?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -195,13 +231,17 @@ export type CreateOptionSetInput = {
 };
 
 export type CreateOptionSetInputValueInput = {
+  is_static?: InputMaybe<Scalars['Boolean']['input']>;
   label: Scalars['String']['input'];
+  order?: InputMaybe<Scalars['Int']['input']>;
   value: Scalars['String']['input'];
 };
 
 export type CreateOptionSetValueInput = {
+  is_static?: InputMaybe<Scalars['Boolean']['input']>;
   label: Scalars['String']['input'];
   option_set_id: Scalars['Int']['input'];
+  order: Scalars['Int']['input'];
   value: Scalars['String']['input'];
 };
 
@@ -244,6 +284,26 @@ export type CustomSchema = {
   updated_by_id?: Maybe<Scalars['Int']['output']>;
 };
 
+export type Document = {
+  __typename?: 'Document';
+  access_role: UserRole;
+  children: Array<Maybe<Document>>;
+  created_at: Scalars['DateTime']['output'];
+  created_by: User;
+  created_by_id: Scalars['Int']['output'];
+  edit_role: UserRole;
+  html_content?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  parent?: Maybe<Document>;
+  parent_id?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  type: Scalars['String']['output'];
+  updated_at: Scalars['DateTime']['output'];
+  updated_by?: Maybe<User>;
+  updated_by_id?: Maybe<Scalars['Int']['output']>;
+};
+
 export type GenericFilterInput = {
   field: Scalars['String']['input'];
   operator?: InputMaybe<Scalars['String']['input']>;
@@ -266,6 +326,7 @@ export type Log = {
   action?: Maybe<Action>;
   action_id?: Maybe<Scalars['Int']['output']>;
   arrests: Array<Maybe<Arrest>>;
+  contact?: Maybe<Scalars['String']['output']>;
   created_at?: Maybe<Scalars['DateTime']['output']>;
   created_by?: Maybe<User>;
   created_by_id?: Maybe<Scalars['Int']['output']>;
@@ -289,10 +350,12 @@ export type Mutation = {
   bulkUpdateArrests?: Maybe<BatchPayload>;
   bulkUpdateUsers?: Maybe<BatchPayload>;
   bulkUpsertSiteSetting: Array<Maybe<SiteSetting>>;
+  changePassword: ChangePasswordPayload;
   createAction: Action;
   /** Create a new arrest record with optional arrestee details */
   createArrest: Arrest;
   createCustomSchema: CustomSchema;
+  createDocument: Document;
   createIgnoredDuplicateArrest: IgnoredDuplicate;
   createLog: Log;
   createOptionSet: OptionSet;
@@ -304,6 +367,7 @@ export type Mutation = {
   /** Remove an arrest record and its arrestee */
   deleteArrest: Arrest;
   deleteCustomSchema: CustomSchema;
+  deleteDocument: Document;
   deleteLog: Log;
   deleteOptionSet: OptionSet;
   deleteOptionSetValue: OptionSetValue;
@@ -311,14 +375,16 @@ export type Mutation = {
   deleteTableView: TableView;
   deleteUser: User;
   mergeArrests: Arrest;
+  sendTestEmail: Scalars['Boolean']['output'];
   unIgnoreDuplicateArrest: IgnoredDuplicate;
   updateAction: Action;
   /** Update an existing arrest record */
   updateArrest: Arrest;
   updateCustomSchema: CustomSchema;
+  updateDocument: Document;
   updateLog: Log;
-  updateOptionSet: OptionSet;
   updateOptionSetValue: OptionSetValue;
+  updateOptionSetValues: OptionSet;
   updateSiteSetting: SiteSetting;
   updateTableView: TableView;
   updateUser: User;
@@ -348,6 +414,11 @@ export type MutationBulkUpsertSiteSettingArgs = {
 };
 
 
+export type MutationChangePasswordArgs = {
+  input: ChangePasswordInput;
+};
+
+
 export type MutationCreateActionArgs = {
   input: CreateActionInput;
 };
@@ -360,6 +431,11 @@ export type MutationCreateArrestArgs = {
 
 export type MutationCreateCustomSchemaArgs = {
   input: CreateCustomSchemaInput;
+};
+
+
+export type MutationCreateDocumentArgs = {
+  input: CreateDocumentInput;
 };
 
 
@@ -415,6 +491,11 @@ export type MutationDeleteCustomSchemaArgs = {
 };
 
 
+export type MutationDeleteDocumentArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type MutationDeleteLogArgs = {
   id: Scalars['Int']['input'];
 };
@@ -452,6 +533,11 @@ export type MutationMergeArrestsArgs = {
 };
 
 
+export type MutationSendTestEmailArgs = {
+  to: Scalars['String']['input'];
+};
+
+
 export type MutationUnIgnoreDuplicateArrestArgs = {
   arrest1_id: Scalars['Int']['input'];
   arrest2_id: Scalars['Int']['input'];
@@ -476,21 +562,27 @@ export type MutationUpdateCustomSchemaArgs = {
 };
 
 
+export type MutationUpdateDocumentArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateDocumentInput;
+};
+
+
 export type MutationUpdateLogArgs = {
   id: Scalars['Int']['input'];
   input: UpdateLogInput;
 };
 
 
-export type MutationUpdateOptionSetArgs = {
-  id: Scalars['Int']['input'];
-  input: UpdateOptionSetInput;
-};
-
-
 export type MutationUpdateOptionSetValueArgs = {
   id: Scalars['Int']['input'];
   input: UpdateOptionSetValueInput;
+};
+
+
+export type MutationUpdateOptionSetValuesArgs = {
+  id: Scalars['Int']['input'];
+  input: UpdateOptionSetInput;
 };
 
 
@@ -521,19 +613,21 @@ export type OptionSet = {
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
   name: Scalars['String']['output'];
-  values: Array<Maybe<OptionSetValue>>;
+  values?: Maybe<Array<Maybe<OptionSetValue>>>;
 };
 
 export type OptionSetValue = {
   __typename?: 'OptionSetValue';
   id: Scalars['Int']['output'];
+  is_static: Scalars['Boolean']['output'];
   label: Scalars['String']['output'];
   option_set_details: OptionSet;
   option_set_id: Scalars['Int']['output'];
+  order: Scalars['Int']['output'];
   value: Scalars['String']['output'];
 };
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type Query = {
   __typename?: 'Query';
   action?: Maybe<Action>;
@@ -543,10 +637,14 @@ export type Query = {
   arresteeLogs: Array<Log>;
   /** Retrieve all accessible arrest records */
   arrests: Array<Arrest>;
+  /** Fetches the Cedar root schema. */
+  cedar?: Maybe<Cedar>;
   customSchema?: Maybe<CustomSchema>;
   customSchemata: Array<CustomSchema>;
   /** Search arrests within a date range for docket sheet generation */
   docketSheetSearch: Array<Maybe<Arrest>>;
+  document?: Maybe<Document>;
+  documents: Array<Document>;
   duplicateArrests: Array<DuplicateArrest>;
   /** Filter arrests using flexible criteria */
   filterArrests: Array<Maybe<Arrest>>;
@@ -556,7 +654,10 @@ export type Query = {
   optionSetValue?: Maybe<OptionSetValue>;
   optionSetValues: Array<OptionSetValue>;
   optionSets: Array<OptionSet>;
-  /** Fetches the Redwood root schema. */
+  /**
+   * Fetches the Cedar root schema.
+   * @deprecated Use 'cedar' instead.
+   */
   redwood?: Maybe<Redwood>;
   searchActions: Array<Action>;
   /** Search arrests by name with optional query parameters */
@@ -571,31 +672,31 @@ export type Query = {
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryActionArgs = {
   id: Scalars['Int']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryArrestArgs = {
   id: Scalars['Int']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryArresteeLogsArgs = {
   arrestee_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryCustomSchemaArgs = {
   id: Scalars['Int']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryDocketSheetSearchArgs = {
   arrest_city?: InputMaybe<Scalars['String']['input']>;
   date: Scalars['DateTime']['input'];
@@ -606,7 +707,13 @@ export type QueryDocketSheetSearchArgs = {
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
+export type QueryDocumentArgs = {
+  id?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** About the Cedar queries. */
 export type QueryDuplicateArrestsArgs = {
   includeIgnored?: InputMaybe<Scalars['Boolean']['input']>;
   maxArrestDateDifferenceSeconds?: InputMaybe<Scalars['Int']['input']>;
@@ -615,74 +722,74 @@ export type QueryDuplicateArrestsArgs = {
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryFilterArrestsArgs = {
   filters?: InputMaybe<Array<InputMaybe<GenericFilterInput>>>;
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryLogArgs = {
   id: Scalars['Int']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryLogsArgs = {
   params?: InputMaybe<QueryParams>;
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryOptionSetArgs = {
   id: Scalars['Int']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryOptionSetValueArgs = {
   id: Scalars['Int']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QuerySearchActionsArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QuerySearchArrestsArgs = {
   action_id?: InputMaybe<Scalars['Int']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QuerySearchUsersArgs = {
   search: Scalars['String']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QuerySiteSettingArgs = {
   id: Scalars['String']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QuerySiteSettingsArgs = {
   ids?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryTableViewArgs = {
   id: Scalars['Int']['input'];
 };
 
 
-/** About the Redwood queries. */
+/** About the Cedar queries. */
 export type QueryUserArgs = {
   id: Scalars['Int']['input'];
 };
@@ -695,18 +802,22 @@ export type QueryParams = {
   where?: InputMaybe<Scalars['JSON']['input']>;
 };
 
-/**
- * The RedwoodJS Root Schema
- *
- * Defines details about RedwoodJS such as the current user and version information.
- */
 export type Redwood = {
   __typename?: 'Redwood';
-  /** The current user. */
+  /**
+   * The current user.
+   * @deprecated Use the Cedar type instead.
+   */
   currentUser?: Maybe<Scalars['JSON']['output']>;
-  /** The version of Prisma. */
+  /**
+   * The version of Prisma.
+   * @deprecated Use the Cedar type instead.
+   */
   prismaVersion?: Maybe<Scalars['String']['output']>;
-  /** The version of Redwood. */
+  /**
+   * The version of CedarJS.
+   * @deprecated Use the Cedar type instead.
+   */
   version?: Maybe<Scalars['String']['output']>;
 };
 
@@ -740,6 +851,7 @@ export type UpdateActionInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   end_date?: InputMaybe<Scalars['DateTime']['input']>;
   jurisdiction?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   start_date?: InputMaybe<Scalars['DateTime']['input']>;
 };
@@ -789,9 +901,18 @@ export type UpdateCustomSchemaInput = {
   updated_by_id?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type UpdateDocumentInput = {
+  access_role?: InputMaybe<UserRole>;
+  edit_role?: InputMaybe<UserRole>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateLogInput = {
   action_id?: InputMaybe<Scalars['Int']['input']>;
   arrests?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  contact?: InputMaybe<Scalars['String']['input']>;
   created_by_id?: InputMaybe<Scalars['Int']['input']>;
   custom_fields?: InputMaybe<Scalars['JSON']['input']>;
   needs_followup?: InputMaybe<Scalars['Boolean']['input']>;
@@ -804,12 +925,23 @@ export type UpdateLogInput = {
 
 export type UpdateOptionSetInput = {
   name?: InputMaybe<Scalars['String']['input']>;
-  values: Array<InputMaybe<CreateOptionSetValueInput>>;
+  values: Array<InputMaybe<UpdateOptionSetInputValueInput>>;
+};
+
+export type UpdateOptionSetInputValueInput = {
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  is_static?: InputMaybe<Scalars['Boolean']['input']>;
+  label?: InputMaybe<Scalars['String']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+  value?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateOptionSetValueInput = {
+  is_static?: InputMaybe<Scalars['Boolean']['input']>;
   label?: InputMaybe<Scalars['String']['input']>;
   option_set_id?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
   value?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -862,13 +994,20 @@ export type User = {
   expiresAt?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['Int']['output'];
   name: Scalars['String']['output'];
-  role: Scalars['String']['output'];
+  role: UserRole;
   updated_arrestee_logs: Array<Maybe<Log>>;
   updated_arrestees: Array<Maybe<Arrestee>>;
   updated_arrests: Array<Maybe<Arrest>>;
   updated_custom_schemas: Array<Maybe<CustomSchema>>;
   updated_table_views: Array<Maybe<TableView>>;
 };
+
+export enum UserRole {
+  Admin = 'Admin',
+  Coordinator = 'Coordinator',
+  Operator = 'Operator',
+  Restricted = 'Restricted'
+}
 
 export type DuplicateArrest = {
   __typename?: 'duplicateArrest';
@@ -962,10 +1101,14 @@ export type ResolversTypes = {
   BigInt: ResolverTypeWrapper<Scalars['BigInt']['output']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Byte: ResolverTypeWrapper<Scalars['Byte']['output']>;
+  Cedar: ResolverTypeWrapper<Cedar>;
+  ChangePasswordInput: ChangePasswordInput;
+  ChangePasswordPayload: ResolverTypeWrapper<ChangePasswordPayload>;
   CreateActionInput: CreateActionInput;
   CreateArrestInput: CreateArrestInput;
   CreateArresteeInput: CreateArresteeInput;
   CreateCustomSchemaInput: CreateCustomSchemaInput;
+  CreateDocumentInput: CreateDocumentInput;
   CreateLogInput: CreateLogInput;
   CreateOptionSetInput: CreateOptionSetInput;
   CreateOptionSetInputValueInput: CreateOptionSetInputValueInput;
@@ -976,6 +1119,7 @@ export type ResolversTypes = {
   CustomSchema: ResolverTypeWrapper<CustomSchema>;
   Date: ResolverTypeWrapper<Scalars['Date']['output']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
+  Document: ResolverTypeWrapper<Document>;
   File: ResolverTypeWrapper<Scalars['File']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GenericFilterInput: GenericFilterInput;
@@ -998,14 +1142,17 @@ export type ResolversTypes = {
   UpdateArrestInput: UpdateArrestInput;
   UpdateArresteeInput: UpdateArresteeInput;
   UpdateCustomSchemaInput: UpdateCustomSchemaInput;
+  UpdateDocumentInput: UpdateDocumentInput;
   UpdateLogInput: UpdateLogInput;
   UpdateOptionSetInput: UpdateOptionSetInput;
+  UpdateOptionSetInputValueInput: UpdateOptionSetInputValueInput;
   UpdateOptionSetValueInput: UpdateOptionSetValueInput;
   UpdateSiteSettingInput: UpdateSiteSettingInput;
   UpdateTableViewInput: UpdateTableViewInput;
   UpdateUserInput: UpdateUserInput;
   UpsertSiteSettingInput: UpsertSiteSettingInput;
   User: ResolverTypeWrapper<User>;
+  UserRole: UserRole;
   duplicateArrest: ResolverTypeWrapper<DuplicateArrest>;
 };
 
@@ -1018,10 +1165,14 @@ export type ResolversParentTypes = {
   BigInt: Scalars['BigInt']['output'];
   Boolean: Scalars['Boolean']['output'];
   Byte: Scalars['Byte']['output'];
+  Cedar: Cedar;
+  ChangePasswordInput: ChangePasswordInput;
+  ChangePasswordPayload: ChangePasswordPayload;
   CreateActionInput: CreateActionInput;
   CreateArrestInput: CreateArrestInput;
   CreateArresteeInput: CreateArresteeInput;
   CreateCustomSchemaInput: CreateCustomSchemaInput;
+  CreateDocumentInput: CreateDocumentInput;
   CreateLogInput: CreateLogInput;
   CreateOptionSetInput: CreateOptionSetInput;
   CreateOptionSetInputValueInput: CreateOptionSetInputValueInput;
@@ -1032,6 +1183,7 @@ export type ResolversParentTypes = {
   CustomSchema: CustomSchema;
   Date: Scalars['Date']['output'];
   DateTime: Scalars['DateTime']['output'];
+  Document: Document;
   File: Scalars['File']['output'];
   Float: Scalars['Float']['output'];
   GenericFilterInput: GenericFilterInput;
@@ -1054,8 +1206,10 @@ export type ResolversParentTypes = {
   UpdateArrestInput: UpdateArrestInput;
   UpdateArresteeInput: UpdateArresteeInput;
   UpdateCustomSchemaInput: UpdateCustomSchemaInput;
+  UpdateDocumentInput: UpdateDocumentInput;
   UpdateLogInput: UpdateLogInput;
   UpdateOptionSetInput: UpdateOptionSetInput;
+  UpdateOptionSetInputValueInput: UpdateOptionSetInputValueInput;
   UpdateOptionSetValueInput: UpdateOptionSetValueInput;
   UpdateSiteSettingInput: UpdateSiteSettingInput;
   UpdateTableViewInput: UpdateTableViewInput;
@@ -1073,7 +1227,7 @@ export type LiveDirectiveArgs = {
 export type LiveDirectiveResolver<Result, Parent, ContextType = any, Args = LiveDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type RequireAuthDirectiveArgs = {
-  roles?: Maybe<Array<Maybe<Scalars['String']['input']>>>;
+  minRole?: Maybe<Scalars['String']['input']>;
 };
 
 export type RequireAuthDirectiveResolver<Result, Parent, ContextType = any, Args = RequireAuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
@@ -1091,6 +1245,7 @@ export type ActionResolvers<ContextType = any, ParentType extends ResolversParen
   end_date?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   jurisdiction?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  location?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   logs_count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   start_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -1166,6 +1321,18 @@ export interface ByteScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Byte';
 }
 
+export type CedarResolvers<ContextType = any, ParentType extends ResolversParentTypes['Cedar'] = ResolversParentTypes['Cedar']> = {
+  currentUser?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  prismaVersion?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ChangePasswordPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangePasswordPayload'] = ResolversParentTypes['ChangePasswordPayload']> = {
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CustomSchemaResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomSchema'] = ResolversParentTypes['CustomSchema']> = {
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   schema?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>;
@@ -1184,6 +1351,26 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
   name: 'DateTime';
 }
+
+export type DocumentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Document'] = ResolversParentTypes['Document']> = {
+  access_role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
+  children?: Resolver<Array<Maybe<ResolversTypes['Document']>>, ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  created_by_id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  edit_role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
+  html_content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  parent?: Resolver<Maybe<ResolversTypes['Document']>, ParentType, ContextType>;
+  parent_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  updated_by?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  updated_by_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export interface FileScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['File'], any> {
   name: 'File';
@@ -1212,6 +1399,7 @@ export type LogResolvers<ContextType = any, ParentType extends ResolversParentTy
   action?: Resolver<Maybe<ResolversTypes['Action']>, ParentType, ContextType>;
   action_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   arrests?: Resolver<Array<Maybe<ResolversTypes['Arrest']>>, ParentType, ContextType>;
+  contact?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   created_at?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   created_by?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   created_by_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -1233,9 +1421,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   bulkUpdateArrests?: Resolver<Maybe<ResolversTypes['BatchPayload']>, ParentType, ContextType, RequireFields<MutationBulkUpdateArrestsArgs, 'ids'>>;
   bulkUpdateUsers?: Resolver<Maybe<ResolversTypes['BatchPayload']>, ParentType, ContextType, RequireFields<MutationBulkUpdateUsersArgs, 'ids'>>;
   bulkUpsertSiteSetting?: Resolver<Array<Maybe<ResolversTypes['SiteSetting']>>, ParentType, ContextType, RequireFields<MutationBulkUpsertSiteSettingArgs, 'input'>>;
+  changePassword?: Resolver<ResolversTypes['ChangePasswordPayload'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'input'>>;
   createAction?: Resolver<ResolversTypes['Action'], ParentType, ContextType, RequireFields<MutationCreateActionArgs, 'input'>>;
   createArrest?: Resolver<ResolversTypes['Arrest'], ParentType, ContextType, RequireFields<MutationCreateArrestArgs, 'input'>>;
   createCustomSchema?: Resolver<ResolversTypes['CustomSchema'], ParentType, ContextType, RequireFields<MutationCreateCustomSchemaArgs, 'input'>>;
+  createDocument?: Resolver<ResolversTypes['Document'], ParentType, ContextType, RequireFields<MutationCreateDocumentArgs, 'input'>>;
   createIgnoredDuplicateArrest?: Resolver<ResolversTypes['IgnoredDuplicate'], ParentType, ContextType, RequireFields<MutationCreateIgnoredDuplicateArrestArgs, 'arrest1_id' | 'arrest2_id'>>;
   createLog?: Resolver<ResolversTypes['Log'], ParentType, ContextType, RequireFields<MutationCreateLogArgs, 'input'>>;
   createOptionSet?: Resolver<ResolversTypes['OptionSet'], ParentType, ContextType, RequireFields<MutationCreateOptionSetArgs, 'input'>>;
@@ -1246,6 +1436,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteAction?: Resolver<ResolversTypes['Action'], ParentType, ContextType, RequireFields<MutationDeleteActionArgs, 'id'>>;
   deleteArrest?: Resolver<ResolversTypes['Arrest'], ParentType, ContextType, RequireFields<MutationDeleteArrestArgs, 'id'>>;
   deleteCustomSchema?: Resolver<ResolversTypes['CustomSchema'], ParentType, ContextType, RequireFields<MutationDeleteCustomSchemaArgs, 'id'>>;
+  deleteDocument?: Resolver<ResolversTypes['Document'], ParentType, ContextType, RequireFields<MutationDeleteDocumentArgs, 'id'>>;
   deleteLog?: Resolver<ResolversTypes['Log'], ParentType, ContextType, RequireFields<MutationDeleteLogArgs, 'id'>>;
   deleteOptionSet?: Resolver<ResolversTypes['OptionSet'], ParentType, ContextType, RequireFields<MutationDeleteOptionSetArgs, 'id'>>;
   deleteOptionSetValue?: Resolver<ResolversTypes['OptionSetValue'], ParentType, ContextType, RequireFields<MutationDeleteOptionSetValueArgs, 'id'>>;
@@ -1253,13 +1444,15 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteTableView?: Resolver<ResolversTypes['TableView'], ParentType, ContextType, RequireFields<MutationDeleteTableViewArgs, 'id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   mergeArrests?: Resolver<ResolversTypes['Arrest'], ParentType, ContextType, RequireFields<MutationMergeArrestsArgs, 'id' | 'input' | 'merge_id'>>;
+  sendTestEmail?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSendTestEmailArgs, 'to'>>;
   unIgnoreDuplicateArrest?: Resolver<ResolversTypes['IgnoredDuplicate'], ParentType, ContextType, RequireFields<MutationUnIgnoreDuplicateArrestArgs, 'arrest1_id' | 'arrest2_id'>>;
   updateAction?: Resolver<ResolversTypes['Action'], ParentType, ContextType, RequireFields<MutationUpdateActionArgs, 'id' | 'input'>>;
   updateArrest?: Resolver<ResolversTypes['Arrest'], ParentType, ContextType, RequireFields<MutationUpdateArrestArgs, 'id' | 'input'>>;
   updateCustomSchema?: Resolver<ResolversTypes['CustomSchema'], ParentType, ContextType, RequireFields<MutationUpdateCustomSchemaArgs, 'id' | 'input'>>;
+  updateDocument?: Resolver<ResolversTypes['Document'], ParentType, ContextType, RequireFields<MutationUpdateDocumentArgs, 'id' | 'input'>>;
   updateLog?: Resolver<ResolversTypes['Log'], ParentType, ContextType, RequireFields<MutationUpdateLogArgs, 'id' | 'input'>>;
-  updateOptionSet?: Resolver<ResolversTypes['OptionSet'], ParentType, ContextType, RequireFields<MutationUpdateOptionSetArgs, 'id' | 'input'>>;
   updateOptionSetValue?: Resolver<ResolversTypes['OptionSetValue'], ParentType, ContextType, RequireFields<MutationUpdateOptionSetValueArgs, 'id' | 'input'>>;
+  updateOptionSetValues?: Resolver<ResolversTypes['OptionSet'], ParentType, ContextType, RequireFields<MutationUpdateOptionSetValuesArgs, 'id' | 'input'>>;
   updateSiteSetting?: Resolver<ResolversTypes['SiteSetting'], ParentType, ContextType, RequireFields<MutationUpdateSiteSettingArgs, 'id' | 'input'>>;
   updateTableView?: Resolver<ResolversTypes['TableView'], ParentType, ContextType, RequireFields<MutationUpdateTableViewArgs, 'id' | 'input'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id' | 'input'>>;
@@ -1270,15 +1463,17 @@ export type OptionSetResolvers<ContextType = any, ParentType extends ResolversPa
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  values?: Resolver<Array<Maybe<ResolversTypes['OptionSetValue']>>, ParentType, ContextType>;
+  values?: Resolver<Maybe<Array<Maybe<ResolversTypes['OptionSetValue']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type OptionSetValueResolvers<ContextType = any, ParentType extends ResolversParentTypes['OptionSetValue'] = ResolversParentTypes['OptionSetValue']> = {
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  is_static?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   label?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   option_set_details?: Resolver<ResolversTypes['OptionSet'], ParentType, ContextType>;
   option_set_id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  order?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1289,9 +1484,12 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   arrest?: Resolver<Maybe<ResolversTypes['Arrest']>, ParentType, ContextType, RequireFields<QueryArrestArgs, 'id'>>;
   arresteeLogs?: Resolver<Array<ResolversTypes['Log']>, ParentType, ContextType, Partial<QueryArresteeLogsArgs>>;
   arrests?: Resolver<Array<ResolversTypes['Arrest']>, ParentType, ContextType>;
+  cedar?: Resolver<Maybe<ResolversTypes['Cedar']>, ParentType, ContextType>;
   customSchema?: Resolver<Maybe<ResolversTypes['CustomSchema']>, ParentType, ContextType, RequireFields<QueryCustomSchemaArgs, 'id'>>;
   customSchemata?: Resolver<Array<ResolversTypes['CustomSchema']>, ParentType, ContextType>;
   docketSheetSearch?: Resolver<Array<Maybe<ResolversTypes['Arrest']>>, ParentType, ContextType, RequireFields<QueryDocketSheetSearchArgs, 'date' | 'days' | 'report_type'>>;
+  document?: Resolver<Maybe<ResolversTypes['Document']>, ParentType, ContextType, Partial<QueryDocumentArgs>>;
+  documents?: Resolver<Array<ResolversTypes['Document']>, ParentType, ContextType>;
   duplicateArrests?: Resolver<Array<ResolversTypes['duplicateArrest']>, ParentType, ContextType, Partial<QueryDuplicateArrestsArgs>>;
   filterArrests?: Resolver<Array<Maybe<ResolversTypes['Arrest']>>, ParentType, ContextType, Partial<QueryFilterArrestsArgs>>;
   log?: Resolver<Maybe<ResolversTypes['Log']>, ParentType, ContextType, RequireFields<QueryLogArgs, 'id'>>;
@@ -1362,7 +1560,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   expiresAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  role?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
   updated_arrestee_logs?: Resolver<Array<Maybe<ResolversTypes['Log']>>, ParentType, ContextType>;
   updated_arrestees?: Resolver<Array<Maybe<ResolversTypes['Arrestee']>>, ParentType, ContextType>;
   updated_arrests?: Resolver<Array<Maybe<ResolversTypes['Arrest']>>, ParentType, ContextType>;
@@ -1392,9 +1590,12 @@ export type Resolvers<ContextType = any> = {
   BatchPayload?: BatchPayloadResolvers<ContextType>;
   BigInt?: GraphQLScalarType;
   Byte?: GraphQLScalarType;
+  Cedar?: CedarResolvers<ContextType>;
+  ChangePasswordPayload?: ChangePasswordPayloadResolvers<ContextType>;
   CustomSchema?: CustomSchemaResolvers<ContextType>;
   Date?: GraphQLScalarType;
   DateTime?: GraphQLScalarType;
+  Document?: DocumentResolvers<ContextType>;
   File?: GraphQLScalarType;
   IgnoredDuplicate?: IgnoredDuplicateResolvers<ContextType>;
   JSON?: GraphQLScalarType;
@@ -1435,6 +1636,7 @@ export const anAction = (overrides?: Partial<Action>, _relationshipsToOmit: Set<
         end_date: overrides && overrides.hasOwnProperty('end_date') ? overrides.end_date! : faker['date']['past'](),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker.lorem.word(),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.lorem.word(),
         logs_count: overrides && overrides.hasOwnProperty('logs_count') ? overrides.logs_count! : faker.number.int({ min: 0, max: 9999 }),
         name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.lorem.word(),
         start_date: overrides && overrides.hasOwnProperty('start_date') ? overrides.start_date! : faker['date']['past'](),
@@ -1514,6 +1716,35 @@ export const aBatchPayload = (overrides?: Partial<BatchPayload>, _relationshipsT
     };
 };
 
+export const aCedar = (overrides?: Partial<Cedar>, _relationshipsToOmit: Set<string> = new Set()): { __typename: 'Cedar' } & Cedar => {
+    const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
+    relationshipsToOmit.add('Cedar');
+    return {
+        __typename: 'Cedar',
+        currentUser: overrides && overrides.hasOwnProperty('currentUser') ? overrides.currentUser! : faker.lorem.word(),
+        prismaVersion: overrides && overrides.hasOwnProperty('prismaVersion') ? overrides.prismaVersion! : faker.lorem.word(),
+        version: overrides && overrides.hasOwnProperty('version') ? overrides.version! : faker.lorem.word(),
+    };
+};
+
+export const aChangePasswordInput = (overrides?: Partial<ChangePasswordInput>, _relationshipsToOmit: Set<string> = new Set()): ChangePasswordInput => {
+    const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
+    relationshipsToOmit.add('ChangePasswordInput');
+    return {
+        currentPassword: overrides && overrides.hasOwnProperty('currentPassword') ? overrides.currentPassword! : faker.lorem.word(),
+        newPassword: overrides && overrides.hasOwnProperty('newPassword') ? overrides.newPassword! : faker.lorem.word(),
+    };
+};
+
+export const aChangePasswordPayload = (overrides?: Partial<ChangePasswordPayload>, _relationshipsToOmit: Set<string> = new Set()): { __typename: 'ChangePasswordPayload' } & ChangePasswordPayload => {
+    const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
+    relationshipsToOmit.add('ChangePasswordPayload');
+    return {
+        __typename: 'ChangePasswordPayload',
+        success: overrides && overrides.hasOwnProperty('success') ? overrides.success! : faker.datatype.boolean(),
+    };
+};
+
 export const aCreateActionInput = (overrides?: Partial<CreateActionInput>, _relationshipsToOmit: Set<string> = new Set()): CreateActionInput => {
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('CreateActionInput');
@@ -1523,6 +1754,7 @@ export const aCreateActionInput = (overrides?: Partial<CreateActionInput>, _rela
         description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
         end_date: overrides && overrides.hasOwnProperty('end_date') ? overrides.end_date! : faker['date']['past'](),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker.lorem.word(),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.lorem.word(),
         name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.lorem.word(),
         start_date: overrides && overrides.hasOwnProperty('start_date') ? overrides.start_date! : faker['date']['past'](),
     };
@@ -1585,17 +1817,30 @@ export const aCreateCustomSchemaInput = (overrides?: Partial<CreateCustomSchemaI
     };
 };
 
+export const aCreateDocumentInput = (overrides?: Partial<CreateDocumentInput>, _relationshipsToOmit: Set<string> = new Set()): CreateDocumentInput => {
+    const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
+    relationshipsToOmit.add('CreateDocumentInput');
+    return {
+        access_role: overrides && overrides.hasOwnProperty('access_role') ? overrides.access_role! : UserRole.Admin,
+        edit_role: overrides && overrides.hasOwnProperty('edit_role') ? overrides.edit_role! : UserRole.Admin,
+        title: overrides && overrides.hasOwnProperty('title') ? overrides.title! : faker.lorem.word(),
+        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.lorem.word(),
+    };
+};
+
 export const aCreateLogInput = (overrides?: Partial<CreateLogInput>, _relationshipsToOmit: Set<string> = new Set()): CreateLogInput => {
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('CreateLogInput');
     return {
         action_id: overrides && overrides.hasOwnProperty('action_id') ? overrides.action_id! : faker.number.int({ min: 0, max: 9999 }),
         arrests: overrides && overrides.hasOwnProperty('arrests') ? overrides.arrests! : [faker.number.int({ min: 0, max: 9999 })],
+        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker.lorem.word(),
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         needs_followup: overrides && overrides.hasOwnProperty('needs_followup') ? overrides.needs_followup! : faker.datatype.boolean(),
         notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.word(),
         shift: overrides && overrides.hasOwnProperty('shift') ? overrides.shift! : faker.lorem.word(),
+        time: overrides && overrides.hasOwnProperty('time') ? overrides.time! : faker['date']['past'](),
         type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.lorem.word(),
         updated_by_id: overrides && overrides.hasOwnProperty('updated_by_id') ? overrides.updated_by_id! : faker.number.int({ min: 0, max: 9999 }),
     };
@@ -1614,7 +1859,9 @@ export const aCreateOptionSetInputValueInput = (overrides?: Partial<CreateOption
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('CreateOptionSetInputValueInput');
     return {
+        is_static: overrides && overrides.hasOwnProperty('is_static') ? overrides.is_static! : faker.datatype.boolean(),
         label: overrides && overrides.hasOwnProperty('label') ? overrides.label! : faker.lorem.word(),
+        order: overrides && overrides.hasOwnProperty('order') ? overrides.order! : faker.number.int({ min: 0, max: 9999 }),
         value: overrides && overrides.hasOwnProperty('value') ? overrides.value! : faker.lorem.word(),
     };
 };
@@ -1623,8 +1870,10 @@ export const aCreateOptionSetValueInput = (overrides?: Partial<CreateOptionSetVa
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('CreateOptionSetValueInput');
     return {
+        is_static: overrides && overrides.hasOwnProperty('is_static') ? overrides.is_static! : faker.datatype.boolean(),
         label: overrides && overrides.hasOwnProperty('label') ? overrides.label! : faker.lorem.word(),
         option_set_id: overrides && overrides.hasOwnProperty('option_set_id') ? overrides.option_set_id! : faker.number.int({ min: 0, max: 9999 }),
+        order: overrides && overrides.hasOwnProperty('order') ? overrides.order! : faker.number.int({ min: 0, max: 9999 }),
         value: overrides && overrides.hasOwnProperty('value') ? overrides.value! : faker.lorem.word(),
     };
 };
@@ -1684,6 +1933,30 @@ export const aCustomSchema = (overrides?: Partial<CustomSchema>, _relationshipsT
     };
 };
 
+export const aDocument = (overrides?: Partial<Document>, _relationshipsToOmit: Set<string> = new Set()): { __typename: 'Document' } & Document => {
+    const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
+    relationshipsToOmit.add('Document');
+    return {
+        __typename: 'Document',
+        access_role: overrides && overrides.hasOwnProperty('access_role') ? overrides.access_role! : UserRole.Admin,
+        children: overrides && overrides.hasOwnProperty('children') ? overrides.children! : [relationshipsToOmit.has('Document') ? {} as Document : aDocument({}, relationshipsToOmit)],
+        created_at: overrides && overrides.hasOwnProperty('created_at') ? overrides.created_at! : faker['date']['past'](),
+        created_by: overrides && overrides.hasOwnProperty('created_by') ? overrides.created_by! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
+        created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
+        edit_role: overrides && overrides.hasOwnProperty('edit_role') ? overrides.edit_role! : UserRole.Admin,
+        html_content: overrides && overrides.hasOwnProperty('html_content') ? overrides.html_content! : faker.lorem.word(),
+        id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.lorem.word(),
+        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.lorem.word(),
+        parent: overrides && overrides.hasOwnProperty('parent') ? overrides.parent! : relationshipsToOmit.has('Document') ? {} as Document : aDocument({}, relationshipsToOmit),
+        parent_id: overrides && overrides.hasOwnProperty('parent_id') ? overrides.parent_id! : faker.lorem.word(),
+        title: overrides && overrides.hasOwnProperty('title') ? overrides.title! : faker.lorem.word(),
+        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.lorem.word(),
+        updated_at: overrides && overrides.hasOwnProperty('updated_at') ? overrides.updated_at! : faker['date']['past'](),
+        updated_by: overrides && overrides.hasOwnProperty('updated_by') ? overrides.updated_by! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
+        updated_by_id: overrides && overrides.hasOwnProperty('updated_by_id') ? overrides.updated_by_id! : faker.number.int({ min: 0, max: 9999 }),
+    };
+};
+
 export const aGenericFilterInput = (overrides?: Partial<GenericFilterInput>, _relationshipsToOmit: Set<string> = new Set()): GenericFilterInput => {
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('GenericFilterInput');
@@ -1717,6 +1990,7 @@ export const aLog = (overrides?: Partial<Log>, _relationshipsToOmit: Set<string>
         action: overrides && overrides.hasOwnProperty('action') ? overrides.action! : relationshipsToOmit.has('Action') ? {} as Action : anAction({}, relationshipsToOmit),
         action_id: overrides && overrides.hasOwnProperty('action_id') ? overrides.action_id! : faker.number.int({ min: 0, max: 9999 }),
         arrests: overrides && overrides.hasOwnProperty('arrests') ? overrides.arrests! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],
+        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker.lorem.word(),
         created_at: overrides && overrides.hasOwnProperty('created_at') ? overrides.created_at! : faker['date']['past'](),
         created_by: overrides && overrides.hasOwnProperty('created_by') ? overrides.created_by! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
@@ -1742,9 +2016,11 @@ export const aMutation = (overrides?: Partial<Mutation>, _relationshipsToOmit: S
         bulkUpdateArrests: overrides && overrides.hasOwnProperty('bulkUpdateArrests') ? overrides.bulkUpdateArrests! : relationshipsToOmit.has('BatchPayload') ? {} as BatchPayload : aBatchPayload({}, relationshipsToOmit),
         bulkUpdateUsers: overrides && overrides.hasOwnProperty('bulkUpdateUsers') ? overrides.bulkUpdateUsers! : relationshipsToOmit.has('BatchPayload') ? {} as BatchPayload : aBatchPayload({}, relationshipsToOmit),
         bulkUpsertSiteSetting: overrides && overrides.hasOwnProperty('bulkUpsertSiteSetting') ? overrides.bulkUpsertSiteSetting! : [relationshipsToOmit.has('SiteSetting') ? {} as SiteSetting : aSiteSetting({}, relationshipsToOmit)],
+        changePassword: overrides && overrides.hasOwnProperty('changePassword') ? overrides.changePassword! : relationshipsToOmit.has('ChangePasswordPayload') ? {} as ChangePasswordPayload : aChangePasswordPayload({}, relationshipsToOmit),
         createAction: overrides && overrides.hasOwnProperty('createAction') ? overrides.createAction! : relationshipsToOmit.has('Action') ? {} as Action : anAction({}, relationshipsToOmit),
         createArrest: overrides && overrides.hasOwnProperty('createArrest') ? overrides.createArrest! : relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit),
         createCustomSchema: overrides && overrides.hasOwnProperty('createCustomSchema') ? overrides.createCustomSchema! : relationshipsToOmit.has('CustomSchema') ? {} as CustomSchema : aCustomSchema({}, relationshipsToOmit),
+        createDocument: overrides && overrides.hasOwnProperty('createDocument') ? overrides.createDocument! : relationshipsToOmit.has('Document') ? {} as Document : aDocument({}, relationshipsToOmit),
         createIgnoredDuplicateArrest: overrides && overrides.hasOwnProperty('createIgnoredDuplicateArrest') ? overrides.createIgnoredDuplicateArrest! : relationshipsToOmit.has('IgnoredDuplicate') ? {} as IgnoredDuplicate : anIgnoredDuplicate({}, relationshipsToOmit),
         createLog: overrides && overrides.hasOwnProperty('createLog') ? overrides.createLog! : relationshipsToOmit.has('Log') ? {} as Log : aLog({}, relationshipsToOmit),
         createOptionSet: overrides && overrides.hasOwnProperty('createOptionSet') ? overrides.createOptionSet! : relationshipsToOmit.has('OptionSet') ? {} as OptionSet : anOptionSet({}, relationshipsToOmit),
@@ -1755,6 +2031,7 @@ export const aMutation = (overrides?: Partial<Mutation>, _relationshipsToOmit: S
         deleteAction: overrides && overrides.hasOwnProperty('deleteAction') ? overrides.deleteAction! : relationshipsToOmit.has('Action') ? {} as Action : anAction({}, relationshipsToOmit),
         deleteArrest: overrides && overrides.hasOwnProperty('deleteArrest') ? overrides.deleteArrest! : relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit),
         deleteCustomSchema: overrides && overrides.hasOwnProperty('deleteCustomSchema') ? overrides.deleteCustomSchema! : relationshipsToOmit.has('CustomSchema') ? {} as CustomSchema : aCustomSchema({}, relationshipsToOmit),
+        deleteDocument: overrides && overrides.hasOwnProperty('deleteDocument') ? overrides.deleteDocument! : relationshipsToOmit.has('Document') ? {} as Document : aDocument({}, relationshipsToOmit),
         deleteLog: overrides && overrides.hasOwnProperty('deleteLog') ? overrides.deleteLog! : relationshipsToOmit.has('Log') ? {} as Log : aLog({}, relationshipsToOmit),
         deleteOptionSet: overrides && overrides.hasOwnProperty('deleteOptionSet') ? overrides.deleteOptionSet! : relationshipsToOmit.has('OptionSet') ? {} as OptionSet : anOptionSet({}, relationshipsToOmit),
         deleteOptionSetValue: overrides && overrides.hasOwnProperty('deleteOptionSetValue') ? overrides.deleteOptionSetValue! : relationshipsToOmit.has('OptionSetValue') ? {} as OptionSetValue : anOptionSetValue({}, relationshipsToOmit),
@@ -1762,13 +2039,15 @@ export const aMutation = (overrides?: Partial<Mutation>, _relationshipsToOmit: S
         deleteTableView: overrides && overrides.hasOwnProperty('deleteTableView') ? overrides.deleteTableView! : relationshipsToOmit.has('TableView') ? {} as TableView : aTableView({}, relationshipsToOmit),
         deleteUser: overrides && overrides.hasOwnProperty('deleteUser') ? overrides.deleteUser! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
         mergeArrests: overrides && overrides.hasOwnProperty('mergeArrests') ? overrides.mergeArrests! : relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit),
+        sendTestEmail: overrides && overrides.hasOwnProperty('sendTestEmail') ? overrides.sendTestEmail! : faker.datatype.boolean(),
         unIgnoreDuplicateArrest: overrides && overrides.hasOwnProperty('unIgnoreDuplicateArrest') ? overrides.unIgnoreDuplicateArrest! : relationshipsToOmit.has('IgnoredDuplicate') ? {} as IgnoredDuplicate : anIgnoredDuplicate({}, relationshipsToOmit),
         updateAction: overrides && overrides.hasOwnProperty('updateAction') ? overrides.updateAction! : relationshipsToOmit.has('Action') ? {} as Action : anAction({}, relationshipsToOmit),
         updateArrest: overrides && overrides.hasOwnProperty('updateArrest') ? overrides.updateArrest! : relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit),
         updateCustomSchema: overrides && overrides.hasOwnProperty('updateCustomSchema') ? overrides.updateCustomSchema! : relationshipsToOmit.has('CustomSchema') ? {} as CustomSchema : aCustomSchema({}, relationshipsToOmit),
+        updateDocument: overrides && overrides.hasOwnProperty('updateDocument') ? overrides.updateDocument! : relationshipsToOmit.has('Document') ? {} as Document : aDocument({}, relationshipsToOmit),
         updateLog: overrides && overrides.hasOwnProperty('updateLog') ? overrides.updateLog! : relationshipsToOmit.has('Log') ? {} as Log : aLog({}, relationshipsToOmit),
-        updateOptionSet: overrides && overrides.hasOwnProperty('updateOptionSet') ? overrides.updateOptionSet! : relationshipsToOmit.has('OptionSet') ? {} as OptionSet : anOptionSet({}, relationshipsToOmit),
         updateOptionSetValue: overrides && overrides.hasOwnProperty('updateOptionSetValue') ? overrides.updateOptionSetValue! : relationshipsToOmit.has('OptionSetValue') ? {} as OptionSetValue : anOptionSetValue({}, relationshipsToOmit),
+        updateOptionSetValues: overrides && overrides.hasOwnProperty('updateOptionSetValues') ? overrides.updateOptionSetValues! : relationshipsToOmit.has('OptionSet') ? {} as OptionSet : anOptionSet({}, relationshipsToOmit),
         updateSiteSetting: overrides && overrides.hasOwnProperty('updateSiteSetting') ? overrides.updateSiteSetting! : relationshipsToOmit.has('SiteSetting') ? {} as SiteSetting : aSiteSetting({}, relationshipsToOmit),
         updateTableView: overrides && overrides.hasOwnProperty('updateTableView') ? overrides.updateTableView! : relationshipsToOmit.has('TableView') ? {} as TableView : aTableView({}, relationshipsToOmit),
         updateUser: overrides && overrides.hasOwnProperty('updateUser') ? overrides.updateUser! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
@@ -1794,9 +2073,11 @@ export const anOptionSetValue = (overrides?: Partial<OptionSetValue>, _relations
     return {
         __typename: 'OptionSetValue',
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
+        is_static: overrides && overrides.hasOwnProperty('is_static') ? overrides.is_static! : faker.datatype.boolean(),
         label: overrides && overrides.hasOwnProperty('label') ? overrides.label! : faker.lorem.word(),
         option_set_details: overrides && overrides.hasOwnProperty('option_set_details') ? overrides.option_set_details! : relationshipsToOmit.has('OptionSet') ? {} as OptionSet : anOptionSet({}, relationshipsToOmit),
         option_set_id: overrides && overrides.hasOwnProperty('option_set_id') ? overrides.option_set_id! : faker.number.int({ min: 0, max: 9999 }),
+        order: overrides && overrides.hasOwnProperty('order') ? overrides.order! : faker.number.int({ min: 0, max: 9999 }),
         value: overrides && overrides.hasOwnProperty('value') ? overrides.value! : faker.lorem.word(),
     };
 };
@@ -1811,9 +2092,12 @@ export const aQuery = (overrides?: Partial<Query>, _relationshipsToOmit: Set<str
         arrest: overrides && overrides.hasOwnProperty('arrest') ? overrides.arrest! : relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit),
         arresteeLogs: overrides && overrides.hasOwnProperty('arresteeLogs') ? overrides.arresteeLogs! : [relationshipsToOmit.has('Log') ? {} as Log : aLog({}, relationshipsToOmit)],
         arrests: overrides && overrides.hasOwnProperty('arrests') ? overrides.arrests! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],
+        cedar: overrides && overrides.hasOwnProperty('cedar') ? overrides.cedar! : relationshipsToOmit.has('Cedar') ? {} as Cedar : aCedar({}, relationshipsToOmit),
         customSchema: overrides && overrides.hasOwnProperty('customSchema') ? overrides.customSchema! : relationshipsToOmit.has('CustomSchema') ? {} as CustomSchema : aCustomSchema({}, relationshipsToOmit),
         customSchemata: overrides && overrides.hasOwnProperty('customSchemata') ? overrides.customSchemata! : [relationshipsToOmit.has('CustomSchema') ? {} as CustomSchema : aCustomSchema({}, relationshipsToOmit)],
         docketSheetSearch: overrides && overrides.hasOwnProperty('docketSheetSearch') ? overrides.docketSheetSearch! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],
+        document: overrides && overrides.hasOwnProperty('document') ? overrides.document! : relationshipsToOmit.has('Document') ? {} as Document : aDocument({}, relationshipsToOmit),
+        documents: overrides && overrides.hasOwnProperty('documents') ? overrides.documents! : [relationshipsToOmit.has('Document') ? {} as Document : aDocument({}, relationshipsToOmit)],
         duplicateArrests: overrides && overrides.hasOwnProperty('duplicateArrests') ? overrides.duplicateArrests! : [relationshipsToOmit.has('DuplicateArrest') ? {} as DuplicateArrest : aDuplicateArrest({}, relationshipsToOmit)],
         filterArrests: overrides && overrides.hasOwnProperty('filterArrests') ? overrides.filterArrests! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],
         log: overrides && overrides.hasOwnProperty('log') ? overrides.log! : relationshipsToOmit.has('Log') ? {} as Log : aLog({}, relationshipsToOmit),
@@ -1899,6 +2183,7 @@ export const anUpdateActionInput = (overrides?: Partial<UpdateActionInput>, _rel
         description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
         end_date: overrides && overrides.hasOwnProperty('end_date') ? overrides.end_date! : faker['date']['past'](),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker.lorem.word(),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.lorem.word(),
         name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.lorem.word(),
         start_date: overrides && overrides.hasOwnProperty('start_date') ? overrides.start_date! : faker['date']['past'](),
     };
@@ -1961,12 +2246,25 @@ export const anUpdateCustomSchemaInput = (overrides?: Partial<UpdateCustomSchema
     };
 };
 
+export const anUpdateDocumentInput = (overrides?: Partial<UpdateDocumentInput>, _relationshipsToOmit: Set<string> = new Set()): UpdateDocumentInput => {
+    const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
+    relationshipsToOmit.add('UpdateDocumentInput');
+    return {
+        access_role: overrides && overrides.hasOwnProperty('access_role') ? overrides.access_role! : UserRole.Admin,
+        edit_role: overrides && overrides.hasOwnProperty('edit_role') ? overrides.edit_role! : UserRole.Admin,
+        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.lorem.word(),
+        title: overrides && overrides.hasOwnProperty('title') ? overrides.title! : faker.lorem.word(),
+        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.lorem.word(),
+    };
+};
+
 export const anUpdateLogInput = (overrides?: Partial<UpdateLogInput>, _relationshipsToOmit: Set<string> = new Set()): UpdateLogInput => {
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('UpdateLogInput');
     return {
         action_id: overrides && overrides.hasOwnProperty('action_id') ? overrides.action_id! : faker.number.int({ min: 0, max: 9999 }),
         arrests: overrides && overrides.hasOwnProperty('arrests') ? overrides.arrests! : [faker.number.int({ min: 0, max: 9999 })],
+        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker.lorem.word(),
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         needs_followup: overrides && overrides.hasOwnProperty('needs_followup') ? overrides.needs_followup! : faker.datatype.boolean(),
@@ -1983,7 +2281,20 @@ export const anUpdateOptionSetInput = (overrides?: Partial<UpdateOptionSetInput>
     relationshipsToOmit.add('UpdateOptionSetInput');
     return {
         name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.lorem.word(),
-        values: overrides && overrides.hasOwnProperty('values') ? overrides.values! : [relationshipsToOmit.has('CreateOptionSetValueInput') ? {} as CreateOptionSetValueInput : aCreateOptionSetValueInput({}, relationshipsToOmit)],
+        values: overrides && overrides.hasOwnProperty('values') ? overrides.values! : [relationshipsToOmit.has('UpdateOptionSetInputValueInput') ? {} as UpdateOptionSetInputValueInput : anUpdateOptionSetInputValueInput({}, relationshipsToOmit)],
+    };
+};
+
+export const anUpdateOptionSetInputValueInput = (overrides?: Partial<UpdateOptionSetInputValueInput>, _relationshipsToOmit: Set<string> = new Set()): UpdateOptionSetInputValueInput => {
+    const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
+    relationshipsToOmit.add('UpdateOptionSetInputValueInput');
+    return {
+        deleted: overrides && overrides.hasOwnProperty('deleted') ? overrides.deleted! : faker.datatype.boolean(),
+        id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
+        is_static: overrides && overrides.hasOwnProperty('is_static') ? overrides.is_static! : faker.datatype.boolean(),
+        label: overrides && overrides.hasOwnProperty('label') ? overrides.label! : faker.lorem.word(),
+        order: overrides && overrides.hasOwnProperty('order') ? overrides.order! : faker.number.int({ min: 0, max: 9999 }),
+        value: overrides && overrides.hasOwnProperty('value') ? overrides.value! : faker.lorem.word(),
     };
 };
 
@@ -1991,8 +2302,10 @@ export const anUpdateOptionSetValueInput = (overrides?: Partial<UpdateOptionSetV
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('UpdateOptionSetValueInput');
     return {
+        is_static: overrides && overrides.hasOwnProperty('is_static') ? overrides.is_static! : faker.datatype.boolean(),
         label: overrides && overrides.hasOwnProperty('label') ? overrides.label! : faker.lorem.word(),
         option_set_id: overrides && overrides.hasOwnProperty('option_set_id') ? overrides.option_set_id! : faker.number.int({ min: 0, max: 9999 }),
+        order: overrides && overrides.hasOwnProperty('order') ? overrides.order! : faker.number.int({ min: 0, max: 9999 }),
         value: overrides && overrides.hasOwnProperty('value') ? overrides.value! : faker.lorem.word(),
     };
 };
@@ -2065,7 +2378,7 @@ export const aUser = (overrides?: Partial<User>, _relationshipsToOmit: Set<strin
         expiresAt: overrides && overrides.hasOwnProperty('expiresAt') ? overrides.expiresAt! : faker['date']['past'](),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.lorem.word(),
-        role: overrides && overrides.hasOwnProperty('role') ? overrides.role! : faker.lorem.word(),
+        role: overrides && overrides.hasOwnProperty('role') ? overrides.role! : UserRole.Admin,
         updated_arrestee_logs: overrides && overrides.hasOwnProperty('updated_arrestee_logs') ? overrides.updated_arrestee_logs! : [relationshipsToOmit.has('Log') ? {} as Log : aLog({}, relationshipsToOmit)],
         updated_arrestees: overrides && overrides.hasOwnProperty('updated_arrestees') ? overrides.updated_arrestees! : [relationshipsToOmit.has('Arrestee') ? {} as Arrestee : anArrestee({}, relationshipsToOmit)],
         updated_arrests: overrides && overrides.hasOwnProperty('updated_arrests') ? overrides.updated_arrests! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],

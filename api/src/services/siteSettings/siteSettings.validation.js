@@ -38,6 +38,20 @@ export const settingsSchemas = {
   timeZone: z.string().default('America/Los_Angeles'),
   restriction_settings: restrictionSettingsSchema,
   default_restrictions: defaultRestrictionsSchema,
+  smtp_host: z
+    .union([
+      z
+        .string()
+        .regex(
+          /^((?=[a-zA-Z0-9-]{1,63}\.)[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,63}(:\d{1,5})?$|^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d{1,5})?$/,
+          'Invalid SMTP host'
+        ),
+      z.string().optional(),
+    ])
+    .default('protonmail-bridge:1025'),
+  smtp_user: z.string().default(''),
+  smtp_pass: z.string().default(''),
+  smtp_secure: z.boolean().default(false),
 }
 
 export const transformSettings = (settings) => {
@@ -45,6 +59,7 @@ export const transformSettings = (settings) => {
 
   return Object.entries(settingsSchemas).reduce((acc, [key, schema]) => {
     const setting = settingsMap[key] || { id: key }
+    // console.error('Transforming setting', key, setting.value)
     setting.value = schema.parse(setting?.value || undefined)
 
     acc.push(setting)

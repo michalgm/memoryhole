@@ -41,5 +41,6 @@ export const schema = gql`
     bulkUpsertSiteSetting(input: [UpsertSiteSettingInput]!): [SiteSetting]!
       @requireAuth
     deleteSiteSetting(id: String!): SiteSetting! @requireAuth
+    sendTestEmail(to: String!): Boolean! @requireAuth
   }
 `
