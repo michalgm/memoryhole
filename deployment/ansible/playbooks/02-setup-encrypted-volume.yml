@@ -11,7 +11,7 @@
 # - Store the passphrase in a secure location (password manager, offline)
 #
 # Usage:
-#   ansible-playbook -i inventory.yml 02-setup-fde.yml
+#   ansible-playbook -i inventory.yml 02-setup-encrypted-volume.yml
 #
 # Prerequisites:
 #   - Server initialized with 01-init-server.yml
@@ -25,20 +25,20 @@
   gather_facts: true
 
   pre_tasks:
-    - name: Notify user that FDE is disabled and skip
-      when: not (use_fde | default(false))
+    - name: Notify user that encrypted volume is disabled and skip
+      when: not (use_encrypted_volume | default(false))
       block:
-        - name: FDE not enabled
+        - name: Encrypted volume not enabled
           debug:
             msg: |
-              Full disk encryption is disabled (use_fde is false or not set).
+              Encrypted volume is disabled (use_encrypted_volume is false or not set).
               Skipping encrypted volume setup. To enable, set in group_vars/all.yml:
-                use_fde: true
+                use_encrypted_volume: true
                 encrypted_volume_device: /dev/sdX
                 encrypted_volume_passphrase: <strong-passphrase>
                 encrypted_volume_mount: /mnt/encrypted
 
-        - name: End play - FDE not configured
+        - name: End play - Encrypted volume not configured
           meta: end_play
 
     - name: Verify required encryption variables
@@ -50,7 +50,7 @@
           - encrypted_volume_passphrase is defined and encrypted_volume_passphrase | length > 0
           - encrypted_volume_passphrase != "CHANGE_ME_GENERATE_STRONG_PASSPHRASE"
         fail_msg: |
-          use_fde is true but required encryption variables are missing or have placeholder values.
+          use_encrypted_volume is true but required encryption variables are missing or have placeholder values.
           Check group_vars/all.yml for: encrypted_volume_device, encrypted_volume_name,
           encrypted_volume_mount, encrypted_volume_passphrase
 
@@ -208,8 +208,21 @@
 
     - name: Setup swapfile on encrypted volume
       block:
-        - name: Create swapfile
-          command: dd if=/dev/zero of={{ encrypted_volume_mount }}/swapfile bs=1M count=4096
+        - name: Disable any existing system swapfiles
+          shell: |
+            for swap in $(swapon --show=NAME --noheadings 2>/dev/null); do
+              swapoff "$swap" 2>/dev/null || true
+            done
+          changed_when: false
+
+        - name: Remove existing swapfile fstab entries
+          replace:
+            path: /etc/fstab
+            regexp: '^[^\s]+\s+none\s+swap\s.*\n?'
+            replace: ''
+
+        - name: Create swapfile on encrypted volume
+          command: dd if=/dev/zero of={{ encrypted_volume_mount }}/swapfile bs=1M count={{ swap_size_mb | default(2048) }}
           args:
             creates: '{{ encrypted_volume_mount }}/swapfile'
 
@@ -220,11 +233,14 @@
 
         - name: Format swapfile
           command: mkswap {{ encrypted_volume_mount }}/swapfile
-          when: ansible_swaptotal_mb < 1
+          register: mkswap_result
+          changed_when: mkswap_result.rc == 0
 
         - name: Enable swapfile
           command: swapon {{ encrypted_volume_mount }}/swapfile
-          when: ansible_swaptotal_mb < 1
+          register: swapon_result
+          failed_when: swapon_result.rc != 0 and 'already' not in swapon_result.stderr
+          changed_when: swapon_result.rc == 0
 
         - name: Add swapfile to fstab
           mount:

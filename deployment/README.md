@@ -90,7 +90,7 @@ Edit `group_vars/all/main.yml`. It only needs the values specific to your deploy
 | `admin_user_email` | Initial admin account email — also used for Let's Encrypt cert notifications and fail2ban alerts |
 | `admin_user_name` | Initial admin display name (default: `Admin`) |
 | `linux_user_ssh_key_file` | Path to your SSH public key, e.g. `~/.ssh/id_ed25519.pub` |
-| `use_fde` | `true` to encrypt the data volume, `false` to skip |
+| `use_encrypted_volume` | `true` to encrypt the data volume, `false` to skip |
 | `encrypted_volume_device` | Block device to encrypt, e.g. `/dev/sdc` — check with `lsblk` on the server |
 
 The admin password is prompted interactively when `deploy.yml` runs.
@@ -130,7 +130,7 @@ ansible-playbook -i inventory.yml deploy.yml
 This runs all setup steps in order:
 
 1. Server initialization (packages, users, SSH)
-2. Disk encryption setup with LUKS (skipped if `use_fde: false`)
+2. Disk encryption setup with LUKS (skipped if `use_encrypted_volume: false`)
 3. Security hardening (firewall, fail2ban, SSH hardening)
 4. Caddy reverse proxy
 5. Memoryhole app instances
@@ -142,7 +142,7 @@ ansible-playbook -i inventory.yml deploy.yml --tags deploy   # re-deploy app onl
 ansible-playbook -i inventory.yml deploy.yml --tags security # re-apply security config
 ```
 
-Available tags: `init`, `fde`, `security`, `caddy`, `deploy`
+Available tags: `init`, `encrypted_volume`, `security`, `caddy`, `deploy`
 
 ---
 
@@ -165,7 +165,7 @@ ansible-playbook -i inventory.yml upgrade-instances.yml -e global_image_tag=v0.2
 
 ## Security Notes
 
-**LUKS passphrase:** If you enabled disk encryption (`use_fde: true`), store your `encrypted_volume_passphrase` in a password manager and an offline backup. There is no recovery — LUKS is unbreakable without the passphrase.
+**LUKS passphrase:** If you enabled disk encryption (`use_encrypted_volume: true`), store your `encrypted_volume_passphrase` in a password manager and an offline backup. There is no recovery — LUKS is unbreakable without the passphrase.
 
 **SSH access:** The server is configured for key-only root SSH. Password authentication is disabled.
 
@@ -176,8 +176,8 @@ ansible-playbook -i inventory.yml upgrade-instances.yml -e global_image_tag=v0.2
 ## Troubleshooting
 
 - **Ansible can't connect:** Verify `ansible_host` in `inventory.yml` and that your SSH key is authorized on the server.
-- **FDE step fails — device not found:** Check the block device name with `lsblk` on the server and update `encrypted_volume_device` in `all.yml`.
+- **Encrypted volume step fails — device not found:** Check the block device name with `lsblk` on the server and update `encrypted_volume_device` in `all.yml`.
 - **App not starting:** Re-run with `--tags deploy` and check `docker compose logs` on the server.
-- **Incident response:** See [docs/INCIDENT-RESPONSE.md](docs/INCIDENT-RESPONSE.md) for security breach procedures.
+
 
 For bugs or questions: https://github.com/michalgm/memoryhole/issues

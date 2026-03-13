@@ -30,7 +30,7 @@
 # Workaround — remove when https://github.com/shenxn/protonmail-bridge-docker/issues/141 is fixed
 - name: Copy bridge Dockerfile workaround
   copy:
-    src: Dockerfile.bridge
+    src: ../../Dockerfile.bridge
     dest: '{{ instances_base }}/{{ instance.domain }}/Dockerfile.bridge'
     owner: '{{ linux_username }}'
     group: '{{ linux_username }}'

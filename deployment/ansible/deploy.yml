@@ -9,9 +9,9 @@
 #   ansible-playbook -i inventory.yml deploy.yml
 #
 # To run only specific steps, use tags:
-#   ansible-playbook -i inventory.yml deploy.yml --tags init,fde
+#   ansible-playbook -i inventory.yml deploy.yml --tags init,encrypted_volume
 #
-# Available tags: init, fde, security, caddy, deploy
+# Available tags: init, encrypted_volume, security, caddy, deploy
 # ============================================================================
 
 # Prompt for sensitive values at runtime so they never need to live in all.yml.
@@ -38,7 +38,7 @@
           Passphrase
         echo: false
       register: _passphrase_result
-      when: use_fde | default(true)
+      when: use_encrypted_volume | default(true)
 
     - name: Confirm disk encryption passphrase
       pause:
@@ -46,14 +46,14 @@
         echo: false
       register: _passphrase_confirm
       when:
-        - use_fde | default(true)
+        - use_encrypted_volume | default(true)
         - _passphrase_result.user_input | default('') | length > 0
 
     - name: Fail if passphrases do not match
       fail:
         msg: "Passphrases do not match. Re-run deploy.yml and try again."
       when:
-        - use_fde | default(true)
+        - use_encrypted_volume | default(true)
         - _passphrase_result.user_input | default('') | length > 0
         - _passphrase_result.user_input != _passphrase_confirm.user_input
 
@@ -61,7 +61,7 @@
       set_fact:
         encrypted_volume_passphrase: "{{ _passphrase_result.user_input }}"
       when:
-        - use_fde | default(true)
+        - use_encrypted_volume | default(true)
         - _passphrase_result.user_input | default('') | length > 0
 
     - name: Prompt for initial admin password
@@ -108,8 +108,8 @@
 - import_playbook: playbooks/01-init-server.yml
   tags: [init]
 
-- import_playbook: playbooks/02-setup-fde.yml
-  tags: [fde]
+- import_playbook: playbooks/02-setup-encrypted-volume.yml
+  tags: [encrypted_volume]
 
 - import_playbook: playbooks/03-security-hardening.yml
   tags: [security]

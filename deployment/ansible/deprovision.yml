@@ -279,7 +279,7 @@
           - '1. ansible-playbook -i inventory.yml linode-cli/provision-linode.sh'
           - '2. Update inventory.yml with new IP'
           - '3. ansible-playbook -i inventory.yml 01-init-server.yml'
-          - '4. ansible-playbook -i inventory.yml 02-setup-fde.yml'
+          - '4. ansible-playbook -i inventory.yml 02-setup-encrypted-volume.yml'
           - '5. ansible-playbook -i inventory.yml 03-security-hardening.yml'
           - '6. ansible-playbook -i inventory.yml 04-deploy-app.yml'
           - ''
