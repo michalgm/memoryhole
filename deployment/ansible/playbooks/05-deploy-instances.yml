@@ -14,7 +14,7 @@
 #     -e '{"instances": [{"domain": "example.com", ...}]}'
 #
 # Prerequisites:
-#   - Encrypted volume mounted (02-setup-fde.yml)
+#   - Encrypted volume mounted (02-setup-encrypted-volume.yml)
 #   - Caddy installed (04-setup-caddy.yml)
 # ============================================================================
 

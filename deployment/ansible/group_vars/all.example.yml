@@ -15,7 +15,7 @@ linux_user_ssh_key_file: ~/.ssh/id_ed25519.pub
 # ==============================================================================
 
 # Set to false to skip LUKS encryption (not recommended for production)
-use_fde: true
+use_encrypted_volume: true
 
 # Block device to encrypt. Check with: lsblk
 encrypted_volume_device: /dev/sdc

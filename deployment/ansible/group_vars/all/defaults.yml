@@ -50,8 +50,10 @@ fail2ban_sender: fail2ban@{{ server_hostname }}
 # ENCRYPTED VOLUME
 # ==============================================================================
 
+use_encrypted_volume: true
 encrypted_volume_mount: /mnt/encrypted
 use_luks_keyfile: false
+swap_size_mb: 2048
 
 # Advanced LUKS settings
 luks_cipher: aes-xts-plain64
