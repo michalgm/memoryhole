@@ -1,0 +1,90 @@
+---
+# ============================================================================
+# DEPROVISION - Delete Linode infrastructure
+# ============================================================================
+# Deletes the Linode instance and attached block storage volume via the
+# linode.cloud Ansible collection. No local CLI tools required.
+#
+# Run deprovision-server.yml first to wipe data while the server is still up.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml deprovision-linode.yml \
+#     --extra-vars "confirm_destroy=yes"
+#
+# The Linode instance label is read from your inventory (the host name set by
+# provision.yml). Override only if your label differs: --extra-vars "linode_label=my-server"
+#
+# Requires: LINODE_TOKEN environment variable
+# ============================================================================
+
+- name: Delete Linode infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    # Force the playbook python so the linode.cloud collection finds linode_api4
+    # regardless of whether Ansible was installed via pipx, brew, or apt.
+    ansible_python_interpreter: '{{ ansible_playbook_python }}'
+
+    # provision.yml names the inventory host entry after linode_label, so the
+    # first non-localhost host in inventory IS the label. Volume follows the
+    # same convention. Override with -e linode_label=... if needed.
+    linode_label: "{{ (groups['all'] | difference(['localhost'])) | first }}"
+    volume_label: '{{ linode_label }}-volume'
+
+  pre_tasks:
+    - name: Require explicit confirmation
+      assert:
+        that:
+          - confirm_destroy is defined
+          - confirm_destroy | bool
+        fail_msg: |
+          DESTRUCTION CONFIRMATION REQUIRED
+
+          This playbook will permanently delete:
+            - Linode instance: {{ linode_label }}
+            - Block storage volume: {{ volume_label }}
+
+          THIS CANNOT BE UNDONE.
+
+          To proceed: --extra-vars "confirm_destroy=yes"
+
+  tasks:
+    - name: Set Linode API token
+      set_fact:
+        linode_api_token: '{{ lookup("env", "LINODE_TOKEN") }}'
+
+    - name: Verify Linode token is available
+      assert:
+        that: linode_api_token != ''
+        fail_msg: 'LINODE_TOKEN environment variable not set. Export it and try again.'
+
+    # Delete instance first — this detaches the volume automatically.
+    - name: Delete Linode instance
+      linode.cloud.instance:
+        api_token: '{{ linode_api_token }}'
+        label: '{{ linode_label }}'
+        state: absent
+      ignore_errors: true
+
+    - name: Delete block storage volume
+      linode.cloud.volume:
+        api_token: '{{ linode_api_token }}'
+        label: '{{ volume_label }}'
+        state: absent
+      ignore_errors: true
+
+    - name: Deprovision complete
+      debug:
+        msg:
+          - '=========================================='
+          - 'Linode deprovision complete'
+          - '=========================================='
+          - 'Instance ({{ linode_label }}): deleted'
+          - 'Volume ({{ volume_label }}): deleted'
+          - ''
+          - 'To start fresh:'
+          - '  ansible-playbook provision.yml'
+          - '  ansible-playbook -i inventory.yml deploy.yml'
+          - '=========================================='
