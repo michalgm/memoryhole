@@ -38,10 +38,14 @@ encrypted_volume_device: /dev/sdc
 #   image_tag           - pin to a release, e.g. v0.28.0 (default: latest)
 #   backup_enabled      - enable nightly database backups (default: true)
 #   backup_retention_days - days to keep backups (default: 7)
+#   port                - internal localhost port Caddy uses to proxy to this instance's
+#                         Docker stack (not exposed outside the server). Default: derived
+#                         from domain name, stable across list reorders. Must be >1023.
+#                         Set explicitly only if the auto-assigned port conflicts.
 
 instances:
   - domain: memoryhole.example.com
-    seed_jurisdictions: 'County Court,Federal Court'
+    seed_jurisdictions: 'County Court,Federal'
     seed_cities: 'Springfield,Shelbyville'
 
   # Example: staging instance on the same server

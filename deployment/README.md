@@ -14,12 +14,11 @@ You need Ansible installed either on your local machine or on the server itself.
 
 Run playbooks from your laptop against a remote server.
 
-```bash
-# macOS
-brew install ansible
+Install Ansible via [pipx](https://pipx.pypa.io/), which keeps it isolated and makes it easy to add the Python libraries the Linode provisioning playbooks require:
 
-# Ubuntu/Debian (including WSL2 on Windows)
-sudo apt update && sudo apt install -y ansible
+```bash
+pipx install --include-deps ansible
+pipx inject ansible linode_api4 polling requests ansible-specdoc
 ```
 
 Then clone the repo locally:
@@ -35,7 +34,9 @@ Good if you don't have a Mac or Linux workstation. SSH into the server as root, 
 
 ```bash
 ssh root@YOUR_SERVER_IP
-apt update && apt install -y ansible git
+apt update && apt install -y pipx git
+pipx install --include-deps ansible
+pipx inject ansible linode_api4 polling requests ansible-specdoc
 git clone https://github.com/michalgm/memoryhole.git
 cd memoryhole/deployment/ansible
 ```
@@ -109,6 +110,7 @@ You can set `encrypted_volume_passphrase` in `all.yml`, or leave it out and ente
 | `image_tag` | no | Pin to a specific memoryhole release, e.g. `v0.28.0` (default: `latest`) |
 | `backup_enabled` | no | Enable nightly database backups (default: `true`) |
 | `backup_retention_days` | no | Days to keep backups (default: `7`) |
+| `port` | no | Internal localhost port Caddy uses to proxy to this instance (not exposed outside the server). Auto-assigned from the domain name — only set this if the assigned port conflicts with something else on the server. Must be >1023. |
 
 ```yaml
 instances:

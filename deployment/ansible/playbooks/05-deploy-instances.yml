@@ -41,6 +41,11 @@
 
     # Generate secrets once per instance and store in credentials/ on the
     # control machine. On re-runs the same values are returned from the files.
+    #
+    # Port assignment: internal localhost port Caddy proxies to — not exposed
+    # outside the server. Derived from the domain's SHA1 hash, range 8080–8979
+    # (non-root, non-conflicting). Stable across list reorders. Set
+    # instance.port explicitly to override.
     - name: Generate or load instance credentials
       set_fact:
         instance_credentials: >-
@@ -51,7 +56,7 @@
               'db_encryption_key':       lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/db_encryption_key       length=32 chars=ascii_letters,digits'),
               'settings_encryption_key': lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/settings_encryption_key length=64 chars=0123456789abcdef'),
               'seed_password':           lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/seed_password           length=16 chars=ascii_letters,digits'),
-              'port':      8080 + ansible_loop.index0
+              'port': instance.port | default(((instance.domain | hash('sha1'))[0:3] | int(base=16) % 900) + 8080)
             }
           }) }}
       loop: '{{ instances }}'
@@ -60,6 +65,16 @@
         extended: true
         label: 'Configuring {{ instance.domain }}'
       no_log: true
+
+    - name: Check for port conflicts between instances
+      assert:
+        that: >-
+          instances | map(attribute='domain') | map('extract', instance_credentials) | map(attribute='port') | list | count
+          ==
+          instances | map(attribute='domain') | map('extract', instance_credentials) | map(attribute='port') | list | unique | count
+        fail_msg: >-
+          Two or more instances have been assigned the same port. Add an explicit
+          'port' value to the conflicting instance(s) in group_vars/all/main.yml.
 
   tasks:
     # ==========================================================================

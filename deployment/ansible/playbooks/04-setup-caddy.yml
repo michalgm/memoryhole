@@ -67,7 +67,7 @@
         group: root
         mode: '0644'
       vars:
-        instance_port: '{{ 8080 + ansible_loop.index0 }}'
+        instance_port: "{{ instance.port | default(((instance.domain | hash('sha1'))[0:3] | int(base=16) % 900) + 8080) }}"
       loop: '{{ instances }}'
       loop_control:
         loop_var: instance

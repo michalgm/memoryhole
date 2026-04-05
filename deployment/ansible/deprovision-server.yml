@@ -1,0 +1,147 @@
+---
+# ============================================================================
+# DEPROVISION - Secure server cleanup
+# ============================================================================
+# Stops all Memoryhole instances and securely erases all data on the server.
+#
+# If disk encryption is enabled (use_encrypted_volume: true), the LUKS key
+# slots are wiped — making all data permanently unrecoverable without needing
+# to shred individual files, because /home and /var/lib/docker are already
+# stored on the encrypted volume via bind mounts.
+#
+# If disk encryption is disabled, instance data directories are shredded
+# before removal.
+#
+# Run this before deprovision-linode.yml, while the server is still reachable.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml deprovision-server.yml \
+#     --extra-vars "confirm_destroy=yes"
+# ============================================================================
+
+- name: Secure server cleanup
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    instances_base: '/home/{{ linux_username }}/instances'
+
+  pre_tasks:
+    - name: Require explicit confirmation
+      assert:
+        that:
+          - confirm_destroy is defined
+          - confirm_destroy | bool
+        fail_msg: |
+          DESTRUCTION CONFIRMATION REQUIRED
+
+          This playbook will PERMANENTLY DELETE all Memoryhole data on:
+            {{ inventory_hostname }}
+
+          THIS CANNOT BE UNDONE.
+
+          To proceed: --extra-vars "confirm_destroy=yes"
+
+    - name: Final warning
+      pause:
+        seconds: 10
+        prompt: |
+
+          ╔════════════════════════════════════════════════════════════════╗
+          ║                       LAST WARNING                             ║
+          ╠════════════════════════════════════════════════════════════════╣
+          ║  About to permanently delete all data on:                     ║
+          ║    {{ inventory_hostname }}                                    ║
+          ║                                                                ║
+          ║  Resuming in 10 seconds... Press Ctrl+C TWICE to cancel        ║
+          ╚════════════════════════════════════════════════════════════════╝
+
+  tasks:
+    # --------------------------------------------------------------------------
+    # STOP ALL INSTANCES
+    # --------------------------------------------------------------------------
+
+    - name: Stop and disable instance systemd services
+      systemd:
+        name: 'memoryhole-{{ instance.domain | replace(".", "-") }}'
+        state: stopped
+        enabled: false
+      loop: '{{ instances | default([]) }}'
+      loop_control:
+        loop_var: instance
+        label: '{{ instance.domain }}'
+      ignore_errors: true
+
+    - name: Stop all running Docker containers
+      shell: docker ps -q | xargs -r docker stop
+      ignore_errors: true
+
+    - name: Stop Docker service
+      systemd:
+        name: docker
+        state: stopped
+      ignore_errors: true
+
+    # --------------------------------------------------------------------------
+    # ENCRYPTED VOLUME: CRYPTO ERASE
+    #
+    # /home and /var/lib/docker are bind-mounted from the encrypted volume, so
+    # all instance data and Docker layer data lives there. Erasing the LUKS key
+    # slots destroys the master encryption key — the ciphertext on disk becomes
+    # permanently unrecoverable without needing to shred individual files.
+    # --------------------------------------------------------------------------
+
+    - name: Force-unmount bind mounts backed by encrypted volume
+      command: umount -l {{ item }}
+      loop:
+        - /var/lib/docker
+        - /home
+        - /var/www
+      ignore_errors: true
+      when: use_encrypted_volume | default(true)
+
+    - name: Unmount encrypted volume
+      command: umount -l {{ encrypted_volume_mount }}
+      ignore_errors: true
+      when: use_encrypted_volume | default(true)
+
+    - name: Close LUKS mapper
+      command: cryptsetup close {{ encrypted_volume_name }}
+      ignore_errors: true
+      when: use_encrypted_volume | default(true)
+
+    - name: Erase LUKS key slots (crypto erase)
+      command: cryptsetup luksErase --batch-mode {{ encrypted_volume_device }}
+      when: use_encrypted_volume | default(true)
+
+    # --------------------------------------------------------------------------
+    # NO ENCRYPTION: SHRED DATA FILES
+    # --------------------------------------------------------------------------
+
+    - name: Shred instance data and remove directories
+      shell: |
+        find '{{ instances_base }}/{{ instance.domain }}' -type f \
+          -exec shred -uz {} \;
+        rm -rf '{{ instances_base }}/{{ instance.domain }}'
+      args:
+        executable: /bin/bash
+      loop: '{{ instances | default([]) }}'
+      loop_control:
+        loop_var: instance
+        label: '{{ instance.domain }}'
+      ignore_errors: true
+      when: not (use_encrypted_volume | default(true))
+
+    # --------------------------------------------------------------------------
+    # SUMMARY
+    # --------------------------------------------------------------------------
+
+    - name: Secure data wipe complete
+      debug:
+        msg: >-
+          {{
+            'LUKS key slots erased — all encrypted data is permanently unrecoverable.'
+            if (use_encrypted_volume | default(true))
+            else 'Instance data directories shredded.'
+          }}

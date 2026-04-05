@@ -3,6 +3,7 @@ ansible/inventory*.yml
 ansible/group_vars/all/main.yml
 ansible/*.retry
 ansible/credentials/
+ansible/playbooks/credentials/
 # ansible/
 # Linode CLI config
 linode-cli/config.env
