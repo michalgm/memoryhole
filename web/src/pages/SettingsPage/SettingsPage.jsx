@@ -56,7 +56,7 @@ const EMAIL_SERVER_PRESETS = {
     smtp_secure: false,
   },
   'Protonmail Bridge': {
-    smtp_host: 'protonmail-bridge:1025',
+    smtp_host: 'protonmail-bridge:25',
     smtp_secure: false,
   },
   Gmail: {
