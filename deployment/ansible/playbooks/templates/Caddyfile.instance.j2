@@ -1,3 +1,10 @@
 {{ instance.domain }} {
 	reverse_proxy 127.0.0.1:{{ instance_port }}
+
+	handle_errors 502 503 {
+		rewrite * /503.html
+		file_server {
+			root /etc/caddy
+		}
+	}
 }

@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ---- config (adjust if needed) ----
+FILE="${FILE:-{{ encrypted_loopback_file }}}"       # loopback file on root disk
+NAME="${NAME:-{{ encrypted_volume_name }}}"         # LUKS mapper name
+MNT="${MNT:-{{ encrypted_volume_mount }}}"          # mountpoint for decrypted filesystem
+
+# Things you might bind-mount from $MNT via /etc/fstab
+BIND_TARGETS=(
+  /home/{{ linux_username }}
+  /var/lib/docker
+  /var/lib/containerd
+)
+
+# Services that must be stopped before unmounting encrypted data.
+# Docker restart policies handle instance containers — no separate service needed.
+STOP_SERVICES=(docker containerd)
+
+# ---- helpers ----
+is_open()    { [[ -e "/dev/mapper/$NAME" ]]; }
+is_mounted() { mountpoint -q "$MNT"; }
+
+# Returns the loop device currently attached to FILE, or attaches one and
+# returns that. Prints the device path (e.g. /dev/loop0) to stdout.
+find_or_setup_loop() {
+  local existing
+  existing=$(losetup -j "$FILE" 2>/dev/null | cut -d: -f1 | head -1)
+  if [[ -n "$existing" ]]; then
+    losetup --direct-io=on "$existing" 2>/dev/null || true
+    echo "$existing"
+  else
+    losetup -f --show --direct-io=on "$FILE"
+  fi
+}
+
+stop_services() {
+  for s in "${STOP_SERVICES[@]}"; do
+    systemctl stop "${s}.socket" >/dev/null 2>&1 || true
+    systemctl stop "$s" >/dev/null 2>&1 || true
+    echo "stopping service $s ..."
+  done
+}
+
+start_services() {
+  for s in "${STOP_SERVICES[@]}"; do
+    echo "starting service $s ..."
+    systemctl start "${s}.socket" >/dev/null 2>&1 || true
+    systemctl start "$s" >/dev/null 2>&1 || true
+  done
+}
+
+unlock() {
+  local loop_dev
+  loop_dev=$(find_or_setup_loop)
+
+  # Open LUKS if needed
+  if ! is_open; then
+    echo -n "Enter LUKS passphrase: "
+    read -rs PASS
+    echo ""
+    echo -n "$PASS" | cryptsetup open \
+      --perf-no_read_workqueue \
+      --perf-no_write_workqueue \
+      "$loop_dev" "$NAME" - || {
+      echo "Pipe unlock failed, trying standard prompt..."
+      cryptsetup open \
+        --perf-no_read_workqueue \
+        --perf-no_write_workqueue \
+        "$loop_dev" "$NAME"
+    }
+    echo "LUKS device opened ($NAME)."
+  fi
+
+  # Mount main FS
+  if ! is_mounted; then
+    mount "$MNT" 2>/dev/null || mount "/dev/mapper/$NAME" "$MNT"
+  fi
+
+  # Mount bind targets listed in /etc/fstab (includes encrypted swap via crypttab)
+  mount -a
+  echo "mounted bind targets from /etc/fstab."
+
+  start_services
+  # Remove any containers with corrupted storage layers (RWLayer nil) so
+  # restart policies can recreate them cleanly.
+  docker ps -aq --filter status=created | xargs -r docker rm 2>/dev/null || true
+  echo "OK: unlocked + mounted ($MNT)."
+}
+
+lock() {
+  stop_services
+
+  for t in "${BIND_TARGETS[@]}"; do
+    umount "$t" >/dev/null 2>&1 || true
+  done
+
+  umount "$MNT" >/dev/null 2>&1 || true
+
+  if is_open; then
+    cryptsetup close "$NAME"
+  fi
+
+  # Detach loop device
+  local loop_dev
+  loop_dev=$(losetup -j "$FILE" 2>/dev/null | cut -d: -f1 | head -1)
+  if [[ -n "$loop_dev" ]]; then losetup -d "$loop_dev"; fi
+
+  echo "OK: unmounted + locked ($NAME)."
+}
+
+status() {
+  local loop_dev
+  loop_dev=$(losetup -j "$FILE" 2>/dev/null | cut -d: -f1 | head -1)
+  echo "FILE=$FILE  loop=${loop_dev:-(not attached)}"
+  echo -n "LUKS mapping: "; is_open && echo "OPEN" || echo "CLOSED"
+  echo -n "Mounted:      "; is_mounted && echo "YES" || echo "NO"
+  echo "Active swap:"
+  swapon --show || true
+}
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") <unlock|lock|status>
+
+Environment overrides (optional):
+  FILE=/encrypted.img  NAME=cryptdata  MNT=/mnt/encrypted
+EOF
+}
+
+cmd="${1:-}"
+case "$cmd" in
+  unlock) unlock ;;
+  lock)   lock ;;
+  status) status ;;
+  *) usage; exit 2 ;;
+esac

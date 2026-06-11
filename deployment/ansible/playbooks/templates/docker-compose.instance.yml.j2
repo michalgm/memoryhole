@@ -31,6 +31,7 @@ services:
     image: ghcr.io/michalgm/memoryhole-api:{{ instance.image_tag | default('latest') }}
     env_file:
       - .env
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -41,6 +42,7 @@ services:
     image: ghcr.io/michalgm/memoryhole-web:{{ instance.image_tag | default('latest') }}
     ports:
       - "127.0.0.1:{{ instance_credentials[instance.domain].port }}:80"
+    restart: unless-stopped
     environment:
       - DOMAIN=:80
     depends_on:
