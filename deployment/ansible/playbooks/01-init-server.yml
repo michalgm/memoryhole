@@ -67,6 +67,10 @@
           - lvm2
         state: present
 
+    - name: Clean apt package cache
+      command: apt-get clean
+      changed_when: false
+
     - name: Set timezone to UTC
       timezone:
         name: UTC
@@ -113,7 +117,7 @@
         content: |
           APT::Periodic::Update-Package-Lists "1";
           APT::Periodic::Download-Upgradeable-Packages "1";
-          APT::Periodic::AutocleanInterval "7";
+          APT::Periodic::AutocleanInterval "1";
           APT::Periodic::Unattended-Upgrade "1";
         mode: '0644'
       when: auto_updates_enabled | default(true)

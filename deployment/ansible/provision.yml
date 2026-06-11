@@ -20,10 +20,6 @@
     linode_image: 'linode/ubuntu24.04'
     linode_tags: ['memoryhole', 'encrypted', 'production']
 
-    # Volume Configuration
-    volume_label: '{{ linode_label }}-volume'
-    volume_size: 20
-
     # Firewall Configuration
     firewall_label: '{{ linode_label }}-firewall'
     ssh_allowed_ips: ['0.0.0.0/0']
@@ -105,21 +101,6 @@
         msg: 'Instance running at: {{ linode_ip }}'
 
     # -------------------------------------------------------------------------
-    # Block Storage Volume
-    # -------------------------------------------------------------------------
-    - name: Create and Attach Volume
-      linode.cloud.volume:
-        api_token: '{{ linode_token }}'
-        label: '{{ volume_label }}'
-        size: '{{ volume_size }}'
-        region: '{{ linode_region }}'
-        linode_id: '{{ linode_id }}'
-        state: present
-        encryption: disabled # We will handle encryption at the OS level
-      register: volume
-      when: volume_size | int > 0
-
-    # -------------------------------------------------------------------------
     # Cloud Firewall
     # -------------------------------------------------------------------------
     - name: Create Firewall
@@ -174,11 +155,6 @@
     # -------------------------------------------------------------------------
     # Output & Next Steps
     # -------------------------------------------------------------------------
-    - name: Define Volume Facts
-      set_fact:
-        volume_device_path: "{{ volume.volume.filesystem_path if (volume_size | int > 0) else '/dev/sda' }}"
-        volume_note: "{{ 'Encrypted Volume attached.' if (volume_size | int > 0) else 'Using local disk /dev/sda.' }}"
-
     - name: Generate Inventory File
       copy:
         content: |
@@ -191,10 +167,6 @@
                     ansible_user: root
                     ansible_port: 22
                     server_hostname: {{ linode_label }}.local
-                    encrypted_volume_device: {{ volume_device_path }}
-                    encrypted_volume_name: {{ linode_label }}_data
-                    encrypted_volume_mount: /mnt/{{ linode_label }}_data
-                    postgres_data_path: /mnt/{{ linode_label }}_data/postgresql
         dest: './inventory.yml'
 
     - name: Provisioning Summary
@@ -205,7 +177,6 @@
           - '--------------------------------------------------------'
           - 'Instance: {{ linode_label }} ({{ linode_id }})'
           - 'IP Address: {{ linode_ip }}'
-          - 'Volume: {{ volume_label }} ({{ volume_device_path }})'
           - 'Firewall: {{ firewall_label }}'
           - '--------------------------------------------------------'
           - 'Root password: {{ root_password }}'

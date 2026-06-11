@@ -238,54 +238,53 @@ VALUES
   ('cities') ON CONFLICT (NAME)
 DO NOTHING;
 
-INSERT INTO
-  "OptionSetValue" (option_set_id, LABEL, VALUE, is_static, "order")
-SELECT
-  id,
-  LABEL,
-  VALUE,
-  is_static,
-  "order"
-FROM
-  (
-    VALUES
-      ('cities', 'Oakland', 'Oakland', FALSE, 1),
-      (
-        'cities',
-        'San Francisco',
-        'San Francisco',
-        FALSE,
-        2
-      ),
-      ('cities', 'Berkeley', 'Berkeley', FALSE, 3),
-      ('cities', 'Emeryville', 'Emeryville', FALSE, 4),
-      ('cities', 'Dublin', 'Dublin', FALSE, 5),
-      ('cities', 'Hayward', 'Hayward', FALSE, 6),
-      ('cities', 'Richmond', 'Richmond', FALSE, 7),
-      ('cities', 'San Jose', 'San Jose', FALSE, 8),
-      ('cities', 'San Leandro', 'San Leandro', FALSE, 9),
-      ('cities', 'San Mateo', 'San Mateo', FALSE, 10),
-      ('cities', 'Santa Cruz', 'Santa Cruz', FALSE, 11),
-      (
-        'cities',
-        'Walnut Creek',
-        'Walnut Creek',
-        FALSE,
-        12
-      ),
-      ('cities', 'Sacramento', 'Sacramento', FALSE, 13),
-      ('cities', 'Concord', 'Concord', FALSE, 14),
-      ('cities', 'Palo Alto', 'Palo Alto', FALSE, 15),
-      ('cities', 'Other', 'Other', FALSE, 16)
-  ) AS t (set_name, LABEL, VALUE, is_static, "order")
-  JOIN "OptionSet" os ON os.name=t.set_name ON CONFLICT (option_set_id, VALUE)
-DO
-UPDATE
-SET
-  LABEL=EXCLUDED.label,
-  is_static=EXCLUDED.is_static,
-  "order"=EXCLUDED."order";
-
+-- INSERT INTO
+--   "OptionSetValue" (option_set_id, LABEL, VALUE, is_static, "order")
+-- SELECT
+--   id,
+--   LABEL,
+--   VALUE,
+--   is_static,
+--   "order"
+-- FROM
+--   (
+--     VALUES
+--       ('cities', 'Oakland', 'Oakland', FALSE, 1),
+--       (
+--         'cities',
+--         'San Francisco',
+--         'San Francisco',
+--         FALSE,
+--         2
+--       ),
+--       ('cities', 'Berkeley', 'Berkeley', FALSE, 3),
+--       ('cities', 'Emeryville', 'Emeryville', FALSE, 4),
+--       ('cities', 'Dublin', 'Dublin', FALSE, 5),
+--       ('cities', 'Hayward', 'Hayward', FALSE, 6),
+--       ('cities', 'Richmond', 'Richmond', FALSE, 7),
+--       ('cities', 'San Jose', 'San Jose', FALSE, 8),
+--       ('cities', 'San Leandro', 'San Leandro', FALSE, 9),
+--       ('cities', 'San Mateo', 'San Mateo', FALSE, 10),
+--       ('cities', 'Santa Cruz', 'Santa Cruz', FALSE, 11),
+--       (
+--         'cities',
+--         'Walnut Creek',
+--         'Walnut Creek',
+--         FALSE,
+--         12
+--       ),
+--       ('cities', 'Sacramento', 'Sacramento', FALSE, 13),
+--       ('cities', 'Concord', 'Concord', FALSE, 14),
+--       ('cities', 'Palo Alto', 'Palo Alto', FALSE, 15),
+--       ('cities', 'Other', 'Other', FALSE, 16)
+--   ) AS t (set_name, LABEL, VALUE, is_static, "order")
+--   JOIN "OptionSet" os ON os.name=t.set_name ON CONFLICT (option_set_id, VALUE)
+-- DO
+-- UPDATE
+-- SET
+--   LABEL=EXCLUDED.label,
+--   is_static=EXCLUDED.is_static,
+--   "order"=EXCLUDED."order";
 -- jurisdictions
 INSERT INTO
   "OptionSet" (NAME)
@@ -293,82 +292,81 @@ VALUES
   ('jurisdictions') ON CONFLICT (NAME)
 DO NOTHING;
 
-INSERT INTO
-  "OptionSetValue" (option_set_id, LABEL, VALUE, is_static, "order")
-SELECT
-  id,
-  LABEL,
-  VALUE,
-  is_static,
-  "order"
-FROM
-  (
-    VALUES
-      (
-        'jurisdictions',
-        'San Francisco',
-        'San Francisco',
-        FALSE,
-        1
-      ),
-      ('jurisdictions', 'Alameda', 'Alameda', FALSE, 2),
-      ('jurisdictions', 'Federal', 'Federal', FALSE, 3),
-      (
-        'jurisdictions',
-        'Contra Costa',
-        'Contra Costa',
-        FALSE,
-        4
-      ),
-      (
-        'jurisdictions',
-        'San Mateo',
-        'San Mateo',
-        FALSE,
-        5
-      ),
-      (
-        'jurisdictions',
-        'Santa Clara',
-        'Santa Clara',
-        FALSE,
-        6
-      ),
-      (
-        'jurisdictions',
-        'Santa Cruz',
-        'Santa Cruz',
-        FALSE,
-        7
-      ),
-      ('jurisdictions', 'Marin', 'Marin', FALSE, 8),
-      ('jurisdictions', 'Yolo', 'Yolo', FALSE, 9),
-      (
-        'jurisdictions',
-        'Humboldt',
-        'Humboldt',
-        FALSE,
-        10
-      ),
-      (
-        'jurisdictions',
-        'Sacramento',
-        'Sacramento',
-        FALSE,
-        11
-      ),
-      ('jurisdictions', 'Solano', 'Solano', FALSE, 12),
-      ('jurisdictions', 'Sonoma', 'Sonoma', FALSE, 13),
-      ('jurisdictions', 'Napa', 'Napa', FALSE, 14)
-  ) AS t (set_name, LABEL, VALUE, is_static, "order")
-  JOIN "OptionSet" os ON os.name=t.set_name ON CONFLICT (option_set_id, VALUE)
-DO
-UPDATE
-SET
-  LABEL=EXCLUDED.label,
-  is_static=EXCLUDED.is_static,
-  "order"=EXCLUDED."order";
-
+-- INSERT INTO
+--   "OptionSetValue" (option_set_id, LABEL, VALUE, is_static, "order")
+-- SELECT
+--   id,
+--   LABEL,
+--   VALUE,
+--   is_static,
+--   "order"
+-- FROM
+--   (
+--     VALUES
+--       (
+--         'jurisdictions',
+--         'San Francisco',
+--         'San Francisco',
+--         FALSE,
+--         1
+--       ),
+--       ('jurisdictions', 'Alameda', 'Alameda', FALSE, 2),
+--       ('jurisdictions', 'Federal', 'Federal', FALSE, 3),
+--       (
+--         'jurisdictions',
+--         'Contra Costa',
+--         'Contra Costa',
+--         FALSE,
+--         4
+--       ),
+--       (
+--         'jurisdictions',
+--         'San Mateo',
+--         'San Mateo',
+--         FALSE,
+--         5
+--       ),
+--       (
+--         'jurisdictions',
+--         'Santa Clara',
+--         'Santa Clara',
+--         FALSE,
+--         6
+--       ),
+--       (
+--         'jurisdictions',
+--         'Santa Cruz',
+--         'Santa Cruz',
+--         FALSE,
+--         7
+--       ),
+--       ('jurisdictions', 'Marin', 'Marin', FALSE, 8),
+--       ('jurisdictions', 'Yolo', 'Yolo', FALSE, 9),
+--       (
+--         'jurisdictions',
+--         'Humboldt',
+--         'Humboldt',
+--         FALSE,
+--         10
+--       ),
+--       (
+--         'jurisdictions',
+--         'Sacramento',
+--         'Sacramento',
+--         FALSE,
+--         11
+--       ),
+--       ('jurisdictions', 'Solano', 'Solano', FALSE, 12),
+--       ('jurisdictions', 'Sonoma', 'Sonoma', FALSE, 13),
+--       ('jurisdictions', 'Napa', 'Napa', FALSE, 14)
+--   ) AS t (set_name, LABEL, VALUE, is_static, "order")
+--   JOIN "OptionSet" os ON os.name=t.set_name ON CONFLICT (option_set_id, VALUE)
+-- DO
+-- UPDATE
+-- SET
+--   LABEL=EXCLUDED.label,
+--   is_static=EXCLUDED.is_static,
+--   "order"=EXCLUDED."order";
 -- arrest_custody_status
 INSERT INTO
   "OptionSet" (NAME)

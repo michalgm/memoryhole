@@ -2,27 +2,35 @@
 # ============================================================================
 # Encrypted Volume Setup Playbook
 # ============================================================================
-# This playbook sets up a LUKS-encrypted volume for sensitive data storage.
+# Creates a LUKS-encrypted loopback volume on the root disk. The loopback
+# file (default: /encrypted.img) acts as the block device — no separate
+# Linode volume required.
+#
+# /home/{{ linux_username }}, /var/lib/docker, and /var/lib/containerd are
+# bind-mounted from the encrypted volume so instance data and Docker layers
+# are encrypted at rest.
 #
 # SECURITY WARNINGS:
-# - This playbook will FORMAT the specified device - ALL DATA WILL BE LOST
-# - The encrypted volume passphrase is handled during this playbook
-# - For maximum security, use manual unlock (use_luks_keyfile=false)
-# - Store the passphrase in a secure location (password manager, offline)
+# - Store the passphrase in a secure location (password manager + offline)
+# - There is no recovery without the passphrase — LUKS cannot be bypassed
 #
 # Usage:
 #   ansible-playbook -i inventory.yml 02-setup-encrypted-volume.yml
 #
 # Prerequisites:
 #   - Server initialized with 01-init-server.yml
-#   - Block device available (check with lsblk)
-#   - Passphrase set in group_vars/all.yml
+#   - encrypted_loopback_size_gb fits within root disk free space (check: df -h /)
 # ============================================================================
 
-- name: Setup Encrypted Volume with LUKS
+- name: Setup Encrypted Loopback Volume with LUKS
   hosts: all
   become: true
   gather_facts: true
+
+  handlers:
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes
 
   pre_tasks:
     - name: Notify user that encrypted volume is disabled and skip
@@ -32,11 +40,9 @@
           debug:
             msg: |
               Encrypted volume is disabled (use_encrypted_volume is false or not set).
-              Skipping encrypted volume setup. To enable, set in group_vars/all.yml:
+              Skipping encrypted volume setup. To enable, set in group_vars/all/main.yml:
                 use_encrypted_volume: true
-                encrypted_volume_device: /dev/sdX
                 encrypted_volume_passphrase: <strong-passphrase>
-                encrypted_volume_mount: /mnt/encrypted
 
         - name: End play - Encrypted volume not configured
           meta: end_play
@@ -50,54 +56,68 @@
     - name: Verify required encryption variables
       assert:
         that:
-          - encrypted_volume_device is defined and encrypted_volume_device | length > 0
           - encrypted_volume_name is defined and encrypted_volume_name | length > 0
           - encrypted_volume_mount is defined and encrypted_volume_mount | length > 0
           - encrypted_volume_passphrase is defined and encrypted_volume_passphrase | length > 0
           - encrypted_volume_passphrase != "CHANGE_ME_GENERATE_STRONG_PASSPHRASE"
         fail_msg: |
-          use_encrypted_volume is true but required encryption variables are missing or have placeholder values.
-          Check group_vars/all.yml for: encrypted_volume_device, encrypted_volume_name,
-          encrypted_volume_mount, encrypted_volume_passphrase
+          use_encrypted_volume is true but required variables are missing or have placeholder values.
+          Check group_vars/all/main.yml for: encrypted_volume_name, encrypted_volume_mount,
+          encrypted_volume_passphrase
       when: _volume_mounted.rc != 0
 
-    - name: Check if device exists
+    - name: Check if loopback file already exists
       stat:
-        path: '{{ encrypted_volume_device }}'
-      register: device_check
+        path: '{{ encrypted_loopback_file }}'
+        get_checksum: false
+        get_mime: false
+      register: _loopback_file
 
-    - name: Fail if device does not exist
-      fail:
-        msg: 'Device {{ encrypted_volume_device }} not found. Check lsblk output.'
-      when: not device_check.stat.exists
-
-    - name: Check if device is already LUKS formatted
-      shell: cryptsetup isLuks {{ encrypted_volume_device }}
-      register: is_luks
+    - name: Check if loopback file is already LUKS formatted
+      command: cryptsetup isLuks {{ encrypted_loopback_file }}
+      register: _is_luks
       failed_when: false
       changed_when: false
+      when: _loopback_file.stat.exists
 
-    - name: WARNING - Data will be destroyed
-      pause:
-        prompt: |
-
-          ╔═══════════════════════════════════════════════════════════════╗
-          ║                      ⚠️  WARNING  ⚠️                          ║
-          ╠═══════════════════════════════════════════════════════════════╣
-          ║  This playbook will DESTROY ALL DATA on:                      ║
-          ║  {{ encrypted_volume_device }}                                ║
-          ║                                                               ║
-          ║  Press Ctrl+C and then 'A' to abort                           ║
-          ║  Press ENTER to continue (THIS CANNOT BE UNDONE)              ║
-          ╚═══════════════════════════════════════════════════════════════╝
-      when: is_luks.rc != 0
 
   tasks:
+    # ==========================================================================
+    # LOOPBACK FILE CREATION
+    # ==========================================================================
+
+    - name: Create loopback file
+      command: fallocate -l {{ encrypted_loopback_size_gb }}G {{ encrypted_loopback_file }}
+      args:
+        creates: '{{ encrypted_loopback_file }}'
+
+    - name: Restrict loopback file permissions
+      file:
+        path: '{{ encrypted_loopback_file }}'
+        mode: '0600'
+        owner: root
+        group: root
+
     # ==========================================================================
     # LUKS ENCRYPTION SETUP
     # ==========================================================================
 
-    - name: Format device with LUKS
+    - name: Find or attach loop device
+      shell: |
+        existing=$(losetup -j {{ encrypted_loopback_file }} 2>/dev/null | cut -d: -f1 | head -1)
+        if [[ -n "$existing" ]]; then
+          # Ensure direct-io is enabled on existing device
+          losetup --direct-io=on "$existing" 2>/dev/null || true
+          echo "$existing"
+        else
+          losetup -f --show --direct-io=on {{ encrypted_loopback_file }}
+        fi
+      args:
+        executable: /bin/bash
+      register: _loop_device
+      changed_when: false
+
+    - name: Format loopback device with LUKS
       shell: |
         printf '%s' "{{ encrypted_volume_passphrase }}" | \
         cryptsetup luksFormat \
@@ -105,31 +125,37 @@
           --key-size {{ luks_key_size }} \
           --hash {{ luks_hash }} \
           --iter-time {{ luks_iter_time }} \
+          --pbkdf-memory {{ luks_pbkdf_memory_kb }} \
           --use-urandom \
           --batch-mode \
-          {{ encrypted_volume_device }} -
-      when: is_luks.rc != 0
-      no_log: true # Don't log passphrase
+          {{ _loop_device.stdout }} -
+      when:
+        - _is_luks is not defined or _is_luks.rc | default(1) != 0
+      no_log: true
 
-    - name: Check if already opened
-      shell: cryptsetup status {{ encrypted_volume_name }}
-      register: luks_status
+    - name: Check if LUKS volume is already open
+      command: cryptsetup status {{ encrypted_volume_name }}
+      register: _luks_status
       failed_when: false
       changed_when: false
 
-    - name: Open LUKS volume if not already open
+    - name: Open LUKS volume
       shell: |
         printf '%s' "{{ encrypted_volume_passphrase }}" | \
-        cryptsetup luksOpen {{ encrypted_volume_device }} {{ encrypted_volume_name }} -
-      when:
-        - luks_status.rc != 0
+        cryptsetup luksOpen \
+          --perf-no_read_workqueue \
+          --perf-no_write_workqueue \
+          {{ _loop_device.stdout }} {{ encrypted_volume_name }} -
+      when: _luks_status.rc != 0
+      no_log: true
+
     # ==========================================================================
     # FILESYSTEM CREATION
     # ==========================================================================
 
     - name: Check if filesystem exists
       shell: blkid /dev/mapper/{{ encrypted_volume_name }} | grep ext4
-      register: has_filesystem
+      register: _has_filesystem
       failed_when: false
       changed_when: false
 
@@ -138,7 +164,7 @@
         fstype: ext4
         dev: /dev/mapper/{{ encrypted_volume_name }}
         opts: -L {{ encrypted_volume_name }}
-      when: has_filesystem.rc != 0
+      when: _has_filesystem.rc != 0
 
     - name: Create mount point directory
       file:
@@ -151,7 +177,7 @@
         path: '{{ encrypted_volume_mount }}'
         src: /dev/mapper/{{ encrypted_volume_name }}
         fstype: ext4
-        opts: defaults,noatime,nofail,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s
+        opts: defaults,noatime,data=writeback,nofail,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s
         state: mounted
 
     # ==========================================================================
@@ -164,33 +190,26 @@
         state: directory
         mode: "{{ item.mode | default('0755') }}"
       loop:
-        - { path: 'home', mode: '0755' }
-        - { path: 'var/www', mode: '0755' }
+        - { path: 'home/{{ linux_username }}', mode: '0750' }
         - { path: 'var/lib/docker', mode: '0710' }
+        - { path: 'var/lib/containerd', mode: '0710' }
 
-    - name: Sync existing /home to encrypted volume
-      shell: rsync -aHAX /home/ {{ encrypted_volume_mount }}/home/
+    - name: Sync existing user homedir to encrypted volume
+      shell: rsync -aHAX /home/{{ linux_username }}/ {{ encrypted_volume_mount }}/home/{{ linux_username }}/
       args:
-        creates: '{{ encrypted_volume_mount }}/home/{{ linux_username }}'
+        creates: '{{ encrypted_volume_mount }}/home/{{ linux_username }}/.profile'
 
-    - name: Sync existing /var/www to encrypted volume
-      shell: rsync -aHAX /var/www/ {{ encrypted_volume_mount }}/var/www/
-      args:
-        creates: '{{ encrypted_volume_mount }}/var/www/html'
-      ignore_errors: true
+    - name: Set ownership of user homedir on encrypted volume
+      file:
+        path: '{{ encrypted_volume_mount }}/home/{{ linux_username }}'
+        owner: '{{ linux_username }}'
+        group: '{{ linux_username }}'
+        recurse: no
 
-    - name: Bind mount /home
+    - name: Bind mount user homedir
       mount:
-        path: /home
-        src: '{{ encrypted_volume_mount }}/home'
-        opts: bind,nofail,x-systemd.mount-timeout=5s
-        state: mounted
-        fstype: none
-
-    - name: Bind mount /var/www
-      mount:
-        path: /var/www
-        src: '{{ encrypted_volume_mount }}/var/www'
+        path: '/home/{{ linux_username }}'
+        src: '{{ encrypted_volume_mount }}/home/{{ linux_username }}'
         opts: bind,nofail,x-systemd.mount-timeout=5s
         state: mounted
         fstype: none
@@ -209,125 +228,153 @@
         state: mounted
         fstype: none
 
-    # ==========================================================================
-    # SWAPFILE SETUP
-    # ==========================================================================
-
-    - name: Setup swapfile on encrypted volume
-      block:
-        - name: Disable any existing system swapfiles
-          shell: |
-            for swap in $(swapon --show=NAME --noheadings 2>/dev/null); do
-              swapoff "$swap" 2>/dev/null || true
-            done
-          changed_when: false
-
-        - name: Remove existing swapfile fstab entries
-          replace:
-            path: /etc/fstab
-            regexp: '^[^\s]+\s+none\s+swap\s.*\n?'
-            replace: ''
-
-        - name: Create swapfile on encrypted volume
-          command: dd if=/dev/zero of={{ encrypted_volume_mount }}/swapfile bs=1M count={{ swap_size_mb | default(2048) }}
-          args:
-            creates: '{{ encrypted_volume_mount }}/swapfile'
-
-        - name: Set swapfile permissions
-          file:
-            path: '{{ encrypted_volume_mount }}/swapfile'
-            mode: '0600'
-
-        - name: Check if swapfile is already formatted
-          command: blkid -o value -s TYPE {{ encrypted_volume_mount }}/swapfile
-          register: swapfile_type
-          failed_when: false
-          changed_when: false
-
-        - name: Format swapfile
-          command: mkswap {{ encrypted_volume_mount }}/swapfile
-          when: swapfile_type.stdout | trim != 'swap'
-
-        - name: Enable swapfile
-          command: swapon {{ encrypted_volume_mount }}/swapfile
-          register: swapon_result
-          failed_when: swapon_result.rc != 0 and 'already' not in swapon_result.stderr
-          changed_when: swapon_result.rc == 0
-
-        - name: Add swapfile to fstab
-          mount:
-            path: none
-            src: '{{ encrypted_volume_mount }}/swapfile'
-            fstype: swap
-            opts: sw
-            state: present
-
-    # ==========================================================================
-    # KEYFILE SETUP (Optional - Less Secure)
-    # ==========================================================================
-
-    - name: Create LUKS keyfile (if enabled)
-      block:
-        - name: Generate keyfile
-          shell: dd if=/dev/urandom of={{ luks_keyfile_path }} bs=1024 count=4
-          args:
-            creates: '{{ luks_keyfile_path }}'
-
-        - name: Secure keyfile permissions
-          file:
-            path: '{{ luks_keyfile_path }}'
-            mode: '0400'
-            owner: root
-            group: root
-
-        - name: Add keyfile to LUKS
-          shell: |
-            echo "{{ encrypted_volume_passphrase }}" | \
-            cryptsetup luksAddKey {{ encrypted_volume_device }} {{ luks_keyfile_path }} -
-          no_log: true
-
-        - name: Create crypttab entry for auto-mount
-          lineinfile:
-            path: /etc/crypttab
-            line: '{{ encrypted_volume_name }} {{ encrypted_volume_device }} {{ luks_keyfile_path }} luks'
-            create: yes
-
-        - name: Add to fstab for auto-mount
-          mount:
-            path: '{{ encrypted_volume_mount }}'
-            src: /dev/mapper/{{ encrypted_volume_name }}
-            fstype: ext4
-            opts: defaults,noatime
-            state: present
-
-      when: use_luks_keyfile | default(false)
-
-    # ==========================================================================
-    # POSTGRESQL DATA DIRECTORY SETUP
-    # ==========================================================================
-
-    - name: Create PostgreSQL data directory
+    - name: Create /var/lib/containerd directory
       file:
-        path: '{{ postgres_data_path }}'
+        path: /var/lib/containerd
         state: directory
-        mode: '0700'
-      when: postgres_data_path is defined
+        mode: '0710'
 
-    - name: Create backup directory
+    - name: Bind mount /var/lib/containerd
+      mount:
+        path: /var/lib/containerd
+        src: '{{ encrypted_volume_mount }}/var/lib/containerd'
+        opts: bind,nofail,x-systemd.mount-timeout=5s
+        state: mounted
+        fstype: none
+
+    # ==========================================================================
+    # ADDITIONAL SWAP LOOPBACK FILE
+    # ==========================================================================
+
+    - name: Stat additional swap loopback file
+      stat:
+        path: '{{ encrypted_swap_file }}'
+      register: _swap_loopback_stat
+
+    - name: Create additional swap loopback file
+      command: fallocate -l {{ swap_size_gb | default(2) }}G {{ encrypted_swap_file }}
+      when: not _swap_loopback_stat.stat.exists
+
+    - name: Restrict swap loopback file permissions
       file:
-        path: '{{ postgres_backup_path }}'
-        state: directory
-        mode: '0700'
-      when: postgres_backup_path is defined
+        path: '{{ encrypted_swap_file }}'
+        mode: '0600'
+        owner: root
+        group: root
+
+    - name: Format swap loopback file
+      command: mkswap {{ encrypted_swap_file }}
+      when: not _swap_loopback_stat.stat.exists
 
     # ==========================================================================
-    # UNLOCK & RESTORE SCRIPT (Admin Access)
+    # ENCRYPT ALL SWAP
+    #
+    # Collects plain swap devices (loopback file + any provider swap partition),
+    # registers each in crypttab with a random ephemeral key, removes the plain
+    # fstab entry, and adds the mapper device entry. All steps are idempotent
+    # via crypttab lineinfile + mount module state management.
     # ==========================================================================
 
-    - name: Create unlock and restore script
+    - name: Collect plain swap devices to encrypt
+      shell: |
+        # Emit: <name> <device> for each plain swap not yet a mapper device
+        idx=0
+        while read -r device _ _; do
+          [[ "$device" == /dev/mapper/* ]] && continue
+          # Resolve UUID= or LABEL= to actual block device path
+          if [[ "$device" == UUID=* || "$device" == LABEL=* ]]; then
+            device=$(blkid -o device -l -t "$device" 2>/dev/null || echo "$device")
+          fi
+          echo "encrypted_swap${idx} ${device}"
+          idx=$((idx + 1))
+        done < <(grep -E '^[^#]\S+\s+\S+\s+swap\s' /etc/fstab 2>/dev/null)
+        # Also include the swap loopback file if not already in fstab
+        if ! grep -q "{{ encrypted_swap_file }}" /etc/fstab && \
+           ! grep -q "{{ encrypted_swap_file }}" /etc/crypttab 2>/dev/null; then
+          echo "encrypted_swap${idx} {{ encrypted_swap_file }}"
+        fi
+      args:
+        executable: /bin/bash
+      register: _plain_swap_devices
+      changed_when: false
+
+    - name: Register plain swap devices in crypttab
+      lineinfile:
+        path: /etc/crypttab
+        regexp: '^{{ item.split()[0] }}\s'
+        line: '{{ item.split()[0] }} {{ item.split()[1] }} /dev/urandom swap,cipher=aes-xts-plain64,size=256,nofail'
+        create: yes
+        mode: '0600'
+      loop: '{{ _plain_swap_devices.stdout_lines }}'
+      notify: reload systemd
+
+    - name: Remove plain swap entries from fstab
+      mount:
+        path: none
+        src: '{{ item.split()[1] }}'
+        fstype: swap
+        state: absent
+      loop: '{{ _plain_swap_devices.stdout_lines }}'
+
+    - name: Add encrypted mapper swap entries to fstab
+      mount:
+        path: none
+        src: '/dev/mapper/{{ item.split()[0] }}'
+        fstype: swap
+        opts: sw
+        state: present
+      loop: '{{ _plain_swap_devices.stdout_lines }}'
+
+    - name: Flush handlers to reload systemd before starting swap
+      meta: flush_handlers
+
+    - name: Disable any still-active unencrypted swap
+      shell: |
+        swapon --show=NAME --noheadings 2>/dev/null | while IFS= read -r dev; do
+          [[ "$dev" == /dev/mapper/* ]] && continue
+          swapoff "$dev" 2>/dev/null || true
+        done
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Collect encrypted swap mapping names
+      shell: grep -E '^encrypted_swap[0-9]* ' /etc/crypttab 2>/dev/null | awk '{print $1}'
+      args:
+        executable: /bin/bash
+      register: _swap_names
+      changed_when: false
+
+    - name: Start and verify encrypted swap mappings
+      systemd:
+        name: 'systemd-cryptsetup@{{ item }}.service'
+        state: started
+      loop: '{{ _swap_names.stdout_lines }}'
+
+    - name: Wait for encrypted swap device nodes to be ready
+      wait_for:
+        path: '/dev/mapper/{{ item }}'
+        timeout: 30
+      loop: '{{ _swap_names.stdout_lines }}'
+
+    - name: Activate and verify encrypted swap
+      shell: |
+        swapon /dev/mapper/{{ item }} 2>/dev/null || true
+        cat /proc/swaps | grep -q "$(readlink -f /dev/mapper/{{ item }})"
+      args:
+        executable: /bin/bash
+      loop: '{{ _swap_names.stdout_lines }}'
+      changed_when: false
+
+
+    # ==========================================================================
+    # UNLOCK & LOCK SCRIPT
+    # ==========================================================================
+
+    - name: Create unlock/lock script
       template:
-        src: scripts/unlock_data.sh
-        dest: /usr/local/bin/unlock_data.sh
+        src: scripts/unlock_data.sh.j2
+        dest: /usr/local/bin/unlock_data
         mode: '0755'
 
     - name: Create admin-unlock user
@@ -335,9 +382,8 @@
         name: admin-unlock
         comment: 'Encrypted Volume Unlock Admin'
         shell: /bin/bash
-        home: /home-unenc/admin-unlock
         create_home: yes
-        password_lock: yes # Disable password login
+        password_lock: yes
 
     - name: Set up SSH authorized key for admin-unlock
       authorized_key:
@@ -349,59 +395,50 @@
       copy:
         dest: /etc/sudoers.d/admin-unlock
         content: |
-          admin-unlock ALL=(root) NOPASSWD: /usr/local/bin/unlock_data.sh
+          admin-unlock ALL=(root) NOPASSWD: /usr/local/bin/unlock_data
         mode: '0440'
         validate: 'visudo -cf %s'
 
     # ==========================================================================
-    # SUMMARY AND NEXT STEPS
+    # SUMMARY
     # ==========================================================================
 
     - name: Display encryption summary
       debug:
-        msg: "{{ encryption_summary.split('\n') }}"
+        msg: "{{ _summary.split('\n') }}"
       vars:
-        encryption_summary: |
+        _summary: |
           ==========================================
           Encrypted Volume Setup Complete
           ==========================================
-          Device: {{ encrypted_volume_device }}
-          Mapper: /dev/mapper/{{ encrypted_volume_name }}
-          Mount: {{ encrypted_volume_mount }}
-          Auto-mount on boot: {{ use_luks_keyfile | default(false) }}
+          Loopback file: {{ encrypted_loopback_file }} ({{ encrypted_loopback_size_gb }} GB)
+          Loop device:   {{ _loop_device.stdout }}
+          Mapper:        /dev/mapper/{{ encrypted_volume_name }}
+          Mount:         {{ encrypted_volume_mount }}
 
-          ⚠️  CRITICAL SECURITY REMINDERS:
-          1. BACKUP YOUR PASSPHRASE - Store it securely offline
-          2. Without the passphrase, data is PERMANENTLY INACCESSIBLE
-          3. Test emergency unmount: /usr/local/bin/unmount-encrypted-volume.sh
+          ⚠️  CRITICAL: Store your passphrase securely — there is no recovery without it.
 
-          {% if not use_luks_keyfile | default(false) %}
-          ⚠️  Manual unlock required on boot:
-             cryptsetup luksOpen {{ encrypted_volume_device }} {{ encrypted_volume_name }}
-             mount /dev/mapper/{{ encrypted_volume_name }} {{ encrypted_volume_mount }}
-          {% endif %}
+          Manual unlock after reboot:
+            sudo /usr/local/bin/unlock_data unlock
           ==========================================
 
     - name: Save encryption info to file
       copy:
         dest: '{{ encrypted_volume_mount }}/.encryption-info.txt'
         content: |
-          LUKS Encrypted Volume Information
-          ==================================
+          LUKS Encrypted Loopback Volume
+          ==============================
           Created: {{ ansible_facts['date_time']['iso8601'] }}
-          Device: {{ encrypted_volume_device }}
-          Mapper Name: {{ encrypted_volume_name }}
-          Mount Point: {{ encrypted_volume_mount }}
+          Loopback file: {{ encrypted_loopback_file }}
+          Size: {{ encrypted_loopback_size_gb }} GB
+          Mapper name: {{ encrypted_volume_name }}
+          Mount point: {{ encrypted_volume_mount }}
           Cipher: {{ luks_cipher }}
-          Key Size: {{ luks_key_size }}
-          Hash: {{ luks_hash }}
+          Key size: {{ luks_key_size }}
 
-          Manual Unlock Commands:
-          -----------------------
-          cryptsetup luksOpen {{ encrypted_volume_device }} {{ encrypted_volume_name }}
-          mount /dev/mapper/{{ encrypted_volume_name }} {{ encrypted_volume_mount }}
+          Manual Unlock:
+            sudo /usr/local/bin/unlock_data unlock
 
-          Emergency Lock Commands:
-          ------------------------
-          /usr/local/bin/unmount-encrypted-volume.sh
+          Manual Lock:
+            sudo /usr/local/bin/unlock_data lock
         mode: '0600'

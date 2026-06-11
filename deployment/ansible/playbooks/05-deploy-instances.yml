@@ -113,16 +113,26 @@
         state: present
         update_cache: yes
 
+    - name: Clean apt package cache
+      command: apt-get clean
+      changed_when: false
+
     - name: Add admin user to docker group
       user:
         name: '{{ linux_username }}'
         groups: docker
         append: yes
 
-    - name: Enable and start Docker
+    - name: Start Containerd (disabled at boot — unlock script manages startup)
+      systemd:
+        name: containerd
+        enabled: no
+        state: started
+
+    - name: Start Docker (disabled at boot — unlock script manages startup)
       systemd:
         name: docker
-        enabled: yes
+        enabled: no
         state: started
 
     - name: Configure Docker daemon
@@ -136,6 +146,36 @@
           }
         mode: '0644'
       notify: restart docker
+
+    - name: Create systemd drop-in directory for docker
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: '0755'
+
+    - name: Create systemd drop-in directory for containerd
+      file:
+        path: /etc/systemd/system/containerd.service.d
+        state: directory
+        mode: '0755'
+
+    - name: Require encrypted mounts for docker.service
+      copy:
+        dest: /etc/systemd/system/docker.service.d/require-encrypted-mounts.conf
+        content: |
+          [Unit]
+          RequiresMountsFor=/var/lib/docker /var/lib/containerd
+        mode: '0644'
+      notify: reload systemd
+
+    - name: Require encrypted mounts for containerd.service
+      copy:
+        dest: /etc/systemd/system/containerd.service.d/require-encrypted-mounts.conf
+        content: |
+          [Unit]
+          RequiresMountsFor=/var/lib/docker /var/lib/containerd
+        mode: '0644'
+      notify: reload systemd
 
     - name: Create instances base directory
       file:

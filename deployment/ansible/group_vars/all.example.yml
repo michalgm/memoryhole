@@ -17,13 +17,14 @@ linux_user_ssh_key_file: ~/.ssh/id_ed25519.pub
 # Set to false to skip LUKS encryption (not recommended for production)
 use_encrypted_volume: true
 
-# Block device to encrypt. Check with: lsblk
-encrypted_volume_device: /dev/sdc
-
 # Strong passphrase — store in a password manager and offline backup.
 # There is NO recovery if you lose it. You can leave this unset and enter it
 # interactively when deploy.yml runs instead.
 # encrypted_volume_passphrase: ''
+
+# Loopback file size in GB (default: 15, suits a Linode nanode with 25 GB root disk).
+# Increase for larger plans. Check available space first: df -h /
+# encrypted_loopback_size_gb: 15
 
 # ==============================================================================
 # INSTANCES

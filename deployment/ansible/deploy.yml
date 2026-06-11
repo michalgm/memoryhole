@@ -48,6 +48,7 @@
       when:
         - use_encrypted_volume | default(true)
         - _volume_mounted.rc | default(1) != 0
+        - encrypted_volume_passphrase is not defined
 
     - name: Confirm disk encryption passphrase
       pause:
@@ -58,6 +59,7 @@
         - use_encrypted_volume | default(true)
         - _volume_mounted.rc | default(1) != 0
         - _passphrase_result.user_input | default('') | length > 0
+        - encrypted_volume_passphrase is not defined
 
     - name: Fail if passphrases do not match
       fail:
@@ -67,6 +69,7 @@
         - _volume_mounted.rc | default(1) != 0
         - _passphrase_result.user_input | default('') | length > 0
         - _passphrase_result.user_input != _passphrase_confirm.user_input
+        - encrypted_volume_passphrase is not defined
 
     - name: Set passphrase fact
       set_fact:
@@ -75,13 +78,16 @@
         - use_encrypted_volume | default(true)
         - _volume_mounted.rc | default(1) != 0
         - _passphrase_result.user_input | default('') | length > 0
+        - encrypted_volume_passphrase is not defined
 
     - name: Prompt for initial admin password
       pause:
         prompt: "Initial admin password for {{ admin_user_email | default('the admin user') }}"
         echo: false
       register: _admin_password_result
-      when: (admin_user_email | default('')) | length > 0
+      when:
+        - (admin_user_email | default('')) | length > 0
+        - admin_user_password is not defined
 
     - name: Confirm initial admin password
       pause:
@@ -90,6 +96,7 @@
       register: _admin_password_confirm
       when:
         - (admin_user_email | default('')) | length > 0
+        - admin_user_password is not defined
         - _admin_password_result.user_input | default('') | length > 0
 
     - name: Fail if passwords do not match
@@ -97,13 +104,16 @@
         msg: "Passwords do not match. Re-run deploy.yml and try again."
       when:
         - (admin_user_email | default('')) | length > 0
+        - admin_user_password is not defined
         - _admin_password_result.user_input | default('') | length > 0
         - _admin_password_result.user_input != _admin_password_confirm.user_input
 
     - name: Set admin password fact
       set_fact:
         admin_user_password: "{{ _admin_password_result.user_input | default('') }}"
-      when: (admin_user_email | default('')) | length > 0
+      when:
+        - (admin_user_email | default('')) | length > 0
+        - admin_user_password is not defined
 
     - name: Validate admin_user_email is set
       assert:
@@ -131,3 +141,26 @@
 
 - import_playbook: playbooks/05-deploy-instances.yml
   tags: [deploy]
+
+- name: Deployment summary
+  hosts: all
+  gather_facts: false
+  tags: [always]
+  tasks:
+    - name: Show deployment summary
+      debug:
+        msg: "{{ _summary.split('\n') }}"
+      vars:
+        _summary: |
+          ==========================================
+           Deployment Complete
+          ==========================================
+          {% for instance in instances %}
+          {{ instance.domain }}
+            URL:   https://{{ instance.domain }}
+            Login: {{ instance.admin_user_email | default(admin_user_email | default('(see admin_user_email)')) }}
+          {% endfor %}
+          ==========================================
+          Unlock after reboot:
+            sudo /usr/local/bin/unlock_data unlock
+          ==========================================

@@ -42,6 +42,10 @@
         state: present
         update_cache: yes
 
+    - name: Clean apt package cache
+      command: apt-get clean
+      changed_when: false
+
     - name: Create Caddy conf.d directory
       file:
         path: /etc/caddy/conf.d
@@ -58,6 +62,14 @@
         group: root
         mode: '0644'
       notify: reload caddy
+
+    - name: Deploy custom error pages
+      template:
+        src: templates/503.html.j2
+        dest: /etc/caddy/503.html
+        owner: root
+        group: root
+        mode: '0644'
 
     - name: Deploy per-instance Caddy configs
       template:

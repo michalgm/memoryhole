@@ -31,7 +31,6 @@
     # first non-localhost host in inventory IS the label. Volume follows the
     # same convention. Override with -e linode_label=... if needed.
     linode_label: "{{ (groups['all'] | difference(['localhost'])) | first }}"
-    volume_label: '{{ linode_label }}-volume'
 
   pre_tasks:
     - name: Require explicit confirmation
@@ -44,7 +43,6 @@
 
           This playbook will permanently delete:
             - Linode instance: {{ linode_label }}
-            - Block storage volume: {{ volume_label }}
 
           THIS CANNOT BE UNDONE.
 
@@ -60,18 +58,10 @@
         that: linode_api_token != ''
         fail_msg: 'LINODE_TOKEN environment variable not set. Export it and try again.'
 
-    # Delete instance first — this detaches the volume automatically.
     - name: Delete Linode instance
       linode.cloud.instance:
         api_token: '{{ linode_api_token }}'
         label: '{{ linode_label }}'
-        state: absent
-      ignore_errors: true
-
-    - name: Delete block storage volume
-      linode.cloud.volume:
-        api_token: '{{ linode_api_token }}'
-        label: '{{ volume_label }}'
         state: absent
       ignore_errors: true
 
@@ -82,7 +72,6 @@
           - 'Linode deprovision complete'
           - '=========================================='
           - 'Instance ({{ linode_label }}): deleted'
-          - 'Volume ({{ volume_label }}): deleted'
           - ''
           - 'To start fresh:'
           - '  ansible-playbook provision.yml'

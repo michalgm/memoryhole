@@ -51,15 +51,32 @@ fail2ban_sender: fail2ban@{{ server_hostname }}
 # ==============================================================================
 
 use_encrypted_volume: true
+encrypted_volume_name: encrypted_data
 encrypted_volume_mount: /mnt/encrypted
 use_luks_keyfile: false
-swap_size_mb: 2048
+
+# Loopback file used as the LUKS container (lives on the root disk).
+# Size guidance for Linode plans:
+#   nanode  (25 GB root):  13 GB  — leaves ~ 5GB for OS + growth
+#   linode2 (50 GB root):  33 GB
+#   linode4 (80 GB root):  58 GB
+encrypted_loopback_file: /encrypted.img
+encrypted_loopback_size_gb: 13
+
+# Additional swap loopback file — converted to encrypted swap via crypttab
+# alongside any existing swap partition. Useful when the provider swap
+# partition is small or absent.
+encrypted_swap_file: /swap.img
+swap_size_gb: 1.5
 
 # Advanced LUKS settings
 luks_cipher: aes-xts-plain64
 luks_key_size: 512
 luks_hash: sha512
 luks_iter_time: 5000
+# Argon2id memory cap in KB. The LUKS2 default can exceed available RAM on
+# small instances — 262144 (256 MB) is safe for a nanode with Docker running.
+luks_pbkdf_memory_kb: 262144
 
 # ==============================================================================
 # DOCKER

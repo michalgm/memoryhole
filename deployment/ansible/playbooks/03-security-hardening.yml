@@ -47,7 +47,6 @@
         regexp: '{{ item.regexp }}'
         line: '{{ item.line }}'
         state: present
-        validate: '/usr/sbin/sshd -t -f %s'
       loop:
         - { regexp: '^#?Port ', line: 'Port {{ ssh_port }}' }
         - {
@@ -87,6 +86,16 @@
         - { regexp: '^#?Protocol ', line: 'Protocol 2' }
         - { regexp: '^#?LogLevel ', line: 'LogLevel VERBOSE' }
       notify: restart ssh
+
+    - name: Ensure SSH privilege separation directory exists
+      file:
+        path: /run/sshd
+        state: directory
+        mode: '0755'
+
+    - name: Validate sshd config
+      command: /usr/sbin/sshd -t
+      changed_when: false
 
     - name: Disable SSH protocol 1
       lineinfile:
@@ -316,6 +325,10 @@
           - logwatch # Log analysis
           - psad # Port scan attack detection
         state: present
+
+    - name: Clean apt package cache
+      command: apt-get clean
+      changed_when: false
 
     # - name: Initialize AIDE database
     #   shell: aideinit
