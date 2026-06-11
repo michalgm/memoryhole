@@ -6,17 +6,16 @@
     "web"
   ],
   "devDependencies": {
-    "@cedarjs/cli-data-migrate": "2.6.0",
-    "@cedarjs/cli-storybook-vite": "2.6.0",
-    "@cedarjs/core": "2.6.0",
-    "@cedarjs/project-config": "2.6.0",
-    "@cedarjs/realtime": "2.6.0",
+    "@cedarjs/cli-data-migrate": "4.2.0",
+    "@cedarjs/cli-storybook-vite": "4.2.0",
+    "@cedarjs/core": "4.2.0",
+    "@cedarjs/project-config": "4.2.0",
+    "@cedarjs/realtime": "4.2.0",
     "@cedarjs/studio": "^2.0.1",
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-codegen/typescript-resolvers": "^4.5.2",
-    "@release-it/conventional-changelog": "^10.0.5",
-    "conventional-changelog-cli": "^5.0.0",
+    "@release-it/conventional-changelog": "^10.0.6",
     "graphql-codegen-typescript-mock-data": "^4.4.0",
     "node-ssh": "^13.2.1",
     "release-it": "^18.1.2"
@@ -27,9 +26,9 @@
   "version": "0.26.2",
   "packageManager": "yarn@4.9.4",
   "dependencies": {
-    "axios": "^1.13.6",
+    "axios": "^1.17.0",
     "axios-cookiejar-support": "^5.0.5",
-    "pm2": "^6.0.14",
+    "pm2": "^7.0.1",
     "tough-cookie": "^5.1.2"
   },
   "scripts": {

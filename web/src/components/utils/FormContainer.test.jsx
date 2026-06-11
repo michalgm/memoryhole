@@ -3,10 +3,10 @@ import { ConfirmProvider } from 'material-ui-confirm'
 
 import { navigate } from '@cedarjs/router'
 import {
-    mockGraphQLMutation,
-    mockGraphQLQuery,
-    screen,
-    waitFor,
+  mockGraphQLMutation,
+  mockGraphQLQuery,
+  screen,
+  waitFor,
 } from '@cedarjs/testing/web'
 import { registerFragment } from '@cedarjs/web/apollo'
 

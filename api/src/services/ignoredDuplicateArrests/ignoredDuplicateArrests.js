@@ -11,9 +11,10 @@ export const ignoredDuplicateArrest = ({ id }) => {
 }
 
 export const createIgnoredDuplicateArrest = ({ arrest1_id, arrest2_id }) => {
-  const [id_1, id_2] = arrest1_id < arrest2_id
-    ? [arrest1_id, arrest2_id]
-    : [arrest2_id, arrest1_id]
+  const [id_1, id_2] =
+    arrest1_id < arrest2_id
+      ? [arrest1_id, arrest2_id]
+      : [arrest2_id, arrest1_id]
 
   return db.ignoredDuplicateArrest.create({
     data: {

@@ -5,6 +5,7 @@
 .redwood/*
 !.redwood/README.md
 dev.db*
+api/db/generated/prisma
 dist
 dist-babel
 node_modules

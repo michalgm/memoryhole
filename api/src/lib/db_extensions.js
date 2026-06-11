@@ -1,9 +1,8 @@
-import { emitLogLevels, handlePrismaLogging } from '@cedarjs/api/logger'
-import { Prisma, PrismaClient } from '@prisma/client'
+// import { emitLogLevels, handlePrismaLogging } from '@cedarjs/api/logger'
 
-import { logger } from 'src/lib/logger'
+import { Prisma } from 'src/lib/db'
+// import { logger } from 'src/lib/logger'
 import { updateSettingsCache } from 'src/lib/settingsCache'
-
 // import { filterArrestAccess } from 'src/services/arrests/arrests'
 // import { filterLogAccess } from 'src/services/logs/logs'
 
@@ -16,15 +15,15 @@ const MUTATION_OPERATIONS = [
   'updateMany',
   'deleteMany',
 ]
-const bypassClient = new PrismaClient({
-  log: emitLogLevels(['info', 'warn', 'error']),
-})
+// const bypassClient = new PrismaClient({
+//   log: emitLogLevels(['info', 'warn', 'error']),
+// })
 
-handlePrismaLogging({
-  db: bypassClient,
-  logger,
-  logLevels: ['info', 'warn', 'error'],
-})
+// handlePrismaLogging({
+//   db: bypassClient,
+//   logger,
+//   logLevels: ['info', 'warn', 'error'],
+// })
 
 export const settingsObserver = Prisma.defineExtension((client) => {
   client.registerInit((client) => updateSettingsCache(client))
@@ -123,7 +122,6 @@ export const initExtension = Prisma.defineExtension((client) => {
         initFunctions.push(fn)
       },
       async runInitFunctions() {
-        await new Promise((resolve) => setTimeout(resolve, 200))
         await Promise.all(initFunctions.map((fn) => fn(client)))
       },
     },

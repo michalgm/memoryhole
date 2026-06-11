@@ -1,8 +1,8 @@
 import { navigate, routes } from '@cedarjs/router'
+import { useMutation } from '@cedarjs/web'
+import { toast } from '@cedarjs/web/toast'
 
 import CustomSchemaForm from 'src/components/CustomSchema/CustomSchemaForm'
-import { toast } from '@cedarjs/web/toast'
-import { useMutation } from '@cedarjs/web'
 
 export const QUERY = gql`
   query EditCustomSchemaById($id: Int!) {

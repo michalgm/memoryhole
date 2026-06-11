@@ -275,7 +275,7 @@ describe('documents', () => {
       // Suppress console output for this error test
       const consoleSpy = jest
         .spyOn(console, 'error')
-        .mockImplementation(() => { })
+        .mockImplementation(() => {})
 
       const { validateRoleLevel } = require('src/lib/utils')
       validateRoleLevel.mockReturnValue(false)

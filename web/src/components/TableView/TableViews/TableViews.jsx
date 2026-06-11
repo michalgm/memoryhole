@@ -1,6 +1,5 @@
 import { Link, routes } from '@cedarjs/router'
 import { useMutation } from '@cedarjs/web'
-
 import { toast } from '@cedarjs/web/toast'
 
 import { QUERY } from 'src/components/TableView/TableViewsCell'

@@ -1,9 +1,9 @@
 import { Link, routes } from '@cedarjs/router'
-import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
+import { useMutation } from '@cedarjs/web'
+import { toast } from '@cedarjs/web/toast'
 
 import { QUERY } from 'src/components/CustomSchema/CustomSchemataCell'
-import { toast } from '@cedarjs/web/toast'
-import { useMutation } from '@cedarjs/web'
+import { jsonTruncate, timeTag, truncate } from 'src/lib/formatters'
 
 const DELETE_CUSTOM_SCHEMA_MUTATION = gql`
   mutation DeleteCustomSchemaMutation($id: Int!) {

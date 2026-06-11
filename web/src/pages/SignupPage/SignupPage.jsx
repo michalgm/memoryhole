@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 
 import {
-    FieldError,
-    Form,
-    Label,
-    PasswordField,
-    Submit,
-    TextField,
+  FieldError,
+  Form,
+  Label,
+  PasswordField,
+  Submit,
+  TextField,
 } from '@cedarjs/forms'
 import { Link, navigate, routes } from '@cedarjs/router'
 import { MetaTags } from '@cedarjs/web'

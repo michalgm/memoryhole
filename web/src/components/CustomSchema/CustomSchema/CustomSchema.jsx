@@ -1,8 +1,8 @@
 import { Link, navigate, routes } from '@cedarjs/router'
-import { jsonDisplay, timeTag } from 'src/lib/formatters'
-
-import { toast } from '@cedarjs/web/toast'
 import { useMutation } from '@cedarjs/web'
+import { toast } from '@cedarjs/web/toast'
+
+import { jsonDisplay, timeTag } from 'src/lib/formatters'
 
 const DELETE_CUSTOM_SCHEMA_MUTATION = gql`
   mutation DeleteCustomSchemaMutation($id: Int!) {

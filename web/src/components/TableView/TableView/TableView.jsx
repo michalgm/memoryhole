@@ -1,6 +1,5 @@
 import { Link, routes, navigate } from '@cedarjs/router'
 import { useMutation } from '@cedarjs/web'
-
 import { toast } from '@cedarjs/web/toast'
 
 import { timeTag } from 'src/lib/formatters'

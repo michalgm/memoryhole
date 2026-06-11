@@ -1,7 +1,5 @@
-import { Prisma } from '@prisma/client'
-
 import { requireAuth } from 'src/lib/auth'
-import { db } from 'src/lib/db'
+import { db, Prisma } from 'src/lib/db'
 
 import { filterArrestAccess } from './arrests'
 
@@ -99,7 +97,7 @@ pairs AS (
         ) / 4.0
       )
     ) AS fp_lev_score,
-    -- DOB exact match → 1 else 0 (if either missing, 0)
+    -- DOB exact match → 1 else 0 (if either missing, 0.0)
     (
       CASE
       WHEN n1.dob IS NULL OR n2.dob IS NULL THEN NULL::float8
@@ -210,34 +208,34 @@ SELECT arrest1_id,
   ROUND(
     100.0 * (
       ${W.name} * name_score +
-      ${W.dob} * coalesce(dob_score, 0) +
-      ${W.email} * coalesce(email_score, 0) +
-      ${W.phone} * coalesce(phone_score, 0) +
-      ${W.date_proximity} * coalesce(date_proximity_score, 0)
+      ${W.dob} * coalesce(dob_score, 0.0) +
+      ${W.email} * coalesce(email_score, 0.0) +
+      ${W.phone} * coalesce(phone_score, 0.0) +
+      ${W.date_proximity} * coalesce(date_proximity_score, 0.0)
     )::numeric /
       NULLIF(
         ${W.name} +
-    (CASE WHEN dob_score   IS NOT NULL THEN ${W.dob} ELSE 0 END) +
-    (CASE WHEN email_score IS NOT NULL THEN ${W.email} ELSE 0 END) +
-    (CASE WHEN phone_score IS NOT NULL THEN ${W.phone} ELSE 0 END) +
-    (CASE WHEN date_proximity_score IS NOT NULL THEN ${W.date_proximity} ELSE 0 END)
-     , 0 )
+    (CASE WHEN dob_score   IS NOT NULL THEN ${W.dob} ELSE 0.0 END) +
+    (CASE WHEN email_score IS NOT NULL THEN ${W.email} ELSE 0.0 END) +
+    (CASE WHEN phone_score IS NOT NULL THEN ${W.phone} ELSE 0.0 END) +
+    (CASE WHEN date_proximity_score IS NOT NULL THEN ${W.date_proximity} ELSE 0.0 END)
+     , 0.0 )
     ,
     2
   )AS final_score,
   -- expose components for UI
   name_score,
-  coalesce(dob_score, 0) AS dob_score,
-  coalesce(email_score, 0) AS email_score,
-  coalesce(phone_score, 0) AS phone_score,
-  coalesce(date_proximity_score, 0) AS date_proximity_score
+  coalesce(dob_score, 0.0) AS dob_score,
+  coalesce(email_score, 0.0) AS email_score,
+  coalesce(phone_score, 0.0) AS phone_score,
+  coalesce(date_proximity_score, 0.0) AS date_proximity_score
 FROM scored
 WHERE (
     ${W.name} * name_score +
-    ${W.dob} * coalesce(dob_score, 0) +
-    ${W.email} * coalesce(email_score, 0) +
-    ${W.phone} * coalesce(phone_score, 0) +
-    ${W.date_proximity} * coalesce(date_proximity_score, 0)
+    ${W.dob} * coalesce(dob_score, 0.0) +
+    ${W.email} * coalesce(email_score, 0.0) +
+    ${W.phone} * coalesce(phone_score, 0.0) +
+    ${W.date_proximity} * coalesce(date_proximity_score, 0.0)
   ) >= ${minScore / 100.0}
 ORDER BY final_score DESC
 `
