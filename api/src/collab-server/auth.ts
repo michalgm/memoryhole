@@ -14,7 +14,7 @@ export class JWTAuthExtension implements Extension {
 
     try {
       // Extract and validate session
-      const cookies = requestHeaders?.cookie || ''
+      const cookies = requestHeaders.get('cookie') || ''
       const sessionCookie = cookies
         .split(';')
         .map((c) => c.trim())
@@ -40,7 +40,7 @@ export class JWTAuthExtension implements Extension {
       }
 
       // Single database lookup for document permissions
-      const permissions = await checkDocumentPermissions(documentName, user, db)
+      const permissions = await checkDocumentPermissions(documentName, user)
 
       if (!permissions.canRead) {
         throw new Error(
@@ -64,13 +64,21 @@ export class JWTAuthExtension implements Extension {
       }
 
       return { user }
-    } catch (error) {
-      throw new Error(`Authentication failed: ${error.message}`)
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : (error as { message?: string })?.message ||
+            'Unknown authentication error'
+      throw new Error(`Authentication failed: ${errorMessage}`)
     }
   }
 }
 
-export const checkDocumentPermissions = async (documentName, user, db) => {
+export const checkDocumentPermissions = async (
+  documentName: string,
+  user: UserType
+) => {
   // Get document permissions from database
   const doc = await db.document.findUnique({
     where: { name: documentName },

@@ -10,18 +10,18 @@ export const createCollabServer = (options = {}) => {
   const extensions = [
     new JWTAuthExtension(),
     new Database({
-      async store({ documentName, state, context }) {
+      async store({ documentName, state, lastContext }) {
         try {
           // Check edit permissions (already validated in auth)
-          if (!context?.canEdit) {
+          if (!lastContext?.canEdit) {
             // Don't throw - just silently ignore the save attempt
             return
           }
 
-          const title = context?.title || documentName
+          const title = lastContext?.title || documentName
           const now = new Date()
           const [type] = documentName.split(/[:-]/, 2)
-          const user = context?.user
+          const user = lastContext?.user
 
           await db.document.upsert({
             where: { name: documentName },
@@ -47,8 +47,13 @@ export const createCollabServer = (options = {}) => {
         } catch (error) {
           console.error('❌ Error storing document:', error)
           // Optionally notify the client/user about the error
-          if (context && typeof context.notifySaveError === 'function') {
-            context.notifySaveError(`Failed to save document: ${error.message}`)
+          if (
+            lastContext &&
+            typeof lastContext.notifySaveError === 'function'
+          ) {
+            lastContext.notifySaveError(
+              `Failed to save document: ${error.message}`
+            )
           }
           // Don't re-throw to prevent server crash
           // Log the error but allow the server to continue
