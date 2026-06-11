@@ -4,7 +4,7 @@ const config = {
   rootDir: '../',
   preset: '@cedarjs/testing/config/jest/web',
   transformIgnorePatterns: [
-    '/node_modules/(?!(@mui|lodash-es|export-to-csv|material-ui-confirm))',
+    '/node_modules/(?!(@mui|lodash-es|export-to-csv|material-ui-confirm|@tiptap|uuid))',
   ],
   setupFilesAfterEnv: [
     '<rootDir>/web/src/setupTests.js',
