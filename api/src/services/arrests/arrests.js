@@ -299,21 +299,8 @@ export const updateArrest = async ({
     },
     current
   )
-  return await tx.arrest.update({
-    data,
-    include: {
-      arrestee: {
-        include: {
-          created_by: true,
-          updated_by: true,
-        },
-      },
-      updated_by: true,
-      created_by: true,
-      action: true,
-    },
-    where: { id },
-  })
+
+  return await tx.arrest.update({ data, where: { id } })
 }
 
 export const bulkUpdateArrests = async ({ ids, input }) => {
