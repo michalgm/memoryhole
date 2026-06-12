@@ -8,8 +8,9 @@ interface Options {
 }
 
 export async function sendEmail({ to, subject, text }: Options) {
-  if (['test', 'development'].includes(process.env.NODE_ENV)) {
+  if (['test', 'development'].includes(process.env.NODE_ENV || '')) {
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
       console.log({ to, subject, text })
     }
     return

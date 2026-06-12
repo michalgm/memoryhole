@@ -41,7 +41,7 @@ describe('duplicateArrests', () => {
 
   scenario(
     'respects maxArrestDateDifferenceSeconds filter',
-    async (scenario) => {
+    async (_scenario) => {
       const results = await duplicateArrests({
         maxArrestDateDifferenceSeconds: 60 * 60, // 1 hour
       })
@@ -203,7 +203,7 @@ describe('duplicateArrests', () => {
   scenario(
     'withIgnored',
     'excludes ignored pairs by default',
-    async (scenario) => {
+    async (_scenario) => {
       const results = await duplicateArrests()
       expect(results.length).toBe(0)
     }
@@ -212,7 +212,7 @@ describe('duplicateArrests', () => {
   scenario(
     'withIgnored',
     'includes ignored pairs when includeIgnored is true',
-    async (scenario) => {
+    async (_scenario) => {
       const results = await duplicateArrests({ includeIgnored: true })
       expect(results.length).toBe(1)
     }

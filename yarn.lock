@@ -13883,7 +13883,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"decamelize@npm:6.0.1":
+"decamelize@npm:6.0.1, decamelize@npm:^6.0.0":
   version: 6.0.1
   resolution: "decamelize@npm:6.0.1"
   checksum: 10c0/c0a3a529591ebab1d1a9458b60684194e91d904e9b0a56367d3d507b2c8ab89dfd40c61423ca6a1eb2f70e2d44d2efe78f3342326395d3738d1d42592b1a6224
@@ -17398,6 +17398,15 @@ __metadata:
   dependencies:
     decamelize: "npm:^2.0.0"
   checksum: 10c0/a0ed69264b5069137afb369b46e18e8dbeb67edc7fb2ad1de18554108943e2fc59155f898013fb7a2f03522879adad7c9a93f1c88428844bcbee006c98db8f0a
+  languageName: node
+  linkType: hard
+
+"humanize-string@npm:3.1.0":
+  version: 3.1.0
+  resolution: "humanize-string@npm:3.1.0"
+  dependencies:
+    decamelize: "npm:^6.0.0"
+  checksum: 10c0/64c0a65d43727971fc14db0fc6d9caa469bc58fb6dbd6e1900d87d331de108454bee16c0a2cb41f7967e1c4c351609f3092f377d83ad1f3a619c8b6870619084
   languageName: node
   linkType: hard
 
@@ -27186,7 +27195,7 @@ __metadata:
     dayjs: "npm:^1.11.21"
     encodeurl: "npm:^2.0.0"
     export-to-csv: "npm:^1.4.0"
-    humanize-string: "npm:2.1.0"
+    humanize-string: "npm:3.1.0"
     is-hotkey: "npm:^0.2.0"
     jest: "npm:^29.7.0"
     jest-matchmedia-mock: "npm:^1.1.0"

@@ -10,7 +10,7 @@ const AuthWrapper = ({ children }) => {
         username,
         password,
       })
-      .then((res) => console.warn(auth))
+      .then(() => console.warn(auth))
   }
 
   return children

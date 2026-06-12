@@ -1,6 +1,9 @@
 import cedarConfig from '@cedarjs/eslint-config'
 
 export default [
+  {
+    ignores: ['**/dist/', 'web/src/test/mocks/**', 'api/db/generated/**'],
+  },
   ...(await cedarConfig()),
   {
     rules: {
@@ -12,6 +15,12 @@ export default [
         },
       ],
       // Your custom rules here
+    },
+  },
+  {
+    files: ['scripts/**'],
+    rules: {
+      'no-console': 'off',
     },
   },
 ]

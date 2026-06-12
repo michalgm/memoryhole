@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { React, useEffect } from 'react'
 
 import { CssBaseline, Paper } from '@mui/material'
 import { ThemeProvider, useColorScheme } from '@mui/material/styles'

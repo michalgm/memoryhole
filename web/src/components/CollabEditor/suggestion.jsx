@@ -3,11 +3,10 @@ import { ReactRenderer } from '@tiptap/react'
 
 import { EmojiList } from './EmojiList.jsx'
 
-console.log('importing suggestion')
 export default {
   char: ':',
   items: ({ editor, query }) => {
-    console.log('query', query)
+    // console.log('query', query)
     return editor.storage.emoji.emojis
       .filter(({ shortcodes, tags }) => {
         return (
@@ -52,7 +51,7 @@ export default {
           props,
           editor: props.editor,
         })
-        console.log('hey ')
+        // console.log('hey ')
         document.body.appendChild(component.element)
         repositionComponent(props.clientRect())
       },

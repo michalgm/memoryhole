@@ -16,23 +16,22 @@ export const EmojiList = forwardRef((props, ref) => {
     }
   }
 
-  const upHandler = () => {
-    setSelectedIndex(
-      (selectedIndex + props.items.length - 1) % props.items.length
-    )
-  }
-
-  const downHandler = () => {
-    setSelectedIndex((selectedIndex + 1) % props.items.length)
-  }
-
-  const enterHandler = () => {
-    selectItem(selectedIndex)
-  }
-
   useEffect(() => setSelectedIndex(0), [props.items])
 
   useImperativeHandle(ref, () => {
+    const upHandler = () => {
+      setSelectedIndex(
+        (selectedIndex + props.items.length - 1) % props.items.length
+      )
+    }
+
+    const downHandler = () => {
+      setSelectedIndex((selectedIndex + 1) % props.items.length)
+    }
+
+    const enterHandler = () => {
+      selectItem(selectedIndex)
+    }
     return {
       onKeyDown: (x) => {
         if (x.event.key === 'ArrowUp') {
@@ -53,7 +52,7 @@ export const EmojiList = forwardRef((props, ref) => {
         return false
       },
     }
-  }, [upHandler, downHandler, enterHandler])
+  })
 
   return (
     <div className="dropdown-menu">
@@ -64,7 +63,7 @@ export const EmojiList = forwardRef((props, ref) => {
           onClick={() => selectItem(index)}
         >
           {item.fallbackImage ? (
-            <img src={item.fallbackImage} align="absmiddle" />
+            <img alt={item.name} src={item.fallbackImage} align="absmiddle" />
           ) : (
             item.emoji
           )}

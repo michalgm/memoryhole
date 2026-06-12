@@ -1,5 +1,5 @@
 import MainLayout from './MainLayout'
-import standard from './MainLayout.mock'
+// import standard from './MainLayout.mock'
 const meta = {
   component: MainLayout,
 }
