@@ -1,8 +1,16 @@
+import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev'
 import { onError } from '@apollo/client/link/error'
 
 import { navigate } from '@cedarjs/router'
 
 import { globalDisplayError } from 'src/components/utils/SnackBar'
+
+if (process.env.NODE_ENV !== 'production') {
+  // Adds messages only in a dev environment
+  loadDevMessages()
+  loadErrorMessages()
+}
+
 const INVALID_AUTH_HEADER_ERROR =
   'Exception in getAuthenticationContext: The `Authorization` header is not valid.'
 

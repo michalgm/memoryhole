@@ -13,6 +13,10 @@ import { waitFor } from '@cedarjs/testing/web'
 
 import './test/setup/browserMocks'
 
+// beforeAll(() => {
+//   jest.spyOn(console, 'warn').mockImplementation(() => {})
+// })
+
 jest.mock('src/components/utils/SnackBar', () =>
   jest.requireActual('src/components/utils/SnackBarProvider.mock')
 )

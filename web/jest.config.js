@@ -1,4 +1,5 @@
 // More info at https://redwoodjs.com/docs/project-configuration-dev-test-build
+// globalThis[Symbol.for('apollo.deprecations')] = true
 
 const config = {
   rootDir: '../',
