@@ -4358,10 +4358,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:^8.4.1":
-  version: 8.4.1
-  resolution: "@faker-js/faker@npm:8.4.1"
-  checksum: 10c0/4f2aecddcfdc2cc8b50b2d15d1e37302a7c7a5bbd184ae910a9d271bc11248533ca74dcdd4a9ccbe20410553e7af0f6a4d334c5b955635e09a32ddf4a64942d4
+"@faker-js/faker@npm:^9.8.0":
+  version: 9.9.0
+  resolution: "@faker-js/faker@npm:9.9.0"
+  checksum: 10c0/02107cb6915217b4831fa4b261603165972eb7f09d2ab2e1d4b75807df2d425a2bac8621cddbfdcc158c2c447c2bce2e14939d51c4a63fbd832df55452e7f73c
   languageName: node
   linkType: hard
 
@@ -16774,11 +16774,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-codegen-typescript-mock-data@npm:^4.4.0":
-  version: 4.4.0
-  resolution: "graphql-codegen-typescript-mock-data@npm:4.4.0"
+"graphql-codegen-typescript-mock-data@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "graphql-codegen-typescript-mock-data@npm:5.1.1"
   dependencies:
-    "@faker-js/faker": "npm:^8.4.1"
+    "@faker-js/faker": "npm:^9.8.0"
     "@graphql-codegen/plugin-helpers": "npm:^5.0.4"
     "@graphql-tools/utils": "npm:^10.7.2"
     casual: "npm:^1.6.2"
@@ -16790,7 +16790,8 @@ __metadata:
     upper-case: "npm:^2.0.1"
   peerDependencies:
     graphql: ^14.6.0 || ^15.0.0 || ^16.0.0
-  checksum: 10c0/8bf86fce0d5abb7a8fc1e9b759bc9c32c885cbe06e151ab6711355bdd9dbfcdc1d3e84877ccfb86cb5a1da832af986d8d9018cb92ddd2bf12af49bd685c8651b
+    typescript: ">=5.0.0"
+  checksum: 10c0/98c3c583d300fb784ca55055c5391dd84958ace51032bf0192881198490e0b907d1dd2b3330adcca909f94c433a14826bd7ceb66ddf1bb2313d9904d88ba78cb
   languageName: node
   linkType: hard
 
@@ -20274,7 +20275,7 @@ __metadata:
     "@release-it/conventional-changelog": "npm:^10.0.6"
     axios: "npm:^1.17.0"
     axios-cookiejar-support: "npm:^5.0.5"
-    graphql-codegen-typescript-mock-data: "npm:^4.4.0"
+    graphql-codegen-typescript-mock-data: "npm:^5.1.1"
     node-ssh: "npm:^13.2.1"
     pm2: "npm:^7.0.1"
     release-it: "npm:^18.1.2"
