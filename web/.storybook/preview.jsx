@@ -1,10 +1,12 @@
-import { React, useEffect } from 'react'
+import React, { useEffect } from 'react'
 
 import { CssBaseline, Paper } from '@mui/material'
 import { ThemeProvider, useColorScheme } from '@mui/material/styles'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
+import { RouterContextProvider } from '@cedarjs/router/dist/router-context'
+import { mockGraphQLQuery } from '@cedarjs/testing/web'
 import { RedwoodProvider } from '@cedarjs/web'
 import { RedwoodApolloProvider } from '@cedarjs/web/apollo'
 
@@ -20,17 +22,38 @@ export const globalTypes = {
     defaultValue: 'light',
     toolbar: {
       title: 'Theme Mode',
-      items: ['light', 'dark'],
-      showName: true,
+      items: [
+        { value: 'light', title: 'Light Mode', icon: 'sun' },
+        { value: 'dark', title: 'Dark Mode', icon: 'moon' },
+      ],
+      dynamicTitle: true,
+    },
+  },
+  showFormValues: {
+    name: 'Form Values',
+    defaultValue: false,
+    toolbar: {
+      title: 'Form Values',
+      items: [
+        { value: false, title: 'Hide Form Values' },
+        { value: true, title: 'Show Form Values' },
+      ],
+      dynamicTitle: true,
     },
   },
 }
+
+mockGraphQLQuery('SiteSettingsQuery', () => {
+  return {
+    siteSettings: [],
+  }
+})
 
 const ModeProvider = ({ mode }) => {
   const { setMode } = useColorScheme()
   useEffect(() => {
     setMode(mode)
-  }, [mode, setMode])
+  }, [mode]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 export const decorators = [
@@ -46,7 +69,13 @@ export const decorators = [
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <AuthProvider>
                     <RedwoodApolloProvider useAuth={useAuth}>
-                      <Story />
+                      <RouterContextProvider
+                        routes={[]}
+                        paramTypes={{}}
+                        activeRouteName={undefined}
+                      >
+                        <Story />
+                      </RouterContextProvider>
                     </RedwoodApolloProvider>
                   </AuthProvider>
                 </LocalizationProvider>

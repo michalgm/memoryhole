@@ -32,6 +32,9 @@ const Autocomplete = ({
   helperText,
   isRHF = false,
   transformOptions,
+  error,
+  placeholder,
+  loading: externalLoading,
   ...props
 }) => {
   const graphqlQuery = query || mockQuery
@@ -121,6 +124,9 @@ const Autocomplete = ({
   }
   delete autocompleteProps.inputProps
   delete autocompleteProps.helperText
+  textFieldProps.helperText = helperText
+  textFieldProps.error = error
+  textFieldProps.placeholder = placeholder
 
   if (isRHF) {
     return (
@@ -131,7 +137,7 @@ const Autocomplete = ({
         textFieldProps={textFieldProps}
         autocompleteProps={autocompleteProps}
         helperText={helperText}
-        loading={loading}
+        loading={loading || externalLoading}
         {...props}
       />
     )
@@ -147,7 +153,7 @@ const Autocomplete = ({
       value={currentValue}
       renderInput={(params) => {
         const mergedProps = merge(params, textFieldProps)
-        if (loading) {
+        if (loading || externalLoading) {
           mergedProps.InputProps = {
             ...mergedProps.InputProps,
             endAdornment: (
@@ -157,7 +163,15 @@ const Autocomplete = ({
             ),
           }
         }
-        return <TextField {...params} {...mergedProps} error={props.error} />
+        return (
+          <TextField
+            {...params}
+            {...mergedProps}
+            error={error}
+            helperText={helperText}
+            placeholder={props.placeholder}
+          />
+        )
       }}
       {...autocompleteProps}
       {...props}

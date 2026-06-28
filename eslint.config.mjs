@@ -2,7 +2,11 @@ import cedarConfig from '@cedarjs/eslint-config'
 
 export default [
   {
-    ignores: ['**/dist/', 'web/src/test/mocks/**', 'api/db/generated/**'],
+    ignores: [
+      '**/dist/',
+      'web/src/test/mocks/generated.ts',
+      'api/db/generated/**',
+    ],
   },
   ...(await cedarConfig()),
   {

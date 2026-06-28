@@ -11,6 +11,7 @@ generates:
           terminateCircularRelationships: true
           addTypename: true
           dynamicValues: true
+          locale: "en_US"
           scalars:
             Date: date.past
             DateTime: date.past
@@ -18,3 +19,29 @@ generates:
               generator: incrementalId
               increment: 1
               start: 1
+          fieldGeneration:
+            _all:
+              first_name: person.firstName
+              last_name: person.lastName
+              preferred_name: person.firstName
+              email: internet.email
+              display_field: person.fullName
+              search_field: person.fullName
+              location: location.city
+              jurisdiction: location.county
+              arrest_city: location.city
+              city: location.city
+              state: location.state
+              zip: location.zipCode
+              address: location.streetAddress
+              phone: phone.number
+              phone_1: phone.number
+              phone_2: phone.number
+              name: faker.helpers.fake('{{word.adjective}} {{animal.type}}')
+              pronoun: faker.helpers.arrayElement(["he/him","she/her","they/them"])
+            User:
+              name: person.fullName
+            Arrestee:
+              display_field: person.fullName
+              search_display_field: person.fullName
+

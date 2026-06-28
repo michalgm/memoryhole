@@ -5,6 +5,7 @@
     "target": "es2023",
     "module": "es2022",
     "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
     "skipLibCheck": false,
     "rootDirs": [
       "./src",

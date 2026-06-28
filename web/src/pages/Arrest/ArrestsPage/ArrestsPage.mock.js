@@ -11,3 +11,15 @@ export const standard = {
     },
   ]),
 }
+
+mockGraphQLQuery('ArrestsQuery', () => {
+  return {
+    arrests: generateMockData('anArrest', 'ArrestFields', 8),
+  }
+})
+
+mockGraphQLQuery('FindTableViews', () => {
+  return {
+    tableViews: generateMockData('aTableView', null, 8),
+  }
+})

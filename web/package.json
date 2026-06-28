@@ -84,7 +84,7 @@
     "babel-plugin-transform-imports": "^2.0.0",
     "babel-plugin-transform-vite-meta-env": "^1.0.3",
     "jest-matchmedia-mock": "^1.1.0",
-    "storybook-framework-cedarjs": "^2.8.1",
+    "storybook-framework-cedarjs": "^4.2.0",
     "vite-plugin-node-polyfills": "^0.28.0"
   }
 }

@@ -56,17 +56,31 @@ function filterFields(data, fields) {
 
   return result
 }
-export const generateMockData = (mockMethod, fragmentName, overrides = []) => {
-  const fragment = fragmentRegistry.lookup(fragmentName)
-
-  // Guard against null fragments
-  if (!fragment) {
-    console.warn(`Fragment "${fragmentName}" not found`)
-    return []
+export const generateMockData = (
+  mockMethod,
+  fragmentOrFields,
+  overrides = []
+) => {
+  let fields
+  if (typeof fragmentOrFields === 'string') {
+    const fragment = fragmentRegistry.lookup(fragmentOrFields)
+    if (!fragment) {
+      console.warn(`Fragment "${fragmentOrFields}" not found`)
+      return []
+    }
+    fields = extractFields(fragment)
+  } else {
+    fields = fragmentOrFields // plain object field spec, or null to skip filtering
   }
-  const fields = extractFields(fragment)
-  return overrides.map((override) => {
-    const mockData = filterFields(mockGenerators[mockMethod]({}), fields)
-    return merge(cloneDeep(mockData), override)
+
+  const resolvedOverrides =
+    typeof overrides === 'number' ? Array(overrides).fill({}) : overrides
+
+  return resolvedOverrides.map((override) => {
+    const mockData = mockGenerators[mockMethod]({})
+    const filtered = fields
+      ? filterFields(mockData, fields)
+      : cloneDeep(mockData)
+    return merge(filtered, override)
   })
 }
