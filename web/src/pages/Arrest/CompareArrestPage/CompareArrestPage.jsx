@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { DialogContentText } from '@mui/material'
+import { Alert, DialogContentText } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 
 import { navigate, routes, useRouteName } from '@cedarjs/router'
@@ -8,6 +8,7 @@ import { useMutation, useQuery } from '@cedarjs/web'
 
 import { ArrestLayout } from 'src/../../api/src/lib/fieldDefinitions'
 import CompareForm from 'src/components/CompareForm/CompareForm'
+import Show from 'src/components/utils/Show'
 import { useDisplayError, useSnackbar } from 'src/components/utils/SnackBar'
 import { useApp } from 'src/lib/AppContext'
 import { fieldSchema } from 'src/lib/FieldSchemas'
@@ -198,14 +199,22 @@ const CompareArrestPage = ({ id, compareId }) => {
       }}
     >
       {(formManagerContext) => (
-        <CompareForm
-          loading={loading}
-          formManagerContext={formManagerContext}
-          schema={fieldSchema.arrest}
-          // fields={ArrestFields}
-          layout={ArrestLayout}
-          compareData={compareData}
-        />
+        <>
+          <Show when={compareId === id}>
+            <Alert severity="error">
+              You cannot compare an arrest to itself. Please select a different
+              arrest to compare.
+            </Alert>
+          </Show>
+          <CompareForm
+            loading={loading}
+            formManagerContext={formManagerContext}
+            schema={fieldSchema.arrest}
+            // fields={ArrestFields}
+            layout={ArrestLayout}
+            compareData={compareData}
+          />
+        </>
       )}
     </ArrestPage>
   )

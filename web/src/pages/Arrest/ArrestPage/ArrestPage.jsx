@@ -12,6 +12,7 @@ import { BaseField } from 'src/components/utils/BaseField'
 import FormContainer from 'src/components/utils/FormContainer'
 import Show from 'src/components/utils/Show'
 import { useApp } from 'src/lib/AppContext'
+import { displayItemProps } from 'src/lib/utils'
 
 export const QUERY = gql`
   query EditArrestById($id: Int!) {
@@ -44,11 +45,15 @@ export const DELETE_ARREST_MUTATION = gql`
     }
   }
 `
-
-const CompareChooser = () => {
+const CompareChooser = ({ id }) => {
   const { pathname } = useLocation()
   const [showChooser, setShowChooser] = useState(pathname.includes('compare'))
-
+  const transformOptions = useCallback(
+    (options) => {
+      return options.filter((option) => option.id !== id)
+    },
+    [id]
+  )
   return (
     <Stack direction={'row'} spacing={1}>
       <Tooltip title="Compare this arrest record to another">
@@ -66,6 +71,7 @@ const CompareChooser = () => {
           name="compare_arrest"
           isRHF={false}
           sx={{ width: 250 }}
+          transformOptions={transformOptions}
           textFieldProps={{
             label: 'Select arrest to compare',
             sx: { backgroundColor: 'background.paper', px: 1 },
@@ -142,7 +148,13 @@ const ArrestPage = ({ id, children, ...props }) => {
 
   const onFetch = useCallback(
     (arrest) => {
-      setPageTitle({ arrest: arrest?.arrestee?.display_field })
+      const { subtitle } = displayItemProps({
+        item: arrest,
+        type: 'arrest',
+      })
+      setPageTitle({
+        arrest: `${arrest?.arrestee?.display_field} ${subtitle ? `(${subtitle})` : ''}`,
+      })
       if (
         isCreate &&
         currentAction &&
@@ -166,7 +178,7 @@ const ArrestPage = ({ id, children, ...props }) => {
   const compareTarget = document.getElementById('modal_layout_header_actions')
 
   const compareControlPortal = compareTarget
-    ? createPortal(<CompareChooser />, compareTarget)
+    ? createPortal(<CompareChooser id={id} />, compareTarget)
     : null
 
   return (
