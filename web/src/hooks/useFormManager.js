@@ -30,19 +30,28 @@ const dataFromResult = (result) => {
 //   return obj
 // }
 
-const getChangedFields = (input, dirtyFields) => {
+export const getChangedFields = (input, dirtyFields) => {
   if (!dirtyFields || typeof dirtyFields !== 'object') {
     return input
   }
 
-  return Object.keys(dirtyFields).reduce((acc, key) => {
-    if (dirtyFields[key] === true) {
-      acc[key] = input[key]
-    } else {
-      acc[key] = getChangedFields(input[key], dirtyFields[key])
+  const changed = Object.keys(dirtyFields).reduce((acc, key) => {
+    const dirtyValue = dirtyFields[key]
+    if (dirtyValue) {
+      const inputValue = input[key]
+      const isObject = typeof dirtyValue === 'object'
+      const isArray = Array.isArray(dirtyValue)
+      if (isObject && !isArray) {
+        acc[key] = getChangedFields(inputValue, dirtyValue)
+      } else {
+        acc[key] = inputValue
+      }
     }
     return acc
   }, {})
+
+  // console.log('getChangedFields', { input, dirtyFields, changed })
+  return changed
 }
 
 export function useFormManager({
