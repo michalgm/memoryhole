@@ -1,16 +1,18 @@
-const fs = require('fs/promises')
+import fs from 'fs/promises'
 
-const axios = require('axios')
-const { wrapper } = require('axios-cookiejar-support')
-const dayjs = require('dayjs')
-const customParseFormat = require('dayjs/plugin/customParseFormat')
+import axios from 'axios'
+import { wrapper } from 'axios-cookiejar-support'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
+import lodash from 'lodash'
+import { CookieJar } from 'tough-cookie'
+
+import { sendEmail } from '../api/src/lib/email.ts'
+
 const apiHost = process.env.PUBLIC_URL
-const timezone = require('dayjs/plugin/timezone')
-const utc = require('dayjs/plugin/utc')
-const { set } = require('lodash')
-const { CookieJar } = require('tough-cookie')
-
-const { sendEmail } = require('../api/src/lib/email.ts')
+const { set } = lodash
 const cookieJar = new CookieJar()
 
 dayjs.extend(customParseFormat)
@@ -208,7 +210,12 @@ const importRecord = async (data) => {
 
 export default async ({ args }) => {
   try {
-    const file = args._[1]
+    const {
+      _: [file],
+    } = args
+    if (!file) {
+      throw new Error('Please provide a file path as an argument.')
+    }
     console.log(`Importing record from ${file}`)
     const data = await fs.readFile(file, 'utf8')
     const json = JSON.parse(data)

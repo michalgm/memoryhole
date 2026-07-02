@@ -1,8 +1,8 @@
-const axios = require('axios')
-const { wrapper } = require('axios-cookiejar-support')
-const apiHost = process.env.PUBLIC_URL
-const { CookieJar } = require('tough-cookie')
+import axios from 'axios'
+import { wrapper } from 'axios-cookiejar-support'
+import { CookieJar } from 'tough-cookie'
 
+const apiHost = process.env.PUBLIC_URL
 const cookieJar = new CookieJar()
 
 const axiosInstance = wrapper(
