@@ -3,7 +3,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "target": "es2023",
-    "module": "es2022",
+    "module": "esnext",
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "skipLibCheck": false,
