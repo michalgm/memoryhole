@@ -36,7 +36,8 @@ const xSmallInputStyles = {
     fontSize: xSmallInputFontSize,
     padding: '6px 8px',
   },
-  '& .MuiInputBase-input.MuiSelect-select': {
+  '& .MuiInputBase-input.MuiSelect-select, & .MuiInputBase-input.MuiAutocomplete-input':
+  {
     padding: '5px 8px',
   },
   '& .MuiInputBase-adornedStart': { paddingLeft: '8px' },
@@ -45,6 +46,9 @@ const xSmallInputStyles = {
   '& .MuiInputBase-inputAdornedEnd': { paddingRight: 0 },
   '& svg': {
     fontSize: '1.2rem',
+  },
+  '& .MuiFormControlLabel-label': {
+    fontSize: xSmallInputFontSize,
   },
   '& .MuiInputLabel-root': {
     fontSize: xSmallInputFontSize,
