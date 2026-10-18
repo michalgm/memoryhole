@@ -19,6 +19,13 @@ const getOperationName = (query) => {
   return selection.name.value
 }
 
+const compact = (values) =>
+  (Array.isArray(values) ? values : []).filter((v) => v != null)
+
+const isOptionEqualToValue = (option = {}, value) => {
+  return option.id === value || option.id === value?.id
+}
+
 const Autocomplete = ({
   name,
   label,
@@ -40,11 +47,16 @@ const Autocomplete = ({
   const graphqlQuery = query || mockQuery
   const displayError = useDisplayError()
   const { getValues } = useFormContext() || {}
-  const currentValue = isRHF && getValues && isRHF ? getValues()[name] : value
+  // getValues(name) resolves dotted paths like 'shift.coordinators'
+  const getCurrentValue = useCallback(
+    () => (isRHF && getValues ? getValues(name) : value),
+    [isRHF, getValues, name, value]
+  )
+  const currentValue = getCurrentValue()
   const [options, setOptions] = useState(() => {
     if (currentValue && !staticOptions) {
       if (props.multiple && Array.isArray(currentValue)) {
-        return currentValue
+        return compact(currentValue)
       }
       return [
         {
@@ -73,11 +85,15 @@ const Autocomplete = ({
         ? transformOptions(options.map((o) => ({ ...o, label: o.name })))
         : options.map((o) => ({ ...o, label: o.name }))
 
-      // Merge with current values if multiple
-      if (props.multiple && Array.isArray(currentValue)) {
+      // Merge with current values if multiple, so selected values stay
+      // matchable after a search replaces the options list
+      const selected = getCurrentValue()
+      if (props.multiple && Array.isArray(selected)) {
         const optionsMap = new Map([
           ...transformedOptions.map((o) => [o.id, o]),
-          ...currentValue.map((v) => [v.id, v]),
+          ...compact(selected)
+            .filter((v) => typeof v === 'object')
+            .map((v) => [v.id, v]),
         ])
         setOptions(Array.from(optionsMap.values()))
       } else {
@@ -89,7 +105,7 @@ const Autocomplete = ({
       staticOptions,
       searchQuery,
       transformOptions,
-      currentValue,
+      getCurrentValue,
       props.multiple,
     ]
   )
@@ -105,12 +121,15 @@ const Autocomplete = ({
 
   const autocompleteProps = {
     disabled: props.disabled,
-    isOptionEqualToValue: (option = {}, value) => {
-      return option.id === value || option.id === value?.id
-    },
+    isOptionEqualToValue,
     getOptionLabel: (option) => option.label || '',
     onChange: (e, value) => {
-      onChange && onChange(storeFullObject ? value : value?.id || null)
+      if (!onChange) return
+      if (props.multiple) {
+        onChange(compact(value).map((v) => (storeFullObject ? v : (v.id ?? v))))
+      } else {
+        onChange(storeFullObject ? value : value?.id || null)
+      }
     },
 
     onInputChange: (_, value, reason) => {
@@ -129,6 +148,22 @@ const Autocomplete = ({
   textFieldProps.placeholder = placeholder
 
   if (isRHF) {
+    // AutocompleteElement's default transform maps values it can't find in
+    // options to undefined, which then gets saved as null in multiple mode
+    const transform = props.multiple
+      ? {
+          input: (fieldValue) =>
+            compact(fieldValue).map(
+              (v) =>
+                options.find((o) => isOptionEqualToValue(o, v)) ??
+                (typeof v === 'object' ? v : { id: v, label: `${v}` })
+            ),
+          output: (_e, newValue) =>
+            compact(newValue).map((v) =>
+              props.matchId && typeof v === 'object' ? v.id : v
+            ),
+        }
+      : undefined
     return (
       <AutocompleteElement
         name={name}
@@ -138,6 +173,7 @@ const Autocomplete = ({
         autocompleteProps={autocompleteProps}
         helperText={helperText}
         loading={loading || externalLoading}
+        transform={transform}
         {...props}
       />
     )
