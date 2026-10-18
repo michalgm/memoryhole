@@ -40,7 +40,10 @@ const Log = ({ log: item, setEditItem, editItem, onCreate }) => {
   }, [item.notes])
 
   const isSummary = item.type === 'Shift Summary'
-  const coordinators = item?.shift?.coordinators?.map((i) => i.name)?.join(', ')
+  const coordinators = item?.shift?.coordinators
+    ?.map((i) => i?.name)
+    ?.filter(Boolean)
+    ?.join(', ')
   return (
     <Card
       key={item.id}
