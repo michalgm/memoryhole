@@ -127,7 +127,7 @@ const Footer = ({
           zIndex: 12,
           position: 'relative',
           ...theme.applyStyles('dark', {
-            backgroundColor: 'Background.paper',
+            backgroundColor: theme.colorSchemes.light.palette.primary.dark,
           }),
         })}
       >
