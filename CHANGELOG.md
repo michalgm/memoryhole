@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.31.0](https://github.com/michalgm/memoryhole/compare/v0.30.0...v0.31.0) (2026-10-22)
+
 ## [0.30.0](https://github.com/michalgm/memoryhole/compare/v0.26.2...v0.30.0) (2026-10-22)
 
 ### Features
