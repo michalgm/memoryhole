@@ -20,7 +20,7 @@
     "eslint-plugin-vitest": "^0.5.4",
     "graphql-codegen-typescript-mock-data": "^5.2.0",
     "node-ssh": "^13.2.1",
-    "prisma": "7.8.0",
+    "prisma": "7.10.1",
     "release-it": "^20.2.1"
   },
   "engines": {
@@ -32,9 +32,9 @@
     "@cedarjs/eslint-config": "7.1.0",
     "axios": "^1.20.0",
     "axios-cookiejar-support": "^5.0.5",
-    "pm2": "^7.0.4",
+    "pm2": "^7.1.0",
     "tough-cookie": "^5.1.2",
-    "vitest": "4.1.10"
+    "vitest": "4.1.12"
   },
   "resolutions": {
     "vite": "7.3.7"

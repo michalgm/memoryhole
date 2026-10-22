@@ -14,10 +14,11 @@ export default defineConfig(({ mode }) => ({
     'process.env.APP_VERSION': JSON.stringify(version),
   },
   ...(mode === 'test' && {
-    // Prefer packages' ESM builds in tests. Otherwise packages like mui-tiptap and
-    // material-react-table load as CJS and pull in duplicate copies of
-    // prosemirror / x-date-pickers that break shared context
     resolve: {
+      // Prefer packages' ESM builds in tests. Otherwise packages like mui-tiptap,
+      // material-react-table and MUI's subpath imports load as CJS and pull in
+      // duplicate copies of prosemirror / x-date-pickers / emotion that break
+      // shared context
       conditions: ['module', 'browser', 'development'],
       mainFields: ['module', 'browser', 'main'],
     },
@@ -48,8 +49,15 @@ export default defineConfig(({ mode }) => ({
     },
     server: {
       deps: {
-        // x-date-pickers imports '@mui/material/utils' as a directory, which Node's ESM loader rejects
-        inline: [/@mui\/x-date-pickers/],
+        inline: [
+          // x-date-pickers imports '@mui/material/utils' as a directory, which
+          // Node's ESM loader rejects
+          /@mui\/x-date-pickers/,
+          // Left to Node, user-event gets the CJS @testing-library/dom while
+          // @testing-library/react configures the ESM one, so user-event's
+          // events skip act() and every state update warns
+          /@testing-library\/user-event/,
+        ],
       },
     },
   },
