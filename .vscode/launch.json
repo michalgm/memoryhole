@@ -29,24 +29,6 @@
       "name": "Test web",
       "request": "launch",
       "type": "node-terminal"
-    },
-    {
-      "type": "node",
-      "name": "vscode-jest-tests.v2.memoryhole",
-      "request": "launch",
-      "args": [
-        "--runInBand",
-        "--watchAll=false",
-        "--testNamePattern",
-        "${jest.testNamePattern}",
-        "--runTestsByPath",
-        "${jest.testFile}"
-      ],
-      "cwd": "/home/dameat/work/memoryhole",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "disableOptimisticBPs": true,
-      "program": "/home/dameat/work/memoryhole/node_modules/.bin/jest"
     }
   ]
 }
