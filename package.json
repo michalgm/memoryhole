@@ -7,11 +7,11 @@
     "web"
   ],
   "devDependencies": {
-    "@cedarjs/cli-data-migrate": "6.0.2",
-    "@cedarjs/cli-storybook-vite": "6.0.2",
-    "@cedarjs/core": "6.0.2",
-    "@cedarjs/project-config": "6.0.2",
-    "@cedarjs/realtime": "6.0.2",
+    "@cedarjs/cli-data-migrate": "7.1.0",
+    "@cedarjs/cli-storybook-vite": "7.1.0",
+    "@cedarjs/core": "7.1.0",
+    "@cedarjs/project-config": "7.1.0",
+    "@cedarjs/realtime": "7.1.0",
     "@cedarjs/studio": "^2.0.1",
     "@graphql-codegen/cli": "^7.4.6",
     "@graphql-codegen/typescript": "^6.1.2",
@@ -29,7 +29,7 @@
   "version": "0.26.2",
   "packageManager": "yarn@4.17.0",
   "dependencies": {
-    "@cedarjs/eslint-config": "6.0.2",
+    "@cedarjs/eslint-config": "7.1.0",
     "axios": "^1.20.0",
     "axios-cookiejar-support": "^5.0.5",
     "pm2": "^7.0.4",

@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => ({
     name: 'web',
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['src/setupTests.js'],
+    setupFiles: ['src/setupTests.jsx'],
     exclude: [...configDefaults.exclude, 'templates/**'],
     deps: {
       // Cedar's MockProviders loads Routes.jsx (and so the whole app) in every

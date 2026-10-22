@@ -12,11 +12,11 @@
     ]
   },
   "dependencies": {
-    "@cedarjs/auth-dbauth-web": "6.0.2",
-    "@cedarjs/forms": "6.0.2",
-    "@cedarjs/router": "6.0.2",
-    "@cedarjs/web": "6.0.2",
-    "@cedarjs/web-server": "6.0.2",
+    "@cedarjs/auth-dbauth-web": "7.1.0",
+    "@cedarjs/forms": "7.1.0",
+    "@cedarjs/router": "7.1.0",
+    "@cedarjs/web": "7.1.0",
+    "@cedarjs/web-server": "7.1.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -72,10 +72,11 @@
     "yjs": "^13.6.33"
   },
   "devDependencies": {
-    "@cedarjs/project-config": "6.0.2",
-    "@cedarjs/testing": "6.0.2",
-    "@cedarjs/vite": "6.0.2",
+    "@cedarjs/project-config": "7.1.0",
+    "@cedarjs/testing": "7.1.0",
+    "@cedarjs/vite": "7.1.0",
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1"
+    "@emotion/styled": "^11.14.1",
+    "storybook-framework-cedarjs": "7.1.0"
   }
 }
