@@ -1,3 +1,6 @@
+import vitest from 'eslint-plugin-vitest'
+import globals from 'globals'
+
 import cedarConfig from '@cedarjs/eslint-config'
 
 export default [
@@ -29,8 +32,11 @@ export default [
       '**/test/setup/**',
       '**/*.mock.*',
     ],
+    plugins: {
+      vitest,
+    },
     languageOptions: {
-      globals: { vi: 'readonly' },
+      globals: { ...vitest.environments.env.globals },
     },
   },
   {

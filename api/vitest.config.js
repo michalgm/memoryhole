@@ -9,4 +9,7 @@ export default defineConfig({
     globals: true,
     globalSetup: ['./vitest.globalSetup.js'],
   },
+  define: {
+    'process.env': {},
+  },
 })

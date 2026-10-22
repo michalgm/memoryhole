@@ -17,6 +17,7 @@
     "@graphql-codegen/typescript": "^6.1.2",
     "@graphql-codegen/typescript-resolvers": "^6.1.1",
     "@release-it/conventional-changelog": "^11.0.1",
+    "eslint-plugin-vitest": "^0.5.4",
     "graphql-codegen-typescript-mock-data": "^5.2.0",
     "node-ssh": "^13.2.1",
     "prisma": "7.8.0",
