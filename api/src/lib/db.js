@@ -32,5 +32,11 @@ handlePrismaLogging({
 })
 
 const extendedClient = applyExtensions(prismaClient)
-const dbReady = extendedClient.runInitFunctions()
-export { extendedClient as db, dbReady, Prisma }
+
+// Run registered init functions (e.g. warming the settings cache). Called from
+// server startup rather than on import: one-off processes that import db
+// (data migrations, `cedar exec` scripts) would otherwise leave this query
+// running after Cedar shuts down, and Prisma's lazy module loading then crashes
+export const initDb = () => extendedClient.runInitFunctions()
+
+export { extendedClient as db, Prisma }
