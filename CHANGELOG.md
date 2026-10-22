@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.30.0](https://github.com/michalgm/memoryhole/compare/v0.26.2...v0.30.0) (2026-10-22)
+
+### Features
+
+* add code to hide deprecation warnings + all warnings from tests ([db28c9d](https://github.com/michalgm/memoryhole/commit/db28c9d7564b10a232ce9ef91708d2518c4358a2))
+* Arrest compare UI fixes ([e05062f](https://github.com/michalgm/memoryhole/commit/e05062fec1f476acf1ce7af9e020ee790a2720bc)), closes [#69](https://github.com/michalgm/memoryhole/issues/69) [#67](https://github.com/michalgm/memoryhole/issues/67) [#68](https://github.com/michalgm/memoryhole/issues/68)
+* replace static mock data with generated mock data for docket sheet ([61ab2ff](https://github.com/michalgm/memoryhole/commit/61ab2ff76d731c8f493d956679959dddef4dc00d))
+
+### Bug Fixes
+
+* enhance input styles for MuiSelect and MuiAutocomplete components ([fe2dec4](https://github.com/michalgm/memoryhole/commit/fe2dec41bfea892241adf6d4a9fb7f2d2044b309))
+* fix Autocomplete to handle bad data in multiple values better ([26694d8](https://github.com/michalgm/memoryhole/commit/26694d8fc4d0edc29c82671e367a58dd32bcea87))
+* handle array fields in getChangedFields. Add tests for getChanged Fields ([15bd50c](https://github.com/michalgm/memoryhole/commit/15bd50c30c32266ea07e6575c02ef75cce1abbc5))
+* improve coordinator name handling in Log component ([0f07d74](https://github.com/michalgm/memoryhole/commit/0f07d7490e227f90c51cf1066859d9364dd40e5a))
+* simplify updateArrest function by removing unnecessary includes - fixes pg query warning:  Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. ([a89bc11](https://github.com/michalgm/memoryhole/commit/a89bc1142dcc0492ded2c835467c3635b564e04e))
+* update scripts to ESM format ([f664517](https://github.com/michalgm/memoryhole/commit/f6645177afb5bd84da7e4ce4ef644524cbbf1414))
+* update transformIgnorePatterns to include [@tiptap](https://github.com/tiptap) and uuid ([84a0f3a](https://github.com/michalgm/memoryhole/commit/84a0f3ad4a2c21d90f62b5269f0cdf836fbc023e))
+
 ## [0.26.2](https://github.com/michalgm/memoryhole/compare/v0.26.1...v0.26.2) (2026-03-04)
 
 ### Features
