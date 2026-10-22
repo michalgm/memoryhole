@@ -144,7 +144,7 @@ const ArrestsPage = () => {
         </Grid2>,
       ]
     })
-    await confirm({
+    const { confirmed } = await confirm({
       content: (
         <>
           Are you sure you want to delete the following arrests?
@@ -161,6 +161,7 @@ const ArrestsPage = () => {
         </>
       ),
     })
+    if (!confirmed) return
     try {
       const {
         data: {

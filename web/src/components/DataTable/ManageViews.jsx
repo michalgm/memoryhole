@@ -117,9 +117,10 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
   }
 
   const replaceView = async () => {
-    await confirm({
+    const { confirmed } = await confirm({
       title: `Are you sure you want to update the view "${currentView.name}" with your current table settings?`,
     })
+    if (!confirmed) return
     await updateTableView({
       variables: {
         id: currentView.id,
@@ -131,9 +132,10 @@ const ManageViews = ({ tableState, setTableState, defaultState }) => {
   }
 
   const deleteView = async () => {
-    await confirm({
+    const { confirmed } = await confirm({
       title: `Are you sure you want to delete the view "${currentView.name}"?`,
     })
+    if (!confirmed) return
     deleteTableView({ variables: { id: currentView.id } })
     loadView({ target: { value: defaultView.current } })
   }

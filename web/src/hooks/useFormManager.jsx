@@ -211,12 +211,10 @@ export function useFormManager({
       confirmOptions.content = renderContent(entityData)
     }
     await new Promise((resolve) => setTimeout(resolve, 0))
-    try {
-      await confirm(confirmOptions)
+    const { confirmed } = await confirm(confirmOptions)
+    if (confirmed) {
       const params = getDeleteParams?.() || {}
       await deleteEntity({ variables: { id, ...params } })
-    } catch (e) {
-      // console.log('delete confirmation cancelled')
     }
   }
 

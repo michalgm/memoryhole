@@ -16,12 +16,12 @@
     "@graphql-codegen/cli": "^7.4.6",
     "@graphql-codegen/typescript": "^6.1.2",
     "@graphql-codegen/typescript-resolvers": "^6.1.1",
-    "@release-it/conventional-changelog": "^11.0.1",
+    "@release-it/conventional-changelog": "^12.0.2",
     "eslint-plugin-vitest": "^0.5.4",
     "graphql-codegen-typescript-mock-data": "^5.2.0",
     "node-ssh": "^13.2.1",
     "prisma": "7.10.1",
-    "release-it": "^20.2.1"
+    "release-it": "^21.1.1"
   },
   "engines": {
     "node": "=24.x"
@@ -31,9 +31,9 @@
   "dependencies": {
     "@cedarjs/eslint-config": "7.1.0",
     "axios": "^1.20.0",
-    "axios-cookiejar-support": "^5.0.5",
+    "axios-cookiejar-support": "^7.0.0",
     "pm2": "^7.1.0",
-    "tough-cookie": "^5.1.2",
+    "tough-cookie": "^6.0.2",
     "vitest": "4.1.12"
   },
   "resolutions": {

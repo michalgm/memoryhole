@@ -52,7 +52,7 @@ const BulkUpdateModal = ({
     name: 'fields', // unique name for your Field Array
   })
   const doBulkUpdate = async () => {
-    await confirm({
+    const { confirmed } = await confirm({
       title: 'Confirm Bulk Update',
       contentProps: { component: 'div' },
       content: (
@@ -81,6 +81,7 @@ const BulkUpdateModal = ({
         </>
       ),
     })
+    if (!confirmed) return
     try {
       const valueMap = getValues().fields.reduce(
         (acc, { field_name, field_value }) => {

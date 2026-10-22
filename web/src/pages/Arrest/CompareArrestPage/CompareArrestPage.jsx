@@ -92,7 +92,7 @@ const CompareArrestPage = ({ id, compareId }) => {
       loading: merging,
       onClick: async () => {
         try {
-          await confirm({
+          const { confirmed } = await confirm({
             title: 'Confirm Merge Arrests',
             content: (
               <DialogContentText component={'div'}>
@@ -111,6 +111,7 @@ const CompareArrestPage = ({ id, compareId }) => {
               </DialogContentText>
             ),
           })
+          if (!confirmed) return
           setMerging(true)
           const { input } = (await prepareUpdate({})) || {}
           if (!input) {
@@ -131,7 +132,7 @@ const CompareArrestPage = ({ id, compareId }) => {
             },
           })
         } catch (err) {
-          console.warn('user cancelled')
+          console.error('Merge failed', err)
           setMerging(false)
         }
       },
@@ -150,7 +151,7 @@ const CompareArrestPage = ({ id, compareId }) => {
       color: 'inherit',
       onClick: async () => {
         try {
-          await confirm({
+          const { confirmed } = await confirm({
             title: 'Confirm marking as not duplicates',
             description: (
               <>
@@ -162,6 +163,7 @@ const CompareArrestPage = ({ id, compareId }) => {
               </>
             ),
           })
+          if (!confirmed) return
           await ignoreDuplicates({
             variables: {
               arrest1_id: parseInt(id),
@@ -182,7 +184,7 @@ const CompareArrestPage = ({ id, compareId }) => {
             },
           })
         } catch (err) {
-          console.warn('user cancelled')
+          console.error('Marking as not duplicates failed', err)
         }
       },
     }

@@ -161,11 +161,11 @@ const NavDrawer = ({ navOpen }) => {
             <span>
               <NavMenuItem
                 onClick={async () => {
-                  await confirm({
+                  const { confirmed } = await confirm({
                     title: 'Are you sure you want to sign out?',
                     confirmationText: 'Sign out',
                   })
-                  if (confirm) {
+                  if (confirmed) {
                     logOut()
                   }
                 }}

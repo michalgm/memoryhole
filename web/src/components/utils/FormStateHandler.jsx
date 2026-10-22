@@ -11,18 +11,17 @@ export const FormStateHandler = ({ blocker }) => {
       if (isDialogOpen) return
 
       setIsDialogOpen(true)
-      try {
-        await confirm({
-          title: 'You have unsaved changes. ',
-          description:
-            'Are you sure you want to leave this page? Changes you made will be lost if you navigate away.',
-        })
+      const { confirmed } = await confirm({
+        title: 'You have unsaved changes. ',
+        description:
+          'Are you sure you want to leave this page? Changes you made will be lost if you navigate away.',
+      })
+      if (confirmed) {
         blocker.confirm()
-      } catch (e) {
+      } else {
         blocker.abort()
-      } finally {
-        setIsDialogOpen(false)
       }
+      setIsDialogOpen(false)
     }
     if (blocker.state === 'BLOCKED') {
       handleNav()
