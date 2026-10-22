@@ -27,6 +27,7 @@ deploy.toml
 deployment/nginx.conf
 deployment/linode.txt
 coverage
+.cedar/*
 
 # Million Lint
 .million
