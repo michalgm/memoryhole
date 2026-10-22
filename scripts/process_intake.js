@@ -125,7 +125,7 @@ const apiRequest = async (url, data, method = 'post') => {
   })
     .then((response) => {
       if (response.data.errors) {
-        throw Error('Error:', response.data.errors.join(' '))
+        throw Error(`Error: ${response.data.errors.join(' ')}`)
       }
       return response
     })
@@ -136,7 +136,7 @@ const apiRequest = async (url, data, method = 'post') => {
         console.log(error?.response?.data)
       }
 
-      throw Error('Error:', error)
+      throw Error(`Error: ${error}`)
     })
 }
 
@@ -177,7 +177,7 @@ const importRecord = async (data) => {
       const path = fieldMap[key]
       if (path) {
         if (key === 'arrest_date') {
-          if (data.arrest_time === 'Invalid date' || !data.court_time) {
+          if (data.arrest_time === 'Invalid date' || !data.arrest_time) {
             data.arrest_time = '12:00AM'
           }
           val = combineDateTime(data.arrest_date, data.arrest_time)
