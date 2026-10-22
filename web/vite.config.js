@@ -42,6 +42,9 @@ export default defineConfig(({ mode }) => ({
             '@emotion/react',
             '@emotion/styled',
             '@mui/material',
+            // MUI v7's exports map loads subpaths separately; without this,
+            // ThemeProvider (from /styles) and components get different theme contexts
+            '@mui/material/styles',
             '@mui/icons-material',
           ],
         },

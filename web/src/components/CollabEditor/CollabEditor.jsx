@@ -14,7 +14,7 @@ import {
   Avatar,
   Box,
   FormHelperText,
-  Grid2,
+  Grid,
   Tooltip,
   Typography,
 } from '@mui/material'
@@ -570,14 +570,14 @@ const CollabEditor = (props) => {
             </Box>
           </Tooltip>
         )}
-        <Grid2
+        <Grid
           container
           direction="row"
           justifyContent="space-between"
           alignItems="center"
           sx={{ height: '100%' }}
         >
-          <Grid2 className="editorPane" size={'grow'} sx={{ height: '100%' }}>
+          <Grid className="editorPane" size={'grow'} sx={{ height: '100%' }}>
             <RichTextEditor
               ref={rteRef}
               extensions={extensions}
@@ -678,9 +678,9 @@ const CollabEditor = (props) => {
                 </>
               )}
             </RichTextEditor>
-          </Grid2>
+          </Grid>
           <Show when={showTOC}>
-            <Grid2
+            <Grid
               sx={{
                 width: 250,
                 borderLeftColor: 'divider',
@@ -703,9 +703,9 @@ const CollabEditor = (props) => {
                   <MemorizedToC items={tocItems} />
                 </Box>
               </Stack>
-            </Grid2>
+            </Grid>
           </Show>
-        </Grid2>
+        </Grid>
 
         {((error?.message && !disabled) || connectionError || helperText) && (
           <FormHelperText

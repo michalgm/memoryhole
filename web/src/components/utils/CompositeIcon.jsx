@@ -82,7 +82,7 @@ const CompositeIcon = ({
                 position: 'absolute',
                 fontSize: outlineIconSize,
                 color: overlayOutlineColor,
-                filter: `drop-shadow(1px 0 0 ${theme.palette.background.paper}) drop-shadow(-1px 0 0 ${theme.palette.background.paper}) drop-shadow(0 1px 0 ${theme.palette.background.paper}) drop-shadow(0 -1px 0 ${theme.palette.background.paper}) drop-shadow(0.2px 0 0 ${theme.palette.background.paper}) drop-shadow(-0.2px 0 0 ${theme.palette.background.paper}) drop-shadow(0 0.2px 0 ${theme.palette.background.paper}) drop-shadow(0 -0.2px 0 ${theme.palette.background.paper})`,
+                filter: `drop-shadow(1px 0 0 ${theme.vars.palette.background.paper}) drop-shadow(-1px 0 0 ${theme.vars.palette.background.paper}) drop-shadow(0 1px 0 ${theme.vars.palette.background.paper}) drop-shadow(0 -1px 0 ${theme.vars.palette.background.paper}) drop-shadow(0.2px 0 0 ${theme.vars.palette.background.paper}) drop-shadow(-0.2px 0 0 ${theme.vars.palette.background.paper}) drop-shadow(0 0.2px 0 ${theme.vars.palette.background.paper}) drop-shadow(0 -0.2px 0 ${theme.vars.palette.background.paper})`,
               })}
               {...overlayIconProps}
             />

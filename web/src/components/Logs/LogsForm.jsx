@@ -1,4 +1,4 @@
-import { Box, Button, Grid2, Stack, Tooltip } from '@mui/material'
+import { Box, Button, Grid, Stack, Tooltip } from '@mui/material'
 
 import { useParams, useRoutePath } from '@cedarjs/router'
 
@@ -72,7 +72,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
   const { id } = useParams()
   const schema = fieldSchema.log
   return (
-    <Grid2 size={12}>
+    <Grid size={12}>
       <BaseForm
         formConfig={{
           id: log_id,
@@ -260,7 +260,7 @@ const LogsForm = ({ callback, log: { id: log_id } = {}, sidebar }) => {
           )
         }}
       </BaseForm>
-    </Grid2>
+    </Grid>
   )
 }
 export default LogsForm

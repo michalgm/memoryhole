@@ -8,7 +8,7 @@ import {
   FormGroup,
   FormHelperText,
   FormLabel,
-  Grid2,
+  Grid,
   InputAdornment,
   Switch,
   TextField,
@@ -301,7 +301,7 @@ export const BaseField = ({
     }
     const checkboxOptions = transformOptions(resolvedOptions) || []
     return (
-      <Grid2 container spacing={2}>
+      <Grid container spacing={2}>
         <FormControl
           sx={{ m: 3 }}
           component="fieldset"
@@ -312,17 +312,17 @@ export const BaseField = ({
           <FormLabel component="legend">{props.label}</FormLabel>
           <FormGroup>
             {checkboxOptions.map((option) => (
-              <Grid2 key={option.id} size={6}>
+              <Grid key={option.id} size={6}>
                 <FormControlLabel
                   control={<Checkbox name={`${name}_${option.id}`} />}
                   label={option.label}
                 />
-              </Grid2>
+              </Grid>
             ))}
           </FormGroup>
           <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
-      </Grid2>
+      </Grid>
     )
   }
 

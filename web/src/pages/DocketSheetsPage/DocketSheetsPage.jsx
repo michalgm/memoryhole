@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Grid2 } from '@mui/material'
+import { Grid } from '@mui/material'
 import { Stack } from '@mui/system'
 
 import DocketSheetCell from 'src/components/DocketSheetCell/DocketSheetCell'
@@ -30,16 +30,16 @@ const DocketSheetsPage = () => {
           onSubmit={onSubmit}
           submitText="Create Docket Sheet"
         >
-          <Grid2 container spacing={2} sx={{ m: 0 }} size={12}>
-            <Grid2 size={6}>
+          <Grid container spacing={2} sx={{ m: 0 }} size={12}>
+            <Grid size={6}>
               <Field
                 field_type="select"
                 name="jurisdiction"
                 optionSet="jurisdictions"
                 // fullWidth={false}
               />
-            </Grid2>
-            <Grid2 alignContent={'center'} size={4}>
+            </Grid>
+            <Grid alignContent={'center'} size={4}>
               <Field
                 field_type="radio"
                 label={'Report Type'}
@@ -47,28 +47,28 @@ const DocketSheetsPage = () => {
                 name="report_type"
                 options={['arrest_date', 'court_date']}
               />
-            </Grid2>
-            <Grid2 size={6}>
+            </Grid>
+            <Grid size={6}>
               <Field
                 field_type="select"
                 name="arrest_city"
                 optionSet="cities"
                 // fullWidth={false}
               />
-            </Grid2>
+            </Grid>
 
-            <Grid2 size={4}>
+            <Grid size={4}>
               <Field field_type="date" name="date" required />
-            </Grid2>
-            <Grid2 size={6}>
+            </Grid>
+            <Grid size={6}>
               <Field
                 field_type="checkbox"
                 name="include_contact"
                 label="Include Arrestee Contact Info"
               />
-            </Grid2>
+            </Grid>
 
-            <Grid2 size={4}>
+            <Grid size={4}>
               <Field
                 field_type="text"
                 type="number"
@@ -76,8 +76,8 @@ const DocketSheetsPage = () => {
                 helperText="Number of days after date to include"
                 // fullWidth={false}
               />
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
         </Form>
       </FormSection>
       <DocketSheetCell

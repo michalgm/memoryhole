@@ -1,4 +1,4 @@
-import { Box, Grid2, Stack } from '@mui/material'
+import { Box, Grid, Stack } from '@mui/material'
 import { get } from 'lodash-es'
 
 import Loading from 'src/components/Loading/Loading'
@@ -44,7 +44,7 @@ export const FormContainerSectionFields = ({
   baseIndex = 0,
 }) => {
   return fields.map(([name, options = {}], index) => (
-    <Grid2 size={12} key={name}>
+    <Grid size={12} key={name}>
       <Field
         tabIndex={baseIndex + index}
         name={name}
@@ -52,7 +52,7 @@ export const FormContainerSectionFields = ({
         {...options}
         {...(fieldProps[name] || {})}
       />
-    </Grid2>
+    </Grid>
   ))
 }
 
@@ -77,26 +77,26 @@ export const FormContainerFieldsLayout = ({
           title={title}
           sectionActions={sectionActions}
         >
-          <Grid2 container sx={{ alignItems: 'start' }} size={12}>
+          <Grid container sx={{ alignItems: 'start' }} size={12}>
             {columns.map((fieldSet, columnIndex) => (
-              <Grid2 key={columnIndex} container size={12 / columnCount}>
+              <Grid key={columnIndex} container size={12 / columnCount}>
                 <FormContainerSectionFields
                   highlightDirty={highlightDirty}
                   fieldProps={fieldProps}
                   fields={fieldSet}
                   baseIndex={100 * (groupIndex + 1)}
                 />
-              </Grid2>
+              </Grid>
             ))}
-            <Grid2 container size={12}>
+            <Grid container size={12}>
               <FormContainerSectionFields
                 highlightDirty={highlightDirty}
                 fieldProps={fieldProps}
                 fields={fullSpan}
                 baseIndex={100 * (groupIndex + 1) + columns.length}
               />
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
         </FormSection>
       )
     }

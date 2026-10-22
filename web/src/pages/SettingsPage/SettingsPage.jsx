@@ -1,6 +1,6 @@
 // import { Link, routes } from '@cedarjs/router'
 
-import { Divider, Grid2, Typography } from '@mui/material'
+import { Divider, Grid, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 
 import { BaseForm } from 'src/components/utils/BaseForm'
@@ -91,13 +91,13 @@ const DaysInputField = ({ withDirection = false, ...props }) => {
 
 const SettingsRow = ({ title, description, children }) => {
   return (
-    <Grid2 size={12}>
-      <Grid2 container spacing={2}>
-        <Grid2 size={3}>
+    <Grid size={12}>
+      <Grid container spacing={2}>
+        <Grid size={3}>
           <Typography variant="body1">{title}</Typography>
           <Typography variant="caption">{description}</Typography>
-        </Grid2>
-        <Grid2 size={9}>
+        </Grid>
+        <Grid size={9}>
           <Stack
             direction="row"
             spacing={2}
@@ -111,9 +111,9 @@ const SettingsRow = ({ title, description, children }) => {
           >
             {children}
           </Stack>
-        </Grid2>
-      </Grid2>
-    </Grid2>
+        </Grid>
+      </Grid>
+    </Grid>
   )
 }
 
@@ -143,7 +143,7 @@ const SettingsPage = () => {
         return (
           <Stack spacing={3} sx={{ mb: 3 }}>
             <FormSection title="General Settings">
-              <Grid2 container spacing={2} sx={{ width: '100%' }}>
+              <Grid container spacing={2} sx={{ width: '100%' }}>
                 <SettingsRow
                   title="Time Zone"
                   description="Select the default time zone for the site. This will be used for displaying dates and times."
@@ -157,7 +157,7 @@ const SettingsPage = () => {
                     fullWidth
                   />
                 </SettingsRow>
-              </Grid2>
+              </Grid>
             </FormSection>
             <FormSection title="Default User Restrictions">
               <Typography variant="body1">
@@ -168,7 +168,7 @@ const SettingsPage = () => {
                 Threshold,&apos; the value is always relative to the current
                 time, functioning as a rolling restriction.
               </Typography>
-              <Grid2 container spacing={2}>
+              <Grid container spacing={2}>
                 <SettingsRow
                   title="Enable/Disable Restriction Types"
                   description="Use the toggles to enable or disable the restriction types in the settings and user edit interfaces"
@@ -184,9 +184,9 @@ const SettingsPage = () => {
                     </Show>
                   ))}
                 </SettingsRow>
-                <Grid2 size={12}>
+                <Grid size={12}>
                   <Divider />
-                </Grid2>
+                </Grid>
                 <SettingsRow>
                   <Typography variant="h6">Operator</Typography>
                   <Typography variant="h6">Coordinator</Typography>
@@ -216,7 +216,7 @@ const SettingsPage = () => {
                     </SettingsRow>
                   </Show>
                 ))}
-              </Grid2>
+              </Grid>
             </FormSection>
             <Footer
               {...{

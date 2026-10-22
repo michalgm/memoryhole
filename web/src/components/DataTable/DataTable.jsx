@@ -2,13 +2,17 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Delete, EditNote, FileDownload, Refresh } from '@mui/icons-material'
 import {
+  alpha,
   Button,
   Chip,
+  darken,
   IconButton,
+  lighten,
   ListItemIcon,
   MenuItem,
   Stack,
   Tooltip,
+  useColorScheme,
 } from '@mui/material'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import { difference, get, isArray, merge, sortBy } from 'lodash-es'
@@ -28,6 +32,29 @@ import dayjs from 'src/lib/dayjs'
 import { formatLabel } from '../utils/BaseField'
 
 import ManageViews from './ManageViews'
+
+// material-react-table derives its colors from theme.palette in JS, which MUI v7
+// leaves on the light scheme when the mode is switched with CSS variables. Build
+// them from the active color scheme instead (same formulas as MRT's defaults)
+const getMrtTheme = (theme, colorScheme) => {
+  // Themes without colorSchemes (e.g. MUI's default, in tests) only have palette
+  const palette = theme.colorSchemes?.[colorScheme]?.palette ?? theme.palette
+  const isDark = colorScheme === 'dark'
+  const baseBackgroundColor = isDark
+    ? lighten(palette.background.default, 0.05)
+    : palette.background.default
+  return {
+    baseBackgroundColor,
+    cellNavigationOutlineColor: palette.primary.main,
+    draggingBorderColor: palette.primary.main,
+    matchHighlightColor: isDark
+      ? darken(palette.warning.dark, 0.25)
+      : lighten(palette.warning.light, 0.5),
+    menuBackgroundColor: lighten(baseBackgroundColor, 0.07),
+    pinnedRowBackgroundColor: alpha(palette.primary.main, 0.1),
+    selectedRowBackgroundColor: alpha(palette.primary.main, 0.2),
+  }
+}
 
 const csvConfig = mkConfig({
   useKeysAsHeaders: true,
@@ -390,6 +417,8 @@ const DataTable = ({
 }) => {
   const [reloading, setReloading] = useState(false)
   const { optionSets } = useApp() || {}
+  const { mode, systemMode } = useColorScheme()
+  const colorScheme = (mode === 'system' ? systemMode : mode) || 'light'
   const mediumLayout = useContainerWidth(870)
   const smallLayout = useContainerWidth(680)
   // const extraSmallLayout = useContainerWidth(500)
@@ -549,7 +578,7 @@ const DataTable = ({
     },
     muiTableBodyProps: {
       sx: (theme) => ({
-        backgroundColor: '#fff',
+        backgroundColor: 'background.paper',
         '& tr:nth-of-type(odd) > td, & tr:nth-of-type(odd) > td[data-pinned="true"]:before':
           {
             backgroundColor: 'grey.100',
@@ -675,6 +704,7 @@ const DataTable = ({
   }
 
   properties.state = state
+  properties.mrtTheme = (theme) => getMrtTheme(theme, colorScheme)
 
   const table = useMaterialReactTable(properties)
 

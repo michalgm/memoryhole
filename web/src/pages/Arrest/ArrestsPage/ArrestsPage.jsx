@@ -1,7 +1,7 @@
 // import ArrestsCell from 'src/components/ArrestsCell/ArrestsCell'
 import { useState } from 'react'
 
-import { Button, Grid2, Typography } from '@mui/material'
+import { Button, Grid, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import { useConfirm } from 'material-ui-confirm'
 import { createPortal } from 'react-dom'
@@ -136,28 +136,28 @@ const ArrestsPage = () => {
     const ids = rows.map(({ id }) => id)
     const list = rows.map((row) => {
       return [
-        <Grid2 key={`${row.id}-name`} size={8}>
+        <Grid key={`${row.id}-name`} size={8}>
           {`${row.original?.arrestee?.display_field}`}
-        </Grid2>,
-        <Grid2 key={`${row.id}-date`} size={4}>
+        </Grid>,
+        <Grid key={`${row.id}-date`} size={4}>
           {`${dayjs(row.original?.date).tz().format('L hh:mm A')}`}
-        </Grid2>,
+        </Grid>,
       ]
     })
     const { confirmed } = await confirm({
       content: (
         <>
           Are you sure you want to delete the following arrests?
-          <Grid2 container spacing={2} sx={{ mt: 2 }}>
-            <Grid2 key={'name'} size={8}>
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid key={'name'} size={8}>
               <b>Name</b>
-            </Grid2>
-            <Grid2 key={'date'} size={4}>
+            </Grid>
+            <Grid key={'date'} size={4}>
               <b>Arrest Date</b>
-            </Grid2>
+            </Grid>
 
             {list.flat()}
-          </Grid2>
+          </Grid>
         </>
       ),
     })

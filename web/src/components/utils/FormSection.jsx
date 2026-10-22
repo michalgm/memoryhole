@@ -5,7 +5,7 @@ import {
   AccordionSummary,
   Box,
   Button,
-  Grid2,
+  Grid,
   Stack,
   Tooltip,
   Typography,
@@ -87,10 +87,10 @@ const FormSection = ({
         </Stack>
       </AccordionSummary>
       <AccordionDetails>
-        <Grid2 container spacing={2} sx={{ m: 0 }} size={12}>
+        <Grid container spacing={2} sx={{ m: 0 }} size={12}>
           {children}
           <Show when={buttons.length > 0}>
-            <Grid2 container justifyContent={'flex-end'} size={12}>
+            <Grid container justifyContent={'flex-end'} size={12}>
               {buttons.map(({ children, tooltip, ...props }, index) => (
                 <Box key={index}>
                   <Tooltip title={tooltip}>
@@ -107,9 +107,9 @@ const FormSection = ({
                   </Tooltip>
                 </Box>
               ))}
-            </Grid2>
+            </Grid>
           </Show>
-        </Grid2>
+        </Grid>
       </AccordionDetails>
     </Accordion>
   )

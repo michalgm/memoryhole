@@ -5,7 +5,7 @@ import {
   Button,
   Divider,
   FormControlLabel,
-  Grid2,
+  Grid,
   IconButton,
   Paper,
   Switch,
@@ -74,7 +74,7 @@ const CompareFormSection = ({
   }
   return (
     <FormSection key={groupIndex} title={title} sectionActions={sectionActions}>
-      <Grid2 container sx={{ alignItems: 'start' }} size={12}>
+      <Grid container sx={{ alignItems: 'start' }} size={12}>
         {fields.map(([key, options = {}], index) => (
           <Show when={!showOnlyDiffs || diffFields.has(key)} key={key}>
             <CompareField
@@ -87,7 +87,7 @@ const CompareFormSection = ({
             />
           </Show>
         ))}
-      </Grid2>
+      </Grid>
     </FormSection>
   )
 }
@@ -281,8 +281,8 @@ const CompareField = ({
     ? 'Append value from right column to current value'
     : 'Replace current value with value from right column'
   return (
-    <Grid2 container size={12} alignItems={'center'} spacing={2}>
-      <Grid2 size="grow">
+    <Grid container size={12} alignItems={'center'} spacing={2}>
+      <Grid size="grow">
         <Field
           tabIndex={100 * (groupIndex + 1) + index}
           highlightDirty={true}
@@ -290,8 +290,8 @@ const CompareField = ({
           {...options}
           color={hasDiff ? 'info' : null}
         />
-      </Grid2>
-      <Grid2>
+      </Grid>
+      <Grid>
         {isDirty ? (
           <Tooltip title="Restore current value">
             <span>
@@ -318,13 +318,13 @@ const CompareField = ({
             </Button>
           </Tooltip>
         )}
-      </Grid2>
-      <Grid2 size="grow">
+      </Grid>
+      <Grid size="grow">
         <FormProvider {...compareFormMethods}>
           <Field name={name} disabled={true} {...options} />
         </FormProvider>
-      </Grid2>
-    </Grid2>
+      </Grid>
+    </Grid>
   )
 }
 

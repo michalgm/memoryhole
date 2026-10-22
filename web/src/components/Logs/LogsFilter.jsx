@@ -13,7 +13,7 @@ import {
   Button,
   Chip,
   Collapse,
-  Grid2,
+  Grid,
   InputAdornment,
   Stack,
   ToggleButton,
@@ -306,17 +306,17 @@ const LogsFilter = ({
             />
           </Show>
           <Collapse in={showFilters}>
-            <Grid2
+            <Grid
               container
               spacing={2}
               sx={{ width: '100%', '&>*': { width: '50%', mt: 1 } }}
             >
               {filterFields.map(([name, { field_type = 'text', ...props }]) => (
-                <Grid2 key={name} alignContent={'center'} size={6}>
+                <Grid key={name} alignContent={'center'} size={6}>
                   <Field name={name} field_type={field_type} {...props} />
-                </Grid2>
+                </Grid>
               ))}
-            </Grid2>
+            </Grid>
           </Collapse>
           <Stack direction="row" justifyContent={'flex-end'} spacing={1}>
             <Button

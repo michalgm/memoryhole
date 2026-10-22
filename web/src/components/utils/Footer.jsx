@@ -1,7 +1,7 @@
 import { AccessTime, Person } from '@mui/icons-material'
 import {
   Box,
-  Grid2,
+  Grid,
   IconButton,
   Paper,
   Stack,
@@ -153,7 +153,7 @@ const Footer = ({
                 <ModInfo stats={stats} formData={formData} />
               ))}
           </Show>
-          <Grid2
+          <Grid
             sx={{
               textAlign: 'right',
               display: 'flex',
@@ -211,7 +211,7 @@ const Footer = ({
                 })}
               />
             ))}
-          </Grid2>
+          </Grid>
           {children}
         </Stack>
       </Paper>

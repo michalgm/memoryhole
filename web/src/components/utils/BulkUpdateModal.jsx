@@ -5,7 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid2,
+  Grid,
   IconButton,
   Tooltip,
   Typography,
@@ -148,10 +148,10 @@ const BulkUpdateModal = ({
             </li>
           </Typography>
           <FormContainer formContext={context}>
-            <Grid2 container spacing={2} sx={{ width: 550, pt: 2 }} size={12}>
+            <Grid container spacing={2} sx={{ width: 550, pt: 2 }} size={12}>
               {controlledFields.map((field, index) => (
-                <Grid2 container key={field.id} size={12}>
-                  <Grid2 size={5}>
+                <Grid container key={field.id} size={12}>
+                  <Grid size={5}>
                     <Field
                       key={index}
                       field_type="select"
@@ -159,8 +159,8 @@ const BulkUpdateModal = ({
                       name={`fields.${index}.field_name`}
                       label="Field"
                     />
-                  </Grid2>
-                  <Grid2 size={6}>
+                  </Grid>
+                  <Grid size={6}>
                     {field.field_name && (
                       <Field
                         name={`fields.${index}.field_value`}
@@ -170,25 +170,25 @@ const BulkUpdateModal = ({
                         label={`${fieldLabel(field.field_name)} Value`}
                       />
                     )}
-                  </Grid2>
-                  <Grid2 size={1}>
+                  </Grid>
+                  <Grid size={1}>
                     <Tooltip title="Remove Field">
                       <IconButton onClick={() => remove(index)}>
                         <Delete />
                       </IconButton>
                     </Tooltip>
-                  </Grid2>
-                </Grid2>
+                  </Grid>
+                </Grid>
               ))}
-              <Grid2 sx={{ textAlign: 'right' }} size={12}>
+              <Grid sx={{ textAlign: 'right' }} size={12}>
                 <Button
                   startIcon={<Add />}
                   onClick={() => append({ ...defaultField })}
                 >
                   Add Field to Update
                 </Button>
-              </Grid2>
-            </Grid2>
+              </Grid>
+            </Grid>
           </FormContainer>
         </DialogContent>
         <DialogActions>

@@ -1,4 +1,4 @@
-import { Grid2 } from '@mui/material'
+import { Grid } from '@mui/material'
 import { Stack } from '@mui/system'
 
 import { useAuth } from 'src/auth'
@@ -65,7 +65,7 @@ const UserProfilePage = () => {
                 },
               ]}
             >
-              <Grid2 size={6}>
+              <Grid size={6}>
                 <Field
                   name="name"
                   required
@@ -77,7 +77,7 @@ const UserProfilePage = () => {
                     },
                   }}
                 />
-              </Grid2>
+              </Grid>
             </FormSection>
           )
         }}
@@ -122,7 +122,7 @@ const UserProfilePage = () => {
                 },
               ]}
             >
-              <Grid2 size={12}>
+              <Grid size={12}>
                 <Field
                   name="currentPassword"
                   label="Current Password"
@@ -132,8 +132,8 @@ const UserProfilePage = () => {
                     required: 'Current password is required',
                   }}
                 />
-              </Grid2>
-              <Grid2 size={6}>
+              </Grid>
+              <Grid size={6}>
                 <Field
                   name="newPassword"
                   label="New Password"
@@ -147,8 +147,8 @@ const UserProfilePage = () => {
                     },
                   }}
                 />
-              </Grid2>
-              <Grid2 size={6}>
+              </Grid>
+              <Grid size={6}>
                 <Field
                   name="confirmPassword"
                   label="Confirm New Password"
@@ -162,7 +162,7 @@ const UserProfilePage = () => {
                     },
                   }}
                 />
-              </Grid2>
+              </Grid>
             </FormSection>
           )
         }}
