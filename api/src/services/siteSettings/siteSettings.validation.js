@@ -1,4 +1,4 @@
-import { keyBy } from 'lodash'
+import { keyBy } from 'lodash-es'
 import { z } from 'zod'
 
 const restrictionSchema = z

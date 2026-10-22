@@ -1,6 +1,8 @@
-// https://prettier.io/docs/en/options.html
-/** @type {import('prettier').RequiredOptions} */
-module.exports = {
+/**
+ * @see https://prettier.io/docs/configuration
+ * @type {import("prettier").Config}
+ */
+const config = {
   trailingComma: 'es5',
   bracketSpacing: true,
   tabWidth: 2,
@@ -16,3 +18,5 @@ module.exports = {
     },
   ],
 }
+
+export default config

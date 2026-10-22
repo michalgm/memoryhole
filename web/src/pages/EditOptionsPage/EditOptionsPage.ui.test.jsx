@@ -1,6 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import EditOptionsPage from './EditOptionsPage'
 const optionSetMocks = [
@@ -29,10 +29,10 @@ const optionSetMocks = [
 ]
 // Mock GraphQL queries
 // jest.mock('@cedarjs/web', () => {
-//   const actual = jest.requireActual('@cedarjs/web')
+//   const actual = vi.requireActual('@cedarjs/web')
 //   return {
 //     ...actual,
-//     useQuery: jest.fn(() => ({
+//     useQuery: vi.fn(() => ({
 //       data: {
 
 //       },

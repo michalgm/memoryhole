@@ -1,6 +1,6 @@
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import MainLayout from './MainLayout'
 

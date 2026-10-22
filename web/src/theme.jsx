@@ -37,9 +37,9 @@ const xSmallInputStyles = {
     padding: '6px 8px',
   },
   '& .MuiInputBase-input.MuiSelect-select, & .MuiInputBase-input.MuiAutocomplete-input':
-  {
-    padding: '5px 8px',
-  },
+    {
+      padding: '5px 8px',
+    },
   '& .MuiInputBase-adornedStart': { paddingLeft: '8px' },
   '& .MuiInputBase-inputAdornedStart': { paddingLeft: 0 },
   '& .MuiInputBase-adornedEnd': { paddingRight: '8px' },

@@ -130,7 +130,7 @@ const LogsFilterSummary = ({ filterFields, updateAndSubmit }) => {
 const LogsFilter = ({
   sidebar = false,
   searchLogs,
-  context,
+  context: formContext,
   loading = false,
 }) => {
   const [showFilters, setShowFilters] = useState(sidebar ? false : true)
@@ -149,10 +149,10 @@ const LogsFilter = ({
     ['contact', {}],
   ]
 
-  const action = context.watch('action') || {}
-  const arrests = context.watch('arrests') || []
-  const users = context.watch('users') || []
-  const type = context.watch('type')
+  const action = formContext.watch('action') || {}
+  const arrests = formContext.watch('arrests') || []
+  const users = formContext.watch('users') || []
+  const type = formContext.watch('type')
 
   const toggles = []
   const filterAction =
@@ -165,10 +165,10 @@ const LogsFilter = ({
 
   const updateAndSubmit = useCallback(
     (field, value) => {
-      context.setValue(field, value)
-      context.handleSubmit(searchLogs)()
+      formContext.setValue(field, value)
+      formContext.handleSubmit(searchLogs)()
     },
-    [context, searchLogs]
+    [formContext, searchLogs]
   )
 
   useEffect(() => {
@@ -176,7 +176,7 @@ const LogsFilter = ({
       const shouldFilter =
         path.includes('arrests') && currentFormData?.id && filterCurrentArrest
       if (shouldFilter) {
-        if (context.getValues('arrests')?.[0]?.id !== currentFormData.id) {
+        if (formContext.getValues('arrests')?.[0]?.id !== currentFormData.id) {
           updateAndSubmit('arrests', [currentFormData])
         }
       } else {
@@ -191,7 +191,7 @@ const LogsFilter = ({
     filterArrest,
     filterCurrentArrest,
     sidebar,
-    context,
+    formContext,
     searchLogs,
     updateAndSubmit,
   ])
@@ -257,7 +257,7 @@ const LogsFilter = ({
   ]
   return (
     <FormContainer
-      formContext={context}
+      formContext={formContext}
       onSuccess={async (data) => {
         await searchLogs(data)
       }}
@@ -284,7 +284,7 @@ const LogsFilter = ({
               size={sidebar ? 'x-small' : 'small'}
               label="Search"
               name="searchString"
-              onChange={() => context.handleSubmit(searchLogs)()}
+              onChange={() => formContext.handleSubmit(searchLogs)()}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -319,7 +319,11 @@ const LogsFilter = ({
             </Grid2>
           </Collapse>
           <Stack direction="row" justifyContent={'flex-end'} spacing={1}>
-            <Button size="small" onClick={() => context.reset()} sx={{ ml: 1 }}>
+            <Button
+              size="small"
+              onClick={() => formContext.reset()}
+              sx={{ ml: 1 }}
+            >
               Clear Filters
             </Button>
             <LoadingButton

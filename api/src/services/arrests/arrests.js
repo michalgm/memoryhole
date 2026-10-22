@@ -1,4 +1,4 @@
-import { get, startCase } from 'lodash'
+import { get, startCase } from 'lodash-es'
 
 import { validate, validateWithSync } from '@cedarjs/api'
 import { ForbiddenError } from '@cedarjs/graphql-server'

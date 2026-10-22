@@ -22,6 +22,18 @@ export default [
     },
   },
   {
+    // Cedar's config provides Jest's test globals; vitest (globals: true) also adds `vi`
+    files: [
+      '**/*.test.*',
+      '**/setupTests.*',
+      '**/test/setup/**',
+      '**/*.mock.*',
+    ],
+    languageOptions: {
+      globals: { vi: 'readonly' },
+    },
+  },
+  {
     files: ['scripts/**'],
     rules: {
       'no-console': 'off',

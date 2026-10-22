@@ -15,8 +15,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { ConfirmProvider } from 'material-ui-confirm'
 
-import { FatalErrorBoundary, RedwoodProvider } from '@cedarjs/web'
-import { RedwoodApolloProvider } from '@cedarjs/web/apollo'
+import { CedarProvider, FatalErrorBoundary } from '@cedarjs/web'
+import { CedarApolloProvider } from '@cedarjs/web/apollo/CedarApolloProvider'
 
 import possibleTypes from 'src/graphql/possibleTypes'
 import FatalErrorPage from 'src/pages/FatalErrorPage'
@@ -51,9 +51,9 @@ const App = () => {
           <InitColorSchemeScript defaultMode={'system'} attribute="class" />
           <CssBaseline />
           <SnackBarProvider>
-            <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
+            <CedarProvider titleTemplate="%PageTitle | %AppTitle">
               <AuthProvider>
-                <RedwoodApolloProvider
+                <CedarApolloProvider
                   useAuth={useAuth}
                   graphQLClientConfig={graphQLClientConfig}
                 >
@@ -70,9 +70,9 @@ const App = () => {
                       <Routes />
                     </ConfirmProvider>
                   </LocalizationProvider>
-                </RedwoodApolloProvider>
+                </CedarApolloProvider>
               </AuthProvider>
-            </RedwoodProvider>
+            </CedarProvider>
           </SnackBarProvider>
         </ThemeProvider>
       </FatalErrorBoundary>

@@ -140,8 +140,8 @@ const ArrestPage = ({ id, children, ...props }) => {
 
   const fieldProps = {
     action: {
-      onChange: (value, context) => {
-        applyActionDefaults(value, context)
+      onChange: (value, formContext) => {
+        applyActionDefaults(value, formContext)
       },
     },
   }

@@ -4,7 +4,7 @@ import path from 'path'
 
 import { parse } from 'graphql'
 
-const SDL_DIR = path.resolve(__dirname, '../../graphql')
+const SDL_DIR = path.resolve(import.meta.dirname, '../../graphql')
 
 function extractJsonFieldsFromSDL(sdlString) {
   const ast = parse(sdlString)

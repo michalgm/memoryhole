@@ -26,3 +26,5 @@ const ProviderWrapper = ({ children }) => (
 export const customRender = (ui, options) => {
   return render(ui, { wrapper: ProviderWrapper, ...options })
 }
+
+export { customRender as render }

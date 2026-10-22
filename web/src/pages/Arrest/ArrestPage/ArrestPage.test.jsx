@@ -9,10 +9,13 @@ import {
   waitFor,
 } from '@cedarjs/testing/web'
 
-import { SnackBarProvider } from 'src/components/utils/SnackBar'
+import {
+  SnackBarProvider,
+  _getMockDisplayError,
+} from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
 import dayjs from 'src/lib/dayjs'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import ArrestPage from './ArrestPage'
 
@@ -29,7 +32,7 @@ const renderArrestPage = (props = {}) => {
 }
 const user = userEvent.setup()
 
-const createMutationSpy = jest.fn()
+const createMutationSpy = vi.fn()
 
 describe('ArrestPage', () => {
   mockGraphQLQuery('searchActions', () => ({ searchActions: [] }))
@@ -94,7 +97,6 @@ describe('ArrestPage - Create', () => {
   })
 
   it('runs save successfully', async () => {
-    const { _getMockDisplayError } = require('src/components/utils/SnackBar')
     const displayErrorMock = _getMockDisplayError()
     renderArrestPage({})
 

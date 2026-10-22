@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import lodash from 'lodash'
+import lodash from 'lodash-es'
 import { CookieJar } from 'tough-cookie'
 
 import { sendEmail } from '../api/src/lib/email.ts'

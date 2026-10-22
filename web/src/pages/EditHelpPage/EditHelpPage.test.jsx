@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@cedarjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBarProvider.mock'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import EditHelpPage from './EditHelpPage'
 

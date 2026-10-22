@@ -1,9 +1,4 @@
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-
-import { render } from '@cedarjs/testing/web'
-
-import { SnackBarProvider } from 'src/components/utils/SnackBar'
+import { render } from 'src/test/utils/testUtils'
 
 import DocketSheetsPage from './DocketSheetsPage'
 
@@ -13,13 +8,7 @@ import DocketSheetsPage from './DocketSheetsPage'
 describe('DocketSheetsPage', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <SnackBarProvider>
-            <DocketSheetsPage />
-          </SnackBarProvider>
-        </LocalizationProvider>
-      )
+      render(<DocketSheetsPage />)
     }).not.toThrow()
   })
 })

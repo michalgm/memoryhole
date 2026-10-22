@@ -11,11 +11,11 @@ const FormDebug = () => {
 
 export const withRHF =
   (defaultValues = {}, { debug = false } = {}) =>
-  (Story, context) => {
+  (Story, { globals }) => {
     return (
       <FormContainer defaultValues={defaultValues}>
         <Story />
-        {(context.globals.showFormValues || debug) && <FormDebug />}
+        {(globals.showFormValues || debug) && <FormDebug />}
       </FormContainer>
     )
   }

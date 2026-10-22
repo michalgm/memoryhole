@@ -10,8 +10,9 @@ import {
 } from '@cedarjs/testing/web'
 import { registerFragment } from '@cedarjs/web/apollo'
 
+import { _getMockDisplayError } from 'src/components/utils/SnackBar'
 import { SnackBarProvider } from 'src/components/utils/SnackBarProvider.mock'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import FormContainer from './FormContainer'
 
@@ -25,7 +26,7 @@ const WrappedFormContainer = (props) => {
   )
 }
 
-const transformInputMock = jest.fn((input) => input)
+const transformInputMock = vi.fn((input) => input)
 
 // Sample fields configuration
 const layout = [
@@ -249,7 +250,6 @@ test('submits only changed fields', async () => {
   })
 })
 test('prevents submission if record has been updated by another user', async () => {
-  const { _getMockDisplayError } = require('src/components/utils/SnackBar')
   const displayErrorMock = _getMockDisplayError()
   let callCount = 0
 
@@ -393,7 +393,7 @@ test('does not warn on nav from new entry', async () => {
     }
   })
 
-  const onCreateMock = jest.fn((input) => input)
+  const onCreateMock = vi.fn((input) => input)
   render(
     <WrappedFormContainer
       layout={layout}
@@ -452,7 +452,7 @@ test('shows confirmation dialog when deleting entity', async () => {
     }
   })
 
-  const onDeleteMock = jest.fn()
+  const onDeleteMock = vi.fn()
 
   render(
     <WrappedFormContainer

@@ -1,4 +1,4 @@
-import { isPlainObject, startCase } from 'lodash'
+import { isPlainObject, startCase } from 'lodash-es'
 
 import { ForbiddenError, ValidationError } from '@cedarjs/graphql-server'
 

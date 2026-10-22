@@ -1,6 +1,10 @@
 import * as Y from 'yjs'
 
+import { context } from '@cedarjs/graphql-server'
+
+import { requireAuth } from 'src/lib/auth'
 import { db } from 'src/lib/db'
+import { slugify, validateRoleLevel } from 'src/lib/utils'
 
 import {
   createDocument,
@@ -11,29 +15,29 @@ import {
 } from './documents'
 
 // Mock the dependencies
-jest.mock('src/lib/db', () => ({
+vi.mock('src/lib/db', () => ({
   db: {
     document: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
     },
   },
 }))
 
-jest.mock('src/lib/auth', () => ({
-  requireAuth: jest.fn(),
+vi.mock('src/lib/auth', () => ({
+  requireAuth: vi.fn(),
 }))
 
-jest.mock('src/lib/utils', () => ({
-  slugify: jest.fn((str) => str.toLowerCase().replace(/\s+/g, '-')),
-  validateRoleLevel: jest.fn(() => true),
-  checkUserRole: jest.fn(() => true),
+vi.mock('src/lib/utils', () => ({
+  slugify: vi.fn((str) => str.toLowerCase().replace(/\s+/g, '-')),
+  validateRoleLevel: vi.fn(() => true),
+  checkUserRole: vi.fn(() => true),
 }))
 
-jest.mock('@cedarjs/graphql-server', () => ({
+vi.mock('@cedarjs/graphql-server', () => ({
   context: { currentUser: { id: 1, name: 'Test User', roles: ['Admin'] } },
 }))
 
@@ -42,10 +46,9 @@ describe('documents', () => {
   let mockDocument
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     // Reset context mock
-    const { context } = require('@cedarjs/graphql-server')
     context.currentUser = {
       id: 1,
       name: 'Test User',
@@ -179,9 +182,6 @@ describe('documents', () => {
   })
 
   describe('createDocument()', () => {
-    const { requireAuth } = require('src/lib/auth')
-    const { slugify } = require('src/lib/utils')
-
     it('creates document with valid input', async () => {
       const input = {
         title: 'New Document',
@@ -273,11 +273,7 @@ describe('documents', () => {
 
     it('validates role hierarchy (access_role >= edit_role)', async () => {
       // Suppress console output for this error test
-      const consoleSpy = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => {})
-
-      const { validateRoleLevel } = require('src/lib/utils')
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       validateRoleLevel.mockReturnValue(false)
 
       const input = {
@@ -314,8 +310,6 @@ describe('documents', () => {
   })
 
   describe('updateDocument()', () => {
-    const { requireAuth } = require('src/lib/auth')
-
     it('updates document with valid input', async () => {
       const input = {
         title: 'Updated Title',
@@ -375,7 +369,6 @@ describe('documents', () => {
     })
 
     it('validates role changes', async () => {
-      const { validateRoleLevel } = require('src/lib/utils')
       validateRoleLevel.mockReturnValue(false)
 
       db.document.findUnique.mockResolvedValue({
@@ -394,8 +387,6 @@ describe('documents', () => {
   })
 
   describe('deleteDocument()', () => {
-    const { requireAuth } = require('src/lib/auth')
-
     it('deletes document with sufficient permissions', async () => {
       db.document.findUnique.mockResolvedValue({
         edit_role: 'Operator',

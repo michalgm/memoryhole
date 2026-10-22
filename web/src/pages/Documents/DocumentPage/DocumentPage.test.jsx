@@ -4,13 +4,13 @@ import { fireEvent, screen, waitFor } from '@cedarjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
-import DocumentPage from './DocumentPage'
+import DocumentPage, { DocumentForm } from './DocumentPage'
 import { standard } from './DocumentPage.mock'
 
 // Mock CollabEditor component
-jest.mock('src/components/CollabEditor/CollabEditor', () => ({
+vi.mock('src/components/CollabEditor/CollabEditor', () => ({
   __esModule: true,
   default: ({ editable, type, title, documentName }) => (
     <div data-testid="collab-editor">
@@ -23,7 +23,7 @@ jest.mock('src/components/CollabEditor/CollabEditor', () => ({
 }))
 
 // Mock Loading component
-jest.mock('src/components/Loading/Loading', () => ({
+vi.mock('src/components/Loading/Loading', () => ({
   __esModule: true,
   default: () => <div data-testid="loading">Loading...</div>,
 }))
@@ -234,10 +234,8 @@ describe('DocumentForm', () => {
     mockGraphQLQuery('EditDocument', (vars) => {
       return standard[vars.id] || { document: null }
     })
-
-    const { DocumentForm } = require('./DocumentPage')
-    const handleClose = jest.fn()
-    const onCreate = jest.fn()
+    const handleClose = vi.fn()
+    const onCreate = vi.fn()
 
     render(
       <AppProvider>
@@ -253,9 +251,8 @@ describe('DocumentForm', () => {
   })
 
   it('renders form for existing document', async () => {
-    const { DocumentForm } = require('./DocumentPage')
-    const handleClose = jest.fn()
-    const onUpdate = jest.fn()
+    const handleClose = vi.fn()
+    const onUpdate = vi.fn()
 
     render(
       <AppProvider>
@@ -276,8 +273,7 @@ describe('DocumentForm', () => {
   })
 
   it('shows delete button for existing documents', async () => {
-    const { DocumentForm } = require('./DocumentPage')
-    const handleClose = jest.fn()
+    const handleClose = vi.fn()
 
     render(
       <AppProvider>
@@ -293,8 +289,7 @@ describe('DocumentForm', () => {
   })
 
   it('does not show delete button for new documents', async () => {
-    const { DocumentForm } = require('./DocumentPage')
-    const handleClose = jest.fn()
+    const handleClose = vi.fn()
 
     render(
       <AppProvider>
@@ -310,8 +305,7 @@ describe('DocumentForm', () => {
   })
 
   it('calls handleClose when cancel button clicked', async () => {
-    const { DocumentForm } = require('./DocumentPage')
-    const handleClose = jest.fn()
+    const handleClose = vi.fn()
 
     render(
       <AppProvider>

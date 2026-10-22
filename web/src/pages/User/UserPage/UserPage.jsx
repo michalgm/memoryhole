@@ -184,9 +184,9 @@ const UserPage = ({ id }) => {
         sectionActions: [
           {
             label: 'Update Restrictions to Defaults',
-            onClick: (e, context) => {
-              const role = context.getValues('role')
-              applyDefaultsToUser(role, context)
+            onClick: (e, formContext) => {
+              const role = formContext.getValues('role')
+              applyDefaultsToUser(role, formContext)
             },
             tooltip: (
               <DefaultsTooltip
@@ -204,8 +204,8 @@ const UserPage = ({ id }) => {
   const fieldProps = useMemo(() => {
     const fieldProps = {
       role: {
-        onChange: (value, context) => {
-          applyDefaultsToUser(value, context)
+        onChange: (value, formContext) => {
+          applyDefaultsToUser(value, formContext)
         },
       },
     }

@@ -2,7 +2,7 @@ import { screen, waitFor } from '@cedarjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import DocumentsPage from './DocumentsPage'
 import { standard } from './DocumentsPage.mock'
@@ -83,7 +83,7 @@ describe('DocumentsPage', () => {
   })
 
   it('handles query error gracefully', async () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const mockError = new Error('Failed to fetch documents')
     mockGraphQLQuery('DocumentsQuery', () => {
       throw mockError

@@ -3,13 +3,13 @@ import { db } from 'src/lib/db'
 import { duplicateArrests } from './duplicateArrests'
 
 // Mock authentication
-jest.mock('src/lib/auth', () => ({
-  requireAuth: jest.fn(),
+vi.mock('src/lib/auth', () => ({
+  requireAuth: vi.fn(),
 }))
 
 // Mock access filter
-jest.mock('./arrests', () => ({
-  filterArrestAccess: jest.fn((where) => where),
+vi.mock('./arrests', () => ({
+  filterArrestAccess: vi.fn((where) => where),
 }))
 
 const ONE_DAY_IN_SECONDS = 86400

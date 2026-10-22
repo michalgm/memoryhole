@@ -1,5 +1,6 @@
 import dayjs from 'src/lib/dayjs'
 import { db } from 'src/lib/db'
+import { getSetting } from 'src/lib/settingsCache'
 
 import {
   arrest,
@@ -12,6 +13,12 @@ import {
   searchArrests,
   updateArrest,
 } from './arrests'
+
+// Pass through to the real getSetting unless a test overrides it
+vi.mock('src/lib/settingsCache', async (importOriginal) => {
+  const actual = await importOriginal()
+  return { ...actual, getSetting: vi.fn(actual.getSetting) }
+})
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float.
@@ -591,12 +598,12 @@ describe('arrest date threshold filtering', () => {
   const mockDate = new Date('2024-11-30T08:00:00.000Z')
 
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(mockDate)
+    vi.useFakeTimers()
+    vi.setSystemTime(mockDate)
     mockCurrentUser({
       access_date_threshold: 30, // 30 days threshold
     })
-    jest.spyOn(require('src/lib/settingsCache'), 'getSetting').mockReturnValue({
+    vi.mocked(getSetting).mockReturnValue({
       access_date_threshold: true,
       access_date_max: true,
       access_date_min: true,
@@ -642,7 +649,7 @@ describe('arrest date threshold filtering', () => {
     expect(result.AND[0].date.lte).toEqual(new Date('2024-12-31'))
   })
   test('does not apply threshold when setting is disabled', () => {
-    require('src/lib/settingsCache').getSetting.mockReturnValue({
+    vi.mocked(getSetting).mockReturnValue({
       access_date_threshold: false,
       access_date_max: true,
     })
@@ -664,9 +671,9 @@ describe('checkArrestAccess', () => {
   const mockDate = new Date('2024-11-30T08:00:00.000Z')
 
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(mockDate)
-    jest.spyOn(require('src/lib/settingsCache'), 'getSetting').mockReturnValue({
+    vi.useFakeTimers()
+    vi.setSystemTime(mockDate)
+    vi.mocked(getSetting).mockReturnValue({
       access_date_threshold: true,
       access_date_max: true,
       access_date_min: true,
@@ -674,7 +681,7 @@ describe('checkArrestAccess', () => {
   })
 
   // afterEach(() => {
-  //   jest.useRealTimers() // Reset timers after test
+  //   vi.useRealTimers() // Reset timers after test
   // })
 
   test('throws error when arrest date is before min date', () => {

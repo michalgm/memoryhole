@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 
 // Create a mock context for the Snackbar
 const SnackbarContext = createContext()
@@ -8,8 +8,8 @@ const SnackbarContext = createContext()
 // Mock implementation of the provider
 export const MockSnackbarProvider = ({ children }) => {
   const contextValue = {
-    openSnackbar: jest.fn(),
-    closeSnackbar: jest.fn(),
+    openSnackbar: vi.fn(),
+    closeSnackbar: vi.fn(),
   }
 
   return (
@@ -28,7 +28,7 @@ export const useSnackbar = () => {
   return context
 }
 
-const displayErrorMock = jest.fn()
+const displayErrorMock = vi.fn()
 
 export const useDisplayError = () => displayErrorMock
 

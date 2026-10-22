@@ -1,4 +1,4 @@
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import { Empty, Failure, Loading, Success } from './DocketSheetCell'
 import { standard } from './DocketSheetCell.mock'

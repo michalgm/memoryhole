@@ -30,7 +30,7 @@ describe('ignoredDuplicateArrests', () => {
   })
 
   scenario('creates a ignoredDuplicateArrest', async (scenario) => {
-    mockCurrentUser({ name: 'Rob', id: 10 })
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
 
     const result = await createIgnoredDuplicateArrest({
       arrest1_id: scenario.ignoredDuplicateArrest.two.arrest1_id,

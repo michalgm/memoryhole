@@ -244,8 +244,8 @@ export function useFormManager({
         if (currentTime > retrieveTime) {
           displayError(
             <span>
-              Unable to save your changes. This record was updated by{' '}
-              <b>{updated_by?.name}</b> on{' '}
+              Unable to save your changes. This record was updated by
+              <b>{updated_by?.name}</b> on
               <b>{currentTime.tz()?.format('LLLL')}</b> after you began editing.
               Please refresh the page to view the latest version and manually
               reapply your changes.

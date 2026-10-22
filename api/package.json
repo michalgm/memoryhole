@@ -2,18 +2,21 @@
   "name": "api",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "dependencies": {
-    "@cedarjs/api": "5.0.8",
-    "@cedarjs/api-server": "5.0.8",
-    "@cedarjs/auth-dbauth-api": "5.0.8",
-    "@cedarjs/graphql-server": "5.0.8",
+    "@cedarjs/api": "6.0.2",
+    "@cedarjs/api-server": "6.0.2",
+    "@cedarjs/auth-dbauth-api": "6.0.2",
+    "@cedarjs/graphql-server": "6.0.2",
     "@hocuspocus/extension-database": "^4.7.1",
     "@hocuspocus/provider": "^4.7.1",
     "@hocuspocus/server": "^4.7.1",
-    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/adapter-pg": "7.8.0",
+    "@prisma/client": "7.8.0",
     "@types/jsonwebtoken": "^9.0.10",
     "dayjs": "^1.11.23",
     "jsonwebtoken": "^9.0.3",
+    "lodash-es": "^4.18.1",
     "nodemailer": "^8.0.11",
     "pg": "^8.23.1",
     "prosemirror-model": "^1.25.12",
@@ -23,13 +26,5 @@
     "y-protocols": "^1.0.7",
     "yjs": "^13.6.33",
     "zod": "^3.25.76"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.29.7",
-    "@babel/core": "^7.29.7",
-    "@babel/node": "^7.29.7",
-    "@babel/plugin-transform-runtime": "^7.29.7",
-    "@babel/preset-env": "^7.29.7",
-    "babel-plugin-module-resolver": "^5.0.3"
   }
 }

@@ -2,7 +2,7 @@ import { screen, waitFor } from '@cedarjs/testing/web'
 
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import ArrestsPage from './ArrestsPage'
 import { standard } from './ArrestsPage.mock'

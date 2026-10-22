@@ -1,5 +1,6 @@
 import dayjs from 'src/lib/dayjs'
 import { db } from 'src/lib/db'
+import { getSetting } from 'src/lib/settingsCache'
 
 import {
   action,
@@ -11,6 +12,13 @@ import {
   filterActionAccess,
   updateAction,
 } from './actions'
+
+// Pass through to the real getSetting unless a test overrides it
+vi.mock('src/lib/settingsCache', async (importOriginal) => {
+  const actual = await importOriginal()
+  return { ...actual, getSetting: vi.fn(actual.getSetting) }
+})
+
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float.
 //           Please refer to the RedwoodJS Testing Docs:
@@ -53,8 +61,8 @@ const verifyRecordDeletion = async (
 
 afterEach(async () => {
   // Clean up any test data that might interfere
-  jest.useRealTimers()
-  jest.restoreAllMocks()
+  vi.useRealTimers()
+  vi.restoreAllMocks()
 })
 
 describe('actions', () => {
@@ -190,12 +198,12 @@ describe('action date threshold filtering', () => {
   const mockDate = new Date('2024-11-30T08:00:00.000Z')
 
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(mockDate)
+    vi.useFakeTimers()
+    vi.setSystemTime(mockDate)
     mockCurrentUser({
       access_date_threshold: 30, // 30 days threshold
     })
-    jest.spyOn(require('src/lib/settingsCache'), 'getSetting').mockReturnValue({
+    vi.mocked(getSetting).mockReturnValue({
       access_date_threshold: true,
       access_date_max: true,
       access_date_min: true,
@@ -242,7 +250,7 @@ describe('action date threshold filtering', () => {
   })
 
   test('does not apply threshold when setting is disabled', () => {
-    require('src/lib/settingsCache').getSetting.mockReturnValue({
+    vi.mocked(getSetting).mockReturnValue({
       access_date_threshold: false,
       access_date_max: true,
     })
@@ -264,9 +272,9 @@ describe('checkActionAccess', () => {
   const mockDate = new Date('2024-11-30T08:00:00.000Z')
 
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(mockDate)
-    jest.spyOn(require('src/lib/settingsCache'), 'getSetting').mockReturnValue({
+    vi.useFakeTimers()
+    vi.setSystemTime(mockDate)
+    vi.mocked(getSetting).mockReturnValue({
       access_date_threshold: true,
       access_date_max: true,
       access_date_min: true,

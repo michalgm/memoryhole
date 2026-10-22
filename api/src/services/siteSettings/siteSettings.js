@@ -1,4 +1,4 @@
-import { keyBy, merge } from 'lodash'
+import { keyBy, merge } from 'lodash-es'
 
 import { db } from 'src/lib/db'
 

@@ -1,18 +1,21 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { SnackBarProvider } from 'src/components/utils/SnackBar'
+import {
+  SnackBarProvider,
+  _getMockDisplayError,
+} from 'src/components/utils/SnackBar'
 import AppProvider from 'src/lib/AppContext'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import { generateMockData } from '../../test/mocks/generateMockData'
 
 import Logs from './Logs'
 
 // Mock the asyncDebounce function
-jest.mock('src/lib/utils', () => ({
+vi.mock('src/lib/utils', async (importOriginal) => ({
   // Use all the original exports
-  ...jest.requireActual('src/lib/utils'),
+  ...(await importOriginal()),
   // Override asyncDebounce to call the function immediately
   asyncDebounce: (fn) => fn,
 }))
@@ -39,7 +42,6 @@ mockGraphQLQuery('searchUsers', () => ({ searchUsers: [] }))
 
 describe('Logs', () => {
   const user = userEvent.setup()
-  const { _getMockDisplayError } = require('src/components/utils/SnackBar')
   const displayErrorMock = _getMockDisplayError()
 
   it('renders logs list and filter section', async () => {
@@ -108,7 +110,7 @@ describe('Logs', () => {
   })
 
   it('calls onNewLogComplete callback after creating new log', async () => {
-    const onNewLogComplete = jest.fn()
+    const onNewLogComplete = vi.fn()
 
     mockGraphQLMutation('CreateLogMutation', () => ({
       createLog: {

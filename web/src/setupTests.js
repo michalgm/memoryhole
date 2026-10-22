@@ -1,24 +1,17 @@
-// Also mock the .jsx extension in case some imports use it
-jest.mock('src/lib/useOptionSets.jsx', () => require('src/lib/useOptionSets'))
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  expect,
-  jest,
-} from '@jest/globals'
+import '@testing-library/jest-dom/vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, expect, vi } from 'vitest'
 
 import { waitFor } from '@cedarjs/testing/web'
 
 import './test/setup/browserMocks'
 
 // beforeAll(() => {
-//   jest.spyOn(console, 'warn').mockImplementation(() => {})
+//   vi.spyOn(console, 'warn').mockImplementation(() => {})
 // })
 
-jest.mock('src/components/utils/SnackBar', () =>
-  jest.requireActual('src/components/utils/SnackBarProvider.mock')
+vi.mock(
+  'src/components/utils/SnackBar',
+  () => import('src/components/utils/SnackBarProvider.mock')
 )
 expect.extend({
   toContainText(received, text) {
@@ -44,8 +37,8 @@ expect.extend({
   },
 })
 
-jest.mock('src/components/utils/BaseField', () => {
-  const ActualBaseField = jest.requireActual('src/components/utils/BaseField')
+vi.mock('src/components/utils/BaseField', async (importOriginal) => {
+  const ActualBaseField = { ...(await importOriginal()) }
   return {
     ...ActualBaseField,
     BaseField: (props) => {
@@ -69,12 +62,12 @@ jest.mock('src/components/utils/BaseField', () => {
 })
 
 beforeAll(() => {
-  window.scrollTo = jest.fn()
+  window.scrollTo = vi.fn()
 })
 
 beforeEach(() => {
   window.scrollTo.mockClear()
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 afterEach(async () => {
@@ -89,35 +82,37 @@ afterAll(async () => {
   })
 })
 
-jest.mock('@cedarjs/router', () => {
-  const actual = { ...jest.requireActual('@cedarjs/router') }
-  const navigateSpy = jest.spyOn(actual, 'navigate')
+// Vitest evaluates this factory more than once per test file (src files and test
+// files end up with separate instances of Cedar's MockRouter mock), so keep a
+// single navigate spy on globalThis or assertions see a different spy than components call
+vi.mock('@cedarjs/router', async (importOriginal) => {
+  const actual = { ...(await importOriginal()) }
+  const navigateSpy = (globalThis.__navigateSpy ??= vi.fn(actual.navigate))
   return {
     ...actual,
-    // ...jest.requireActual('@cedarjs/router'),
     navigate: navigateSpy,
-    useRoutePath: jest.fn(() => '/mock-route-path'),
-    useRouteName: jest.fn((path) => `${path}-route-name`),
+    useRoutePath: vi.fn(() => '/mock-route-path'),
+    useRouteName: vi.fn((path) => `${path}-route-name`),
   }
 })
 
-jest.mock('src/lib/useSiteSettings', () => {
-  const actual = { ...jest.requireActual('src/lib/useSiteSettings') }
+vi.mock('src/lib/useSiteSettings', async (importOriginal) => {
+  const actual = { ...(await importOriginal()) }
   return {
     ...actual,
-    useSiteSettings: jest.fn(() => ({
+    useSiteSettings: vi.fn(() => ({
       settings: { timeZone: 'America/Los_Angeles' },
       loading: false,
     })),
   }
 })
 
-jest.mock('src/lib/useOptionSets', () => {
-  const actual = { ...jest.requireActual('src/lib/useOptionSets') }
+vi.mock('src/lib/useOptionSets', async (importOriginal) => {
+  const actual = { ...(await importOriginal()) }
   // Provide default test data for all real optionSets
   return {
     ...actual,
-    useOptionSets: jest.fn(() => ({
+    useOptionSets: vi.fn(() => ({
       optionSets: {
         states: [
           {
@@ -196,9 +191,7 @@ jest.mock('src/lib/useOptionSets', () => {
       },
       loading: false,
       error: null,
-      refetch: jest.fn(),
+      refetch: vi.fn(),
     })),
   }
 })
-
-export { customRender as render } from './test/utils/testUtils'

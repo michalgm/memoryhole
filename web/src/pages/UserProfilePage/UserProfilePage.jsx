@@ -1,8 +1,6 @@
 import { Grid2 } from '@mui/material'
 import { Stack } from '@mui/system'
 
-import { gql } from '@cedarjs/web'
-
 import { useAuth } from 'src/auth'
 import { BaseForm } from 'src/components/utils/BaseForm'
 import { Field } from 'src/components/utils/Field'

@@ -27,9 +27,7 @@ export const standard = defineScenario({
   },
   user: {
     test: {
-      // id: 1,
       data: {
-        id: 10,
         name: 'Greg',
         email: 'foo2@bar.com',
       },

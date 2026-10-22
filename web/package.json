@@ -2,6 +2,7 @@
   "name": "web",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "browserslist": {
     "development": [
       "last 1 version"
@@ -11,11 +12,11 @@
     ]
   },
   "dependencies": {
-    "@cedarjs/auth-dbauth-web": "5.0.8",
-    "@cedarjs/forms": "5.0.8",
-    "@cedarjs/router": "5.0.8",
-    "@cedarjs/web": "5.0.8",
-    "@cedarjs/web-server": "5.0.8",
+    "@cedarjs/auth-dbauth-web": "6.0.2",
+    "@cedarjs/forms": "6.0.2",
+    "@cedarjs/router": "6.0.2",
+    "@cedarjs/web": "6.0.2",
+    "@cedarjs/web-server": "6.0.2",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -71,20 +72,10 @@
     "yjs": "^13.6.33"
   },
   "devDependencies": {
-    "@babel/core": "7.29.7",
-    "@babel/plugin-transform-class-properties": "^7.29.7",
-    "@babel/plugin-transform-private-methods": "^7.29.7",
-    "@babel/plugin-transform-private-property-in-object": "^7.29.7",
-    "@babel/preset-react": "^7.29.7",
-    "@cedarjs/project-config": "5.0.8",
-    "@cedarjs/vite": "5.0.8",
+    "@cedarjs/project-config": "6.0.2",
+    "@cedarjs/testing": "6.0.2",
+    "@cedarjs/vite": "6.0.2",
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "babel-plugin-graphql-tag": "^3.3.0",
-    "babel-plugin-transform-imports": "^2.0.0",
-    "babel-plugin-transform-vite-meta-env": "^1.0.3",
-    "jest-matchmedia-mock": "^1.1.0",
-    "storybook-framework-cedarjs": "^4.2.0",
-    "vite-plugin-node-polyfills": "^0.28.0"
+    "@emotion/styled": "^11.14.1"
   }
 }

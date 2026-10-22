@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 
 import { navigate } from '@cedarjs/router'
 
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import { generateMockData } from '../../test/mocks/generateMockData'
 
@@ -18,8 +18,8 @@ const renderLog = (log) => {
 }
 
 describe('Log', () => {
-  const mockSetEditItem = jest.fn()
-  const mockOnCreate = jest.fn()
+  const mockSetEditItem = vi.fn()
+  const mockOnCreate = vi.fn()
   const user = userEvent.setup()
   beforeEach(() => {
     mockGraphQLQuery('EditLog', () => ({ log: mockLog }))

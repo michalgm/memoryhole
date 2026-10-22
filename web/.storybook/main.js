@@ -1,13 +1,13 @@
 import { getPaths, importStatementPath } from '@cedarjs/project-config'
 
-const redwoodProjectPaths = getPaths()
+const cedarProjectPaths = getPaths()
 
 const config = {
   framework: 'storybook-framework-cedarjs',
 
   stories: [
     `${importStatementPath(
-      redwoodProjectPaths.web.src
+      cedarProjectPaths.web.src
     )}/**/*.stories.@(js|jsx|ts|tsx|mdx)`,
   ],
 

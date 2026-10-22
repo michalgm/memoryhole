@@ -1,5 +1,5 @@
 import { SnackBarProvider } from 'src/components/utils/SnackBar'
-import { render } from 'src/setupTests'
+import { render } from 'src/test/utils/testUtils'
 
 import { settingsSchemas } from '../../../../api/src/services/siteSettings/siteSettings.validation'
 

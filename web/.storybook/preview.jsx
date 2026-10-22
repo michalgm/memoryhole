@@ -7,8 +7,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import { RouterContextProvider } from '@cedarjs/router/dist/router-context'
 import { mockGraphQLQuery } from '@cedarjs/testing/web'
-import { RedwoodProvider } from '@cedarjs/web'
-import { RedwoodApolloProvider } from '@cedarjs/web/apollo'
+import { CedarProvider } from '@cedarjs/web'
+import { CedarApolloProvider } from '@cedarjs/web/apollo/CedarApolloProvider'
 
 import { AuthProvider, useAuth } from '../src/auth'
 import { SnackBarProvider } from '../src/components/utils/SnackBar'
@@ -57,18 +57,18 @@ const ModeProvider = ({ mode }) => {
 }
 
 export const decorators = [
-  (Story, context) => {
+  (Story, { globals }) => {
     return (
       <ThemeProvider theme={theme} modeStorageKey={`mui-storybook-`}>
         <CssBaseline enableColorScheme />
-        <ModeProvider mode={context.globals.displayMode} />
+        <ModeProvider mode={globals.displayMode} />
         <SnackBarProvider>
           <Paper sx={{ p: 5 }}>
-            <RedwoodProvider>
+            <CedarProvider>
               <AppProvider>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <AuthProvider>
-                    <RedwoodApolloProvider useAuth={useAuth}>
+                    <CedarApolloProvider useAuth={useAuth}>
                       <RouterContextProvider
                         routes={[]}
                         paramTypes={{}}
@@ -76,11 +76,11 @@ export const decorators = [
                       >
                         <Story />
                       </RouterContextProvider>
-                    </RedwoodApolloProvider>
+                    </CedarApolloProvider>
                   </AuthProvider>
                 </LocalizationProvider>
               </AppProvider>
-            </RedwoodProvider>
+            </CedarProvider>
           </Paper>
         </SnackBarProvider>
       </ThemeProvider>
