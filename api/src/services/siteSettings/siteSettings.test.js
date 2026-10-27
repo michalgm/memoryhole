@@ -1,5 +1,6 @@
 import { decrypt, isEncrypted } from 'src/lib/crypto'
 import { db } from 'src/lib/db'
+import { sendEmail } from 'src/lib/email'
 
 import {
   bulkUpsertSiteSetting,
@@ -13,8 +14,8 @@ import {
   upsertSiteSetting,
 } from './siteSettings'
 
-jest.mock('src/lib/email', () => ({
-  sendEmail: jest.fn().mockResolvedValue({}),
+vi.mock('src/lib/email', () => ({
+  sendEmail: vi.fn().mockResolvedValue({}),
 }))
 
 describe('siteSettings', () => {
@@ -97,11 +98,13 @@ describe('smtp_pass encryption', () => {
   beforeEach(() => {
     process.env.SETTINGS_ENCRYPTION_KEY =
       'a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8'
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   scenario('siteSettings returns sentinel for smtp_pass when set', async () => {
-    await db.siteSetting.create({ data: { id: 'smtp_pass', value: 'stored-value' } })
+    await db.siteSetting.create({
+      data: { id: 'smtp_pass', value: 'stored-value' },
+    })
 
     const result = await siteSettings()
     const setting = result.find((s) => s.id === 'smtp_pass')
@@ -185,8 +188,6 @@ describe('smtp_pass encryption', () => {
   )
 
   scenario('sendTestEmail calls sendEmail and returns true', async () => {
-    const { sendEmail } = require('src/lib/email')
-
     const result = await sendTestEmail({ to: 'test@example.com' })
 
     expect(result).toBe(true)

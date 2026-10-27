@@ -1,7 +1,7 @@
 import * as nodemailer from 'nodemailer'
 
-import { decrypt, isEncrypted } from 'src/lib/crypto'
-import { getSetting } from 'src/lib/settingsCache'
+import { decrypt, isEncrypted } from 'src/lib/crypto.js'
+import { getSetting } from 'src/lib/settingsCache.js'
 
 interface Options {
   to: string | string[]
@@ -21,7 +21,7 @@ export async function sendEmail({ to, subject, text }: Options) {
   const [host, portStr] = smtpHost.split(':')
   const port = portStr ? parseInt(portStr, 10) : 1025
 
-  if (!host || ['test', 'development'].includes(process.env.NODE_ENV)) {
+  if (!host || ['test', 'development'].includes(process.env.NODE_ENV || '')) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
       console.warn({ to, subject, text })

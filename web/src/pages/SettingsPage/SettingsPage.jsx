@@ -205,7 +205,7 @@ const EmailSettingsSection = ({ formContext }) => {
         end-to-end encryption for emails sent to Protonmail addresses — though
         this requires a paid Protonmail account.
       </Typography>
-      <Grid2
+      <Grid
         container
         spacing={2}
         sx={{
@@ -235,7 +235,7 @@ const EmailSettingsSection = ({ formContext }) => {
           </SettingsRow>
         </FormProvider>
         {emailServer === 'Protonmail Bridge' && (
-          <Grid2 size={12}>
+          <Grid size={12}>
             <Alert severity="info">
               <Typography variant="body2" gutterBottom>
                 <strong>
@@ -251,10 +251,10 @@ const EmailSettingsSection = ({ formContext }) => {
                 credentials in the fields below.
               </Typography>
             </Alert>
-          </Grid2>
+          </Grid>
         )}
         {emailServer === 'Gmail' && (
-          <Grid2 size={12}>
+          <Grid size={12}>
             <Alert severity="info">
               <strong>App password required:</strong> Gmail does not allow
               regular passwords for SMTP. In your Google Account, go to{' '}
@@ -270,7 +270,7 @@ const EmailSettingsSection = ({ formContext }) => {
               , generate a new app password, and enter it in the SMTP Password
               field below.
             </Alert>
-          </Grid2>
+          </Grid>
         )}
         <SettingsRow
           title="SMTP Host and Port"
@@ -331,7 +331,7 @@ const EmailSettingsSection = ({ formContext }) => {
             </Button>
           </SettingsRow>
         </FormProvider>
-      </Grid2>
+      </Grid>
     </FormSection>
   )
 }
