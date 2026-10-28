@@ -1,5 +1,7 @@
 import { keyBy, merge } from 'lodash-es'
 
+import { validate } from '@cedarjs/api'
+
 import { encrypt } from 'src/lib/crypto'
 import { db } from 'src/lib/db'
 import { sendEmail } from 'src/lib/email'
@@ -112,6 +114,7 @@ export const SiteSetting = {
 }
 
 export const sendTestEmail = async ({ to }) => {
+  validate(to, 'Test email address', { presence: true, email: true })
   await sendEmail({
     to,
     subject: 'Memoryhole test email',

@@ -195,4 +195,14 @@ describe('smtp_pass encryption', () => {
       expect.objectContaining({ to: 'test@example.com' })
     )
   })
+
+  scenario('sendTestEmail rejects an invalid address', async () => {
+    await expect(sendTestEmail({ to: 'not-an-email' })).rejects.toThrow(
+      /Test email address/i
+    )
+    await expect(sendTestEmail({ to: '' })).rejects.toThrow(
+      /Test email address/i
+    )
+    expect(sendEmail).not.toHaveBeenCalled()
+  })
 })

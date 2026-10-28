@@ -146,6 +146,50 @@ ansible-playbook -i inventory.yml deploy.yml --tags security # re-apply security
 
 Available tags: `init`, `encrypted_volume`, `security`, `caddy`, `deploy`
 
+### Step 3: Set up email with ProtonMail Bridge (optional)
+
+Memoryhole sends email (password resets, notifications) over SMTP. Each instance has its own ProtonMail Bridge container, which turns a ProtonMail account into a local SMTP server. This requires a **paid** ProtonMail account.
+
+You may also use gmail or any other SMTP service, though those will not be automatically encrypted - in that case, you can skip this step and enter the credentials directly into the Admin Settings page.
+
+The Bridge login is interactive (password plus 2FA), so it can't be automated. You do it once per instance:
+
+1. **SSH in as the `memoryhole` user**, not root:
+
+   ```bash
+   ssh memoryhole@YOUR_SERVER_IP
+   protonmail-bridge-setup
+   ```
+
+   If the server runs more than one instance, the script asks which one to set up. It stops that instance's Bridge, prints a short reminder of the next steps, and opens the Bridge shell when you press Enter.
+
+2. **In the Bridge shell**, log in and get the SMTP credentials:
+
+   ```
+   >>> login
+   ```
+   Enter your ProtonMail username and password, then complete the 2FA prompt.
+
+   ```
+   >>> info
+   ```
+   This shows the SMTP **username** and **password** that Bridge generated. Copy them now. The password is **not** your ProtonMail password.
+
+   ```
+   >>> exit
+   ```
+
+   The script then restarts the instance and prints where to enter the credentials.
+
+3. **In Memoryhole**, log in as an admin and open **Admin → Settings** (`/admin/settings`). Under **Email Settings**:
+   - **Email Server:** choose **Protonmail Bridge**. This fills in the host (`protonmail-bridge:25`) and leaves **SMTP Security** unchecked.
+   - **SMTP Username / SMTP Password:** paste the values from `info`.
+   - Save.
+
+4. **Test it:** enter an address under **Test Email Address** and click **Send Test Email**.
+
+The Bridge login is saved in the instance's data directory on the encrypted volume, so it survives restarts, upgrades and reboots. Re-run `protonmail-bridge-setup` only if Bridge gets logged out, for example after you change your ProtonMail password or revoke the session in ProtonMail's settings.
+
 ---
 
 ## 3. Upgrading

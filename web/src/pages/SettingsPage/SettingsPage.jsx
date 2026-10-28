@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Alert, Button, Divider, Grid, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
-import { FormProvider } from 'react-hook-form'
+import { FormProvider, useFormState } from 'react-hook-form'
 import { useForm } from 'react-hook-form-mui'
 
 import { useMutation } from '@cedarjs/web'
@@ -64,6 +64,15 @@ const EMAIL_SERVER_PRESETS = {
     smtp_secure: true,
   },
 }
+
+const SMTP_FIELDS = ['smtp_host', 'smtp_secure', 'smtp_user', 'smtp_pass']
+
+// Enables the test email button. Same check as the login and forgot-password
+// forms; the field's own error message comes from type="email".
+const isEmailAddress = (value) => /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value || '')
+
+const BRIDGE_DOCS_URL =
+  'https://github.com/michalgm/memoryhole/blob/main/deployment/README.md#step-3-set-up-email-with-protonmail-bridge-optional'
 
 const inferEmailServer = (smtpHost) => {
   if (!smtpHost) return 'None'
@@ -166,13 +175,34 @@ const EmailSettingsSection = ({ formContext }) => {
   }
   const [sending, setSending] = useState(false)
   const localForm = useForm({
+    // Show the test address error as soon as the field is left, not on submit
+    mode: 'onTouched',
     defaultValues: {
       email_server: 'None',
       test_email_address: '',
     },
   })
   const emailServer = localForm.watch('email_server')
+  const testEmailAddress = localForm.watch('test_email_address')
   const initialSyncDone = useRef(false)
+
+  // defaultValues are the last-saved settings (the form resets after each
+  // save). The test email is sent server-side with saved settings, so only
+  // allow it once SMTP is saved and there are no unsaved SMTP edits.
+  const { defaultValues: saved, dirtyFields } = useFormState({
+    control: formContext.control,
+  })
+  const smtpSaved = Boolean(
+    saved?.smtp_host && saved?.smtp_user && saved?.smtp_pass
+  )
+  const smtpDirty = SMTP_FIELDS.some((field) => dirtyFields?.[field])
+  const bridgeSaved =
+    smtpSaved && saved.smtp_host.startsWith('protonmail-bridge')
+  const testEmailBlocker = !smtpSaved
+    ? 'Save your SMTP settings to send a test email.'
+    : smtpDirty
+      ? 'Save your changes to test the new SMTP settings.'
+      : null
 
   // Sync email_server from parent's smtp_host once on initial load
   const parentSmtpHost = formContext.watch('smtp_host')
@@ -234,7 +264,7 @@ const EmailSettingsSection = ({ formContext }) => {
             />
           </SettingsRow>
         </FormProvider>
-        {emailServer === 'Protonmail Bridge' && (
+        {emailServer === 'Protonmail Bridge' && !bridgeSaved && (
           <Grid size={12}>
             <Alert severity="info">
               <Typography variant="body2" gutterBottom>
@@ -244,13 +274,38 @@ const EmailSettingsSection = ({ formContext }) => {
                 </strong>
               </Typography>
               <Typography variant="body2" gutterBottom>
-                <strong>Setup required:</strong> SSH into your server and run{' '}
-                <code>sudo init-bridge.sh</code>. Follow the prompts to log in
-                to your Protonmail account, then run <code>info</code> to
+                <strong>Setup required:</strong> SSH into your server as the{' '}
+                <code>memoryhole</code> user and run{' '}
+                <code>protonmail-bridge-setup</code>. Follow the prompts to log
+                in to your Protonmail account, then run <code>info</code> to
                 retrieve the generated SMTP username and password. Enter those
-                credentials in the fields below.
+                credentials in the fields below. See the{' '}
+                <a
+                  href={BRIDGE_DOCS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  setup guide
+                </a>{' '}
+                for details.
               </Typography>
             </Alert>
+          </Grid>
+        )}
+        {emailServer === 'Protonmail Bridge' && bridgeSaved && (
+          <Grid size={12}>
+            <Typography variant="body2" color="text.secondary">
+              Protonmail Bridge is configured. If emails stop sending, the
+              Bridge may have been logged out; see the{' '}
+              <a
+                href={BRIDGE_DOCS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                setup guide
+              </a>{' '}
+              to log in again.
+            </Typography>
           </Grid>
         )}
         {emailServer === 'Gmail' && (
@@ -315,6 +370,7 @@ const EmailSettingsSection = ({ formContext }) => {
               name="test_email_address"
               field_type="text"
               label="Test Email Address"
+              // type="email" makes TextFieldElement validate the format itself
               type="email"
               sx={{ flexGrow: 1 }}
             />
@@ -322,14 +378,26 @@ const EmailSettingsSection = ({ formContext }) => {
               variant="contained"
               loading={sending}
               loadingPosition="start"
-              onClick={() =>
-                handleSendTestEmail(localForm.getValues('test_email_address'))
+              disabled={
+                Boolean(testEmailBlocker) || !isEmailAddress(testEmailAddress)
               }
+              onClick={() => handleSendTestEmail(testEmailAddress)}
               sx={{ flexGrow: 0, flexBasis: 'fit-content' }}
             >
               Send Test Email
             </Button>
           </SettingsRow>
+          {testEmailBlocker && (
+            <Grid size={12}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: 'right' }}
+              >
+                {testEmailBlocker}
+              </Typography>
+            </Grid>
+          )}
         </FormProvider>
       </Grid>
     </FormSection>
