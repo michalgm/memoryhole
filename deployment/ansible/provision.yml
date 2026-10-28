@@ -13,7 +13,7 @@
     linode_label: "memoryhole"
     linode_region: "eu-central"
     linode_type: "g6-nanode-1"
-    linode_image: "linode/ubuntu24.04"
+    linode_image: "linode/ubuntu26.04"
     linode_tags: ["memoryhole", "encrypted", "production"]
 
     # Firewall Configuration
