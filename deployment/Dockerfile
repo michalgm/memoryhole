@@ -106,9 +106,14 @@ COPY --chown=node:node .env.defaults .env.defaults
 
 COPY --chown=node:node --from=api_build /home/node/app/api/dist /home/node/app/api/dist
 COPY --chown=node:node --from=api_build /home/node/app/api/db /home/node/app/api/db
-COPY --chown=node:node --from=api_build /home/node/app/node_modules/prisma /home/node/app/node_modules/prisma
-COPY --chown=node:node --from=api_build /home/node/app/node_modules/.bin/prisma /home/node/app/node_modules/.bin/prisma
 COPY --chown=node:node --from=api_build /home/node/app/scripts /home/node/app/scripts
+# For `cedar prisma migrate deploy` / `cedar prisma db seed` (the entrypoint and
+# the Ansible seed task): Prisma config, api source that the seed script
+# imports, and docs for the site-help seed
+COPY --chown=node:node api/prisma.config.cjs api/prisma.config.cjs
+COPY --chown=node:node api/src api/src
+COPY --chown=node:node web/package.json web/package.json
+COPY --chown=node:node docs docs
 
 ENV NODE_ENV=production
 

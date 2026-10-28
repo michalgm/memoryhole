@@ -10874,6 +10874,7 @@ __metadata:
     "@cedarjs/api": "npm:7.1.0"
     "@cedarjs/api-server": "npm:7.1.0"
     "@cedarjs/auth-dbauth-api": "npm:7.1.0"
+    "@cedarjs/cli": "npm:7.1.0"
     "@cedarjs/graphql-server": "npm:7.1.0"
     "@hocuspocus/extension-database": "npm:^4.7.1"
     "@hocuspocus/provider": "npm:^4.7.1"
