@@ -37,7 +37,7 @@ async function seedOptions(setName) {
     }
   })
 
-  updateOptionSetValues({
+  await updateOptionSetValues({
     id,
     input: {
       values: items,

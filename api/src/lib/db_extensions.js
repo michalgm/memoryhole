@@ -36,9 +36,10 @@ export const settingsObserver = Prisma.defineExtension((client) => {
         async $allOperations({ operation, args, query }) {
           const result = await query(args)
 
-          // Only update cache for mutations
+          // Only update cache for mutations. Awaited so the refresh query
+          // can't outlive the caller (e.g. a seed script that then disconnects)
           if (MUTATION_OPERATIONS.includes(operation)) {
-            updateSettingsCache(client)
+            await updateSettingsCache(client)
           }
           return result
         },
