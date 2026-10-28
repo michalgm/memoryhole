@@ -253,6 +253,32 @@ The `-t` is needed for the passphrase prompt. This unlocks and mounts the volume
 
 ---
 
+## 5. Decommissioning a Server
+
+Use this to shut a server down for good. Deleting a server, or a Linode, doesn't guarantee its disk is actually erased, so first destroy the data yourself while the server is still running.
+
+**Step 1: Securely wipe the data** (any server). This destroys **all** Memoryhole data on the server and can't be undone. Make sure you have any backups you need first.
+
+```bash
+cd deployment/ansible
+ansible-playbook -i inventory.yml deprovision.yml --extra-vars "confirm_destroy=yes"
+```
+
+It stops all instances and Docker. With disk encryption on, it overwrites the encrypted volume's header, which destroys the encryption key, so everything on the volume becomes unrecoverable at once. Without encryption, it shreds each instance's data files. You get a 10-second warning before anything is deleted; press Ctrl+C twice to cancel.
+
+**Step 2: Delete the Linode** (Linode only). Deletes the Linode and the Cloud Firewall that `provision.yml` created:
+
+```bash
+export LINODE_TOKEN=your-token   # optional; prompted for if unset
+ansible-playbook -i inventory.yml deprovision-linode.yml --extra-vars "confirm_destroy=yes"
+```
+
+On other hosting, delete the server through your provider instead.
+
+**Step 3: Clean up locally.** `inventory.yml` still points at the deleted server, so delete it. If you're done with this deployment entirely, also delete `playbooks/credentials/` (the instances' generated secrets) and `group_vars/all/main.yml`. To replace the server instead, keep them and provision again with the same name. `provision.yml` reuses `inventory.yml` and updates the IP.
+
+---
+
 ## Security Notes
 
 **LUKS passphrase:** If you enabled disk encryption (`use_encrypted_volume: true`), store your `encrypted_volume_passphrase` in a password manager and an offline backup. There is no recovery — LUKS is unbreakable without the passphrase.

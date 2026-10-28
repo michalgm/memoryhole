@@ -2,10 +2,11 @@
 # ============================================================================
 # DEPROVISION - Delete Linode infrastructure
 # ============================================================================
-# Deletes the Linode instance and attached block storage volume via the
-# linode.cloud Ansible collection. No local CLI tools required.
+# Deletes the Linode instance and its Cloud Firewall (both created by
+# provision.yml) via the linode.cloud Ansible collection.
 #
-# Run deprovision-server.yml first to wipe data while the server is still up.
+# Run deprovision.yml first to securely wipe the data while the server is
+# still reachable. Deleting a Linode doesn't guarantee its disk is erased.
 #
 # Usage:
 #   ansible-playbook -i inventory.yml deprovision-linode.yml \
@@ -14,7 +15,7 @@
 # The Linode instance label is read from your inventory (the host name set by
 # provision.yml). Override only if your label differs: --extra-vars "linode_label=my-server"
 #
-# Requires: LINODE_TOKEN environment variable
+# Linode API token: from the LINODE_TOKEN environment variable, or prompted for.
 # ============================================================================
 
 - name: Delete Linode infrastructure
@@ -28,9 +29,11 @@
     ansible_python_interpreter: "{{ ansible_playbook_python }}"
 
     # provision.yml names the inventory host entry after linode_label, so the
-    # first non-localhost host in inventory IS the label. Volume follows the
-    # same convention. Override with -e linode_label=... if needed.
+    # first non-localhost host in inventory IS the label. Override with
+    # -e linode_label=... if needed.
     linode_label: "{{ (groups['all'] | difference(['localhost'])) | first }}"
+    # Same naming as provision.yml
+    firewall_label: "{{ linode_label }}-firewall"
 
   pre_tasks:
     - name: Require explicit confirmation
@@ -43,6 +46,7 @@
 
           This playbook will permanently delete:
             - Linode instance: {{ linode_label }}
+            - Cloud Firewall: {{ firewall_label }}
 
           THIS CANNOT BE UNDONE.
 
@@ -52,16 +56,41 @@
     - name: Set Linode API token
       ansible.builtin.set_fact:
         linode_api_token: '{{ lookup("env", "LINODE_TOKEN") }}'
+      no_log: true
+
+    - name: Prompt for Linode API token
+      ansible.builtin.pause:
+        prompt: |2
+
+          Linode API token (LINODE_TOKEN is not set)
+
+          Token
+        echo: false
+      register: _linode_token_prompt
+      when: linode_api_token == ''
+
+    - name: Set Linode API token from prompt
+      ansible.builtin.set_fact:
+        linode_api_token: "{{ _linode_token_prompt.user_input }}"
+      when: linode_api_token == ''
+      no_log: true
 
     - name: Verify Linode token is available
       ansible.builtin.assert:
         that: linode_api_token != ''
-        fail_msg: "LINODE_TOKEN environment variable not set. Export it and try again."
+        fail_msg: "A Linode API token is required: set LINODE_TOKEN or enter one at the prompt."
 
     - name: Delete Linode instance
       linode.cloud.instance:
         api_token: "{{ linode_api_token }}"
         label: "{{ linode_label }}"
+        state: absent
+
+    # Deleting the instance detaches the firewall, so delete it afterwards
+    - name: Delete Cloud Firewall
+      linode.cloud.firewall:
+        api_token: "{{ linode_api_token }}"
+        label: "{{ firewall_label }}"
         state: absent
 
     - name: Deprovision complete
@@ -71,8 +100,11 @@
           - "Linode deprovision complete"
           - "=========================================="
           - "Instance ({{ linode_label }}): deleted"
+          - "Firewall ({{ firewall_label }}): deleted"
           - ""
-          - "To start fresh:"
-          - "  ansible-playbook provision.yml"
+          - "inventory.yml still points at the deleted server. Delete it,"
+          - "or provision a replacement (it keeps the same name and updates"
+          - "the IP in inventory.yml):"
+          - "  ansible-playbook provision.yml -e linode_label={{ linode_label }}"
           - "  ansible-playbook -i inventory.yml deploy.yml"
           - "=========================================="

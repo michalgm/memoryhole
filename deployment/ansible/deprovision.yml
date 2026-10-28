@@ -62,20 +62,6 @@
     # STOP ALL INSTANCES
     # --------------------------------------------------------------------------
 
-    - name: Stop and disable instance systemd services
-      ansible.builtin.systemd:
-        name: 'memoryhole-{{ instance.domain | replace(".", "-") }}'
-        state: stopped
-        enabled: false
-      loop: "{{ instances | default([]) }}"
-      loop_control:
-        loop_var: instance
-        label: "{{ instance.domain }}"
-      register: _instance_services
-      failed_when:
-        - _instance_services is failed
-        - "'Could not find the requested service' not in _instance_services.msg | default('')"
-
     - name: Stop all running Docker containers
       ansible.builtin.shell: |
         set -o pipefail
