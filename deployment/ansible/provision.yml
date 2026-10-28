@@ -3,10 +3,6 @@
   hosts: localhost
   connection: local
   gather_facts: false
-  vars_prompt:
-    - name: linode_token
-      prompt: "Linode API token (create one at https://cloud.linode.com/profile/tokens)"
-      private: true
 
   vars:
     # Force use of the python interpreter that's running ansible-playbook
@@ -29,9 +25,7 @@
     ssh_public_key_path: "~/.ssh/id_rsa.pub"
     root_password: "{{ lookup('env', 'ROOT_PASSWORD') | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32'), true) }}"
 
-    # Try environment variable first, then fallback to ~/.config/linode-cli
-    # Finally, try reading from linode-token file in project root if present
-    # We take the first line of linode-token file to avoid newline issues
+    # From the LINODE_TOKEN environment variable; prompted for if unset
     linode_token: "{{ lookup('env', 'LINODE_TOKEN') }}"
 
     inventory_file_path: "{{ playbook_dir }}/inventory.yml"
@@ -49,9 +43,27 @@
     # -------------------------------------------------------------------------
     # Prerequisites Checks
     # -------------------------------------------------------------------------
+    - name: Prompt for Linode API token
+      ansible.builtin.pause:
+        prompt: |2
+
+          Linode API token (LINODE_TOKEN is not set)
+          Create one at https://cloud.linode.com/profile/tokens
+
+          Token
+        echo: false
+      register: _linode_token_prompt
+      when: linode_token == ""
+
+    - name: Set Linode API token from prompt
+      ansible.builtin.set_fact:
+        linode_token: "{{ _linode_token_prompt.user_input }}"
+      when: linode_token == ""
+      no_log: true
+
     - name: Verify Linode API Token
       ansible.builtin.fail:
-        msg: "LINODE_TOKEN environment variable is required."
+        msg: "A Linode API token is required: set LINODE_TOKEN or enter one at the prompt."
       when: linode_token == ""
 
     - name: Check for SSH public key

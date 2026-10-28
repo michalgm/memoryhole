@@ -69,10 +69,13 @@ Then follow the [Deployment](#2-deployment) section below — skip the inventory
 
 Skip this section if your server already exists.
 
-This creates a new Linode VPS, attaches a Cloud Firewall (SSH, HTTP and HTTPS only), and sets the server's hostname. By default, it will provision a $5/month nanode in the eu-central region called `memoryhole`. Edit `provision.yml` if you want to change any of these settings. The playbook will prompt for a Linode API token, which can be created here: https://cloud.linode.com/profile/tokens.
+This creates a new Linode VPS, attaches a Cloud Firewall (SSH, HTTP and HTTPS only), and sets the server's hostname. By default, it will provision a $5/month nanode in the eu-central region called `memoryhole`. Edit `provision.yml` if you want to change any of these settings.
+
+You need a Linode API token with read/write access to Linodes and Firewalls, which you can create at https://cloud.linode.com/profile/tokens. Either export it, or leave it unset and the playbook will prompt for it:
 
 ```bash
 cd deployment/ansible
+export LINODE_TOKEN=your-token   # optional; prompted for if unset
 ansible-playbook provision.yml
 ```
 
@@ -224,6 +227,29 @@ To pin a specific release instead of pulling `latest`:
 ```bash
 ansible-playbook -i inventory.yml upgrade-instances.yml -e global_image_tag=v0.28.0
 ```
+
+---
+
+## 4. Unlocking After a Reboot
+
+If you enabled disk encryption, the encrypted volume stays **locked** after every reboot, whether you rebooted it, Linode did host maintenance, or unattended upgrades did. That's the point: the data can't be read without the passphrase. Until someone unlocks it, Docker doesn't start, and each instance's domain shows a "temporarily unavailable" page.
+
+To unlock, SSH in as the `admin-unlock` user and enter the disk encryption passphrase:
+
+```bash
+ssh -t admin-unlock@YOUR_SERVER_IP sudo unlock_data unlock
+```
+
+The `-t` is needed for the passphrase prompt. This unlocks and mounts the volume, mounts the data directories, and starts Docker. The instances then come back up on their own within a minute or so.
+
+`admin-unlock` uses the same SSH key as the `memoryhole` user. It's an ordinary unprivileged account whose only admin right is running `unlock_data` (all of its commands, including `lock`). It isn't in the `docker` group and can't read the instance data, so you can give someone access to it to bring the server back up after a reboot without giving them full server access.
+
+`unlock_data` has two other commands:
+
+| Command | What it does |
+|---|---|
+| `sudo unlock_data status` | Shows whether the volume is unlocked and mounted, and which swap is active |
+| `sudo unlock_data lock` | Stops Docker, unmounts everything and locks the volume. Instances go offline until it's unlocked again. Use it before handing the server over or if you think it's compromised. |
 
 ---
 
