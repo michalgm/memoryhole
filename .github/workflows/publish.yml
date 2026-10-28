@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+    # Test builds: images are tagged with the branch name and commit SHA,
+    # never 'latest'. Deploy one with image_tag: <branch-name>.
+    # branches:
+    #   - ansible-deployment
+  # Manual builds of any branch (only available once this file is on main)
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -28,9 +34,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract version tag
-        id: meta
-        run: echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+      # Release tags (v*) get the version and 'latest'; branches get the
+      # branch name and sha-<short>, so test builds never replace 'latest'.
+      - name: Image tags for api
+        id: meta_api
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/memoryhole-api
+          flavor: latest=false
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+            type=ref,event=branch
+            type=sha,enable=${{ github.ref_type == 'branch' }}
+
+      - name: Image tags for web
+        id: meta_web
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/memoryhole-web
+          flavor: latest=false
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+            type=ref,event=branch
+            type=sha,enable=${{ github.ref_type == 'branch' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -42,9 +70,8 @@ jobs:
           file: ./deployment/Dockerfile
           target: api_serve
           push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/memoryhole-api:${{ steps.meta.outputs.tag }}
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/memoryhole-api:latest
+          tags: ${{ steps.meta_api.outputs.tags }}
+          labels: ${{ steps.meta_api.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -55,8 +82,7 @@ jobs:
           file: ./deployment/Dockerfile
           target: caddy_serve
           push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/memoryhole-web:${{ steps.meta.outputs.tag }}
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/memoryhole-web:latest
+          tags: ${{ steps.meta_web.outputs.tags }}
+          labels: ${{ steps.meta_web.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
