@@ -255,30 +255,39 @@
           # Failure Mode (0=silent 1=printk 2=panic)
           -f 1
 
-          # Audit system calls
-          -a always,exit -F arch=b64 -S execve -k exec
+          # Commands run in a login session (SSH, including via sudo and
+          # Ansible). Daemons and containers have no login ID (auid), so they
+          # aren't logged.
+          -a always,exit -F arch=b64 -S execve -F auid!=unset -k user_exec
+          -a always,exit -F arch=b32 -S execve -F auid!=unset -k user_exec
 
-          # Monitor authentication
+          # Users, groups and sudo
           -w /etc/passwd -p wa -k passwd_changes
           -w /etc/group -p wa -k group_changes
+          -w /etc/gshadow -p wa -k group_changes
           -w /etc/shadow -p wa -k shadow_changes
           -w /etc/sudoers -p wa -k sudoers_changes
+          -w /etc/sudoers.d/ -p wa -k sudoers_changes
 
-          # Monitor SSH
+          # SSH configuration and root's authorized keys
           -w /etc/ssh/sshd_config -p wa -k sshd_config
-          -w /var/log/auth.log -p wa -k auth_log
+          -w /etc/ssh/sshd_config.d/ -p wa -k sshd_config
+          -w /root/.ssh/ -p wa -k ssh_keys
 
-          # Monitor network configuration
-          -w /etc/network/ -p wa -k network_changes
+          # Network configuration
+          -w /etc/netplan/ -p wa -k network_changes
           -w /etc/hosts -p wa -k hosts_changes
 
-          # Monitor LUKS operations
-          -w /sbin/cryptsetup -p x -k luks_operations
+          # Encrypted volume: config, tools, and every unlock/lock
+          -w /etc/crypttab -p wa -k luks_config
+          -w /etc/fstab -p wa -k luks_config
+          -w /usr/sbin/cryptsetup -p x -k luks_operations
+          -w /usr/local/bin/unlock_data -p wax -k unlock
 
-          # Make configuration immutable
-          -e 2
+          # Docker daemon configuration
+          -w /etc/docker/ -p wa -k docker_config
         mode: "0640"
-      notify: Restart auditd
+      notify: Reload audit rules
 
     - name: Enable auditd
       ansible.builtin.systemd:
@@ -355,7 +364,8 @@
         name: fail2ban
         state: restarted
 
-    - name: Restart auditd
-      ansible.builtin.systemd:
-        name: auditd
-        state: restarted
+    # auditd refuses manual restarts (RefuseManualStop); augenrules is the
+    # supported way to apply rule changes, and fails if a rule is invalid
+    - name: Reload audit rules
+      ansible.builtin.command: augenrules --load
+      changed_when: true
