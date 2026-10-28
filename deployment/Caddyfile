@@ -1,3 +1,12 @@
+{
+	servers {
+		# Requests arrive through the host's Caddy, which terminates HTTPS.
+		# Trust its X-Forwarded-Proto/Host so the API sees the original
+		# https origin (dbAuth rejects logins whose Origin doesn't match).
+		trusted_proxies static private_ranges
+	}
+}
+
 {$DOMAIN} {
 	root * /var/www/html
 
