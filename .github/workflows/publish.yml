@@ -6,8 +6,8 @@ on:
       - 'v*'
     # Test builds: images are tagged with the branch name and commit SHA,
     # never 'latest'. Deploy one with image_tag: <branch-name>.
-    # branches:
-    #   - ansible-deployment
+    branches:
+      - ansible-deployment
   # Manual builds of any branch (only available once this file is on main)
   workflow_dispatch:
 
