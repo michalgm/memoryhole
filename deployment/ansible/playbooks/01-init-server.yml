@@ -24,11 +24,11 @@
 
   pre_tasks:
     - name: Verify required variables are set
-      assert:
+      ansible.builtin.assert:
         that:
           - linux_username is defined
           - linux_user_ssh_key_file is defined
-        fail_msg: 'Required variables not set. Check group_vars/all.yml'
+        fail_msg: "Required variables not set. Check group_vars/all.yml"
 
   tasks:
     # ==========================================================================
@@ -36,18 +36,18 @@
     # ==========================================================================
 
     - name: Update apt cache
-      apt:
-        update_cache: yes
+      ansible.builtin.apt:
+        update_cache: true
         cache_valid_time: 3600
 
     - name: Upgrade all packages
-      apt:
+      ansible.builtin.apt:
         upgrade: dist
-        autoremove: yes
-        autoclean: yes
+        autoremove: true
+        autoclean: true
 
     - name: Install essential packages
-      apt:
+      ansible.builtin.apt:
         name:
           - curl
           - wget
@@ -68,11 +68,11 @@
         state: present
 
     - name: Clean apt package cache
-      command: apt-get clean
-      changed_when: false
+      ansible.builtin.apt:
+        clean: true
 
     - name: Set timezone to UTC
-      timezone:
+      community.general.timezone:
         name: UTC
 
     # ==========================================================================
@@ -80,23 +80,23 @@
     # ==========================================================================
 
     - name: Create admin user
-      user:
-        name: '{{ linux_username }}'
+      ansible.builtin.user:
+        name: "{{ linux_username }}"
         shell: /bin/bash
-        create_home: yes
+        create_home: true
         state: present
 
     - name: Create .ssh directory for admin user
-      file:
-        path: '/home/{{ linux_username }}/.ssh'
+      ansible.builtin.file:
+        path: "/home/{{ linux_username }}/.ssh"
         state: directory
-        owner: '{{ linux_username }}'
-        group: '{{ linux_username }}'
-        mode: '0700'
+        owner: "{{ linux_username }}"
+        group: "{{ linux_username }}"
+        mode: "0700"
 
     - name: Add SSH public key for admin user
-      authorized_key:
-        user: '{{ linux_username }}'
+      ansible.posix.authorized_key:
+        user: "{{ linux_username }}"
         key: "{{ lookup('file', linux_user_ssh_key_file) }}"
         state: present
 
@@ -105,19 +105,19 @@
     # ==========================================================================
 
     - name: Configure unattended-upgrades
-      template:
+      ansible.builtin.template:
         src: templates/50unattended-upgrades.j2
         dest: /etc/apt/apt.conf.d/50unattended-upgrades
-        mode: '0644'
+        mode: "0644"
       when: auto_updates_enabled | default(true)
 
     - name: Enable automatic updates
-      copy:
+      ansible.builtin.copy:
         dest: /etc/apt/apt.conf.d/20auto-upgrades
         content: |
           APT::Periodic::Update-Package-Lists "1";
           APT::Periodic::Download-Upgradeable-Packages "1";
           APT::Periodic::AutocleanInterval "1";
           APT::Periodic::Unattended-Upgrade "1";
-        mode: '0644'
+        mode: "0644"
       when: auto_updates_enabled | default(true)

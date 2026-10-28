@@ -4,111 +4,89 @@
 #                     encrypted_volume_mount, playbook_dir
 
 - name: Create instance directory
-  file:
-    path: '{{ instances_base }}/{{ instance.domain }}'
+  ansible.builtin.file:
+    path: "{{ instances_base }}/{{ instance.domain }}"
     state: directory
-    owner: '{{ linux_username }}'
-    group: '{{ linux_username }}'
-    mode: '0750'
+    owner: "{{ linux_username }}"
+    group: "{{ linux_username }}"
+    mode: "0750"
 
 - name: Create postgres data directory (owned by postgres uid inside container)
-  file:
-    path: '{{ instances_base }}/{{ instance.domain }}/data/postgres'
+  ansible.builtin.file:
+    path: "{{ instances_base }}/{{ instance.domain }}/data/postgres"
     state: directory
-    owner: '999'
-    group: '999'
-    mode: '0700'
+    owner: "999"
+    group: "999"
+    mode: "0700"
 
 - name: Create protonmail data directory
-  file:
-    path: '{{ instances_base }}/{{ instance.domain }}/data/protonmail'
+  ansible.builtin.file:
+    path: "{{ instances_base }}/{{ instance.domain }}/data/protonmail"
     state: directory
-    owner: '{{ linux_username }}'
-    group: '{{ linux_username }}'
-    mode: '0750'
+    owner: "{{ linux_username }}"
+    group: "{{ linux_username }}"
+    mode: "0750"
 
 # Workaround — remove when https://github.com/shenxn/protonmail-bridge-docker/issues/141 is fixed
 - name: Copy bridge Dockerfile workaround
-  copy:
+  ansible.builtin.copy:
     src: ../../Dockerfile.bridge
-    dest: '{{ instances_base }}/{{ instance.domain }}/Dockerfile.bridge'
-    owner: '{{ linux_username }}'
-    group: '{{ linux_username }}'
-    mode: '0640'
+    dest: "{{ instances_base }}/{{ instance.domain }}/Dockerfile.bridge"
+    owner: "{{ linux_username }}"
+    group: "{{ linux_username }}"
+    mode: "0640"
 
 - name: Template docker-compose.yml
-  template:
+  ansible.builtin.template:
     src: templates/docker-compose.instance.yml.j2
-    dest: '{{ instances_base }}/{{ instance.domain }}/docker-compose.yml'
-    owner: '{{ linux_username }}'
-    group: '{{ linux_username }}'
-    mode: '0640'
+    dest: "{{ instances_base }}/{{ instance.domain }}/docker-compose.yml"
+    owner: "{{ linux_username }}"
+    group: "{{ linux_username }}"
+    mode: "0640"
 
 - name: Template .env
-  template:
+  ansible.builtin.template:
     src: templates/env.j2
-    dest: '{{ instances_base }}/{{ instance.domain }}/.env'
-    owner: '{{ linux_username }}'
-    group: '{{ linux_username }}'
-    mode: '0600'
+    dest: "{{ instances_base }}/{{ instance.domain }}/.env"
+    owner: "{{ linux_username }}"
+    group: "{{ linux_username }}"
+    mode: "0600"
 
 - name: Template .env.db
-  template:
+  ansible.builtin.template:
     src: templates/env.db.j2
-    dest: '{{ instances_base }}/{{ instance.domain }}/.env.db'
-    owner: '{{ linux_username }}'
-    group: '{{ linux_username }}'
-    mode: '0600'
+    dest: "{{ instances_base }}/{{ instance.domain }}/.env.db"
+    owner: "{{ linux_username }}"
+    group: "{{ linux_username }}"
+    mode: "0600"
 
-- name: Pull Docker images
-  shell: docker compose pull --quiet
-  args:
-    chdir: '{{ instances_base }}/{{ instance.domain }}'
-  become_user: '{{ linux_username }}'
-
-- name: Build Docker images
-  shell: docker compose build
-  args:
-    chdir: '{{ instances_base }}/{{ instance.domain }}'
-  become_user: '{{ linux_username }}'
-
-- name: Start instance stack
-  shell: docker compose up -d
-  args:
-    chdir: '{{ instances_base }}/{{ instance.domain }}'
-  become_user: '{{ linux_username }}'
+- name: Pull, build and start instance stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ instances_base }}/{{ instance.domain }}"
+    pull: always
+    build: always
+    state: present
+  become: true
+  become_user: "{{ linux_username }}"
 
 - name: Deploy bridge init script
-  copy:
+  ansible.builtin.copy:
     src: scripts/protonmail-bridge-setup.sh
     dest: /usr/local/bin/protonmail-bridge-setup
-    mode: '0755'
+    mode: "0755"
 
 # ------------------------------------------------------------------
 # DATABASE SEED (first deploy only — skipped if users exist)
 # ------------------------------------------------------------------
 
 - name: Wait for migrations and check if any users exist
-  shell: >
+  ansible.builtin.shell: >
     docker compose exec -T db
     psql -U memoryhole -d memoryhole -tAc 'SELECT COUNT(*) FROM "User";'
   args:
-    chdir: '{{ instances_base }}/{{ instance.domain }}'
-  become_user: '{{ linux_username }}'
-  register: user_count
-  changed_when: false
-  retries: 30
-  delay: 5
-  until: user_count.rc == 0
-  when: (instance.admin_user_email | default(admin_user_email | default(''))) != ''
-
-- name: Wait for migrations and check if any users exist
-  shell: >
-    docker compose exec -T db
-    psql -U memoryhole -d memoryhole -tAc 'SELECT COUNT(*) FROM "User";'
-  args:
-    chdir: '{{ instances_base }}/{{ instance.domain }}'
-  become_user: '{{ linux_username }}'
+    chdir: "{{ instances_base }}/{{ instance.domain }}"
+  become: true
+  become_user: "{{ linux_username }}"
   register: user_count
   changed_when: false
   retries: 30
@@ -117,39 +95,46 @@
   when: (instance.admin_user_email | default(admin_user_email | default(''))) != ''
 
 - name: Wait for instance web service to be ready (implies migrations complete)
-  wait_for:
-    port: '{{ instance_credentials[instance.domain].port }}'
+  ansible.builtin.wait_for:
+    port: "{{ instance_credentials[instance.domain].port }}"
     host: 127.0.0.1
     timeout: 300
   when: (instance.admin_user_email | default(admin_user_email | default(''))) != ''
   # no_log: true
 
 - name: Seed database
-  shell: >
+  ansible.builtin.shell: >
     docker compose exec -T
-    -e SEED_USER_NAME="{{ instance.admin_user_name | default(admin_user_name | default('Admin')) }}"
-    -e SEED_USER_PASSWORD="{{ instance.admin_user_password | default(admin_user_password | default('')) }}"
-    -e SEED_USER_EMAIL="{{ instance.admin_user_email | default(admin_user_email | default('')) }}"
-    -e SEED_JURISDICTIONS="{{ instance.seed_jurisdictions | default('') }}"
-    -e SEED_CITIES="{{ instance.seed_cities | default('') }}"
+    -e SEED_USER_NAME
+    -e SEED_USER_PASSWORD
+    -e SEED_USER_EMAIL
+    -e SEED_JURISDICTIONS
+    -e SEED_CITIES
     api node_modules/.bin/cedar prisma db seed
   args:
-    chdir: '{{ instances_base }}/{{ instance.domain }}'
-  become_user: '{{ linux_username }}'
-  # no_log: true
+    chdir: "{{ instances_base }}/{{ instance.domain }}"
+  environment:
+    SEED_USER_NAME: "{{ instance.admin_user_name | default(admin_user_name | default('Admin')) }}"
+    SEED_USER_PASSWORD: "{{ instance.admin_user_password | default(admin_user_password | default('')) }}"
+    SEED_USER_EMAIL: "{{ instance.admin_user_email | default(admin_user_email | default('')) }}"
+    SEED_JURISDICTIONS: "{{ instance.seed_jurisdictions | default('') }}"
+    SEED_CITIES: "{{ instance.seed_cities | default('') }}"
+  become: true
+  become_user: "{{ linux_username }}"
+  changed_when: true
+  no_log: true
   when:
     - (instance.admin_user_email | default(admin_user_email | default(''))) != ''
     - user_count.stdout | default('1') | int == 0
-
 
 # ------------------------------------------------------------------
 # BACKUP
 # ------------------------------------------------------------------
 
 - name: Create backup script
-  copy:
+  ansible.builtin.copy:
     dest: '/usr/local/bin/backup-{{ instance.domain | replace(".", "-") }}.sh'
-    mode: '0750'
+    mode: "0750"
     content: |
       #!/bin/bash
       set -e
@@ -164,10 +149,10 @@
   when: instance.backup_enabled | default(true)
 
 - name: Schedule backup cron
-  cron:
-    name: 'Memoryhole backup ({{ instance.domain }})'
-    minute: '0'
-    hour: '2'
+  ansible.builtin.cron:
+    name: "Memoryhole backup ({{ instance.domain }})"
+    minute: "0"
+    hour: "2"
     job: '/usr/local/bin/backup-{{ instance.domain | replace(".", "-") }}.sh >> /var/log/memoryhole-backup.log 2>&1'
     user: root
   when: instance.backup_enabled | default(true)

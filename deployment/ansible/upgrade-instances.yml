@@ -3,12 +3,14 @@
 # Instance Upgrade Playbook
 # ============================================================================
 # Pulls latest images and restarts all instances. Migrations run automatically.
+# Each instance pulls the tag in its docker-compose.yml: global_image_tag if
+# given, else instance.image_tag if set, else latest.
 #
 # Usage:
-#   ansible-playbook -i inventory.yml 06-upgrade-instances.yml
+#   ansible-playbook -i inventory.yml upgrade-instances.yml
 #
 # To pin a specific image tag for all instances:
-#   ansible-playbook -i inventory.yml 06-upgrade-instances.yml \
+#   ansible-playbook -i inventory.yml upgrade-instances.yml \
 #     -e global_image_tag=v0.26.0
 # ============================================================================
 
@@ -18,43 +20,36 @@
   gather_facts: false
 
   vars:
-    instances_base: '/home/{{ linux_username }}/instances'
+    instances_base: "/home/{{ linux_username }}/instances"
 
   tasks:
-    - name: Pull latest images
-      shell: docker compose pull
-      args:
-        chdir: '{{ instances_base }}/{{ instance.domain }}'
-      become_user: '{{ linux_username }}'
-      loop: '{{ instances }}'
+    - name: Set image tag
+      ansible.builtin.replace:
+        path: "{{ instances_base }}/{{ instance.domain }}/docker-compose.yml"
+        regexp: '(image: ghcr\.io/michalgm/memoryhole-(?:api|web)):\S+'
+        replace: '\1:{{ global_image_tag | default(instance.image_tag | default(''latest'')) }}'
+      loop: "{{ instances }}"
       loop_control:
-        label: '{{ instance.domain }}'
+        label: "{{ instance.domain }}"
         loop_var: instance
 
-    - name: Restart stacks
-      shell: docker compose up -d --remove-orphans
-      args:
-        chdir: '{{ instances_base }}/{{ instance.domain }}'
-      become_user: '{{ linux_username }}'
-      loop: '{{ instances }}'
+    - name: Pull latest images and restart stacks
+      community.docker.docker_compose_v2:
+        project_src: "{{ instances_base }}/{{ instance.domain }}"
+        pull: always
+        remove_orphans: true
+        state: present
+      become: true
+      become_user: "{{ linux_username }}"
+      register: compose_up
+      loop: "{{ instances }}"
       loop_control:
-        label: '{{ instance.domain }}'
-        loop_var: instance
-
-    - name: Show container status
-      shell: docker compose ps
-      args:
-        chdir: '{{ instances_base }}/{{ instance.domain }}'
-      become_user: '{{ linux_username }}'
-      register: compose_ps
-      loop: '{{ instances }}'
-      loop_control:
-        label: '{{ instance.domain }}'
+        label: "{{ instance.domain }}"
         loop_var: instance
 
     - name: Display status
-      debug:
-        msg: '{{ item.stdout_lines }}'
-      loop: '{{ compose_ps.results }}'
+      ansible.builtin.debug:
+        msg: "{{ item.containers | map(attribute='Name') | zip(item.containers | map(attribute='Status')) | map('join', ': ') | list }}"
+      loop: "{{ compose_up.results }}"
       loop_control:
-        label: '{{ item.instance.domain }}'
+        label: "{{ item.instance.domain }}"

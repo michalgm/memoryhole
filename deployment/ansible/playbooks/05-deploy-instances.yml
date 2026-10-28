@@ -24,50 +24,51 @@
   gather_facts: true
 
   vars:
-    instances_base: '/home/{{ linux_username }}/instances'
-    credentials_dir: '{{ playbook_dir }}/credentials'
+    instances_base: "/home/{{ linux_username }}/instances"
+    credentials_dir: "{{ playbook_dir }}/credentials"
 
   pre_tasks:
     - name: Verify encrypted volume is mounted
-      stat:
-        path: '{{ encrypted_volume_mount }}'
+      ansible.builtin.stat:
+        path: "{{ encrypted_volume_mount }}"
       register: volume_check
       failed_when: not volume_check.stat.exists or not volume_check.stat.isdir
 
     - name: Verify instances are defined
-      assert:
+      ansible.builtin.assert:
         that: instances is defined and instances | length > 0
-        fail_msg: 'No instances defined in group_vars'
+        fail_msg: "No instances defined in group_vars"
 
     # Generate secrets once per instance and store in credentials/ on the
     # control machine. On re-runs the same values are returned from the files.
-    #
+
+    - name: Generate or load instance credentials
+      ansible.builtin.set_fact:
+        instance_credentials: >-
+          {{ instance_credentials | default({}) | combine({
+            instance.domain: {
+              'db_password': lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/db_password', length=32, chars='ascii_letters,digits'),
+              'session_secret': lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/session_secret', length=64, chars='ascii_letters,digits'),
+              'db_encryption_key': lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/db_encryption_key',length=32,chars='ascii_letters,digits'),
+              'settings_encryption_key':
+                lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/settings_encryption_key', length=64,chars='0123456789abcdef'),
+              'seed_password': lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/seed_password', length=16, chars='ascii_letters,digits'),
+              'port': instance.port | default(((instance.domain | hash('sha1'))[0:3] | int(base=16) % 900) + 8080)
+            }
+          }) }}
+      loop: "{{ instances }}"
+      loop_control:
+        loop_var: instance
+        extended: true
+        label: "Configuring {{ instance.domain }}"
+      no_log: true
+
     # Port assignment: internal localhost port Caddy proxies to — not exposed
     # outside the server. Derived from the domain's SHA1 hash, range 8080–8979
     # (non-root, non-conflicting). Stable across list reorders. Set
     # instance.port explicitly to override.
-    - name: Generate or load instance credentials
-      set_fact:
-        instance_credentials: >-
-          {{ instance_credentials | default({}) | combine({
-            instance.domain: {
-              'db_password':       lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/db_password    length=32 chars=ascii_letters,digits'),
-              'session_secret':    lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/session_secret length=64 chars=ascii_letters,digits'),
-              'db_encryption_key':       lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/db_encryption_key       length=32 chars=ascii_letters,digits'),
-              'settings_encryption_key': lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/settings_encryption_key length=64 chars=0123456789abcdef'),
-              'seed_password':           lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/seed_password           length=16 chars=ascii_letters,digits'),
-              'port': instance.port | default(((instance.domain | hash('sha1'))[0:3] | int(base=16) % 900) + 8080)
-            }
-          }) }}
-      loop: '{{ instances }}'
-      loop_control:
-        loop_var: instance
-        extended: true
-        label: 'Configuring {{ instance.domain }}'
-      no_log: true
-
     - name: Check for port conflicts between instances
-      assert:
+      ansible.builtin.assert:
         that: >-
           instances | map(attribute='domain') | map('extract', instance_credentials) | map(attribute='port') | list | count
           ==
@@ -82,7 +83,7 @@
     # ==========================================================================
 
     - name: Install Docker dependencies
-      apt:
+      ansible.builtin.apt:
         name:
           - apt-transport-https
           - ca-certificates
@@ -90,20 +91,21 @@
           - gnupg
           - lsb-release
         state: present
-        update_cache: yes
-
-    - name: Add Docker GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
+        update_cache: true
 
     - name: Add Docker repository
-      apt_repository:
-        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_facts["distribution_release"] }} stable'
+      ansible.builtin.deb822_repository:
+        name: docker
+        types: [deb]
+        uris: [https://download.docker.com/linux/ubuntu]
+        suites: ['{{ ansible_facts["distribution_release"] }}']
+        components: [stable]
+        signed_by: https://download.docker.com/linux/ubuntu/gpg
         state: present
+        enabled: true
 
     - name: Install Docker
-      apt:
+      ansible.builtin.apt:
         name:
           - docker-ce
           - docker-ce-cli
@@ -111,32 +113,32 @@
           - docker-buildx-plugin
           - docker-compose-plugin
         state: present
-        update_cache: yes
+        update_cache: true
 
     - name: Clean apt package cache
-      command: apt-get clean
-      changed_when: false
+      ansible.builtin.apt:
+        clean: true
 
     - name: Add admin user to docker group
-      user:
-        name: '{{ linux_username }}'
+      ansible.builtin.user:
+        name: "{{ linux_username }}"
         groups: docker
-        append: yes
+        append: true
 
     - name: Start Containerd (disabled at boot — unlock script manages startup)
-      systemd:
+      ansible.builtin.systemd:
         name: containerd
-        enabled: no
+        enabled: false
         state: started
 
     - name: Start Docker (disabled at boot — unlock script manages startup)
-      systemd:
+      ansible.builtin.systemd:
         name: docker
-        enabled: no
+        enabled: false
         state: started
 
     - name: Configure Docker daemon
-      copy:
+      ansible.builtin.copy:
         dest: /etc/docker/daemon.json
         content: |
           {
@@ -144,64 +146,64 @@
             "log-opts": { "max-size": "10m", "max-file": "3" },
             "dns": ["1.1.1.1"]
           }
-        mode: '0644'
-      notify: restart docker
+        mode: "0644"
+      notify: Restart docker
 
     - name: Create systemd drop-in directory for docker
-      file:
+      ansible.builtin.file:
         path: /etc/systemd/system/docker.service.d
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Create systemd drop-in directory for containerd
-      file:
+      ansible.builtin.file:
         path: /etc/systemd/system/containerd.service.d
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Require encrypted mounts for docker.service
-      copy:
+      ansible.builtin.copy:
         dest: /etc/systemd/system/docker.service.d/require-encrypted-mounts.conf
         content: |
           [Unit]
           RequiresMountsFor=/var/lib/docker /var/lib/containerd
-        mode: '0644'
-      notify: reload systemd
+        mode: "0644"
+      notify: Reload systemd
 
     - name: Require encrypted mounts for containerd.service
-      copy:
+      ansible.builtin.copy:
         dest: /etc/systemd/system/containerd.service.d/require-encrypted-mounts.conf
         content: |
           [Unit]
           RequiresMountsFor=/var/lib/docker /var/lib/containerd
-        mode: '0644'
-      notify: reload systemd
+        mode: "0644"
+      notify: Reload systemd
 
     - name: Create instances base directory
-      file:
-        path: '{{ instances_base }}'
+      ansible.builtin.file:
+        path: "{{ instances_base }}"
         state: directory
-        owner: '{{ linux_username }}'
-        group: '{{ linux_username }}'
-        mode: '0750'
+        owner: "{{ linux_username }}"
+        group: "{{ linux_username }}"
+        mode: "0750"
 
     # ==========================================================================
     # PER-INSTANCE DEPLOYMENT
     # ==========================================================================
 
     - name: Deploy instance
-      include_tasks: tasks/deploy-instance.yml
-      loop: '{{ instances }}'
+      ansible.builtin.include_tasks: tasks/deploy-instance.yml
+      loop: "{{ instances }}"
       loop_control:
         loop_var: instance
-        label: 'Deploying {{ instance.domain }}'
+        label: "Deploying {{ instance.domain }}"
 
   handlers:
-    - name: restart docker
-      systemd:
+    - name: Restart docker
+      ansible.builtin.systemd:
         name: docker
         state: restarted
 
-    - name: reload systemd
-      systemd:
-        daemon_reload: yes
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true

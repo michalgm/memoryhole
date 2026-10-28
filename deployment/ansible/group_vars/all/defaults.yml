@@ -43,6 +43,10 @@ fail2ban_enabled: true
 fail2ban_bantime: 3600    # 1 hour
 fail2ban_findtime: 600    # 10 minutes
 fail2ban_maxretry: 5
+# Caddy jails (see 04-setup-caddy.yml)
+fail2ban_auth_maxretry: 10      # failed logins per findtime before ban
+fail2ban_scan_maxretry: 3       # probe requests (.php, .env, wp-admin...) per findtime
+fail2ban_scan_bantime: 86400    # 1 day
 fail2ban_destemail: '{{ admin_user_email }}'
 fail2ban_sender: fail2ban@{{ server_hostname }}
 

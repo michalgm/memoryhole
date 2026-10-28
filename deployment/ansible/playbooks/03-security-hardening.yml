@@ -24,10 +24,10 @@
 
   pre_tasks:
     - name: Verify SSH key authentication works
-      assert:
+      ansible.builtin.assert:
         that:
           - ansible_user != "root" or disable_root_login == false
-        fail_msg: 'Ensure you can login as {{ linux_username }} before disabling root'
+        fail_msg: "Ensure you can login as {{ linux_username }} before disabling root"
 
   tasks:
     # ==========================================================================
@@ -35,75 +35,52 @@
     # ==========================================================================
 
     - name: Backup original sshd_config
-      copy:
+      ansible.builtin.copy:
         src: /etc/ssh/sshd_config
         dest: /etc/ssh/sshd_config.backup
-        remote_src: yes
-        force: no
+        remote_src: true
+        force: false
+        mode: "0644"
 
     - name: Configure SSH daemon security settings
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: '{{ item.regexp }}'
-        line: '{{ item.line }}'
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
         state: present
       loop:
-        - { regexp: '^#?Port ', line: 'Port {{ ssh_port }}' }
-        - {
-            regexp: '^#?PermitRootLogin ',
-            line: 'PermitRootLogin {{ ssh_permit_root_login }}',
-          }
-        - {
-            regexp: '^#?PasswordAuthentication ',
-            line: 'PasswordAuthentication {{ "yes" if ssh_allow_password_auth else "no" }}',
-          }
-        - {
-            regexp: '^#?PubkeyAuthentication ',
-            line: 'PubkeyAuthentication yes',
-          }
-        - {
-            regexp: '^#?ChallengeResponseAuthentication ',
-            line: 'ChallengeResponseAuthentication no',
-          }
-        - { regexp: '^#?UsePAM ', line: 'UsePAM yes' }
-        - { regexp: '^#?X11Forwarding ', line: 'X11Forwarding no' }
-        - {
-            regexp: '^#?MaxAuthTries ',
-            line: 'MaxAuthTries {{ ssh_max_auth_tries }}',
-          }
-        - {
-            regexp: '^#?ClientAliveInterval ',
-            line: 'ClientAliveInterval {{ ssh_client_alive_interval }}',
-          }
-        - {
-            regexp: '^#?ClientAliveCountMax ',
-            line: 'ClientAliveCountMax {{ ssh_client_alive_count_max }}',
-          }
-        - {
-            regexp: '^#?PermitEmptyPasswords ',
-            line: 'PermitEmptyPasswords no',
-          }
-        - { regexp: '^#?Protocol ', line: 'Protocol 2' }
-        - { regexp: '^#?LogLevel ', line: 'LogLevel VERBOSE' }
-      notify: restart ssh
+        - { regexp: "^#?Port ", line: "Port {{ ssh_port }}" }
+        - { regexp: "^#?PermitRootLogin ", line: "PermitRootLogin {{ ssh_permit_root_login }}" }
+        - { regexp: "^#?PasswordAuthentication ", line: 'PasswordAuthentication {{ "yes" if ssh_allow_password_auth else "no" }}' }
+        - { regexp: "^#?PubkeyAuthentication ", line: "PubkeyAuthentication yes" }
+        - { regexp: "^#?ChallengeResponseAuthentication ", line: "ChallengeResponseAuthentication no" }
+        - { regexp: "^#?UsePAM ", line: "UsePAM yes" }
+        - { regexp: "^#?X11Forwarding ", line: "X11Forwarding no" }
+        - { regexp: "^#?MaxAuthTries ", line: "MaxAuthTries {{ ssh_max_auth_tries }}" }
+        - { regexp: "^#?ClientAliveInterval ", line: "ClientAliveInterval {{ ssh_client_alive_interval }}" }
+        - { regexp: "^#?ClientAliveCountMax ", line: "ClientAliveCountMax {{ ssh_client_alive_count_max }}" }
+        - { regexp: "^#?PermitEmptyPasswords ", line: "PermitEmptyPasswords no" }
+        - { regexp: "^#?Protocol ", line: "Protocol 2" }
+        - { regexp: "^#?LogLevel ", line: "LogLevel VERBOSE" }
+      notify: Restart ssh
 
     - name: Ensure SSH privilege separation directory exists
-      file:
+      ansible.builtin.file:
         path: /run/sshd
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Validate sshd config
-      command: /usr/sbin/sshd -t
+      ansible.builtin.command: /usr/sbin/sshd -t
       changed_when: false
 
     - name: Disable SSH protocol 1
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: '^#?Protocol '
-        line: 'Protocol 2'
+        regexp: "^#?Protocol "
+        line: "Protocol 2"
         state: present
-      notify: restart ssh
+      notify: Restart ssh
 
     # - name: Configure allowed SSH users
     #   lineinfile:
@@ -119,56 +96,56 @@
     # ==========================================================================
 
     - name: Reset UFW to default
-      ufw:
+      community.general.ufw:
         state: reset
       when: firewall_reset | default(false)
 
     - name: Set UFW default policies
-      ufw:
-        direction: '{{ item.direction }}'
-        policy: '{{ item.policy }}'
+      community.general.ufw:
+        direction: "{{ item.direction }}"
+        default: "{{ item.policy }}"
       loop:
-        - { direction: 'incoming', policy: 'deny' }
-        - { direction: 'outgoing', policy: 'allow' }
-        - { direction: 'routed', policy: 'deny' }
+        - { direction: "incoming", policy: "deny" }
+        - { direction: "outgoing", policy: "allow" }
+        - { direction: "routed", policy: "deny" }
 
     - name: Allow SSH on custom port
-      ufw:
+      community.general.ufw:
         rule: allow
-        port: '{{ ssh_port }}'
+        port: "{{ ssh_port }}"
         proto: tcp
       when: ssh_port is defined
 
     - name: Rate limit SSH connections
-      ufw:
+      community.general.ufw:
         rule: limit
-        port: '{{ ssh_port }}'
+        port: "{{ ssh_port }}"
         proto: tcp
       when:
         - ssh_port is defined
         - firewall_rate_limit_ssh | default(true)
 
     - name: Allow TCP ports
-      ufw:
+      community.general.ufw:
         rule: allow
-        port: '{{ item }}'
+        port: "{{ item }}"
         proto: tcp
-      loop: '{{ firewall_allowed_tcp_ports }}'
+      loop: "{{ firewall_allowed_tcp_ports }}"
       when: item != ssh_port # SSH already configured above
 
     - name: Allow UDP ports
-      ufw:
+      community.general.ufw:
         rule: allow
-        port: '{{ item }}'
+        port: "{{ item }}"
         proto: udp
-      loop: '{{ firewall_allowed_udp_ports | default([]) }}'
+      loop: "{{ firewall_allowed_udp_ports | default([]) }}"
 
     - name: Enable UFW logging
-      ufw:
-        logging: 'low'
+      community.general.ufw:
+        logging: "low"
 
     - name: Enable UFW
-      ufw:
+      community.general.ufw:
         state: enabled
 
     # ==========================================================================
@@ -176,13 +153,15 @@
     # ==========================================================================
 
     - name: Create fail2ban local configuration directory
-      file:
+      ansible.builtin.file:
         path: /etc/fail2ban/jail.d
         state: directory
-        mode: '0755'
+        mode: "0755"
 
+    # SSH jail only. The Caddy jails (caddy-auth, caddy-scan) live in
+    # 04-setup-caddy.yml, since they need Caddy's log files to exist.
     - name: Configure fail2ban jail settings
-      copy:
+      ansible.builtin.copy:
         dest: /etc/fail2ban/jail.d/custom.conf
         content: |
           [DEFAULT]
@@ -197,20 +176,15 @@
           filter = sshd
           logpath = /var/log/auth.log
           maxretry = {{ fail2ban_maxretry }}
+          mode = aggressive
 
-          [sshd-ddos]
-          enabled = true
-          port = {{ ssh_port }}
-          filter = sshd-ddos
-          logpath = /var/log/auth.log
-          maxretry = 2
-        mode: '0644'
-      notify: restart fail2ban
+        mode: "0644"
+      notify: Restart fail2ban
 
     - name: Enable and start fail2ban
-      systemd:
+      ansible.builtin.systemd:
         name: fail2ban
-        enabled: yes
+        enabled: true
         state: started
 
     # ==========================================================================
@@ -218,58 +192,58 @@
     # ==========================================================================
 
     - name: Apply kernel security settings
-      sysctl:
-        name: '{{ item.name }}'
-        value: '{{ item.value }}'
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
         state: present
-        reload: yes
+        reload: true
         sysctl_file: /etc/sysctl.d/99-security.conf
       loop:
         # IP Forwarding (disable unless needed)
-        - { name: 'net.ipv4.ip_forward', value: '0' }
-        - { name: 'net.ipv6.conf.all.forwarding', value: '0' }
+        - { name: "net.ipv4.ip_forward", value: "0" }
+        - { name: "net.ipv6.conf.all.forwarding", value: "0" }
 
         # SYN flood protection
-        - { name: 'net.ipv4.tcp_syncookies', value: '1' }
-        - { name: 'net.ipv4.tcp_max_syn_backlog', value: '2048' }
-        - { name: 'net.ipv4.tcp_synack_retries', value: '2' }
-        - { name: 'net.ipv4.tcp_syn_retries', value: '5' }
+        - { name: "net.ipv4.tcp_syncookies", value: "1" }
+        - { name: "net.ipv4.tcp_max_syn_backlog", value: "2048" }
+        - { name: "net.ipv4.tcp_synack_retries", value: "2" }
+        - { name: "net.ipv4.tcp_syn_retries", value: "5" }
 
         # IP spoofing protection
-        - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
-        - { name: 'net.ipv4.conf.default.rp_filter', value: '1' }
+        - { name: "net.ipv4.conf.all.rp_filter", value: "1" }
+        - { name: "net.ipv4.conf.default.rp_filter", value: "1" }
 
         # Ignore ICMP redirects
-        - { name: 'net.ipv4.conf.all.accept_redirects', value: '0' }
-        - { name: 'net.ipv6.conf.all.accept_redirects', value: '0' }
-        - { name: 'net.ipv4.conf.all.send_redirects', value: '0' }
+        - { name: "net.ipv4.conf.all.accept_redirects", value: "0" }
+        - { name: "net.ipv6.conf.all.accept_redirects", value: "0" }
+        - { name: "net.ipv4.conf.all.send_redirects", value: "0" }
 
         # Ignore ICMP ping requests
-        - { name: 'net.ipv4.icmp_echo_ignore_all', value: '0' }
+        - { name: "net.ipv4.icmp_echo_ignore_all", value: "0" }
 
         # Disable source packet routing
-        - { name: 'net.ipv4.conf.all.accept_source_route', value: '0' }
-        - { name: 'net.ipv6.conf.all.accept_source_route', value: '0' }
+        - { name: "net.ipv4.conf.all.accept_source_route", value: "0" }
+        - { name: "net.ipv6.conf.all.accept_source_route", value: "0" }
 
         # Log Martians
-        - { name: 'net.ipv4.conf.all.log_martians', value: '1' }
+        - { name: "net.ipv4.conf.all.log_martians", value: "1" }
 
         # Kernel security
-        - { name: 'kernel.dmesg_restrict', value: '1' }
-        - { name: 'kernel.kptr_restrict', value: '2' }
-        - { name: 'kernel.yama.ptrace_scope', value: '1' }
+        - { name: "kernel.dmesg_restrict", value: "1" }
+        - { name: "kernel.kptr_restrict", value: "2" }
+        - { name: "kernel.yama.ptrace_scope", value: "1" }
 
     # ==========================================================================
     # AUDIT LOGGING
     # ==========================================================================
 
     - name: Install auditd
-      apt:
+      ansible.builtin.apt:
         name: auditd
         state: present
 
     - name: Configure auditd rules for security monitoring
-      copy:
+      ansible.builtin.copy:
         dest: /etc/audit/rules.d/security.rules
         content: |
           # Delete all existing rules
@@ -303,13 +277,13 @@
 
           # Make configuration immutable
           -e 2
-        mode: '0640'
-      notify: restart auditd
+        mode: "0640"
+      notify: Restart auditd
 
     - name: Enable auditd
-      systemd:
+      ansible.builtin.systemd:
         name: auditd
-        enabled: yes
+        enabled: true
         state: started
 
     # ==========================================================================
@@ -317,7 +291,7 @@
     # ==========================================================================
 
     - name: Install security tools
-      apt:
+      ansible.builtin.apt:
         name:
           - rkhunter # Rootkit detection
           - lynis # Security auditing
@@ -327,8 +301,8 @@
         state: present
 
     - name: Clean apt package cache
-      command: apt-get clean
-      changed_when: false
+      ansible.builtin.apt:
+        clean: true
 
     # - name: Initialize AIDE database
     #   shell: aideinit
@@ -345,43 +319,43 @@
     # ==========================================================================
 
     - name: Display security hardening summary
-      debug:
+      ansible.builtin.debug:
         msg:
-          - '=========================================='
-          - 'Security Hardening Complete'
-          - '=========================================='
-          - 'SSH Port: {{ ssh_port }}'
-          - 'Root Login: {{ ssh_permit_root_login }}'
-          - 'Password Auth: {{ ssh_allow_password_auth }}'
-          - 'Firewall: Enabled (UFW)'
-          - 'IDS: Enabled (fail2ban)'
-          - 'Audit Logging: Enabled (auditd)'
-          - ''
-          - '⚠️  IMPORTANT:'
-          - '1. Update your SSH client config:'
-          - '   Host {{ server_hostname }}'
-          - '     Port {{ ssh_port }}'
-          - '     User {{ linux_username }}'
-          - ''
-          - '2. Test SSH connection BEFORE closing this session:'
-          - '   ssh -p {{ ssh_port }} {{ linux_username }}@{{ ansible_host }}'
-          - ''
-          - '3. Monitor fail2ban: sudo fail2ban-client status sshd'
-          - '4. Check firewall: sudo ufw status verbose'
-          - '=========================================='
+          - "=========================================="
+          - "Security Hardening Complete"
+          - "=========================================="
+          - "SSH Port: {{ ssh_port }}"
+          - "Root Login: {{ ssh_permit_root_login }}"
+          - "Password Auth: {{ ssh_allow_password_auth }}"
+          - "Firewall: Enabled (UFW)"
+          - "IDS: Enabled (fail2ban)"
+          - "Audit Logging: Enabled (auditd)"
+          - ""
+          - "⚠️  IMPORTANT:"
+          - "1. Update your SSH client config:"
+          - "   Host {{ server_hostname }}"
+          - "     Port {{ ssh_port }}"
+          - "     User {{ linux_username }}"
+          - ""
+          - "2. Test SSH connection BEFORE closing this session:"
+          - "   ssh -p {{ ssh_port }} {{ linux_username }}@{{ ansible_host }}"
+          - ""
+          - "3. Monitor fail2ban: sudo fail2ban-client status sshd"
+          - "4. Check firewall: sudo ufw status verbose"
+          - "=========================================="
 
   handlers:
-    - name: restart ssh
-      systemd:
+    - name: Restart ssh
+      ansible.builtin.systemd:
         name: ssh
         state: restarted
 
-    - name: restart fail2ban
-      systemd:
+    - name: Restart fail2ban
+      ansible.builtin.systemd:
         name: fail2ban
         state: restarted
 
-    - name: restart auditd
-      systemd:
+    - name: Restart auditd
+      ansible.builtin.systemd:
         name: auditd
         state: restarted

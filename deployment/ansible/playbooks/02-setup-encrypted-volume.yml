@@ -28,16 +28,16 @@
   gather_facts: true
 
   handlers:
-    - name: reload systemd
-      systemd:
-        daemon_reload: yes
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
 
   pre_tasks:
     - name: Notify user that encrypted volume is disabled and skip
-      when: not (use_encrypted_volume | default(false))
+      when: not (use_encrypted_volume)
       block:
         - name: Encrypted volume not enabled
-          debug:
+          ansible.builtin.debug:
             msg: |
               Encrypted volume is disabled (use_encrypted_volume is false or not set).
               Skipping encrypted volume setup. To enable, set in group_vars/all/main.yml:
@@ -45,16 +45,16 @@
                 encrypted_volume_passphrase: <strong-passphrase>
 
         - name: End play - Encrypted volume not configured
-          meta: end_play
+          ansible.builtin.meta: end_play
 
     - name: Check if encrypted volume is already mounted
-      command: mountpoint -q {{ encrypted_volume_mount }}
+      ansible.builtin.command: mountpoint -q {{ encrypted_volume_mount }}
       register: _volume_mounted
       failed_when: false
       changed_when: false
 
     - name: Verify required encryption variables
-      assert:
+      ansible.builtin.assert:
         that:
           - encrypted_volume_name is defined and encrypted_volume_name | length > 0
           - encrypted_volume_mount is defined and encrypted_volume_mount | length > 0
@@ -67,19 +67,18 @@
       when: _volume_mounted.rc != 0
 
     - name: Check if loopback file already exists
-      stat:
-        path: '{{ encrypted_loopback_file }}'
+      ansible.builtin.stat:
+        path: "{{ encrypted_loopback_file }}"
         get_checksum: false
         get_mime: false
       register: _loopback_file
 
     - name: Check if loopback file is already LUKS formatted
-      command: cryptsetup isLuks {{ encrypted_loopback_file }}
+      ansible.builtin.command: cryptsetup isLuks {{ encrypted_loopback_file }}
       register: _is_luks
       failed_when: false
       changed_when: false
       when: _loopback_file.stat.exists
-
 
   tasks:
     # ==========================================================================
@@ -87,14 +86,14 @@
     # ==========================================================================
 
     - name: Create loopback file
-      command: fallocate -l {{ encrypted_loopback_size_gb }}G {{ encrypted_loopback_file }}
+      ansible.builtin.command: fallocate -l {{ encrypted_loopback_size_gb }}G {{ encrypted_loopback_file }}
       args:
-        creates: '{{ encrypted_loopback_file }}'
+        creates: "{{ encrypted_loopback_file }}"
 
     - name: Restrict loopback file permissions
-      file:
-        path: '{{ encrypted_loopback_file }}'
-        mode: '0600'
+      ansible.builtin.file:
+        path: "{{ encrypted_loopback_file }}"
+        mode: "0600"
         owner: root
         group: root
 
@@ -103,7 +102,8 @@
     # ==========================================================================
 
     - name: Find or attach loop device
-      shell: |
+      ansible.builtin.shell: |
+        set -o pipefail
         existing=$(losetup -j {{ encrypted_loopback_file }} 2>/dev/null | cut -d: -f1 | head -1)
         if [[ -n "$existing" ]]; then
           # Ensure direct-io is enabled on existing device
@@ -118,7 +118,8 @@
       changed_when: false
 
     - name: Format loopback device with LUKS
-      shell: |
+      ansible.builtin.shell: |
+        set -o pipefail
         printf '%s' "{{ encrypted_volume_passphrase }}" | \
         cryptsetup luksFormat \
           --cipher {{ luks_cipher }} \
@@ -129,24 +130,31 @@
           --use-urandom \
           --batch-mode \
           {{ _loop_device.stdout }} -
+      args:
+        executable: /bin/bash
       when:
         - _is_luks is not defined or _is_luks.rc | default(1) != 0
+      changed_when: true
       no_log: true
 
     - name: Check if LUKS volume is already open
-      command: cryptsetup status {{ encrypted_volume_name }}
+      ansible.builtin.command: cryptsetup status {{ encrypted_volume_name }}
       register: _luks_status
       failed_when: false
       changed_when: false
 
     - name: Open LUKS volume
-      shell: |
+      ansible.builtin.shell: |
+        set -o pipefail
         printf '%s' "{{ encrypted_volume_passphrase }}" | \
         cryptsetup luksOpen \
           --perf-no_read_workqueue \
           --perf-no_write_workqueue \
           {{ _loop_device.stdout }} {{ encrypted_volume_name }} -
+      args:
+        executable: /bin/bash
       when: _luks_status.rc != 0
+      changed_when: true
       no_log: true
 
     # ==========================================================================
@@ -154,27 +162,29 @@
     # ==========================================================================
 
     - name: Check if filesystem exists
-      shell: blkid /dev/mapper/{{ encrypted_volume_name }} | grep ext4
+      ansible.builtin.shell: set -o pipefail && blkid /dev/mapper/{{ encrypted_volume_name }} | grep ext4
+      args:
+        executable: /bin/bash
       register: _has_filesystem
       failed_when: false
       changed_when: false
 
     - name: Create ext4 filesystem on encrypted volume
-      filesystem:
+      community.general.filesystem:
         fstype: ext4
         dev: /dev/mapper/{{ encrypted_volume_name }}
         opts: -L {{ encrypted_volume_name }}
       when: _has_filesystem.rc != 0
 
     - name: Create mount point directory
-      file:
-        path: '{{ encrypted_volume_mount }}'
+      ansible.builtin.file:
+        path: "{{ encrypted_volume_mount }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Mount encrypted volume
-      mount:
-        path: '{{ encrypted_volume_mount }}'
+      ansible.posix.mount:
+        path: "{{ encrypted_volume_mount }}"
         src: /dev/mapper/{{ encrypted_volume_name }}
         fstype: ext4
         opts: defaults,noatime,data=writeback,nofail,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s
@@ -185,59 +195,60 @@
     # ==========================================================================
 
     - name: Create base directories on encrypted volume
-      file:
-        path: '{{ encrypted_volume_mount }}/{{ item.path }}'
+      ansible.builtin.file:
+        path: "{{ encrypted_volume_mount }}/{{ item.path }}"
         state: directory
         mode: "{{ item.mode | default('0755') }}"
       loop:
-        - { path: 'home/{{ linux_username }}', mode: '0750' }
-        - { path: 'var/lib/docker', mode: '0710' }
-        - { path: 'var/lib/containerd', mode: '0710' }
+        - { path: "home/{{ linux_username }}", mode: "0750" }
+        - { path: "var/lib/docker", mode: "0710" }
+        - { path: "var/lib/containerd", mode: "0710" }
 
+    # rsync runs locally on the host; the synchronize module is for controller-to-host copies
     - name: Sync existing user homedir to encrypted volume
-      shell: rsync -aHAX /home/{{ linux_username }}/ {{ encrypted_volume_mount }}/home/{{ linux_username }}/
+      ansible.builtin.command: rsync -aHAX /home/{{ linux_username }}/ {{ encrypted_volume_mount }}/home/{{ linux_username }}/ # noqa: command-instead-of-module
       args:
-        creates: '{{ encrypted_volume_mount }}/home/{{ linux_username }}/.profile'
+        creates: "{{ encrypted_volume_mount }}/home/{{ linux_username }}/.profile"
 
     - name: Set ownership of user homedir on encrypted volume
-      file:
-        path: '{{ encrypted_volume_mount }}/home/{{ linux_username }}'
-        owner: '{{ linux_username }}'
-        group: '{{ linux_username }}'
-        recurse: no
+      ansible.builtin.file:
+        path: "{{ encrypted_volume_mount }}/home/{{ linux_username }}"
+        owner: "{{ linux_username }}"
+        group: "{{ linux_username }}"
+        recurse: false
 
     - name: Bind mount user homedir
-      mount:
-        path: '/home/{{ linux_username }}'
-        src: '{{ encrypted_volume_mount }}/home/{{ linux_username }}'
+      ansible.posix.mount:
+        path: "/home/{{ linux_username }}"
+        src: "{{ encrypted_volume_mount }}/home/{{ linux_username }}"
         opts: bind,nofail,x-systemd.mount-timeout=5s
         state: mounted
         fstype: none
 
     - name: Create /var/lib/docker directory
-      file:
+      ansible.builtin.file:
         path: /var/lib/docker
         state: directory
-        mode: '0710'
+        mode: "0710"
 
     - name: Bind mount /var/lib/docker
-      mount:
+      ansible.posix.mount:
         path: /var/lib/docker
-        src: '{{ encrypted_volume_mount }}/var/lib/docker'
+        src: "{{ encrypted_volume_mount }}/var/lib/docker"
         opts: bind,nofail,x-systemd.mount-timeout=5s
         state: mounted
         fstype: none
 
     - name: Create /var/lib/containerd directory
-      file:
+      ansible.builtin.file:
         path: /var/lib/containerd
         state: directory
-        mode: '0710'
+        mode: "0710"
 
     - name: Bind mount /var/lib/containerd
-      mount:
+      ansible.posix.mount:
         path: /var/lib/containerd
-        src: '{{ encrypted_volume_mount }}/var/lib/containerd'
+        src: "{{ encrypted_volume_mount }}/var/lib/containerd"
         opts: bind,nofail,x-systemd.mount-timeout=5s
         state: mounted
         fstype: none
@@ -247,24 +258,26 @@
     # ==========================================================================
 
     - name: Stat additional swap loopback file
-      stat:
-        path: '{{ encrypted_swap_file }}'
+      ansible.builtin.stat:
+        path: "{{ encrypted_swap_file }}"
       register: _swap_loopback_stat
 
     - name: Create additional swap loopback file
-      command: fallocate -l {{ swap_size_gb | default(2) }}G {{ encrypted_swap_file }}
-      when: not _swap_loopback_stat.stat.exists
+      ansible.builtin.command: fallocate -l {{ swap_size_gb | default(2) }}G {{ encrypted_swap_file }}
+      args:
+        creates: "{{ encrypted_swap_file }}"
 
     - name: Restrict swap loopback file permissions
-      file:
-        path: '{{ encrypted_swap_file }}'
-        mode: '0600'
+      ansible.builtin.file:
+        path: "{{ encrypted_swap_file }}"
+        mode: "0600"
         owner: root
         group: root
 
     - name: Format swap loopback file
-      command: mkswap {{ encrypted_swap_file }}
+      ansible.builtin.command: mkswap {{ encrypted_swap_file }}
       when: not _swap_loopback_stat.stat.exists
+      changed_when: true
 
     # ==========================================================================
     # ENCRYPT ALL SWAP
@@ -276,7 +289,7 @@
     # ==========================================================================
 
     - name: Collect plain swap devices to encrypt
-      shell: |
+      ansible.builtin.shell: |
         # Emit: <name> <device> for each plain swap not yet a mapper device
         idx=0
         while read -r device _ _; do
@@ -299,37 +312,38 @@
       changed_when: false
 
     - name: Register plain swap devices in crypttab
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/crypttab
-        regexp: '^{{ item.split()[0] }}\s'
-        line: '{{ item.split()[0] }} {{ item.split()[1] }} /dev/urandom swap,cipher=aes-xts-plain64,size=256,nofail'
-        create: yes
-        mode: '0600'
-      loop: '{{ _plain_swap_devices.stdout_lines }}'
-      notify: reload systemd
+        regexp: "^{{ item.split()[0] }}\\s"
+        line: "{{ item.split()[0] }} {{ item.split()[1] }} /dev/urandom swap,cipher=aes-xts-plain64,size=256,nofail"
+        create: true
+        mode: "0600"
+      loop: "{{ _plain_swap_devices.stdout_lines }}"
+      notify: Reload systemd
 
     - name: Remove plain swap entries from fstab
-      mount:
+      ansible.posix.mount:
         path: none
-        src: '{{ item.split()[1] }}'
+        src: "{{ item.split()[1] }}"
         fstype: swap
         state: absent
-      loop: '{{ _plain_swap_devices.stdout_lines }}'
+      loop: "{{ _plain_swap_devices.stdout_lines }}"
 
     - name: Add encrypted mapper swap entries to fstab
-      mount:
+      ansible.posix.mount:
         path: none
-        src: '/dev/mapper/{{ item.split()[0] }}'
+        src: "/dev/mapper/{{ item.split()[0] }}"
         fstype: swap
         opts: sw
         state: present
-      loop: '{{ _plain_swap_devices.stdout_lines }}'
+      loop: "{{ _plain_swap_devices.stdout_lines }}"
 
     - name: Flush handlers to reload systemd before starting swap
-      meta: flush_handlers
+      ansible.builtin.meta: flush_handlers
 
     - name: Disable any still-active unencrypted swap
-      shell: |
+      ansible.builtin.shell: |
+        set -o pipefail
         swapon --show=NAME --noheadings 2>/dev/null | while IFS= read -r dev; do
           [[ "$dev" == /dev/mapper/* ]] && continue
           swapoff "$dev" 2>/dev/null || true
@@ -339,72 +353,72 @@
       changed_when: false
 
     - name: Collect encrypted swap mapping names
-      shell: grep -E '^encrypted_swap[0-9]* ' /etc/crypttab 2>/dev/null | awk '{print $1}'
+      ansible.builtin.shell: set -o pipefail && grep -E '^encrypted_swap[0-9]* ' /etc/crypttab 2>/dev/null | awk '{print $1}'
       args:
         executable: /bin/bash
       register: _swap_names
       changed_when: false
 
     - name: Start and verify encrypted swap mappings
-      systemd:
-        name: 'systemd-cryptsetup@{{ item }}.service'
+      ansible.builtin.systemd:
+        name: "systemd-cryptsetup@{{ item }}.service"
         state: started
-      loop: '{{ _swap_names.stdout_lines }}'
+      loop: "{{ _swap_names.stdout_lines }}"
 
     - name: Wait for encrypted swap device nodes to be ready
-      wait_for:
-        path: '/dev/mapper/{{ item }}'
+      ansible.builtin.wait_for:
+        path: "/dev/mapper/{{ item }}"
         timeout: 30
-      loop: '{{ _swap_names.stdout_lines }}'
+      loop: "{{ _swap_names.stdout_lines }}"
 
     - name: Activate and verify encrypted swap
-      shell: |
+      ansible.builtin.shell: |
+        set -o pipefail
         swapon /dev/mapper/{{ item }} 2>/dev/null || true
         cat /proc/swaps | grep -q "$(readlink -f /dev/mapper/{{ item }})"
       args:
         executable: /bin/bash
-      loop: '{{ _swap_names.stdout_lines }}'
+      loop: "{{ _swap_names.stdout_lines }}"
       changed_when: false
-
 
     # ==========================================================================
     # UNLOCK & LOCK SCRIPT
     # ==========================================================================
 
     - name: Create unlock/lock script
-      template:
+      ansible.builtin.template:
         src: scripts/unlock_data.sh.j2
         dest: /usr/local/bin/unlock_data
-        mode: '0755'
+        mode: "0755"
 
     - name: Create admin-unlock user
-      user:
+      ansible.builtin.user:
         name: admin-unlock
-        comment: 'Encrypted Volume Unlock Admin'
+        comment: "Encrypted Volume Unlock Admin"
         shell: /bin/bash
-        create_home: yes
-        password_lock: yes
+        create_home: true
+        password_lock: true
 
     - name: Set up SSH authorized key for admin-unlock
-      authorized_key:
+      ansible.posix.authorized_key:
         user: admin-unlock
         state: present
         key: "{{ lookup('file', linux_user_ssh_key_file) }}"
 
     - name: Allow admin-unlock to run unlock script without password
-      copy:
+      ansible.builtin.copy:
         dest: /etc/sudoers.d/admin-unlock
         content: |
           admin-unlock ALL=(root) NOPASSWD: /usr/local/bin/unlock_data
-        mode: '0440'
-        validate: 'visudo -cf %s'
+        mode: "0440"
+        validate: "visudo -cf %s"
 
     # ==========================================================================
     # SUMMARY
     # ==========================================================================
 
     - name: Display encryption summary
-      debug:
+      ansible.builtin.debug:
         msg: "{{ _summary.split('\n') }}"
       vars:
         _summary: |
@@ -423,12 +437,11 @@
           ==========================================
 
     - name: Save encryption info to file
-      copy:
-        dest: '{{ encrypted_volume_mount }}/.encryption-info.txt'
+      ansible.builtin.copy:
+        dest: "{{ encrypted_volume_mount }}/.encryption-info.txt"
         content: |
           LUKS Encrypted Loopback Volume
           ==============================
-          Created: {{ ansible_facts['date_time']['iso8601'] }}
           Loopback file: {{ encrypted_loopback_file }}
           Size: {{ encrypted_loopback_size_gb }} GB
           Mapper name: {{ encrypted_volume_name }}
@@ -441,4 +454,4 @@
 
           Manual Lock:
             sudo /usr/local/bin/unlock_data lock
-        mode: '0600'
+        mode: "0600"

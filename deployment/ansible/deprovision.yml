@@ -15,7 +15,7 @@
 # Run this before deprovision-linode.yml, while the server is still reachable.
 #
 # Usage:
-#   ansible-playbook -i inventory.yml deprovision-server.yml \
+#   ansible-playbook -i inventory.yml deprovision.yml \
 #     --extra-vars "confirm_destroy=yes"
 # ============================================================================
 
@@ -25,11 +25,11 @@
   gather_facts: false
 
   vars:
-    instances_base: '/home/{{ linux_username }}/instances'
+    instances_base: "/home/{{ linux_username }}/instances"
 
   pre_tasks:
     - name: Require explicit confirmation
-      assert:
+      ansible.builtin.assert:
         that:
           - confirm_destroy is defined
           - confirm_destroy | bool
@@ -44,14 +44,14 @@
           To proceed: --extra-vars "confirm_destroy=yes"
 
     - name: Final warning
-      pause:
+      ansible.builtin.pause:
         seconds: 10
-        prompt: |
+        prompt: |2
 
           ╔════════════════════════════════════════════════════════════════╗
           ║                       LAST WARNING                             ║
           ╠════════════════════════════════════════════════════════════════╣
-          ║  About to permanently delete all data on:                     ║
+          ║  About to permanently delete all data on:                      ║
           ║    {{ inventory_hostname }}                                    ║
           ║                                                                ║
           ║  Resuming in 10 seconds... Press Ctrl+C TWICE to cancel        ║
@@ -63,25 +63,37 @@
     # --------------------------------------------------------------------------
 
     - name: Stop and disable instance systemd services
-      systemd:
+      ansible.builtin.systemd:
         name: 'memoryhole-{{ instance.domain | replace(".", "-") }}'
         state: stopped
         enabled: false
-      loop: '{{ instances | default([]) }}'
+      loop: "{{ instances | default([]) }}"
       loop_control:
         loop_var: instance
-        label: '{{ instance.domain }}'
-      ignore_errors: true
+        label: "{{ instance.domain }}"
+      register: _instance_services
+      failed_when:
+        - _instance_services is failed
+        - "'Could not find the requested service' not in _instance_services.msg | default('')"
 
     - name: Stop all running Docker containers
-      shell: docker ps -q | xargs -r docker stop
-      ignore_errors: true
+      ansible.builtin.shell: |
+        set -o pipefail
+        command -v docker >/dev/null || exit 0
+        docker ps -q | xargs -r docker stop
+      args:
+        executable: /bin/bash
+      register: _stopped_containers
+      changed_when: _stopped_containers.stdout | length > 0
 
     - name: Stop Docker service
-      systemd:
+      ansible.builtin.systemd:
         name: docker
         state: stopped
-      ignore_errors: true
+      register: _docker_service
+      failed_when:
+        - _docker_service is failed
+        - "'Could not find the requested service' not in _docker_service.msg | default('')"
 
     # --------------------------------------------------------------------------
     # ENCRYPTED VOLUME: CRYPTO ERASE
@@ -94,40 +106,63 @@
     # --------------------------------------------------------------------------
 
     - name: Force-unmount bind mounts backed by encrypted volume
-      command: umount -l {{ item }}
+      ansible.builtin.shell: |
+        if mountpoint -q {{ item }}; then umount -l {{ item }} && echo unmounted; fi
+      args:
+        executable: /bin/bash
       loop:
         - /var/lib/containerd
         - /var/lib/docker
-        - '/home/{{ linux_username }}'
-      ignore_errors: true
+        - "/home/{{ linux_username }}"
+      register: _bind_umount
+      changed_when: "'unmounted' in _bind_umount.stdout"
       when: use_encrypted_volume | default(true)
 
     - name: Unmount encrypted volume
-      command: umount -l {{ encrypted_volume_mount }}
-      ignore_errors: true
+      ansible.builtin.shell: |
+        if mountpoint -q {{ encrypted_volume_mount }}; then umount -l {{ encrypted_volume_mount }} && echo unmounted; fi
+      args:
+        executable: /bin/bash
+      register: _volume_umount
+      changed_when: "'unmounted' in _volume_umount.stdout"
       when: use_encrypted_volume | default(true)
 
+    # Close and detach are best-effort: a lazily-unmounted filesystem can keep
+    # the mapper busy, and that must not stop the header overwrite below, which
+    # is what actually destroys the data.
     - name: Close LUKS mapper
-      command: cryptsetup close {{ encrypted_volume_name }}
-      ignore_errors: true
+      ansible.builtin.shell: |
+        if cryptsetup status {{ encrypted_volume_name }} >/dev/null 2>&1; then
+          cryptsetup close {{ encrypted_volume_name }} && echo closed
+        fi
+      args:
+        executable: /bin/bash
+      register: _luks_close
+      changed_when: "'closed' in _luks_close.stdout"
+      failed_when: false
       when: use_encrypted_volume | default(true)
 
     - name: Detach loop device
-      shell: |
+      ansible.builtin.shell: |
+        set -o pipefail
         loop_dev=$(losetup -j {{ encrypted_loopback_file }} 2>/dev/null | cut -d: -f1 | head -1)
-        if [[ -n "$loop_dev" ]]; then losetup -d "$loop_dev"; fi
+        if [[ -n "$loop_dev" ]]; then losetup -d "$loop_dev" && echo detached; fi
       args:
         executable: /bin/bash
-      ignore_errors: true
+      register: _loop_detach
+      changed_when: "'detached' in _loop_detach.stdout"
+      failed_when: false
       when: use_encrypted_volume | default(true)
 
     - name: Overwrite LUKS header in loopback file (crypto erase)
-      command: dd if=/dev/urandom of={{ encrypted_loopback_file }} bs=1M count=8 conv=notrunc
+      ansible.builtin.command: dd if=/dev/urandom of={{ encrypted_loopback_file }} bs=1M count=8 conv=notrunc
+      args:
+        removes: "{{ encrypted_loopback_file }}"
       when: use_encrypted_volume | default(true)
 
     - name: Remove loopback file
-      file:
-        path: '{{ encrypted_loopback_file }}'
+      ansible.builtin.file:
+        path: "{{ encrypted_loopback_file }}"
         state: absent
       when: use_encrypted_volume | default(true)
 
@@ -136,17 +171,18 @@
     # --------------------------------------------------------------------------
 
     - name: Shred instance data and remove directories
-      shell: |
+      ansible.builtin.shell: |
+        set -e
         find '{{ instances_base }}/{{ instance.domain }}' -type f \
           -exec shred -uz {} \;
         rm -rf '{{ instances_base }}/{{ instance.domain }}'
       args:
         executable: /bin/bash
-      loop: '{{ instances | default([]) }}'
+        removes: "{{ instances_base }}/{{ instance.domain }}"
+      loop: "{{ instances | default([]) }}"
       loop_control:
         loop_var: instance
-        label: '{{ instance.domain }}'
-      ignore_errors: true
+        label: "{{ instance.domain }}"
       when: not (use_encrypted_volume | default(true))
 
     # --------------------------------------------------------------------------
@@ -154,7 +190,7 @@
     # --------------------------------------------------------------------------
 
     - name: Secure data wipe complete
-      debug:
+      ansible.builtin.debug:
         msg: >-
           {{
             'LUKS key slots erased — all encrypted data is permanently unrecoverable.'

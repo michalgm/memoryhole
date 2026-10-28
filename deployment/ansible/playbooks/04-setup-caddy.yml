@@ -16,84 +16,161 @@
 
   tasks:
     - name: Install Caddy apt dependencies
-      apt:
+      ansible.builtin.apt:
         name:
           - debian-keyring
           - debian-archive-keyring
           - apt-transport-https
           - curl
         state: present
-        update_cache: yes
+        update_cache: true
 
-    - name: Add Caddy GPG key
-      apt_key:
-        url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
-        state: present
+    # - name: Add Caddy GPG key
+    #   apt_key:
+    #     url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+    #     state: present
 
     - name: Add Caddy apt repository
-      apt_repository:
-        repo: 'deb [trusted=yes] https://apt.fury.io/caddy/ /'
+      ansible.builtin.deb822_repository:
+        name: caddy
+        types: [deb]
+        uris: [https://dl.cloudsmith.io/public/caddy/stable/deb/debian]
+        suites: [any-version]
+        components: [main]
+        signed_by: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
         state: present
-        filename: caddy
+        enabled: true
+        # repo: 'deb [trusted=yes] https://apt.fury.io/caddy/ /'
+        # filename: caddy
 
     - name: Install Caddy
-      apt:
+      ansible.builtin.apt:
         name: caddy
         state: present
-        update_cache: yes
+        update_cache: true
 
     - name: Clean apt package cache
-      command: apt-get clean
-      changed_when: false
+      ansible.builtin.apt:
+        clean: true
 
     - name: Create Caddy conf.d directory
-      file:
+      ansible.builtin.file:
         path: /etc/caddy/conf.d
         state: directory
         owner: root
         group: root
-        mode: '0755'
+        mode: "0755"
 
     - name: Deploy global Caddyfile
-      template:
+      ansible.builtin.template:
         src: templates/Caddyfile.global.j2
         dest: /etc/caddy/Caddyfile
         owner: root
         group: root
-        mode: '0644'
-      notify: reload caddy
+        mode: "0644"
+      notify: Reload caddy
 
     - name: Deploy custom error pages
-      template:
+      ansible.builtin.template:
         src: templates/503.html.j2
         dest: /etc/caddy/503.html
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
 
     - name: Deploy per-instance Caddy configs
-      template:
+      ansible.builtin.template:
         src: templates/Caddyfile.instance.j2
-        dest: '/etc/caddy/conf.d/{{ instance.domain }}.caddy'
+        dest: "/etc/caddy/conf.d/{{ instance.domain }}.caddy"
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
       vars:
         instance_port: "{{ instance.port | default(((instance.domain | hash('sha1'))[0:3] | int(base=16) % 900) + 8080) }}"
-      loop: '{{ instances }}'
+      loop: "{{ instances }}"
       loop_control:
         loop_var: instance
         extended: true
-      notify: reload caddy
+      notify: Reload caddy
 
     - name: Enable and start Caddy
-      systemd:
+      ansible.builtin.systemd:
         name: caddy
-        enabled: yes
+        enabled: true
         state: started
 
+    # ==========================================================================
+    # FAIL2BAN JAILS FOR CADDY ACCESS LOGS
+    # ==========================================================================
+
+    # fail2ban refuses to start if a jail's log file is missing, so create
+    # them before Caddy has served its first request.
+    - name: Create Caddy access log files
+      ansible.builtin.file:
+        path: "/var/log/caddy/{{ instance.domain }}.access.log"
+        state: touch
+        owner: caddy
+        group: caddy
+        mode: "0640"
+        modification_time: preserve
+        access_time: preserve
+      loop: "{{ instances }}"
+      loop_control:
+        loop_var: instance
+        label: "{{ instance.domain }}"
+
+    - name: Deploy fail2ban filters for Caddy
+      ansible.builtin.copy:
+        dest: "/etc/fail2ban/filter.d/{{ item.name }}.conf"
+        content: |
+          [Definition]
+          failregex = {{ item.failregex }}
+          datepattern = "ts":{EPOCH}
+        mode: "0644"
+      loop:
+        # Failed logins: Cedar dbAuth returns 400 for a bad password
+        - name: caddy-auth
+          failregex: '^\{.*?"client_ip":"<ADDR>".*?"method":"POST".*?"uri":"/\.redwood/functions/auth(\?[^"]*)?".*?"status":400[,}]'
+        # Probes for software this server doesn't run
+        - name: caddy-scan
+          failregex: '^\{.*?"client_ip":"<ADDR>".*?"uri":"[^"]*(\.php|/\.env|/\.git/|/wp-(admin|login|content|includes)|/phpmyadmin|/cgi-bin/)'
+      loop_control:
+        label: "{{ item.name }}"
+      notify: Restart fail2ban
+
+    - name: Configure fail2ban jails for Caddy
+      ansible.builtin.copy:
+        dest: /etc/fail2ban/jail.d/caddy.conf
+        content: |
+          [caddy-auth]
+          enabled = true
+          backend = auto
+          port = http,https
+          filter = caddy-auth
+          logpath = /var/log/caddy/*.access.log
+          maxretry = {{ fail2ban_auth_maxretry }}
+          findtime = {{ fail2ban_findtime }}
+          bantime = {{ fail2ban_bantime }}
+
+          [caddy-scan]
+          enabled = true
+          backend = auto
+          port = http,https
+          filter = caddy-scan
+          logpath = /var/log/caddy/*.access.log
+          maxretry = {{ fail2ban_scan_maxretry }}
+          findtime = {{ fail2ban_findtime }}
+          bantime = {{ fail2ban_scan_bantime }}
+        mode: "0644"
+      notify: Restart fail2ban
+
   handlers:
-    - name: reload caddy
-      systemd:
+    - name: Reload caddy
+      ansible.builtin.systemd:
         name: caddy
         state: reloaded
+
+    - name: Restart fail2ban
+      ansible.builtin.systemd:
+        name: fail2ban
+        state: restarted

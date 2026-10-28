@@ -46,8 +46,8 @@ use_encrypted_volume: true
 
 instances:
   - domain: memoryhole.example.com
-    seed_jurisdictions: 'County Court,Federal'
-    seed_cities: 'Springfield,Shelbyville'
+    seed_jurisdictions: "County Court,Federal"
+    seed_cities: "Springfield,Shelbyville"
 
   # Example: staging instance on the same server
   # - domain: staging.example.com

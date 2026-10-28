@@ -14,18 +14,25 @@ You need Ansible installed either on your local machine or on the server itself.
 
 Run playbooks from your laptop against a remote server.
 
-Install Ansible via [pipx](https://pipx.pypa.io/), which keeps it isolated and makes it easy to add the Python libraries the Linode provisioning playbooks require:
-
-```bash
-pipx install --include-deps ansible
-pipx inject ansible linode_api4 polling requests ansible-specdoc
-```
-
-Then clone the repo locally:
+Clone the repo locally:
 
 ```bash
 git clone https://github.com/michalgm/memoryhole.git
 cd memoryhole/deployment/ansible
+```
+
+Then install Ansible via [pipx](https://pipx.pypa.io/), which keeps it isolated, and add the Python libraries and Ansible collections the playbooks require:
+
+```bash
+pipx install --include-deps ansible
+pipx inject ansible -r requirements.txt
+ansible-galaxy collection install -r requirements.yml
+```
+
+If you'll be editing the playbooks, also install the dev tools (ansible-lint):
+
+```bash
+pipx inject --include-apps ansible -r requirements-dev.txt
 ```
 
 ### Option B: On the server itself
@@ -35,10 +42,11 @@ Good if you don't have a Mac or Linux workstation. SSH into the server as root, 
 ```bash
 ssh root@YOUR_SERVER_IP
 apt update && apt install -y pipx git
-pipx install --include-deps ansible
-pipx inject ansible linode_api4 polling requests ansible-specdoc
 git clone https://github.com/michalgm/memoryhole.git
 cd memoryhole/deployment/ansible
+pipx install --include-deps ansible
+pipx inject ansible -r requirements.txt
+ansible-galaxy collection install -r requirements.yml
 ```
 
 Instead of `inventory.example.yml`, create `inventory.yml` with this content:
@@ -51,7 +59,6 @@ all:
       ansible_host: localhost
       ansible_user: root
       server_hostname: memoryhole
-      encrypted_volume_device: /dev/sdc  # check with: lsblk
 ```
 
 Then follow the [Deployment](#2-deployment) section below — skip the inventory.yml step.
@@ -62,14 +69,26 @@ Then follow the [Deployment](#2-deployment) section below — skip the inventory
 
 Skip this section if your server already exists.
 
-This creates a new Linode VPS, attaches a volume (to be encrypted), configures a firewall, and generate an `inventory.yml` file automatically. By default, it will provision a $5/month nanode in the eu-central region called 'memoryhole', and a 20GB volume. Edit 'provision.yml' if you want to change any of these settings.  The playbook will prompt for a Linode API token, which can be created here: https://cloud.linode.com/profile/tokens.
+This creates a new Linode VPS, attaches a Cloud Firewall (SSH, HTTP and HTTPS only), and sets the server's hostname. By default, it will provision a $5/month nanode in the eu-central region called `memoryhole`. Edit `provision.yml` if you want to change any of these settings. The playbook will prompt for a Linode API token, which can be created here: https://cloud.linode.com/profile/tokens.
 
 ```bash
 cd deployment/ansible
 ansible-playbook provision.yml
 ```
 
-After it completes, your `inventory.yml` will be populated with the new server's IP. Continue to [Deployment](#2-deployment).
+At the end it prints the server's IP and root password. Save the root password: you'll need it for Linode's web console (Lish) if SSH ever stops working, and it can't be recovered later.
+
+**inventory.yml**
+
+Each clone of this repo manages one server, which can run several Memoryhole instances (see [Instances](#step-1-configure)). To manage a second server, use a separate clone.
+
+- If `inventory.yml` doesn't exist yet, the playbook creates it for the new server.
+- If it lists a **different** server than the `linode_label` you're provisioning, the playbook stops before creating anything.
+- If it lists the **same** server, it's safe to re-run: the existing Linode and firewall are reused, not duplicated. If the server's IP has changed (for example, you deleted and re-provisioned it), `ansible_host` is updated in place. If `ansible_host` is a hostname rather than an IP, it's left alone and the new IP is printed so you can update DNS.
+
+The root password is only printed when the Linode is first created.
+
+Continue to [Deployment](#2-deployment).
 
 ---
 
@@ -92,7 +111,6 @@ Edit `group_vars/all/main.yml`. It only needs the values specific to your deploy
 | `admin_user_name` | Initial admin display name (default: `Admin`) |
 | `linux_user_ssh_key_file` | Path to your SSH public key, e.g. `~/.ssh/id_ed25519.pub` |
 | `use_encrypted_volume` | `true` to encrypt the data volume, `false` to skip |
-| `encrypted_volume_device` | Block device to encrypt, e.g. `/dev/sdc` — check with `lsblk` on the server |
 
 The admin password is prompted interactively when `deploy.yml` runs.
 
@@ -222,7 +240,6 @@ ansible-playbook -i inventory.yml upgrade-instances.yml -e global_image_tag=v0.2
 ## Troubleshooting
 
 - **Ansible can't connect:** Verify `ansible_host` in `inventory.yml` and that your SSH key is authorized on the server.
-- **Encrypted volume step fails — device not found:** Check the block device name with `lsblk` on the server and update `encrypted_volume_device` in `all.yml`.
 - **App not starting:** Re-run with `--tags deploy` and check `docker compose logs` on the server.
 
 

@@ -1,4 +1,13 @@
 {{ instance.domain }} {
+	# Read by fail2ban (caddy-auth and caddy-scan jails)
+	log {
+		output file /var/log/caddy/{{ instance.domain }}.access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+		format json
+	}
+
 	reverse_proxy 127.0.0.1:{{ instance_port }}
 
 	handle_errors 502 503 {
