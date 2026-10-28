@@ -76,7 +76,7 @@ async function seedSiteHelp() {
   const existing = await db.siteSetting.findUnique({
     where: { id: 'siteHelp' },
   })
-  if (existing?.value && existing.value !== '"Help"') {
+  if (existing?.value && existing.value !== 'Help') {
     console.warn('siteHelp already has content, skipping.')
     return
   }
