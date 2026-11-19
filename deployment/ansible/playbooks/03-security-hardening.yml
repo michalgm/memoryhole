@@ -10,7 +10,7 @@
 # - Audit logging
 #
 # Usage:
-#   ansible-playbook -i inventory.yml 03-security-hardening.yml
+#   ansible-playbook 03-security-hardening.yml
 #
 # Prerequisites:
 #   - Server initialized with 01-init-server.yml
@@ -86,7 +86,7 @@
     #   lineinfile:
     #     path: /etc/ssh/sshd_config
     #     regexp: '^#?AllowUsers '
-    #     line: 'AllowUsers {{ linux_username }} admin-unlock'
+    #     line: 'AllowUsers {{ linux_username }} unlock'
     #     state: present
     #   notify: restart sshd
     #   when: linux_username is defined
@@ -168,7 +168,7 @@
           bantime = {{ fail2ban_bantime }}
           findtime = {{ fail2ban_findtime }}
           maxretry = {{ fail2ban_maxretry }}
-          action = %(action_mwl)s
+          action = %(action_)s
 
           [sshd]
           enabled = true
@@ -212,6 +212,13 @@
         # IP spoofing protection
         - { name: "net.ipv4.conf.all.rp_filter", value: "1" }
         - { name: "net.ipv4.conf.default.rp_filter", value: "1" }
+
+        # Memory headroom. The defaults on a 1 GB server keep only a few MB
+        # free, and a burst (e.g. all containers starting) can use it up before
+        # reclaim catches up. Swap is encrypted, so writing to it needs free
+        # memory too; with none left the server deadlocks instead of swapping.
+        - { name: "vm.min_free_kbytes", value: "65536" }
+        - { name: "vm.watermark_scale_factor", value: "200" }
 
         # Ignore ICMP redirects
         - { name: "net.ipv4.conf.all.accept_redirects", value: "0" }
@@ -305,7 +312,6 @@
           - rkhunter # Rootkit detection
           - lynis # Security auditing
           - aide # File integrity monitoring
-          - logwatch # Log analysis
           - psad # Port scan attack detection
         state: present
 
@@ -322,36 +328,6 @@
     #   shell: mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db
     #   args:
     #     creates: /var/lib/aide/aide.db
-
-    # ==========================================================================
-    # SUMMARY
-    # ==========================================================================
-
-    - name: Display security hardening summary
-      ansible.builtin.debug:
-        msg:
-          - "=========================================="
-          - "Security Hardening Complete"
-          - "=========================================="
-          - "SSH Port: {{ ssh_port }}"
-          - "Root Login: {{ ssh_permit_root_login }}"
-          - "Password Auth: {{ ssh_allow_password_auth }}"
-          - "Firewall: Enabled (UFW)"
-          - "IDS: Enabled (fail2ban)"
-          - "Audit Logging: Enabled (auditd)"
-          - ""
-          - "⚠️  IMPORTANT:"
-          - "1. Update your SSH client config:"
-          - "   Host {{ server_hostname }}"
-          - "     Port {{ ssh_port }}"
-          - "     User {{ linux_username }}"
-          - ""
-          - "2. Test SSH connection BEFORE closing this session:"
-          - "   ssh -p {{ ssh_port }} {{ linux_username }}@{{ ansible_host }}"
-          - ""
-          - "3. Monitor fail2ban: sudo fail2ban-client status sshd"
-          - "4. Check firewall: sudo ufw status verbose"
-          - "=========================================="
 
   handlers:
     - name: Restart ssh

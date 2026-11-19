@@ -201,7 +201,7 @@ Decryption happens on-demand in the email service when credentials are needed.
 
 ## Build & Images
 
-The Dockerfile at `deployment/Dockerfile` uses a multi-stage build:
+The Dockerfile at `deployment/docker/Dockerfile` uses a multi-stage build:
 
 ```
 node:24-trixie-slim (base)

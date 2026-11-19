@@ -6,7 +6,7 @@
 # tenant instances. Run this once before deploying instances.
 #
 # Usage:
-#   ansible-playbook -i inventory.yml 04-setup-caddy.yml
+#   ansible-playbook 04-setup-caddy.yml
 # ============================================================================
 
 - name: Set up bare-metal Caddy
@@ -85,8 +85,6 @@
         owner: root
         group: root
         mode: "0644"
-      vars:
-        instance_port: "{{ instance.port | default(((instance.domain | hash('sha1'))[0:3] | int(base=16) % 900) + 8080) }}"
       loop: "{{ instances }}"
       loop_control:
         loop_var: instance

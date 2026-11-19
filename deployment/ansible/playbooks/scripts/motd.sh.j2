@@ -1,0 +1,68 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Memoryhole login status, run by pam_motd (as root) on every SSH login.
+# Keep it fast: every command that could hang is wrapped in `timeout`.
+
+NAME="{{ encrypted_volume_name }}"
+MNT="{{ encrypted_volume_mount }}"
+INSTANCES_BASE="{{ instances_base }}"
+
+bold=$'\e[1m' red=$'\e[31m' green=$'\e[32m' yellow=$'\e[33m' reset=$'\e[0m'
+
+echo
+echo "${bold}memoryhole${reset} · $(hostname)"
+echo
+
+{% if use_encrypted_volume | default(true) %}
+if [[ ! -e "/dev/mapper/$NAME" ]] || ! mountpoint -q "$MNT"; then
+  echo "  Data volume: ${red}${bold}LOCKED${reset}. All instances are offline."
+  echo "  Unlock with: sudo unlock_data unlock"
+  echo
+  exit 0
+fi
+read -r used size pcent < <(df -h --output=used,size,pcent "$MNT" | tail -1)
+echo "  Data volume: ${green}unlocked${reset} (${used} of ${size} used, ${pcent})"
+{% endif %}
+
+if ! timeout 3 docker info >/dev/null 2>&1; then
+  echo "  Docker:      ${red}not running${reset}"
+  echo
+  exit 0
+fi
+
+# One line per container: <instance dir>|<state>|<status>
+{% raw %}
+containers=$(timeout 3 docker ps -a \
+  --filter label=com.docker.compose.project.working_dir \
+  --format '{{.Label "com.docker.compose.project.working_dir"}}|{{.State}}|{{.Status}}' 2>/dev/null)
+{% endraw %}
+
+echo
+echo "  Instances:"
+found=false
+for dir in "$INSTANCES_BASE"/*/; do
+  [[ -f "$dir/docker-compose.yml" ]] || continue
+  found=true
+  dir=${dir%/}
+  # Skip one-shot containers that finished cleanly (e.g. `console`)
+  rows=$(grep -F "${dir}|" <<<"$containers" | grep -v '|Exited (0)')
+  total=$(grep -c . <<<"$rows")
+  running=$(grep -c '|running|' <<<"$rows")
+  unhealthy=$(grep -c '(unhealthy)' <<<"$rows")
+  if (( total == 0 )); then
+    mark="${red}✗${reset}" note="no containers"
+  elif (( running < total )); then
+    mark="${red}✗${reset}" note="${running}/${total} running"
+  elif (( unhealthy > 0 )); then
+    mark="${yellow}!${reset}" note="${unhealthy} unhealthy"
+  else
+    mark="${green}●${reset}" note="${running}/${total} running"
+  fi
+  printf '    %s %-32s %s\n' "$mark" "$(basename "$dir")" "$note"
+done
+$found || echo "    (none deployed)"
+
+echo
+echo "  Volume status:  sudo unlock_data status"
+echo "  Instance logs:  cd $INSTANCES_BASE/<domain> && docker compose logs -f"
+echo

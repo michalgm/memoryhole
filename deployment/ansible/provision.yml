@@ -9,21 +9,10 @@
     # This ensures dependencies installed in the pipx venv (like linode_api4) are found
     ansible_python_interpreter: "{{ ansible_playbook_python }}"
 
-    # Defaults (override via -e or environment vars)
-    linode_label: "memoryhole"
-    linode_region: "eu-central"
-    linode_type: "g6-nanode-1"
-    linode_image: "linode/ubuntu26.04"
-    linode_tags: ["memoryhole", "encrypted", "production"]
-
-    # Firewall Configuration
+    # Label, region, plan, image, swap size and SSH access come from
+    # group_vars/all/defaults.yml (LINODE PROVISIONING); override in main.yml or with -e.
     firewall_label: "{{ linode_label }}-firewall"
-    ssh_allowed_ips: ["0.0.0.0/0"]
-    ssh_port: 22
 
-    # Authentication
-    ssh_public_key_path: "~/.ssh/id_rsa.pub"
-    root_password: "{{ lookup('env', 'ROOT_PASSWORD') | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32'), true) }}"
 
     # From the LINODE_TOKEN environment variable; prompted for if unset
     linode_token: "{{ lookup('env', 'LINODE_TOKEN') }}"
@@ -105,6 +94,13 @@
         - _inventory_file.stat.exists
         - _inventory_hostvars.keys() | reject('equalto', linode_label) | list | length > 0
 
+    # Set once: as a play var the random lookup would be re-run, giving a
+    # different password each time it's used (API call vs. summary)
+    - name: Set root password
+      ansible.builtin.set_fact:
+        root_password: "{{ lookup('env', 'ROOT_PASSWORD') | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32'), true) }}"
+      no_log: true
+
     # -------------------------------------------------------------------------
     # SSH Key Content
     # -------------------------------------------------------------------------
@@ -125,10 +121,87 @@
         root_pass: "{{ root_password }}"
         authorized_keys: ["{{ ssh_key_content }}"]
         tags: "{{ linode_tags }}"
+        # Create-only: ignored if the Linode already exists
+        swap_size: "{{ linode_swap_partition_size }}"
         state: present
         booted: true
         private_ip: true
       register: linode_instance
+
+    # -------------------------------------------------------------------------
+    # Rebuild (opt-in): -e allow_rebuild=true
+    #
+    # If the Linode already existed, reinstall its OS. This shuts it down and
+    # DELETES ALL ITS DISKS, then deploys linode_image fresh. Its IPs, firewall
+    # and tags are kept. A Linode created by this run is never rebuilt.
+    # linode.cloud has no rebuild module, so this calls the API directly:
+    # https://techdocs.akamai.com/linode-api/reference/post-rebuild-linode-instance
+    # -------------------------------------------------------------------------
+    # Skipped with -e confirm_rebuild=yes, for unattended runs
+    - name: Confirm rebuild
+      ansible.builtin.pause:
+        prompt: |2
+
+          ⚠  REBUILD '{{ linode_label }}' ({{ linode_instance.instance.ipv4 | join(', ') }})
+          This ERASES ALL DISKS on the server, including every instance's data,
+          and installs a fresh {{ linode_image }}. It cannot be undone.
+
+          Type the Linode label to confirm
+      register: _rebuild_confirm
+      when:
+        - allow_rebuild | default(false) | bool
+        - not linode_instance.changed
+        - not (confirm_rebuild | default(false) | bool)
+
+    - name: Stop unless rebuild was confirmed
+      ansible.builtin.fail:
+        msg: "Rebuild not confirmed (expected '{{ linode_label }}'). Nothing was changed."
+      when:
+        - _rebuild_confirm is not skipped
+        - _rebuild_confirm.user_input | trim != linode_label
+
+    - name: Rebuild existing Linode
+      ansible.builtin.uri:
+        url: "https://api.linode.com/v4/linode/instances/{{ linode_instance.instance.id }}/rebuild"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ linode_token }}"
+        body_format: json
+        body:
+          image: "{{ linode_image }}"
+          root_pass: "{{ root_password }}"
+          authorized_keys: ["{{ ssh_key_content }}"]
+          booted: true
+      register: _rebuild
+      changed_when: true
+      # no_log hides root_pass, but also the API's error, so it's reported below
+      failed_when: false
+      no_log: true
+      when:
+        - allow_rebuild | default(false) | bool
+        - not linode_instance.changed
+
+    - name: Fail if rebuild was rejected
+      ansible.builtin.fail:
+        msg: >-
+          Rebuild failed (HTTP {{ _rebuild.status | default('?') }}):
+          {{ _rebuild.json.errors | default([]) | map(attribute='reason') | join('; ') or _rebuild.msg | default('unknown error') }}
+      when:
+        - _rebuild is not skipped
+        - _rebuild.status | default(0) != 200
+
+    # The API can still report 'running' for a moment after accepting the
+    # rebuild, which would satisfy the wait below before the rebuild starts.
+    - name: Wait for rebuild to start
+      linode.cloud.instance:
+        api_token: "{{ linode_token }}"
+        label: "{{ linode_label }}"
+        state: present
+      register: _rebuild_status
+      until: _rebuild_status.instance.status != 'running'
+      retries: 12
+      delay: 5
+      when: _rebuild is not skipped
 
     - name: Wait for Linode to be running
       linode.cloud.instance:
@@ -144,6 +217,17 @@
       ansible.builtin.set_fact:
         linode_ip: "{{ linode_instance.instance.ipv4[0] }}"
         linode_id: "{{ linode_instance.instance.id }}"
+        # True when this run created or rebuilt the server (fresh OS, new root
+        # password, new SSH host key)
+        _fresh_server: "{{ linode_instance.changed or _rebuild is not skipped }}"
+
+    # A rebuilt server has a new SSH host key; drop the old one so plain `ssh`
+    # doesn't refuse to connect
+    - name: Forget the rebuilt server's old SSH host key
+      ansible.builtin.known_hosts:
+        name: "{{ linode_ip }}"
+        state: absent
+      when: _rebuild is not skipped
 
     - name: Display Instance IP
       ansible.builtin.debug:
@@ -250,11 +334,11 @@
           --------------------------------------------------------
            PROVISIONING COMPLETE
           --------------------------------------------------------
-          Instance: {{ linode_label }} ({{ linode_id }}){{ '' if linode_instance.changed else ' (already existed)' }}
+          Instance: {{ linode_label }} ({{ linode_id }}){{ ' (created)' if linode_instance.changed else ' (rebuilt)' if _fresh_server else ' (already existed)' }}
           IP Address: {{ linode_ip }}
           Firewall: {{ firewall_label }}
           --------------------------------------------------------
-          {% if linode_instance.changed %}
+          {% if _fresh_server %}
           Root password: {{ root_password }}
           Save this — it cannot be recovered after this point.
           --------------------------------------------------------
@@ -270,7 +354,7 @@
           Make sure it resolves to {{ linode_ip }}.
           {% endif %}
           To proceed with configuration:
-            ansible-playbook -i inventory.yml deploy.yml
+            ansible-playbook deploy.yml
 
 # ============================================================================
 # Set hostname on the newly provisioned server
@@ -283,7 +367,8 @@
   tasks:
     - name: Wait for SSH to become available
       ansible.builtin.wait_for_connection:
-        timeout: 120
+        # A rebuild reports 'running' before sshd is up
+        timeout: 300
 
     - name: Set hostname
       ansible.builtin.hostname:

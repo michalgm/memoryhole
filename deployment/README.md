@@ -8,7 +8,7 @@ All commands are run from the `deployment/ansible/` directory unless noted other
 
 ## Setting Up Ansible
 
-You need Ansible installed either on your local machine or on the server itself.
+You need [Ansible](https://docs.ansible.com/) installed either on your local machine or on the server itself.
 
 ### Option A: Local machine
 
@@ -69,7 +69,7 @@ Then follow the [Deployment](#2-deployment) section below — skip the inventory
 
 Skip this section if your server already exists.
 
-This creates a new Linode VPS, attaches a Cloud Firewall (SSH, HTTP and HTTPS only), and sets the server's hostname. By default, it will provision a $5/month nanode in the eu-central region called `memoryhole`. Edit `provision.yml` if you want to change any of these settings.
+This creates a new Linode VPS, attaches a Cloud Firewall (SSH, HTTP and HTTPS only), and sets the server's hostname. By default, it will provision a $5/month nanode in the eu-central region called `memoryhole`, with a 2 GB swap disk. To change these, override the `linode_*` settings from `group_vars/all/defaults.yml` in your `main.yml`. The 1 GB nanode is enough for one instance; for more, use a larger plan (`linode_type`).
 
 You need a Linode API token with read/write access to Linodes and Firewalls, which you can create at https://cloud.linode.com/profile/tokens. Either export it, or leave it unset and the playbook will prompt for it:
 
@@ -89,7 +89,15 @@ Each clone of this repo manages one server, which can run several Memoryhole ins
 - If it lists a **different** server than the `linode_label` you're provisioning, the playbook stops before creating anything.
 - If it lists the **same** server, it's safe to re-run: the existing Linode and firewall are reused, not duplicated. If the server's IP has changed (for example, you deleted and re-provisioned it), `ansible_host` is updated in place. If `ansible_host` is a hostname rather than an IP, it's left alone and the new IP is printed so you can update DNS.
 
-The root password is only printed when the Linode is first created.
+The root password is only printed when the Linode is first created or rebuilt.
+
+**Starting over on the same Linode**
+
+To reinstall the server from scratch while keeping its IP and firewall, add `-e allow_rebuild=true`. If the Linode already exists, this **erases all of its disks**, including every instance's data, and installs a fresh OS. Run [deprovision.yml](#5-decommissioning-a-server) first if the data needs to be securely wiped. It asks you to type the Linode's label before rebuilding; add `-e confirm_rebuild=yes` to skip that in scripts. Then run `deploy.yml` as usual. Without `allow_rebuild`, an existing Linode is never touched.
+
+```bash
+ansible-playbook provision.yml -e allow_rebuild=true
+```
 
 Continue to [Deployment](#2-deployment).
 
@@ -119,7 +127,7 @@ The admin password is prompted interactively when `deploy.yml` runs.
 
 **Disk encryption passphrase**
 
-You can set `encrypted_volume_passphrase` in `all.yml`, or leave it out and enter it interactively when `deploy.yml` runs. Either way, store it offline — there is no recovery without it.
+You can set `encrypted_volume_passphrase` in `all.yml`, or leave it out and enter it interactively when `deploy.yml` runs. *Make sure to securely save this passphrase somewhere* - without it, the data will be unrecoverable after a reboot.
 
 **Instances** — one entry per Memoryhole deployment:
 
@@ -131,6 +139,7 @@ You can set `encrypted_volume_passphrase` in `all.yml`, or leave it out and ente
 | `image_tag` | no | Pin to a specific memoryhole release, e.g. `v0.28.0` (default: `latest`) |
 | `backup_enabled` | no | Enable nightly database backups (default: `true`) |
 | `backup_retention_days` | no | Days to keep backups (default: `7`) |
+| `mem_limits` | no | Per-container memory caps, e.g. `{ api: 1g }`, overriding `container_mem_limits` in `defaults.yml` |
 | `port` | no | Internal localhost port Caddy uses to proxy to this instance (not exposed outside the server). Auto-assigned from the domain name — only set this if the assigned port conflicts with something else on the server. Must be >1023. |
 
 ```yaml
@@ -144,10 +153,19 @@ Multiple instances can run on the same server — just add more entries to the l
 
 Edit `inventory.yml` — set `ansible_host` to your server's IP address. (Skip this if you're running Ansible on the server itself — you already created `inventory.yml` above.)
 
-### Step 2: Run
+### Step 2: Point DNS at the server
+
+Before deploying, create a DNS **A record** for each instance's `domain`, pointing at the server's IP address. Caddy gets a free Let's Encrypt HTTPS certificate for each domain automatically, which only works if:
+
+- the domain already resolves to this server, and
+- ports 80 and 443 are reachable from the internet. The firewall set up by `provision.yml` and the deploy allows both.
+
+Check with `dig +short memoryhole.example.com`, which should print the server's IP. DNS changes can take a while to spread. If you deploy before DNS is ready, the site won't load over HTTPS. Caddy keeps retrying, but Let's Encrypt limits repeated failures, so it's best to wait until `dig` shows the right IP.
+
+### Step 3: Run
 
 ```bash
-ansible-playbook -i inventory.yml deploy.yml
+ansible-playbook deploy.yml
 ```
 
 This runs all setup steps in order:
@@ -161,13 +179,26 @@ This runs all setup steps in order:
 To re-run a single step, use tags:
 
 ```bash
-ansible-playbook -i inventory.yml deploy.yml --tags deploy   # re-deploy app only
-ansible-playbook -i inventory.yml deploy.yml --tags security # re-apply security config
+ansible-playbook deploy.yml --tags deploy   # re-deploy app only
+ansible-playbook deploy.yml --tags security # re-apply security config
 ```
 
 Available tags: `init`, `encrypted_volume`, `security`, `caddy`, `deploy`
 
-### Step 3: Set up email with ProtonMail Bridge (optional)
+### Step 4: Verify
+
+```bash
+ansible-playbook verify.yml
+```
+
+This changes nothing. It checks that the server is set up correctly and prints a PASS/FAIL line for each check:
+
+- **Server:** encrypted volume and mounts, encrypted swap, Docker, Caddy, firewall, fail2ban jails, audit rules, SSH password login disabled, automatic updates.
+- **Each instance:** containers running, database migrated with an admin user, nightly backup scheduled, app and API responding, the domain resolving to this server, and HTTPS working with a valid certificate.
+
+It fails if any check fails. Run it after deploying, after upgrades, or any time something seems off. After a reboot, unlock the volume first (see [Unlocking After a Reboot](#4-unlocking-after-a-reboot)).
+
+### Step 5: Set up email with ProtonMail Bridge (optional)
 
 Memoryhole sends email (password resets, notifications) over SMTP. Each instance has its own ProtonMail Bridge container, which turns a ProtonMail account into a local SMTP server. This requires a **paid** ProtonMail account.
 
@@ -219,13 +250,13 @@ Pulls the latest Docker images and restarts all instances. Database migrations r
 
 ```bash
 cd deployment/ansible
-ansible-playbook -i inventory.yml upgrade-instances.yml
+ansible-playbook upgrade-instances.yml
 ```
 
 To pin a specific release instead of pulling `latest`:
 
 ```bash
-ansible-playbook -i inventory.yml upgrade-instances.yml -e global_image_tag=v0.28.0
+ansible-playbook upgrade-instances.yml -e global_image_tag=v0.28.0
 ```
 
 ---
@@ -234,22 +265,47 @@ ansible-playbook -i inventory.yml upgrade-instances.yml -e global_image_tag=v0.2
 
 If you enabled disk encryption, the encrypted volume stays **locked** after every reboot, whether you rebooted it, Linode did host maintenance, or unattended upgrades did. That's the point: the data can't be read without the passphrase. Until someone unlocks it, Docker doesn't start, and each instance's domain shows a "temporarily unavailable" page.
 
-To unlock, SSH in as the `admin-unlock` user and enter the disk encryption passphrase:
+To unlock, SSH in as the `unlock` user and enter the disk encryption passphrase:
 
 ```bash
-ssh -t admin-unlock@YOUR_SERVER_IP sudo unlock_data unlock
+ssh unlock@YOUR_SERVER_IP
+sudo unlock_data unlock
 ```
 
-The `-t` is needed for the passphrase prompt. This unlocks and mounts the volume, mounts the data directories, and starts Docker. The instances then come back up on their own within a minute or so.
+This unlocks and mounts the volume, mounts the data directories, and starts Docker. The instances then come back up on their own within a minute or so.
 
-`admin-unlock` uses the same SSH key as the `memoryhole` user. It's an ordinary unprivileged account whose only admin right is running `unlock_data` (all of its commands, including `lock`). It isn't in the `docker` group and can't read the instance data, so you can give someone access to it to bring the server back up after a reboot without giving them full server access.
+`unlock` uses the same SSH key as the `memoryhole` user. It's an ordinary unprivileged account whose only admin right is running `unlock_data unlock`, `lock`, `status` and `change-key`. It isn't in the `docker` group and can't read the instance data, so you can give someone access to it to bring the server back up after a reboot without giving them full server access. To do that, add their SSH public key to `/home/unlock/.ssh/authorized_keys`, and give them their own passphrase (below).
 
-`unlock_data` has two other commands:
+`unlock_data` has these other commands:
 
 | Command | What it does |
 |---|---|
 | `sudo unlock_data status` | Shows whether the volume is unlocked and mounted, and which swap is active |
 | `sudo unlock_data lock` | Stops Docker, unmounts everything and locks the volume. Instances go offline until it's unlocked again. Use it before handing the server over or if you think it's compromised. |
+| `sudo unlock_data change-key` | Replaces your passphrase with a new one |
+| `sudo unlock_data add-key` | *Admin only.* Adds a passphrase for someone new (see below) |
+| `sudo unlock_data list-keys` | *Admin only.* Shows which key slots are in use |
+| `sudo unlock_data remove-key <slot>` | *Admin only.* Removes a passphrase |
+
+"Admin only" means it needs full `sudo`, as the `memoryhole` user or root. The `unlock` user can't run these.
+
+### Managing passphrases
+
+The volume is encrypted with [LUKS2](https://gitlab.com/cryptsetup/cryptsetup/-/wikis/FrequentlyAskedQuestions), which has up to 32 **key slots**. Each slot holds a separate passphrase, and any one of them unlocks the volume. Give each person who needs to unlock the server their own slot, so nobody has to share a passphrase, and one person's access can be removed without changing everyone else's.
+
+**Adding keys.** You can't type a passphrase on someone else's behalf, so the admin creates a temporary one and the new person replaces it:
+
+1. The admin runs `sudo unlock_data add-key` and enters their own passphrase. It prints a random temporary passphrase and the slot number it went into. **Write down who has which slot**: LUKS doesn't store names, and you need the number to remove them later.
+2. The admin sends the temporary passphrase to the new person over a secure channel (for example, Signal).
+3. The new person logs in as `unlock` and runs `sudo unlock_data change-key` straight away. They enter the temporary passphrase, then their own. Their passphrase replaces the temporary one in the same slot, so the temporary one stops working and only they know the new one.
+
+Anyone can use `change-key` at any time to change their own passphrase. It only changes the slot their current passphrase opens.
+
+**Removing keys.** Run `sudo unlock_data remove-key <slot>` and enter any *other* valid passphrase. It won't remove the last remaining slot.
+
+**Removing a slot doesn't fully revoke access.** All passphrases unlock the same underlying volume key. Someone who had root on the server while it was unlocked could have copied that key, and someone with a copy of the encrypted file and an old LUKS header backup can still use their old passphrase on it. If you have to assume either, re-encrypt the volume with a new volume key (`cryptsetup reencrypt`, see `man cryptsetup-reencrypt`) after removing their slot. Do this with a backup in hand: it rewrites the whole volume.
+
+**Header backup.** If the LUKS header at the start of the volume file is damaged, the data is lost even with the right passphrase. `cryptsetup luksHeaderBackup` saves a copy. Keep that copy as carefully as a passphrase: every passphrase that was valid when you made the backup still works with it, including any you remove later.
 
 ---
 
@@ -261,7 +317,7 @@ Use this to shut a server down for good. Deleting a server, or a Linode, doesn't
 
 ```bash
 cd deployment/ansible
-ansible-playbook -i inventory.yml deprovision.yml --extra-vars "confirm_destroy=yes"
+ansible-playbook deprovision.yml --extra-vars "confirm_destroy=yes"
 ```
 
 It stops all instances and Docker. With disk encryption on, it overwrites the encrypted volume's header, which destroys the encryption key, so everything on the volume becomes unrecoverable at once. Without encryption, it shreds each instance's data files. You get a 10-second warning before anything is deleted; press Ctrl+C twice to cancel.
@@ -270,12 +326,18 @@ It stops all instances and Docker. With disk encryption on, it overwrites the en
 
 ```bash
 export LINODE_TOKEN=your-token   # optional; prompted for if unset
-ansible-playbook -i inventory.yml deprovision-linode.yml --extra-vars "confirm_destroy=yes"
+ansible-playbook deprovision-linode.yml --extra-vars "confirm_destroy=yes"
 ```
 
 On other hosting, delete the server through your provider instead.
 
 **Step 3: Clean up locally.** `inventory.yml` still points at the deleted server, so delete it. If you're done with this deployment entirely, also delete `playbooks/credentials/` (the instances' generated secrets) and `group_vars/all/main.yml`. To replace the server instead, keep them and provision again with the same name. `provision.yml` reuses `inventory.yml` and updates the IP.
+
+---
+
+## Development and Testing Tools
+
+[`tools/`](tools/README.md) has scripts for working on the deployment itself: an end-to-end deployment test and disk/Postgres benchmarks. You don't need them for a normal deployment.
 
 ---
 

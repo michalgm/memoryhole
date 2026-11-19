@@ -4,11 +4,41 @@
 # Override any of these in group_vars/all.yml if needed.
 
 # ==============================================================================
+# LINODE PROVISIONING (provision.yml only)
+# ==============================================================================
+
+linode_label: memoryhole
+linode_region: eu-central
+linode_type: g6-nanode-1
+linode_image: linode/ubuntu26.04
+linode_tags: [memoryhole, encrypted, production]
+# Swap disk size in MB (the Linode default is 512). Set when the Linode is
+# created; changing it later doesn't resize an existing Linode's swap.
+linode_swap_partition_size: 2048
+# Addresses allowed to SSH through the Linode Cloud Firewall
+ssh_allowed_ips: ["0.0.0.0/0"]
+ssh_public_key_path: ~/.ssh/id_rsa.pub
+
+# ==============================================================================
 # USER CONFIGURATION
 # ==============================================================================
 
 # Service account for running Docker instances
 linux_username: memoryhole
+
+# Each instance's compose project lives in <instances_base>/<domain>
+instances_base: "/home/{{ linux_username }}/instances"
+
+# Internal localhost port Caddy proxies each instance to (not exposed outside
+# the server). Derived from the domain's SHA1 hash, range 8080-8979, so it's
+# stable across list reorders. Set instance.port to override. Only valid
+# inside a loop over instances with loop_var: instance.
+instance_port: "{{ instance.port | default(((instance.domain | hash('sha1'))[0:3] | int(base=16) % 900) + 8080) }}"
+
+# Prints the number of users in an instance's database. Run it in the
+# instance's directory as linux_username.
+instance_user_count_cmd: >-
+  docker compose exec -T db psql -U memoryhole -d memoryhole -tAc 'SELECT COUNT(*) FROM "User";'
 
 # ==============================================================================
 # SSH CONFIGURATION
@@ -16,7 +46,7 @@ linux_username: memoryhole
 
 ssh_port: 22
 ssh_allow_password_auth: false
-ssh_permit_root_login: 'yes'  # Intentionally kept enabled — Ansible connects as root (key-only)
+ssh_permit_root_login: "yes" # Intentionally kept enabled — Ansible connects as root (key-only)
 ssh_max_auth_tries: 3
 ssh_client_alive_interval: 300
 ssh_client_alive_count_max: 2
@@ -28,9 +58,9 @@ disable_root_login: false
 # ==============================================================================
 
 firewall_allowed_tcp_ports:
-  - '{{ ssh_port }}'
-  - '80'
-  - '443'
+  - "{{ ssh_port }}"
+  - "80"
+  - "443"
 
 firewall_allowed_udp_ports: []
 firewall_rate_limit_ssh: true
@@ -40,15 +70,13 @@ firewall_rate_limit_ssh: true
 # ==============================================================================
 
 fail2ban_enabled: true
-fail2ban_bantime: 3600    # 1 hour
-fail2ban_findtime: 600    # 10 minutes
+fail2ban_bantime: 3600 # 1 hour
+fail2ban_findtime: 600 # 10 minutes
 fail2ban_maxretry: 5
 # Caddy jails (see 04-setup-caddy.yml)
-fail2ban_auth_maxretry: 10      # failed logins per findtime before ban
-fail2ban_scan_maxretry: 3       # probe requests (.php, .env, wp-admin...) per findtime
-fail2ban_scan_bantime: 86400    # 1 day
-fail2ban_destemail: '{{ admin_user_email }}'
-fail2ban_sender: fail2ban@{{ server_hostname }}
+fail2ban_auth_maxretry: 10 # failed logins per findtime before ban
+fail2ban_scan_maxretry: 3 # probe requests (.php, .env, wp-admin...) per findtime
+fail2ban_scan_bantime: 86400 # 1 day
 
 # ==============================================================================
 # ENCRYPTED VOLUME
@@ -67,11 +95,13 @@ use_luks_keyfile: false
 encrypted_loopback_file: /encrypted.img
 encrypted_loopback_size_gb: 13
 
-# Additional swap loopback file — converted to encrypted swap via crypttab
-# alongside any existing swap partition. Useful when the provider swap
-# partition is small or absent.
+# Optional swap file, encrypted via crypttab alongside any existing swap
+# partition. Off by default: swap on a file needs a loop device on the root
+# filesystem, which can deadlock the server when memory runs out (and swap is
+# needed most). Prefer a real swap partition (on Linode: linode_swap_partition_size).
+# Only set this on hosts with no swap partition.
 encrypted_swap_file: /swap.img
-swap_size_gb: 1.5
+swap_file_size_gb: 0
 
 # Advanced LUKS settings
 luks_cipher: aes-xts-plain64
@@ -87,13 +117,22 @@ luks_pbkdf_memory_kb: 262144
 # ==============================================================================
 
 docker_users:
-  - '{{ linux_username }}'
+  - "{{ linux_username }}"
+
+# Per-container memory caps, so one runaway container is OOM-killed instead
+# of exhausting the host's memory. Override per instance with mem_limits.
+# Check actual usage with: docker stats --no-stream
+container_mem_limits:
+  db: 384m
+  api: 768m # also runs migrations and the seed
+  web: 128m
+  protonmail-bridge: 384m
 
 # ==============================================================================
 # CADDY
 # ==============================================================================
 
-caddy_acme_email: '{{ admin_user_email }}'
+caddy_acme_email: "{{ admin_user_email }}"
 
 # ==============================================================================
 # SECURITY & MONITORING
@@ -101,9 +140,9 @@ caddy_acme_email: '{{ admin_user_email }}'
 
 auto_updates_enabled: true
 auto_updates_reboot: false
-auto_updates_time: '03:00'
+auto_updates_time: "03:00"
 
 enable_monitoring: true
-monitoring_email: '{{ admin_user_email }}'
+monitoring_email: "{{ admin_user_email }}"
 
 log_retention_days: 30

@@ -1,0 +1,247 @@
+---
+# ============================================================================
+# Deployment Verification Playbook
+# ============================================================================
+# Checks that a deployed server is set up correctly: encryption and mounts,
+# services, firewall, fail2ban, auditd, SSH hardening, and for each instance
+# its containers, database, backups, DNS and HTTPS certificate. Changes
+# nothing. Prints a PASS/FAIL summary and fails if any check failed.
+#
+# Usage:
+#   ansible-playbook verify.yml
+#
+# The volume must be unlocked first (after a reboot: unlock_data unlock).
+# ============================================================================
+
+- name: Verify deployment
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    encrypted: "{{ use_encrypted_volume | default(true) | bool }}"
+
+    host_checks:
+      - name: Encrypted volume is unlocked and mounted
+        cmd: mountpoint -q {{ encrypted_volume_mount }}
+        enabled: "{{ encrypted }}"
+      - name: Home, Docker and containerd data are on the encrypted volume
+        cmd: |
+          for m in /home/{{ linux_username }} /var/lib/docker /var/lib/containerd; do
+            mountpoint -q "$m" || { echo "not mounted: $m"; exit 1; }
+          done
+        enabled: "{{ encrypted }}"
+      - name: All swap is encrypted
+        cmd: |
+          for d in $(swapon --show=NAME --noheadings); do
+            [ "$(lsblk -dno TYPE "$d" 2>/dev/null)" = crypt ] || { echo "unencrypted swap: $d"; exit 1; }
+          done
+        enabled: "{{ encrypted }}"
+      - name: Docker is running
+        cmd: systemctl is-active --quiet docker
+      - name: Caddy is running and its config is valid
+        cmd: |
+          systemctl is-active --quiet caddy || { echo "caddy not running"; exit 1; }
+          caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1 | tail -1
+          exit "${PIPESTATUS[0]}"
+      - name: UFW firewall is active
+        cmd: "ufw status | grep -q '^Status: active'"
+      - name: fail2ban jails are running (sshd, caddy-auth, caddy-scan)
+        cmd: |
+          for j in sshd caddy-auth caddy-scan; do
+            fail2ban-client status "$j" >/dev/null 2>&1 || { echo "jail not running: $j"; exit 1; }
+          done
+      - name: Audit rules are loaded
+        cmd: auditctl -l | grep -q 'key=user_exec'
+      - name: SSH password login is disabled
+        cmd: sshd -T 2>/dev/null | grep -qx 'passwordauthentication no'
+      - name: Automatic security updates are enabled
+        cmd: grep -q 'Unattended-Upgrade "1"' /etc/apt/apt.conf.d/20auto-upgrades
+
+  tasks:
+    # --------------------------------------------------------------------------
+    # SERVER
+    # --------------------------------------------------------------------------
+    - name: Check server
+      ansible.builtin.shell: "{{ item.cmd }}"
+      args:
+        executable: /bin/bash
+      loop: "{{ host_checks }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: item.enabled | default(true) | bool
+      register: _host
+      changed_when: false
+      failed_when: false
+
+    # --------------------------------------------------------------------------
+    # INSTANCES (on the server)
+    # --------------------------------------------------------------------------
+    - name: Check containers are running
+      ansible.builtin.shell: |
+        running=$(docker compose ps --status running --services)
+        for s in db api web protonmail-bridge; do
+          grep -qx "$s" <<<"$running" || { echo "not running: $s"; exit 1; }
+        done
+      args:
+        chdir: "{{ instances_base }}/{{ instance.domain }}"
+        executable: /bin/bash
+      become: true
+      become_user: "{{ linux_username }}"
+      loop: "{{ instances }}"
+      loop_control: &instance_loop
+        loop_var: instance
+        label: "{{ instance.domain }}"
+      register: _containers
+      changed_when: false
+      failed_when: false
+
+    - name: Check database is migrated and has an admin user
+      ansible.builtin.shell: |
+        count=$({{ instance_user_count_cmd }}) || exit 1
+        [ "$count" -gt 0 ] || { echo "no users"; exit 1; }
+      args:
+        chdir: "{{ instances_base }}/{{ instance.domain }}"
+        executable: /bin/bash
+      become: true
+      become_user: "{{ linux_username }}"
+      loop: "{{ instances }}"
+      loop_control: *instance_loop
+      register: _seeded
+      changed_when: false
+      failed_when: false
+
+    - name: Check nightly backup is scheduled
+      ansible.builtin.shell: |
+        set -o pipefail
+        script=/usr/local/bin/backup-{{ instance.domain | replace('.', '-') }}.sh
+        [ -x "$script" ] || { echo "missing $script"; exit 1; }
+        crontab -l -u root | grep -qF "$script" || { echo "no cron entry"; exit 1; }
+      args:
+        executable: /bin/bash
+      loop: "{{ instances }}"
+      loop_control: *instance_loop
+      when: instance.backup_enabled | default(true) | bool
+      register: _backups
+      changed_when: false
+      failed_when: false
+
+    - name: Check app responds locally
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ instance_port }}/"
+        timeout: 10
+      loop: "{{ instances }}"
+      loop_control: *instance_loop
+      register: _local
+      failed_when: false
+
+    - name: Check API responds locally
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ instance_port }}/.redwood/functions/graphql"
+        method: POST
+        body_format: json
+        body: { query: "{ __typename }" }
+        timeout: 10
+      loop: "{{ instances }}"
+      loop_control: *instance_loop
+      register: _api
+      failed_when: false
+
+    # --------------------------------------------------------------------------
+    # INSTANCES (from this machine, like a visitor)
+    # --------------------------------------------------------------------------
+    - name: Check domain resolves to this server
+      ansible.builtin.command:
+        argv:
+          - "{{ ansible_playbook_python }}"
+          - -c
+          - |
+            import socket, sys
+            domain, host = sys.argv[1:3]
+            try:
+                got = socket.gethostbyname(domain)
+            except OSError:
+                sys.exit(f"{domain} does not resolve")
+            want = socket.gethostbyname(host)
+            print(f"{domain} -> {got}, server is {want}")
+            sys.exit(got != want)
+          - "{{ instance.domain }}"
+          - "{{ ansible_host | default(inventory_hostname) }}"
+      delegate_to: localhost
+      become: false
+      loop: "{{ instances }}"
+      loop_control: *instance_loop
+      register: _dns
+      changed_when: false
+      failed_when: false
+
+    - name: Check HTTPS works with a valid certificate
+      ansible.builtin.uri:
+        url: "https://{{ instance.domain }}/"
+        validate_certs: true
+        timeout: 15
+      delegate_to: localhost
+      become: false
+      loop: "{{ instances }}"
+      loop_control: *instance_loop
+      register: _https
+      failed_when: false
+      # Caddy may still be getting the certificate right after a deploy
+      until: _https.status | default(-1) == 200
+      retries: 6
+      delay: 10
+
+    # --------------------------------------------------------------------------
+    # SUMMARY
+    # --------------------------------------------------------------------------
+    - name: Summarize results
+      ansible.builtin.set_fact:
+        _cmd_results:
+          - { label: "", results: "{{ _host.results }}" }
+          - { label: "Containers running", results: "{{ _containers.results }}" }
+          - { label: "Database migrated with admin user", results: "{{ _seeded.results }}" }
+          - { label: "Nightly backup scheduled", results: "{{ _backups.results }}" }
+          - { label: "Domain resolves to this server", results: "{{ _dns.results }}" }
+        _http_results:
+          - { label: "App responds locally", results: "{{ _local.results }}" }
+          - { label: "API responds locally", results: "{{ _api.results }}" }
+          - { label: "HTTPS with valid certificate", results: "{{ _https.results }}" }
+
+    - name: Verification results
+      ansible.builtin.debug:
+        msg: "{{ _summary | trim | split('\n') }}"
+      vars:
+        _summary: |
+          {% for group in _cmd_results %}
+          {% for r in group.results if not (r.skipped | default(false)) %}
+          {% set name = r.item.name if r.item.name is defined else group.label ~ ': ' ~ r.instance.domain %}
+          {% set ok = r.rc | default(1) == 0 %}
+          {% set detail = ((r.stdout | default('') ~ ' ' ~ r.stderr | default('')) | trim) or r.msg | default('') %}
+          {{ 'PASS' if ok else 'FAIL' }}  {{ name }}{{ '' if ok or not detail else '  (' ~ detail ~ ')' }}
+          {% endfor %}
+          {% endfor %}
+          {% for group in _http_results %}
+          {% for r in group.results %}
+          {% set ok = r.status == 200 %}
+          {% set detail = r.msg | default('HTTP ' ~ r.status) %}
+          {{ 'PASS' if ok else 'FAIL' }}  {{ group.label }}: {{ r.instance.domain }}{{ '' if ok else '  (' ~ detail ~ ')' }}
+          {% endfor %}
+          {% endfor %}
+
+    - name: Fail if any check failed
+      ansible.builtin.assert:
+        that: _failures | int == 0
+        fail_msg: "{{ _failures }} check(s) failed. See the results above."
+        success_msg: "All checks passed."
+      vars:
+        _failures: >-
+          {{
+            (_cmd_results | map(attribute='results') | flatten
+              | rejectattr('skipped', 'defined') | list | length)
+            -
+            (_cmd_results | map(attribute='results') | flatten
+              | selectattr('rc', 'defined') | selectattr('rc', 'equalto', 0) | list | length)
+            +
+            (_http_results | map(attribute='results') | flatten
+              | rejectattr('status', 'equalto', 200) | list | length)
+          }}

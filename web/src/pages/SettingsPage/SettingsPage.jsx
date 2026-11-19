@@ -72,7 +72,7 @@ const SMTP_FIELDS = ['smtp_host', 'smtp_secure', 'smtp_user', 'smtp_pass']
 const isEmailAddress = (value) => /^[^@\s]+@[^.\s]+\.[^\s]+$/.test(value || '')
 
 const BRIDGE_DOCS_URL =
-  'https://github.com/michalgm/memoryhole/blob/main/deployment/README.md#step-3-set-up-email-with-protonmail-bridge-optional'
+  'https://github.com/michalgm/memoryhole/blob/main/deployment/README.md#step-5-set-up-email-with-protonmail-bridge-optional'
 
 const inferEmailServer = (smtpHost) => {
   if (!smtpHost) return 'None'

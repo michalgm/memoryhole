@@ -15,7 +15,7 @@
 # - There is no recovery without the passphrase — LUKS cannot be bypassed
 #
 # Usage:
-#   ansible-playbook -i inventory.yml 02-setup-encrypted-volume.yml
+#   ansible-playbook 02-setup-encrypted-volume.yml
 #
 # Prerequisites:
 #   - Server initialized with 01-init-server.yml
@@ -257,27 +257,31 @@
     # ADDITIONAL SWAP LOOPBACK FILE
     # ==========================================================================
 
-    - name: Stat additional swap loopback file
-      ansible.builtin.stat:
-        path: "{{ encrypted_swap_file }}"
-      register: _swap_loopback_stat
+    # Off by default (swap_file_size_gb: 0): see defaults.yml
+    - name: Set up additional swap loopback file
+      when: swap_file_size_gb | float > 0
+      block:
+        - name: Stat additional swap loopback file
+          ansible.builtin.stat:
+            path: "{{ encrypted_swap_file }}"
+          register: _swap_loopback_stat
 
-    - name: Create additional swap loopback file
-      ansible.builtin.command: fallocate -l {{ swap_size_gb | default(2) }}G {{ encrypted_swap_file }}
-      args:
-        creates: "{{ encrypted_swap_file }}"
+        - name: Create additional swap loopback file
+          ansible.builtin.command: fallocate -l {{ swap_file_size_gb }}G {{ encrypted_swap_file }}
+          args:
+            creates: "{{ encrypted_swap_file }}"
 
-    - name: Restrict swap loopback file permissions
-      ansible.builtin.file:
-        path: "{{ encrypted_swap_file }}"
-        mode: "0600"
-        owner: root
-        group: root
+        - name: Restrict swap loopback file permissions
+          ansible.builtin.file:
+            path: "{{ encrypted_swap_file }}"
+            mode: "0600"
+            owner: root
+            group: root
 
-    - name: Format swap loopback file
-      ansible.builtin.command: mkswap {{ encrypted_swap_file }}
-      when: not _swap_loopback_stat.stat.exists
-      changed_when: true
+        - name: Format swap loopback file
+          ansible.builtin.command: mkswap {{ encrypted_swap_file }}
+          when: not _swap_loopback_stat.stat.exists
+          changed_when: true
 
     # ==========================================================================
     # ENCRYPT ALL SWAP
@@ -288,23 +292,51 @@
     # via crypttab lineinfile + mount module state management.
     # ==========================================================================
 
+    # crypttab must reference swap by a path that doesn't depend on the device's
+    # contents. With a random key, mkswap on the mapper overwrites the original
+    # swap header, so a UUID= or LABEL= source disappears after the first boot
+    # and systemd-cryptsetup times out waiting for it on every later start.
     - name: Collect plain swap devices to encrypt
       ansible.builtin.shell: |
-        # Emit: <name> <device> for each plain swap not yet a mapper device
+        # Emit: <name> <crypttab source> <original fstab source, or - if none>
+        stable_path() {
+          local src="$1" real link
+          if [[ "$src" == *=* ]]; then
+            real=$(blkid -o device -l -t "$src" 2>/dev/null) || return 1
+          else
+            real=$(readlink -f "$src")
+          fi
+          # Swap files have no udev symlinks; their path is already stable
+          [[ -f "$real" ]] && { echo "$real"; return 0; }
+          [[ -b "$real" ]] || return 1
+          for link in $(udevadm info -q symlink -n "$real"); do
+            [[ "$link" == disk/by-id/* ]] && { echo "/dev/$link"; return 0; }
+          done
+          echo "$real"
+        }
+        # Number new mappings after any already in crypttab, so adding swap
+        # later (e.g. a swap file) can't take over an existing mapping's name
         idx=0
+        while read -r name _; do
+          n=${name#encrypted_swap}
+          if [[ "$n" =~ ^[0-9]+$ ]] && (( n >= idx )); then idx=$((n + 1)); fi
+        done < <(grep -E '^encrypted_swap[0-9]+\s' /etc/crypttab 2>/dev/null)
         while read -r device _ _; do
           [[ "$device" == /dev/mapper/* ]] && continue
-          # Resolve UUID= or LABEL= to actual block device path
-          if [[ "$device" == UUID=* || "$device" == LABEL=* ]]; then
-            device=$(blkid -o device -l -t "$device" 2>/dev/null || echo "$device")
+          if ! path=$(stable_path "$device"); then
+            echo "Cannot resolve swap device '$device' from /etc/fstab to a stable path" >&2
+            exit 1
           fi
-          echo "encrypted_swap${idx} ${device}"
-          idx=$((idx + 1))
+          # Already in crypttab (an earlier run stopped part-way): keep its name
+          name=$(awk -v p="$path" '$2 == p {print $1; exit}' /etc/crypttab 2>/dev/null)
+          if [[ -z "$name" ]]; then name="encrypted_swap${idx}"; idx=$((idx + 1)); fi
+          echo "${name} ${path} ${device}"
         done < <(grep -E '^[^#]\S+\s+\S+\s+swap\s' /etc/fstab 2>/dev/null)
         # Also include the swap loopback file if not already in fstab
-        if ! grep -q "{{ encrypted_swap_file }}" /etc/fstab && \
+        if [[ -f "{{ encrypted_swap_file }}" ]] && \
+           ! grep -q "{{ encrypted_swap_file }}" /etc/fstab && \
            ! grep -q "{{ encrypted_swap_file }}" /etc/crypttab 2>/dev/null; then
-          echo "encrypted_swap${idx} {{ encrypted_swap_file }}"
+          echo "encrypted_swap${idx} {{ encrypted_swap_file }} -"
         fi
       args:
         executable: /bin/bash
@@ -324,10 +356,11 @@
     - name: Remove plain swap entries from fstab
       ansible.posix.mount:
         path: none
-        src: "{{ item.split()[1] }}"
+        src: "{{ item.split()[2] }}"
         fstype: swap
         state: absent
       loop: "{{ _plain_swap_devices.stdout_lines }}"
+      when: item.split()[2] != '-'
 
     - name: Add encrypted mapper swap entries to fstab
       ansible.posix.mount:
@@ -391,67 +424,29 @@
         dest: /usr/local/bin/unlock_data
         mode: "0755"
 
-    - name: Create admin-unlock user
+    - name: Create unlock user
       ansible.builtin.user:
-        name: admin-unlock
+        name: unlock
         comment: "Encrypted Volume Unlock Admin"
         shell: /bin/bash
         create_home: true
         password_lock: true
 
-    - name: Set up SSH authorized key for admin-unlock
+    - name: Set up SSH authorized key for unlock
       ansible.posix.authorized_key:
-        user: admin-unlock
+        user: unlock
         state: present
         key: "{{ lookup('file', linux_user_ssh_key_file) }}"
 
-    - name: Allow admin-unlock to run unlock script without password
+    - name: Allow unlock to run unlock script without password
       ansible.builtin.copy:
-        dest: /etc/sudoers.d/admin-unlock
-        content: |
-          admin-unlock ALL=(root) NOPASSWD: /usr/local/bin/unlock_data
+        dest: /etc/sudoers.d/unlock
+        # Exact arguments only: add-key, list-keys and remove-key stay admin-only
+        content: >
+          unlock ALL=(root) NOPASSWD:
+          /usr/local/bin/unlock_data unlock,
+          /usr/local/bin/unlock_data lock,
+          /usr/local/bin/unlock_data status,
+          /usr/local/bin/unlock_data change-key
         mode: "0440"
         validate: "visudo -cf %s"
-
-    # ==========================================================================
-    # SUMMARY
-    # ==========================================================================
-
-    - name: Display encryption summary
-      ansible.builtin.debug:
-        msg: "{{ _summary.split('\n') }}"
-      vars:
-        _summary: |
-          ==========================================
-          Encrypted Volume Setup Complete
-          ==========================================
-          Loopback file: {{ encrypted_loopback_file }} ({{ encrypted_loopback_size_gb }} GB)
-          Loop device:   {{ _loop_device.stdout }}
-          Mapper:        /dev/mapper/{{ encrypted_volume_name }}
-          Mount:         {{ encrypted_volume_mount }}
-
-          ⚠️  CRITICAL: Store your passphrase securely — there is no recovery without it.
-
-          Manual unlock after reboot:
-            sudo /usr/local/bin/unlock_data unlock
-          ==========================================
-
-    - name: Save encryption info to file
-      ansible.builtin.copy:
-        dest: "{{ encrypted_volume_mount }}/.encryption-info.txt"
-        content: |
-          LUKS Encrypted Loopback Volume
-          ==============================
-          Loopback file: {{ encrypted_loopback_file }}
-          Size: {{ encrypted_loopback_size_gb }} GB
-          Mapper name: {{ encrypted_volume_name }}
-          Mount point: {{ encrypted_volume_mount }}
-          Cipher: {{ luks_cipher }}
-          Key size: {{ luks_key_size }}
-
-          Manual Unlock:
-            sudo /usr/local/bin/unlock_data unlock
-
-          Manual Lock:
-            sudo /usr/local/bin/unlock_data lock
-        mode: "0600"

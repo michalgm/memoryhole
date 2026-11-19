@@ -7,10 +7,10 @@
 # Re-running is idempotent — existing instances are updated, not recreated.
 #
 # Usage:
-#   ansible-playbook -i inventory.yml 05-deploy-instances.yml
+#   ansible-playbook 05-deploy-instances.yml
 #
 # To deploy a single instance:
-#   ansible-playbook -i inventory.yml 05-deploy-instances.yml \
+#   ansible-playbook 05-deploy-instances.yml \
 #     -e '{"instances": [{"domain": "example.com", ...}]}'
 #
 # Prerequisites:
@@ -24,7 +24,6 @@
   gather_facts: true
 
   vars:
-    instances_base: "/home/{{ linux_username }}/instances"
     credentials_dir: "{{ playbook_dir }}/credentials"
 
   pre_tasks:
@@ -53,7 +52,7 @@
               'settings_encryption_key':
                 lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/settings_encryption_key', length=64,chars='0123456789abcdef'),
               'seed_password': lookup('password', credentials_dir ~ '/' ~ instance.domain ~ '/seed_password', length=16, chars='ascii_letters,digits'),
-              'port': instance.port | default(((instance.domain | hash('sha1'))[0:3] | int(base=16) % 900) + 8080)
+              'port': instance_port | int
             }
           }) }}
       loop: "{{ instances }}"
@@ -63,10 +62,7 @@
         label: "Configuring {{ instance.domain }}"
       no_log: true
 
-    # Port assignment: internal localhost port Caddy proxies to — not exposed
-    # outside the server. Derived from the domain's SHA1 hash, range 8080–8979
-    # (non-root, non-conflicting). Stable across list reorders. Set
-    # instance.port explicitly to override.
+    # Ports come from instance_port in group_vars/all/defaults.yml
     - name: Check for port conflicts between instances
       ansible.builtin.assert:
         that: >-

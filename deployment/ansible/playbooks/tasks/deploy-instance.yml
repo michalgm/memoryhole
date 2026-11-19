@@ -30,7 +30,7 @@
 # Workaround — remove when https://github.com/shenxn/protonmail-bridge-docker/issues/141 is fixed
 - name: Copy bridge Dockerfile workaround
   ansible.builtin.copy:
-    src: ../../Dockerfile.bridge
+    src: ../../docker/Dockerfile.bridge
     dest: "{{ instances_base }}/{{ instance.domain }}/Dockerfile.bridge"
     owner: "{{ linux_username }}"
     group: "{{ linux_username }}"
@@ -79,28 +79,33 @@
 # DATABASE SEED (first deploy only — skipped if users exist)
 # ------------------------------------------------------------------
 
-- name: Wait for migrations and check if any users exist
-  ansible.builtin.shell: >
-    docker compose exec -T db
-    psql -U memoryhole -d memoryhole -tAc 'SELECT COUNT(*) FROM "User";'
+# The api container applies migrations on startup (docker-entrypoint.sh).
+# `migrate status` exits non-zero until every migration is applied, so seeding
+# can't start against a half-migrated database.
+- name: Wait for database migrations to finish
+  ansible.builtin.command: >
+    docker compose exec -T api
+    node_modules/.bin/prisma migrate status --config api/prisma.config.cjs
+  args:
+    chdir: "{{ instances_base }}/{{ instance.domain }}"
+  become: true
+  become_user: "{{ linux_username }}"
+  register: _migrate_status
+  changed_when: false
+  retries: 60
+  delay: 5
+  until: _migrate_status.rc == 0
+  when: (instance.admin_user_email | default(admin_user_email | default(''))) != ''
+
+- name: Check if any users exist
+  ansible.builtin.command: "{{ instance_user_count_cmd }}"
   args:
     chdir: "{{ instances_base }}/{{ instance.domain }}"
   become: true
   become_user: "{{ linux_username }}"
   register: user_count
   changed_when: false
-  retries: 30
-  delay: 5
-  until: user_count.rc == 0
   when: (instance.admin_user_email | default(admin_user_email | default(''))) != ''
-
-- name: Wait for instance web service to be ready (implies migrations complete)
-  ansible.builtin.wait_for:
-    port: "{{ instance_credentials[instance.domain].port }}"
-    host: 127.0.0.1
-    timeout: 300
-  when: (instance.admin_user_email | default(admin_user_email | default(''))) != ''
-  # no_log: true
 
 - name: Seed database
   ansible.builtin.shell: >
@@ -121,11 +126,22 @@
     SEED_CITIES: "{{ instance.seed_cities | default('') }}"
   become: true
   become_user: "{{ linux_username }}"
+  register: _seed
   changed_when: true
+  failed_when: false
+  # Hides the admin password in the environment above. The seed's own output
+  # doesn't contain it, so it's shown separately if seeding fails.
   no_log: true
   when:
     - (instance.admin_user_email | default(admin_user_email | default(''))) != ''
     - user_count.stdout | default('1') | int == 0
+
+- name: Fail if seeding failed
+  ansible.builtin.fail:
+    msg: "{{ (['Seeding failed (exit ' ~ _seed.rc | default(1) ~ '):'] + _seed.stdout_lines | default([]) + _seed.stderr_lines | default([])) | join('\n') }}"
+  when:
+    - _seed is not skipped
+    - _seed.rc != 0
 
 # ------------------------------------------------------------------
 # BACKUP

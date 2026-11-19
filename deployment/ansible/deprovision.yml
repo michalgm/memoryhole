@@ -15,7 +15,7 @@
 # Run this before deprovision-linode.yml, while the server is still reachable.
 #
 # Usage:
-#   ansible-playbook -i inventory.yml deprovision.yml \
+#   ansible-playbook deprovision.yml \
 #     --extra-vars "confirm_destroy=yes"
 # ============================================================================
 
@@ -23,9 +23,6 @@
   hosts: all
   become: true
   gather_facts: false
-
-  vars:
-    instances_base: "/home/{{ linux_username }}/instances"
 
   pre_tasks:
     - name: Require explicit confirmation

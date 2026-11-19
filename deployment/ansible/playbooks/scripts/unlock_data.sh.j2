@@ -17,6 +17,11 @@ BIND_TARGETS=(
 # Docker restart policies handle instance containers — no separate service needed.
 STOP_SERVICES=(docker containerd)
 
+# Key derivation settings for new passphrases, matching luksFormat. Without
+# the memory cap, cryptsetup can pick more than a small server has free, and
+# the volume then can't be unlocked.
+PBKDF_OPTS=(--pbkdf-memory {{ luks_pbkdf_memory_kb }} --iter-time {{ luks_iter_time }})
+
 # ---- helpers ----
 is_open()    { [[ -e "/dev/mapper/$NAME" ]]; }
 is_mounted() { mountpoint -q "$MNT"; }
@@ -32,6 +37,34 @@ find_or_setup_loop() {
   else
     losetup -f --show --direct-io=on "$FILE"
   fi
+}
+
+# The LUKS header lives at the start of FILE. Use the attached loop device if
+# there is one, so header changes go through the same path the kernel reads.
+luks_dev() {
+  local loop_dev
+  loop_dev=$(losetup -j "$FILE" 2>/dev/null | cut -d: -f1 | head -1)
+  echo "${loop_dev:-$FILE}"
+}
+
+# Keyslot numbers in use, one per line
+used_slots() {
+  cryptsetup luksDump "$(luks_dev)" | sed -n '/^Keyslots:/,/^Tokens:/p' \
+    | awk '/^  [0-9]+: /{sub(":", "", $1); print $1}'
+}
+
+# Prompts without echo; prints the answer (no trailing newline) to stdout
+read_pass() {
+  local pass
+  read -rsp "$1: " pass
+  echo >&2
+  printf '%s' "$pass"
+}
+
+# Prints the keyslot a passphrase opens, or nothing if it opens none
+slot_for() {
+  printf '%s' "$1" | cryptsetup open --test-passphrase -v --key-file - "$(luks_dev)" 2>/dev/null \
+    | sed -n 's/^Key slot \([0-9]*\) unlocked.*/\1/p' || true
 }
 
 stop_services() {
@@ -59,6 +92,7 @@ unlock() {
     echo -n "Enter LUKS passphrase: "
     read -rs PASS
     echo ""
+    echo "Trying to unlock LUKS device..."
     echo -n "$PASS" | cryptsetup open \
       --perf-no_read_workqueue \
       --perf-no_write_workqueue \
@@ -109,6 +143,81 @@ lock() {
   echo "OK: unmounted + locked ($NAME)."
 }
 
+# Admin: add a keyslot with a random temporary passphrase for someone new.
+# They replace it with their own using change-key, so nobody else knows it.
+add_key() {
+  local dev current slot temp s used
+  dev=$(luks_dev)
+  current=$(read_pass "Your passphrase")
+  echo "Checking current key slots..."
+  [[ -n "$(slot_for "$current")" ]] || { echo "That passphrase doesn't match any key." >&2; exit 1; }
+
+  used=$(used_slots)
+  for s in $(seq 0 31); do
+    grep -qx "$s" <<<"$used" || { slot=$s; break; }
+  done
+  [[ -n "${slot:-}" ]] || { echo "All 32 keyslots are in use." >&2; exit 1; }
+
+  temp=$(head -c 18 /dev/urandom | base64)
+
+  echo "Adding temporary key slot $slot..."
+  printf '%s' "$current" | cryptsetup luksAddKey "${PBKDF_OPTS[@]}" \
+    --new-key-slot "$slot" --key-file - "$dev" <(printf '%s' "$temp")
+
+  cat <<EOF
+
+OK: added key slot $slot with this temporary passphrase:
+
+    $temp
+
+Send it to the new keyholder over a secure channel (e.g. Signal), and note
+who has slot $slot. They should replace it right away with:
+
+    sudo unlock_data change-key
+
+Until they do, anyone who sees the temporary passphrase can unlock the data.
+EOF
+}
+
+# Anyone with a passphrase: replace it with a new one, in the same keyslot
+change_key() {
+  local dev old slot new again
+  dev=$(luks_dev)
+  old=$(read_pass "Current passphrase (or the temporary one you were sent)")
+  echo "Checking current key slots..."
+  slot=$(slot_for "$old")
+  [[ -n "$slot" ]] || { echo "That passphrase doesn't match any key." >&2; exit 1; }
+
+  new=$(read_pass "New passphrase")
+  again=$(read_pass "Repeat new passphrase")
+  [[ "$new" == "$again" ]] || { echo "Passphrases don't match. Nothing changed." >&2; exit 1; }
+  # wc, not bash's length syntax: its brace-hash opens a Jinja comment here
+  (( $(printf '%s' "$new" | wc -m) >= 12 )) || { echo "Use at least 12 characters. Nothing changed." >&2; exit 1; }
+
+  echo "Changing key for slot $slot..."
+  printf '%s' "$old" | cryptsetup luksChangeKey "${PBKDF_OPTS[@]}" \
+    --key-slot "$slot" --key-file - "$dev" <(printf '%s' "$new")
+  echo "OK: key slot $slot now uses your new passphrase. The old one no longer works."
+}
+
+# Admin: show which keyslots are in use
+list_keys() {
+  echo "Key slots in use: $(used_slots | paste -sd ' ')"
+}
+
+# Admin: remove someone's keyslot. Asks for any OTHER valid passphrase.
+remove_key() {
+  local slot="${1:-}" used
+  [[ "$slot" =~ ^[0-9]+$ ]] || { echo "Usage: $(basename "$0") remove-key <slot>" >&2; exit 2; }
+  used=$(used_slots)
+  grep -qx "$slot" <<<"$used" || { echo "Key slot $slot isn't in use." >&2; exit 1; }
+  (( $(wc -l <<<"$used") > 1 )) || { echo "Refusing to remove the last key." >&2; exit 1; }
+
+  echo "Removing key slot $slot..."
+  cryptsetup luksKillSlot "$(luks_dev)" "$slot"
+  echo "OK: removed key slot $slot."
+}
+
 status() {
   local loop_dev
   loop_dev=$(losetup -j "$FILE" 2>/dev/null | cut -d: -f1 | head -1)
@@ -121,7 +230,17 @@ status() {
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") <unlock|lock|status>
+Usage: $(basename "$0") <command>
+
+  unlock            Unlock and mount the data volume, start Docker
+  lock              Stop Docker, unmount and lock the data volume
+  status            Show whether the volume is unlocked and mounted
+  change-key        Replace your passphrase with a new one
+
+Admin only (not allowed for the unlock user):
+  add-key           Add a key slot with a temporary passphrase for someone new
+  list-keys         Show which key slots are in use
+  remove-key <slot> Remove a key slot
 
 Environment overrides (optional):
   FILE=/encrypted.img  NAME=cryptdata  MNT=/mnt/encrypted
@@ -133,5 +252,9 @@ case "$cmd" in
   unlock) unlock ;;
   lock)   lock ;;
   status) status ;;
+  change-key) change_key ;;
+  add-key)    add_key ;;
+  list-keys)  list_keys ;;
+  remove-key) remove_key "${2:-}" ;;
   *) usage; exit 2 ;;
 esac

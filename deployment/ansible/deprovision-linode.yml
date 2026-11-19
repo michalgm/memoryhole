@@ -9,7 +9,7 @@
 # still reachable. Deleting a Linode doesn't guarantee its disk is erased.
 #
 # Usage:
-#   ansible-playbook -i inventory.yml deprovision-linode.yml \
+#   ansible-playbook deprovision-linode.yml \
 #     --extra-vars "confirm_destroy=yes"
 #
 # The Linode instance label is read from your inventory (the host name set by
@@ -106,5 +106,5 @@
           - "or provision a replacement (it keeps the same name and updates"
           - "the IP in inventory.yml):"
           - "  ansible-playbook provision.yml -e linode_label={{ linode_label }}"
-          - "  ansible-playbook -i inventory.yml deploy.yml"
+          - "  ansible-playbook deploy.yml"
           - "=========================================="

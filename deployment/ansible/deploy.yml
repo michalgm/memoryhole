@@ -6,10 +6,10 @@
 # standalone for partial re-runs or targeted changes.
 #
 # Usage:
-#   ansible-playbook -i inventory.yml deploy.yml
+#   ansible-playbook deploy.yml
 #
 # To run only specific steps, use tags:
-#   ansible-playbook -i inventory.yml deploy.yml --tags init,encrypted_volume
+#   ansible-playbook deploy.yml --tags init,encrypted_volume
 #
 # Available tags: init, encrypted_volume, security, caddy, deploy
 # ============================================================================
@@ -21,6 +21,7 @@
   hosts: all
   gather_facts: false
   tags: [always]
+
   tasks:
     - name: Wait for host to be reachable
       ansible.builtin.wait_for_connection:
@@ -34,91 +35,121 @@
       changed_when: false
       when: use_encrypted_volume | default(true)
 
-    - name: Prompt for disk encryption passphrase
-      ansible.builtin.pause:
-        prompt: |2
+    - name: Check if any users exist (i.e. the database has been seeded)
+      ansible.builtin.command: "{{ instance_user_count_cmd }}"
+      args:
+        chdir: "{{ instances_base }}/{{ instance.domain }}"
+      become: true
+      become_user: "{{ linux_username }}"
+      register: _seed_check
+      changed_when: false
+      failed_when: false
+      loop: "{{ instances }}"
+      loop_control: { loop_var: instance, label: "{{ instance.domain }}" }
 
-          Disk encryption passphrase
-          ──────────────────────────
-          Tips:
-            • Generate one with: openssl rand -base64 32
-            • Store it in a password manager AND keep an offline copy
-            • There is NO recovery if you lose it — LUKS cannot be bypassed
-
-          Leave blank to use the value already set in all.yml
-
-          Passphrase
-        echo: false
-      register: _passphrase_result
-      when:
-        - use_encrypted_volume | default(true)
-        - _volume_mounted.rc | default(1) != 0
-        - encrypted_volume_passphrase is not defined
-
-    - name: Confirm disk encryption passphrase
-      ansible.builtin.pause:
-        prompt: "Confirm passphrase"
-        echo: false
-      register: _passphrase_confirm
-      when:
-        - use_encrypted_volume | default(true)
-        - _volume_mounted.rc | default(1) != 0
-        - _passphrase_result.user_input | default('') | length > 0
-        - encrypted_volume_passphrase is not defined
-
-    - name: Fail if passphrases do not match
-      ansible.builtin.fail:
-        msg: "Passphrases do not match. Re-run deploy.yml and try again."
-      when:
-        - use_encrypted_volume | default(true)
-        - _volume_mounted.rc | default(1) != 0
-        - _passphrase_result.user_input | default('') | length > 0
-        - _passphrase_result.user_input != _passphrase_confirm.user_input
-        - encrypted_volume_passphrase is not defined
-
-    - name: Set passphrase fact
+    - name: Note whether any instance needs seeding
       ansible.builtin.set_fact:
-        encrypted_volume_passphrase: "{{ _passphrase_result.user_input }}"
+        _seed_required: "{{ 0 in (_seed_check.results | map(attribute='stdout', default='') | map('int') | list) }}"
+
+    - name: Verify encrypted volume variables
       when:
         - use_encrypted_volume | default(true)
         - _volume_mounted.rc | default(1) != 0
-        - _passphrase_result.user_input | default('') | length > 0
-        - encrypted_volume_passphrase is not defined
+      block:
+        - name: Prompt for disk encryption passphrase
+          ansible.builtin.pause:
+            prompt: |2
 
-    - name: Prompt for initial admin password
-      ansible.builtin.pause:
-        prompt: "Initial admin password for {{ admin_user_email | default('the admin user') }}"
-        echo: false
-      register: _admin_password_result
-      when:
-        - (admin_user_email | default('')) | length > 0
-        - admin_user_password is not defined
+              Disk encryption passphrase
+              ──────────────────────────
+              Tips:
+                • Generate one with: openssl rand -base64 32
+                • Store it in a password manager AND keep an offline copy
+                • There is NO recovery if you lose it — LUKS cannot be bypassed
 
-    - name: Confirm initial admin password
-      ansible.builtin.pause:
-        prompt: "Confirm initial admin password"
-        echo: false
-      register: _admin_password_confirm
-      when:
-        - (admin_user_email | default('')) | length > 0
-        - admin_user_password is not defined
-        - _admin_password_result.user_input | default('') | length > 0
+              Leave blank to use the value already set in all.yml
 
-    - name: Fail if passwords do not match
-      ansible.builtin.fail:
-        msg: "Passwords do not match. Re-run deploy.yml and try again."
-      when:
-        - (admin_user_email | default('')) | length > 0
-        - admin_user_password is not defined
-        - _admin_password_result.user_input | default('') | length > 0
-        - _admin_password_result.user_input != _admin_password_confirm.user_input
+              Passphrase
+            echo: false
+          register: _passphrase_result
+          when:
+            - use_encrypted_volume | default(true)
+            - _volume_mounted.rc | default(1) != 0
+            - encrypted_volume_passphrase is not defined
 
-    - name: Set admin password fact
-      ansible.builtin.set_fact:
-        admin_user_password: "{{ _admin_password_result.user_input | default('') }}"
-      when:
-        - (admin_user_email | default('')) | length > 0
-        - admin_user_password is not defined
+        - name: Confirm disk encryption passphrase
+          ansible.builtin.pause:
+            prompt: "Confirm passphrase"
+            echo: false
+          register: _passphrase_confirm
+          when:
+            - use_encrypted_volume | default(true)
+            - _volume_mounted.rc | default(1) != 0
+            - _passphrase_result.user_input | default('') | length > 0
+            - encrypted_volume_passphrase is not defined
+
+        - name: Fail if passphrases do not match
+          ansible.builtin.fail:
+            msg: "Passphrases do not match. Re-run deploy.yml and try again."
+          when:
+            - use_encrypted_volume | default(true)
+            - _volume_mounted.rc | default(1) != 0
+            - _passphrase_result.user_input | default('') | length > 0
+            - _passphrase_result.user_input != _passphrase_confirm.user_input
+            - encrypted_volume_passphrase is not defined
+
+        - name: Set passphrase fact
+          ansible.builtin.set_fact:
+            encrypted_volume_passphrase: "{{ _passphrase_result.user_input }}"
+          when:
+            - use_encrypted_volume | default(true)
+            - _volume_mounted.rc | default(1) != 0
+            - _passphrase_result.user_input | default('') | length > 0
+            - encrypted_volume_passphrase is not defined
+
+    - name: Verify admin credentials variables
+      when: _seed_required
+      block:
+        - name: Prompt for initial admin password
+          ansible.builtin.pause:
+            prompt: "Initial admin password for {{ admin_user_email | default('the admin user') }}"
+            echo: false
+          register: _admin_password_result
+          when:
+            - (admin_user_email | default('')) | length > 0
+            - admin_user_password is not defined
+
+        - name: Confirm initial admin password
+          ansible.builtin.pause:
+            prompt: "Confirm initial admin password"
+            echo: false
+          register: _admin_password_confirm
+          when:
+            - (admin_user_email | default('')) | length > 0
+            - admin_user_password is not defined
+            - _admin_password_result.user_input | default('') | length > 0
+
+        - name: Fail if passwords do not match
+          ansible.builtin.fail:
+            msg: "Passwords do not match. Re-run deploy.yml and try again."
+          when:
+            - (admin_user_email | default('')) | length > 0
+            - admin_user_password is not defined
+            - _admin_password_result.user_input | default('') | length > 0
+            - _admin_password_result.user_input != _admin_password_confirm.user_input
+
+        - name: Set admin password fact
+          ansible.builtin.set_fact:
+            admin_user_password: "{{ _admin_password_result.user_input | default('') }}"
+          when:
+            - (admin_user_email | default('')) | length > 0
+            - admin_user_password is not defined
+
+        - name: Validate admin_user_password is set
+          ansible.builtin.assert:
+            that: admin_user_password is defined and admin_user_password | length > 0
+            fail_msg: >-
+              admin_user_password is required. Re-run deploy.yml and enter a password at the prompt.
 
     - name: Validate admin_user_email is set
       ansible.builtin.assert:
@@ -126,11 +157,6 @@
         fail_msg: >-
           admin_user_email is required. Set it in group_vars/all/main.yml and re-run.
 
-    - name: Validate admin_user_password is set
-      ansible.builtin.assert:
-        that: admin_user_password is defined and admin_user_password | length > 0
-        fail_msg: >-
-          admin_user_password is required. Re-run deploy.yml and enter a password at the prompt.
 
 - name: Initialize server
   import_playbook: playbooks/01-init-server.yml
@@ -157,6 +183,13 @@
   gather_facts: false
   tags: [always]
   tasks:
+    # Written by apt when an update (usually a kernel) needs a reboot. We
+    # never reboot automatically: the data volume would need unlocking after.
+    - name: Check whether a reboot is needed for updates
+      ansible.builtin.stat:
+        path: /run/reboot-required
+      register: _reboot_required
+
     - name: Show deployment summary
       ansible.builtin.debug:
         msg: "{{ _summary.split('\n') }}"
@@ -171,6 +204,25 @@
             Login: {{ instance.admin_user_email | default(admin_user_email | default('(see admin_user_email)')) }}
           {% endfor %}
           ==========================================
-          Unlock after reboot:
-            sudo /usr/local/bin/unlock_data unlock
+          Server: ssh {{ linux_username }}@{{ ansible_host }}
+          {% if use_encrypted_volume | default(true) %}
+
+          The data volume is locked after every reboot. Unlock it with:
+            ssh unlock@{{ ansible_host }}
+            sudo unlock_data unlock
+          Make sure to securely save this passphrase somewhere - without it, the data will be unrecoverable after a reboot.
+
+          To give someone else their own passphrase, see "Managing passphrases" in the README.
+          {% endif %}
+          {% if _reboot_required.stat.exists %}
+          ==========================================
+          ⚠  REBOOT NEEDED to finish installing updates
+
+             When it suits you, run as root on the server:
+               reboot
+          {% if use_encrypted_volume | default(true) %}
+             then unlock the data volume as shown above.
+             Instances stay offline until it's unlocked.
+          {% endif %}
+          {% endif %}
           ==========================================
