@@ -45,18 +45,17 @@ describe('arrests', () => {
 
   scenario('creates a arrest', async (scenario) => {
     mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+    const date = new Date('2023-02-26T20:00:00Z')
 
     const result = await createArrest({
       input: {
-        display_field: 'String',
-        search_field: 'String',
         jurisdiction: 'String',
-        date: new Date('2023-02-26'),
+        date,
       },
     })
-
-    expect(result.display_field).toEqual('String')
-    expect(result.search_field).toEqual('String')
+    expect(result.display_field).toEqual(dayjs(date).format('L'))
+    expect(result.created_by_id).toEqual(scenario.user.test.id)
+    expect(result.jurisdiction).toEqual('String')
   })
 
   scenario('updates a arrest', async (scenario) => {
@@ -65,10 +64,10 @@ describe('arrests', () => {
     const original = await arrest({ id: scenario.arrest.one.id })
     const result = await updateArrest({
       id: original.id,
-      input: { display_field: 'String2' },
+      input: { location: 'String2' },
     })
 
-    expect(result.display_field).toEqual('String2')
+    expect(result.location).toEqual('String2')
   })
 
   scenario('updates a custom field', async (scenario) => {
@@ -93,6 +92,8 @@ describe('arrests', () => {
     })
   })
 
+  // TODO: uses made-up keys (foo, bar); switch to defined custom fields once
+  // the API rejects unknown keys (see TODO, custom fields refactor)
   scenario('updates an arrestee custom field', async (scenario) => {
     mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
     const original = await arrest({ id: scenario.arrest.one.id })
@@ -453,7 +454,38 @@ describe('arrests', () => {
       id: scenario.arrest.one.id,
       input: { date: new Date('2023-02-26') },
     })
-    expect(result.display_field).toBeDefined()
+    expect(result.display_field).toEqual(
+      dayjs(new Date('2023-02-26')).format('L')
+    )
+  })
+
+  scenario('ignores display_field in create input', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+    const result = await createArrest({
+      input: {
+        display_field: 'Should be ignored',
+        date: new Date('2023-02-26'),
+      },
+    })
+
+    expect(result.display_field).not.toBe('Should be ignored')
+    expect(result.display_field).toEqual(
+      dayjs(new Date('2023-02-26')).format('L')
+    )
+  })
+
+  scenario('ignores display_field in update input', async (scenario) => {
+    mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
+    const result = await updateArrest({
+      input: {
+        display_field: 'Should be ignored',
+        jurisdiction: 'SF',
+      },
+      id: scenario.arrest.one.id,
+    })
+
+    expect(result.display_field).not.toBe('Should be ignored')
+    expect(result.display_field).toEqual('02/26/2023')
   })
 
   // --- Create/Delete Logic ---
@@ -461,8 +493,6 @@ describe('arrests', () => {
     mockCurrentUser({ name: 'Rob', id: scenario.user.test.id })
     const { id } = await createArrest({
       input: {
-        display_field: 'String',
-        search_field: 'String',
         jurisdiction: 'String',
         date: new Date('2023-02-26'),
         arrestee: { first_name: 'Rob', custom_fields: { foo: 'bar' } },

@@ -188,6 +188,7 @@ const updateDisplayField = (arrest) => {
     arrest.display_field = dayjs(arrest.date).format('L')
   } else {
     delete arrest.date
+    delete arrest.display_field
   }
 }
 
@@ -195,11 +196,8 @@ const validateAndPrepareData = (
   { id: _id, action_id, arrestee, ...arrest },
   current = {}
 ) => {
-  const data = {
-    ...arrest,
-    updated_by: {
-      connect: { id: context.currentUser.id },
-    },
+  arrest.updated_by = {
+    connect: { id: context.currentUser.id },
   }
 
   if (arrestee) {
@@ -210,12 +208,15 @@ const validateAndPrepareData = (
     })
     updateArresteeDisplayField(arrestee, current.arrestee)
 
-    data.arrestee = {
+    arrest.arrestee = {
       update: {
         data: arrestee,
       },
     }
   }
+  // TODO: validate all custom_fields (arrest and arrestee) against the field
+  // definitions: reject unknown keys and check types. Part of the
+  // user-defined custom fields refactor; see TODO.
   if (arrest.custom_fields) {
     if (arrest.custom_fields.next_court_date) {
       validateWithSync(() => {
@@ -236,11 +237,11 @@ const validateAndPrepareData = (
   }
   updateDisplayField(arrest)
   if (action_id !== undefined) {
-    data.action =
+    arrest.action =
       action_id === null ? { disconnect: true } : { connect: { id: action_id } }
   }
 
-  return data
+  return arrest
 }
 
 export const createArrest = ({ input: { arrestee, action_id, ...arrest } }) => {

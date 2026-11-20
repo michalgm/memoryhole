@@ -2,10 +2,9 @@ export const standard = defineScenario({
   arrest: {
     one: {
       data: {
-        display_field: 'String',
-        search_field: 'String',
         date: new Date('2023-02-26'),
         jurisdiction: 'Alameda',
+        display_field: '02/26/2023',
         custom_fields: {
           test: true,
           custom: 'yes',
@@ -24,8 +23,6 @@ export const standard = defineScenario({
     },
     two: {
       data: {
-        display_field: 'String',
-        search_field: 'String',
         date: new Date('2023-02-26'),
         jurisdiction: 'Alameda',
         arrestee: {
