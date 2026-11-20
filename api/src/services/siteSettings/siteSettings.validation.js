@@ -48,7 +48,7 @@ export const settingsSchemas = {
         ),
       z.string().optional(),
     ])
-    .default('protonmail-bridge:25'),
+    .default(''),
   smtp_user: z.string().default(''),
   smtp_pass: z.string().default(''),
   smtp_secure: z.boolean().default(false),
