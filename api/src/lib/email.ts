@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql'
 import * as nodemailer from 'nodemailer'
 
 import { decrypt, isEncrypted } from 'src/lib/crypto.js'
@@ -52,6 +53,15 @@ export async function sendEmail({ to, subject, text }: Options) {
     return info
   } catch (err) {
     console.error(err)
-    throw err
+
+    throw new GraphQLError(
+      `Failed to send email. Please check the mail settings.`,
+      {
+        extensions: {
+          code: 'INTERNAL_SERVER_ERROR',
+          originalError: { message: String(err) },
+        },
+      }
+    )
   }
 }
