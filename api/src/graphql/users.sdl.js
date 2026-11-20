@@ -45,7 +45,7 @@ export const schema = gql`
     email: String!
     name: String!
     custom_fields: JSON
-    role: String!
+    role: UserRole!
     # hashedPassword: String
     # salt: String
     expiresAt: DateTime
@@ -61,7 +61,7 @@ export const schema = gql`
     email: String
     name: String
     custom_fields: JSON
-    role: String
+    role: UserRole
     # hashedPassword: String
     # salt: String
     expiresAt: DateTime
