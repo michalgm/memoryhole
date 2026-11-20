@@ -5,13 +5,7 @@ import { fragmentRegistry } from '@cedarjs/web/apollo'
 
 import * as _fragments from 'src/lib/gql_fragments'
 
-import * as generatedMocks from './generated'
-export function transformGeneratedTypes(generated) {
-  const { seedMocks: _seedMocks, ...mockGenerators } = generated
-  return mockGenerators
-}
-
-const mockGenerators = transformGeneratedTypes(generatedMocks)
+import { buildMock } from './mockBuilders'
 
 function extractFields(selectionSet) {
   const fields = {}
@@ -77,7 +71,7 @@ export const generateMockData = (
     typeof overrides === 'number' ? Array(overrides).fill({}) : overrides
 
   return resolvedOverrides.map((override) => {
-    const mockData = mockGenerators[mockMethod]({})
+    const mockData = buildMock(mockMethod)
     const filtered = fields
       ? filterFields(mockData, fields)
       : cloneDeep(mockData)

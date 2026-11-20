@@ -33,18 +33,22 @@ const apiRequest = async (url, data, method = 'post') => {
   })
     .then((response) => {
       if (response.data.errors) {
-        throw Error('Error:', response.data.errors.join(' '))
+        const messages = response.data.errors.map((e) => e.message ?? e)
+        throw new Error(messages?.join('; '))
       }
       return response
     })
     .catch((error) => {
-      if (error?.response?.data?.errors) {
-        console.error(error?.response?.data?.errors)
+      if (!error.response) {
+        throw error
+      }
+      if (error.response.data?.errors) {
+        console.error(error.response.data.errors)
       } else {
-        console.log(error?.response?.data)
+        console.log(error.response.data)
       }
 
-      throw Error('Error:', error)
+      throw new Error(`Request to ${url} failed: ${error.message}`)
     })
 }
 

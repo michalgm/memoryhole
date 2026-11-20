@@ -33,6 +33,10 @@
 #   E2E_ADMIN_PASSWORD    initial admin password (default: random)
 #   FRESH=1               replace the Linode instead of rebuilding it
 #   YES=1                 skip the confirmation prompt
+#   DEMO_ARRESTS          fake arrests to add to each instance after verifying,
+#                         with matching actions and logs (default: 100; 0 to
+#                         skip). Uses scripts/seed_test_instance_data.js, so needs yarn install
+#                         in the repo.
 #
 set -euo pipefail
 
@@ -184,6 +188,20 @@ ansible-playbook deploy.yml -e @"$SECRETS"
 
 echo "== Verifying"
 ansible-playbook verify.yml
+
+DEMO_ARRESTS="${DEMO_ARRESTS:-100}"
+if ((DEMO_ARRESTS > 0)); then
+  echo "== Adding demo data ($DEMO_ARRESTS arrests per instance)"
+  # "domain email" per instance, using each instance's admin login
+  instances=$(ansible_var "instances | map(attribute='domain') | zip(instances | map(attribute='admin_user_email', default=admin_user_email)) | map('join', ' ') | join(';')")
+  IFS=';' read -ra pairs <<<"$instances"
+  for pair in "${pairs[@]}"; do
+    read -r domain email <<<"$pair"
+    (cd ../.. && PUBLIC_URL="https://$domain" IMPORT_USERNAME="$email" \
+      IMPORT_PASSWORD="$E2E_ADMIN_PASSWORD" DEMO_ARRESTS="$DEMO_ARRESTS" \
+      yarn cedar exec seed_test_instance_data)
+  done
+fi
 
 cat <<EOF
 

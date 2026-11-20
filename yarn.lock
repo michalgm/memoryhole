@@ -18607,6 +18607,7 @@ __metadata:
     "@cedarjs/project-config": "npm:7.1.0"
     "@cedarjs/realtime": "npm:7.1.0"
     "@cedarjs/studio": "npm:^2.0.1"
+    "@faker-js/faker": "npm:^9.8.0"
     "@graphql-codegen/cli": "npm:^7.4.6"
     "@graphql-codegen/typescript": "npm:^6.1.2"
     "@graphql-codegen/typescript-resolvers": "npm:^6.1.1"

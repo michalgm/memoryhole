@@ -27,7 +27,7 @@ generates:
               email: internet.email
               display_field: person.fullName
               search_field: person.fullName
-              location: location.city
+              location: "faker.location.street() + ' & ' + faker.location.street()"
               jurisdiction: location.county
               arrest_city: location.city
               city: location.city
@@ -39,9 +39,29 @@ generates:
               phone_2: phone.number
               name: faker.helpers.fake('{{word.adjective}} {{animal.type}}')
               pronoun: faker.helpers.arrayElement(["he/him","she/her","they/them"])
-            User:
-              name: person.fullName
+              dob: "faker.date.birthdate({ min: 13, max: 75, mode: 'age' })"
+              charges: faker.helpers.arrayElement(["PC 148(a)(1) resisting/obstructing","PC 409 failure to disperse","PC 602 trespass","PC 594 vandalism","PC 243(b) battery on officer","VC 2800 failure to obey officer"])
+              citation_number: "faker.string.alphanumeric({ length: 8, casing: 'upper' })"
+              notes: "faker.lorem.sentences({ min: 1, max: 3 })"
+              description: faker.lorem.paragraph()
+              contact: person.fullName
             Arrestee:
               display_field: person.fullName
               search_display_field: person.fullName
+            # Anchors share each type's rules with its Create/Update inputs
+            User: &user
+              name: person.fullName
+              email: "faker.internet.email({ provider: 'example.com' })"
+              role: faker.helpers.enumValue(UserRole)
+            CreateUserInput: *user
+            UpdateUserInput: *user
+            Action: &action
+              name: "faker.location.street() + ' ' + faker.helpers.arrayElement(['March', 'Rally', 'Blockade', 'Sit-in', 'Encampment'])"
+            CreateActionInput: *action
+            UpdateActionInput: *action
+            Log: &log
+              # The log_type option set seeded by migrations
+              type: faker.helpers.arrayElement(["Shift Summary","Jail Call","Witness Call","Support Call","Out-of-Custody Call","Text Message","Email","Note","Other"])
+            CreateLogInput: *log
+            UpdateLogInput: *log
 

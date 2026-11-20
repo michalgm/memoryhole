@@ -13,6 +13,7 @@
     "@cedarjs/project-config": "7.1.0",
     "@cedarjs/realtime": "7.1.0",
     "@cedarjs/studio": "^2.0.1",
+    "@faker-js/faker": "^9.8.0",
     "@graphql-codegen/cli": "^7.4.6",
     "@graphql-codegen/typescript": "^6.1.2",
     "@graphql-codegen/typescript-resolvers": "^6.1.1",

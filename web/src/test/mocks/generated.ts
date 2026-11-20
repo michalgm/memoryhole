@@ -265,7 +265,7 @@ export type CreateUserInput = {
   email: Scalars['String']['input'];
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
-  role: Scalars['String']['input'];
+  role: UserRole;
 };
 
 export type CustomSchema = {
@@ -964,7 +964,7 @@ export type UpdateUserInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  role?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<UserRole>;
 };
 
 export type UpsertSiteSettingInput = {
@@ -1359,7 +1359,6 @@ export type DocumentResolvers<ContextType = any, ParentType extends ResolversPar
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   updated_by?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   updated_by_id?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface FileScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['File'], any> {
@@ -1452,7 +1451,6 @@ export type OptionSetResolvers<ContextType = any, ParentType extends ResolversPa
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   values?: Resolver<Maybe<Array<Maybe<ResolversTypes['OptionSetValue']>>>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type OptionSetValueResolvers<ContextType = any, ParentType extends ResolversParentTypes['OptionSetValue'] = ResolversParentTypes['OptionSetValue']> = {
@@ -1614,13 +1612,13 @@ export const anAction = (overrides?: Partial<Action>, _relationshipsToOmit: Set<
         arrests_count: overrides && overrides.hasOwnProperty('arrests_count') ? overrides.arrests_count! : faker.number.int({ min: 0, max: 9999 }),
         city: overrides && overrides.hasOwnProperty('city') ? overrides.city! : faker['location']['city'](),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
-        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
+        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.paragraph(),
         end_date: overrides && overrides.hasOwnProperty('end_date') ? overrides.end_date! : faker['date']['past'](),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker['location']['county'](),
-        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker['location']['city'](),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.location.street() + ' & ' + faker.location.street(),
         logs_count: overrides && overrides.hasOwnProperty('logs_count') ? overrides.logs_count! : faker.number.int({ min: 0, max: 9999 }),
-        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.helpers.fake('{{word.adjective}} {{animal.type}}'),
+        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.location.street() + ' ' + faker.helpers.arrayElement(['March', 'Rally', 'Blockade', 'Sit-in', 'Encampment']),
         start_date: overrides && overrides.hasOwnProperty('start_date') ? overrides.start_date! : faker['date']['past'](),
     };
 };
@@ -1635,8 +1633,8 @@ export const anArrest = (overrides?: Partial<Arrest>, _relationshipsToOmit: Set<
         arrest_city: overrides && overrides.hasOwnProperty('arrest_city') ? overrides.arrest_city! : faker['location']['city'](),
         arrestee: overrides && overrides.hasOwnProperty('arrestee') ? overrides.arrestee! : relationshipsToOmit.has('Arrestee') ? {} as Arrestee : anArrestee({}, relationshipsToOmit),
         arrestee_id: overrides && overrides.hasOwnProperty('arrestee_id') ? overrides.arrestee_id! : faker.number.int({ min: 0, max: 9999 }),
-        charges: overrides && overrides.hasOwnProperty('charges') ? overrides.charges! : faker.lorem.word(),
-        citation_number: overrides && overrides.hasOwnProperty('citation_number') ? overrides.citation_number! : faker.lorem.word(),
+        charges: overrides && overrides.hasOwnProperty('charges') ? overrides.charges! : faker.helpers.arrayElement(["PC 148(a)(1) resisting/obstructing","PC 409 failure to disperse","PC 602 trespass","PC 594 vandalism","PC 243(b) battery on officer","VC 2800 failure to obey officer"]),
+        citation_number: overrides && overrides.hasOwnProperty('citation_number') ? overrides.citation_number! : faker.string.alphanumeric({ length: 8, casing: 'upper' }),
         combined_notes: overrides && overrides.hasOwnProperty('combined_notes') ? overrides.combined_notes! : faker.lorem.word(),
         created_at: overrides && overrides.hasOwnProperty('created_at') ? overrides.created_at! : faker['date']['past'](),
         created_by: overrides && overrides.hasOwnProperty('created_by') ? overrides.created_by! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
@@ -1646,7 +1644,7 @@ export const anArrest = (overrides?: Partial<Arrest>, _relationshipsToOmit: Set<
         display_field: overrides && overrides.hasOwnProperty('display_field') ? overrides.display_field! : faker['person']['fullName'](),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker['location']['county'](),
-        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker['location']['city'](),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.location.street() + ' & ' + faker.location.street(),
         search_field: overrides && overrides.hasOwnProperty('search_field') ? overrides.search_field! : faker['person']['fullName'](),
         updated_at: overrides && overrides.hasOwnProperty('updated_at') ? overrides.updated_at! : faker['date']['past'](),
         updated_by: overrides && overrides.hasOwnProperty('updated_by') ? overrides.updated_by! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
@@ -1668,13 +1666,13 @@ export const anArrestee = (overrides?: Partial<Arrestee>, _relationshipsToOmit: 
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         display_field: overrides && overrides.hasOwnProperty('display_field') ? overrides.display_field! : faker['person']['fullName'](),
-        dob: overrides && overrides.hasOwnProperty('dob') ? overrides.dob! : faker['date']['past'](),
+        dob: overrides && overrides.hasOwnProperty('dob') ? overrides.dob! : faker.date.birthdate({ min: 13, max: 75, mode: 'age' }),
         email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker['internet']['email'](),
         first_name: overrides && overrides.hasOwnProperty('first_name') ? overrides.first_name! : faker['person']['firstName'](),
         full_legal_name: overrides && overrides.hasOwnProperty('full_legal_name') ? overrides.full_legal_name! : faker.lorem.word(),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         last_name: overrides && overrides.hasOwnProperty('last_name') ? overrides.last_name! : faker['person']['lastName'](),
-        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.word(),
+        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.sentences({ min: 1, max: 3 }),
         phone_1: overrides && overrides.hasOwnProperty('phone_1') ? overrides.phone_1! : faker['phone']['number'](),
         phone_2: overrides && overrides.hasOwnProperty('phone_2') ? overrides.phone_2! : faker['phone']['number'](),
         preferred_name: overrides && overrides.hasOwnProperty('preferred_name') ? overrides.preferred_name! : faker['person']['firstName'](),
@@ -1733,11 +1731,11 @@ export const aCreateActionInput = (overrides?: Partial<CreateActionInput>, _rela
     return {
         city: overrides && overrides.hasOwnProperty('city') ? overrides.city! : faker['location']['city'](),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
-        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
+        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.paragraph(),
         end_date: overrides && overrides.hasOwnProperty('end_date') ? overrides.end_date! : faker['date']['past'](),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker['location']['county'](),
-        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker['location']['city'](),
-        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.helpers.fake('{{word.adjective}} {{animal.type}}'),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.location.street() + ' & ' + faker.location.street(),
+        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.location.street() + ' ' + faker.helpers.arrayElement(['March', 'Rally', 'Blockade', 'Sit-in', 'Encampment']),
         start_date: overrides && overrides.hasOwnProperty('start_date') ? overrides.start_date! : faker['date']['past'](),
     };
 };
@@ -1750,14 +1748,14 @@ export const aCreateArrestInput = (overrides?: Partial<CreateArrestInput>, _rela
         arrest_city: overrides && overrides.hasOwnProperty('arrest_city') ? overrides.arrest_city! : faker['location']['city'](),
         arrestee: overrides && overrides.hasOwnProperty('arrestee') ? overrides.arrestee! : relationshipsToOmit.has('UpdateArresteeInput') ? {} as UpdateArresteeInput : anUpdateArresteeInput({}, relationshipsToOmit),
         arrestee_id: overrides && overrides.hasOwnProperty('arrestee_id') ? overrides.arrestee_id! : faker.number.int({ min: 0, max: 9999 }),
-        charges: overrides && overrides.hasOwnProperty('charges') ? overrides.charges! : faker.lorem.word(),
-        citation_number: overrides && overrides.hasOwnProperty('citation_number') ? overrides.citation_number! : faker.lorem.word(),
+        charges: overrides && overrides.hasOwnProperty('charges') ? overrides.charges! : faker.helpers.arrayElement(["PC 148(a)(1) resisting/obstructing","PC 409 failure to disperse","PC 602 trespass","PC 594 vandalism","PC 243(b) battery on officer","VC 2800 failure to obey officer"]),
+        citation_number: overrides && overrides.hasOwnProperty('citation_number') ? overrides.citation_number! : faker.string.alphanumeric({ length: 8, casing: 'upper' }),
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         date: overrides && overrides.hasOwnProperty('date') ? overrides.date! : faker['date']['past'](),
         display_field: overrides && overrides.hasOwnProperty('display_field') ? overrides.display_field! : faker['person']['fullName'](),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker['location']['county'](),
-        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker['location']['city'](),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.location.street() + ' & ' + faker.location.street(),
         search_field: overrides && overrides.hasOwnProperty('search_field') ? overrides.search_field! : faker['person']['fullName'](),
         updated_by_id: overrides && overrides.hasOwnProperty('updated_by_id') ? overrides.updated_by_id! : faker.number.int({ min: 0, max: 9999 }),
     };
@@ -1772,11 +1770,11 @@ export const aCreateArresteeInput = (overrides?: Partial<CreateArresteeInput>, _
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         display_field: overrides && overrides.hasOwnProperty('display_field') ? overrides.display_field! : faker['person']['fullName'](),
-        dob: overrides && overrides.hasOwnProperty('dob') ? overrides.dob! : faker['date']['past'](),
+        dob: overrides && overrides.hasOwnProperty('dob') ? overrides.dob! : faker.date.birthdate({ min: 13, max: 75, mode: 'age' }),
         email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker['internet']['email'](),
         first_name: overrides && overrides.hasOwnProperty('first_name') ? overrides.first_name! : faker['person']['firstName'](),
         last_name: overrides && overrides.hasOwnProperty('last_name') ? overrides.last_name! : faker['person']['lastName'](),
-        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.word(),
+        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.sentences({ min: 1, max: 3 }),
         phone_1: overrides && overrides.hasOwnProperty('phone_1') ? overrides.phone_1! : faker['phone']['number'](),
         phone_2: overrides && overrides.hasOwnProperty('phone_2') ? overrides.phone_2! : faker['phone']['number'](),
         preferred_name: overrides && overrides.hasOwnProperty('preferred_name') ? overrides.preferred_name! : faker['person']['firstName'](),
@@ -1816,14 +1814,14 @@ export const aCreateLogInput = (overrides?: Partial<CreateLogInput>, _relationsh
     return {
         action_id: overrides && overrides.hasOwnProperty('action_id') ? overrides.action_id! : faker.number.int({ min: 0, max: 9999 }),
         arrests: overrides && overrides.hasOwnProperty('arrests') ? overrides.arrests! : [faker.number.int({ min: 0, max: 9999 })],
-        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker.lorem.word(),
+        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker['person']['fullName'](),
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         needs_followup: overrides && overrides.hasOwnProperty('needs_followup') ? overrides.needs_followup! : faker.datatype.boolean(),
-        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.word(),
+        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.sentences({ min: 1, max: 3 }),
         shift: overrides && overrides.hasOwnProperty('shift') ? overrides.shift! : faker.lorem.word(),
         time: overrides && overrides.hasOwnProperty('time') ? overrides.time! : faker['date']['past'](),
-        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.lorem.word(),
+        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.helpers.arrayElement(["Shift Summary","Jail Call","Witness Call","Support Call","Out-of-Custody Call","Text Message","Email","Note","Other"]),
         updated_by_id: overrides && overrides.hasOwnProperty('updated_by_id') ? overrides.updated_by_id! : faker.number.int({ min: 0, max: 9999 }),
     };
 };
@@ -1864,7 +1862,7 @@ export const aCreateSiteSettingInput = (overrides?: Partial<CreateSiteSettingInp
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('CreateSiteSettingInput');
     return {
-        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
+        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.paragraph(),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.lorem.word(),
         value: overrides && overrides.hasOwnProperty('value') ? overrides.value! : faker.lorem.word(),
     };
@@ -1893,10 +1891,10 @@ export const aCreateUserInput = (overrides?: Partial<CreateUserInput>, _relation
         access_date_threshold: overrides && overrides.hasOwnProperty('access_date_threshold') ? overrides.access_date_threshold! : faker.number.int({ min: 0, max: 9999 }),
         action_ids: overrides && overrides.hasOwnProperty('action_ids') ? overrides.action_ids! : [faker.number.int({ min: 0, max: 9999 })],
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
-        email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker['internet']['email'](),
+        email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker.internet.email({ provider: 'example.com' }),
         expiresAt: overrides && overrides.hasOwnProperty('expiresAt') ? overrides.expiresAt! : faker['date']['past'](),
-        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.helpers.fake('{{word.adjective}} {{animal.type}}'),
-        role: overrides && overrides.hasOwnProperty('role') ? overrides.role! : faker.lorem.word(),
+        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker['person']['fullName'](),
+        role: overrides && overrides.hasOwnProperty('role') ? overrides.role! : faker.helpers.enumValue(UserRole),
     };
 };
 
@@ -1972,17 +1970,17 @@ export const aLog = (overrides?: Partial<Log>, _relationshipsToOmit: Set<string>
         action: overrides && overrides.hasOwnProperty('action') ? overrides.action! : relationshipsToOmit.has('Action') ? {} as Action : anAction({}, relationshipsToOmit),
         action_id: overrides && overrides.hasOwnProperty('action_id') ? overrides.action_id! : faker.number.int({ min: 0, max: 9999 }),
         arrests: overrides && overrides.hasOwnProperty('arrests') ? overrides.arrests! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],
-        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker.lorem.word(),
+        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker['person']['fullName'](),
         created_at: overrides && overrides.hasOwnProperty('created_at') ? overrides.created_at! : faker['date']['past'](),
         created_by: overrides && overrides.hasOwnProperty('created_by') ? overrides.created_by! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         needs_followup: overrides && overrides.hasOwnProperty('needs_followup') ? overrides.needs_followup! : faker.datatype.boolean(),
-        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.word(),
+        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.sentences({ min: 1, max: 3 }),
         shift: overrides && overrides.hasOwnProperty('shift') ? overrides.shift! : faker.lorem.word(),
         time: overrides && overrides.hasOwnProperty('time') ? overrides.time! : faker['date']['past'](),
-        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.lorem.word(),
+        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.helpers.arrayElement(["Shift Summary","Jail Call","Witness Call","Support Call","Out-of-Custody Call","Text Message","Email","Note","Other"]),
         updated_at: overrides && overrides.hasOwnProperty('updated_at') ? overrides.updated_at! : faker['date']['past'](),
         updated_by: overrides && overrides.hasOwnProperty('updated_by') ? overrides.updated_by! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
         updated_by_id: overrides && overrides.hasOwnProperty('updated_by_id') ? overrides.updated_by_id! : faker.number.int({ min: 0, max: 9999 }),
@@ -2042,7 +2040,7 @@ export const anOptionSet = (overrides?: Partial<OptionSet>, _relationshipsToOmit
     relationshipsToOmit.add('OptionSet');
     return {
         __typename: 'OptionSet',
-        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
+        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.paragraph(),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.helpers.fake('{{word.adjective}} {{animal.type}}'),
         values: overrides && overrides.hasOwnProperty('values') ? overrides.values! : [relationshipsToOmit.has('OptionSetValue') ? {} as OptionSetValue : anOptionSetValue({}, relationshipsToOmit)],
@@ -2129,7 +2127,7 @@ export const aSiteSetting = (overrides?: Partial<SiteSetting>, _relationshipsToO
     relationshipsToOmit.add('SiteSetting');
     return {
         __typename: 'SiteSetting',
-        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
+        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.paragraph(),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.lorem.word(),
         updated_at: overrides && overrides.hasOwnProperty('updated_at') ? overrides.updated_at! : faker['date']['past'](),
         updated_by: overrides && overrides.hasOwnProperty('updated_by') ? overrides.updated_by! : relationshipsToOmit.has('User') ? {} as User : aUser({}, relationshipsToOmit),
@@ -2162,11 +2160,11 @@ export const anUpdateActionInput = (overrides?: Partial<UpdateActionInput>, _rel
     return {
         city: overrides && overrides.hasOwnProperty('city') ? overrides.city! : faker['location']['city'](),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
-        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
+        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.paragraph(),
         end_date: overrides && overrides.hasOwnProperty('end_date') ? overrides.end_date! : faker['date']['past'](),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker['location']['county'](),
-        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker['location']['city'](),
-        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.helpers.fake('{{word.adjective}} {{animal.type}}'),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.location.street() + ' & ' + faker.location.street(),
+        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.location.street() + ' ' + faker.helpers.arrayElement(['March', 'Rally', 'Blockade', 'Sit-in', 'Encampment']),
         start_date: overrides && overrides.hasOwnProperty('start_date') ? overrides.start_date! : faker['date']['past'](),
     };
 };
@@ -2179,14 +2177,14 @@ export const anUpdateArrestInput = (overrides?: Partial<UpdateArrestInput>, _rel
         arrest_city: overrides && overrides.hasOwnProperty('arrest_city') ? overrides.arrest_city! : faker['location']['city'](),
         arrestee: overrides && overrides.hasOwnProperty('arrestee') ? overrides.arrestee! : relationshipsToOmit.has('CreateArresteeInput') ? {} as CreateArresteeInput : aCreateArresteeInput({}, relationshipsToOmit),
         arrestee_id: overrides && overrides.hasOwnProperty('arrestee_id') ? overrides.arrestee_id! : faker.number.int({ min: 0, max: 9999 }),
-        charges: overrides && overrides.hasOwnProperty('charges') ? overrides.charges! : faker.lorem.word(),
-        citation_number: overrides && overrides.hasOwnProperty('citation_number') ? overrides.citation_number! : faker.lorem.word(),
+        charges: overrides && overrides.hasOwnProperty('charges') ? overrides.charges! : faker.helpers.arrayElement(["PC 148(a)(1) resisting/obstructing","PC 409 failure to disperse","PC 602 trespass","PC 594 vandalism","PC 243(b) battery on officer","VC 2800 failure to obey officer"]),
+        citation_number: overrides && overrides.hasOwnProperty('citation_number') ? overrides.citation_number! : faker.string.alphanumeric({ length: 8, casing: 'upper' }),
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         date: overrides && overrides.hasOwnProperty('date') ? overrides.date! : faker['date']['past'](),
         display_field: overrides && overrides.hasOwnProperty('display_field') ? overrides.display_field! : faker['person']['fullName'](),
         jurisdiction: overrides && overrides.hasOwnProperty('jurisdiction') ? overrides.jurisdiction! : faker['location']['county'](),
-        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker['location']['city'](),
+        location: overrides && overrides.hasOwnProperty('location') ? overrides.location! : faker.location.street() + ' & ' + faker.location.street(),
         search_field: overrides && overrides.hasOwnProperty('search_field') ? overrides.search_field! : faker['person']['fullName'](),
         updated_by_id: overrides && overrides.hasOwnProperty('updated_by_id') ? overrides.updated_by_id! : faker.number.int({ min: 0, max: 9999 }),
     };
@@ -2201,11 +2199,11 @@ export const anUpdateArresteeInput = (overrides?: Partial<UpdateArresteeInput>, 
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         display_field: overrides && overrides.hasOwnProperty('display_field') ? overrides.display_field! : faker['person']['fullName'](),
-        dob: overrides && overrides.hasOwnProperty('dob') ? overrides.dob! : faker['date']['past'](),
+        dob: overrides && overrides.hasOwnProperty('dob') ? overrides.dob! : faker.date.birthdate({ min: 13, max: 75, mode: 'age' }),
         email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker['internet']['email'](),
         first_name: overrides && overrides.hasOwnProperty('first_name') ? overrides.first_name! : faker['person']['firstName'](),
         last_name: overrides && overrides.hasOwnProperty('last_name') ? overrides.last_name! : faker['person']['lastName'](),
-        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.word(),
+        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.sentences({ min: 1, max: 3 }),
         phone_1: overrides && overrides.hasOwnProperty('phone_1') ? overrides.phone_1! : faker['phone']['number'](),
         phone_2: overrides && overrides.hasOwnProperty('phone_2') ? overrides.phone_2! : faker['phone']['number'](),
         preferred_name: overrides && overrides.hasOwnProperty('preferred_name') ? overrides.preferred_name! : faker['person']['firstName'](),
@@ -2246,14 +2244,14 @@ export const anUpdateLogInput = (overrides?: Partial<UpdateLogInput>, _relations
     return {
         action_id: overrides && overrides.hasOwnProperty('action_id') ? overrides.action_id! : faker.number.int({ min: 0, max: 9999 }),
         arrests: overrides && overrides.hasOwnProperty('arrests') ? overrides.arrests! : [faker.number.int({ min: 0, max: 9999 })],
-        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker.lorem.word(),
+        contact: overrides && overrides.hasOwnProperty('contact') ? overrides.contact! : faker['person']['fullName'](),
         created_by_id: overrides && overrides.hasOwnProperty('created_by_id') ? overrides.created_by_id! : faker.number.int({ min: 0, max: 9999 }),
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
         needs_followup: overrides && overrides.hasOwnProperty('needs_followup') ? overrides.needs_followup! : faker.datatype.boolean(),
-        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.word(),
+        notes: overrides && overrides.hasOwnProperty('notes') ? overrides.notes! : faker.lorem.sentences({ min: 1, max: 3 }),
         shift: overrides && overrides.hasOwnProperty('shift') ? overrides.shift! : faker.lorem.word(),
         time: overrides && overrides.hasOwnProperty('time') ? overrides.time! : faker['date']['past'](),
-        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.lorem.word(),
+        type: overrides && overrides.hasOwnProperty('type') ? overrides.type! : faker.helpers.arrayElement(["Shift Summary","Jail Call","Witness Call","Support Call","Out-of-Custody Call","Text Message","Email","Note","Other"]),
         updated_by_id: overrides && overrides.hasOwnProperty('updated_by_id') ? overrides.updated_by_id! : faker.number.int({ min: 0, max: 9999 }),
     };
 };
@@ -2296,7 +2294,7 @@ export const anUpdateSiteSettingInput = (overrides?: Partial<UpdateSiteSettingIn
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('UpdateSiteSettingInput');
     return {
-        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
+        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.paragraph(),
         value: overrides && overrides.hasOwnProperty('value') ? overrides.value! : faker.lorem.word(),
     };
 };
@@ -2324,10 +2322,10 @@ export const anUpdateUserInput = (overrides?: Partial<UpdateUserInput>, _relatio
         access_date_threshold: overrides && overrides.hasOwnProperty('access_date_threshold') ? overrides.access_date_threshold! : faker.number.int({ min: 0, max: 9999 }),
         action_ids: overrides && overrides.hasOwnProperty('action_ids') ? overrides.action_ids! : [faker.number.int({ min: 0, max: 9999 })],
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
-        email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker['internet']['email'](),
+        email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker.internet.email({ provider: 'example.com' }),
         expiresAt: overrides && overrides.hasOwnProperty('expiresAt') ? overrides.expiresAt! : faker['date']['past'](),
-        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker.helpers.fake('{{word.adjective}} {{animal.type}}'),
-        role: overrides && overrides.hasOwnProperty('role') ? overrides.role! : faker.lorem.word(),
+        name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker['person']['fullName'](),
+        role: overrides && overrides.hasOwnProperty('role') ? overrides.role! : faker.helpers.enumValue(UserRole),
     };
 };
 
@@ -2335,7 +2333,7 @@ export const anUpsertSiteSettingInput = (overrides?: Partial<UpsertSiteSettingIn
     const relationshipsToOmit: Set<string> = new Set(_relationshipsToOmit);
     relationshipsToOmit.add('UpsertSiteSettingInput');
     return {
-        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.word(),
+        description: overrides && overrides.hasOwnProperty('description') ? overrides.description! : faker.lorem.paragraph(),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.lorem.word(),
         value: overrides && overrides.hasOwnProperty('value') ? overrides.value! : faker.lorem.word(),
     };
@@ -2356,11 +2354,11 @@ export const aUser = (overrides?: Partial<User>, _relationshipsToOmit: Set<strin
         created_arrests: overrides && overrides.hasOwnProperty('created_arrests') ? overrides.created_arrests! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],
         created_table_views: overrides && overrides.hasOwnProperty('created_table_views') ? overrides.created_table_views! : [relationshipsToOmit.has('TableView') ? {} as TableView : aTableView({}, relationshipsToOmit)],
         custom_fields: overrides && overrides.hasOwnProperty('custom_fields') ? overrides.custom_fields! : faker.lorem.word(),
-        email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker['internet']['email'](),
+        email: overrides && overrides.hasOwnProperty('email') ? overrides.email! : faker.internet.email({ provider: 'example.com' }),
         expiresAt: overrides && overrides.hasOwnProperty('expiresAt') ? overrides.expiresAt! : faker['date']['past'](),
         id: overrides && overrides.hasOwnProperty('id') ? overrides.id! : faker.number.int({ min: 0, max: 9999 }),
         name: overrides && overrides.hasOwnProperty('name') ? overrides.name! : faker['person']['fullName'](),
-        role: overrides && overrides.hasOwnProperty('role') ? overrides.role! : UserRole.Admin,
+        role: overrides && overrides.hasOwnProperty('role') ? overrides.role! : faker.helpers.enumValue(UserRole),
         updated_arrestee_logs: overrides && overrides.hasOwnProperty('updated_arrestee_logs') ? overrides.updated_arrestee_logs! : [relationshipsToOmit.has('Log') ? {} as Log : aLog({}, relationshipsToOmit)],
         updated_arrestees: overrides && overrides.hasOwnProperty('updated_arrestees') ? overrides.updated_arrestees! : [relationshipsToOmit.has('Arrestee') ? {} as Arrestee : anArrestee({}, relationshipsToOmit)],
         updated_arrests: overrides && overrides.hasOwnProperty('updated_arrests') ? overrides.updated_arrests! : [relationshipsToOmit.has('Arrest') ? {} as Arrest : anArrest({}, relationshipsToOmit)],
