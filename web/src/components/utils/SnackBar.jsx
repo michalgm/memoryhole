@@ -98,8 +98,8 @@ const formatError = (error) => {
         'Unknown error'
 
   const errors = [
-    ...(error.graphQLErrors || []),
-    ...(error.networkError?.result?.errors || []),
+    ...(error?.graphQLErrors || []),
+    ...(error?.networkError?.result?.errors || []),
   ]
   if (error?.[0]?.extensions?.code === 'BAD_USER_INPUT') {
     rootMessage = 'Errors prevented this form from being saved:'

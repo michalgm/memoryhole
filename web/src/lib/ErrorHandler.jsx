@@ -16,7 +16,7 @@ const INVALID_AUTH_HEADER_ERROR =
 
 const checkAuthExpired = ({ graphQLErrors, networkError }) => {
   if (
-    graphQLErrors[0]?.extensions?.originalError?.message ===
+    graphQLErrors?.[0]?.extensions?.originalError?.message ===
       INVALID_AUTH_HEADER_ERROR ||
     networkError?.result?.errors?.[0]?.extensions?.originalError?.message ===
       INVALID_AUTH_HEADER_ERROR
