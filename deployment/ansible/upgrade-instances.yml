@@ -53,6 +53,7 @@
         images_filters:
           dangling: false
         builder_cache: true
+        networks: true
       register: _prune
 
     - name: Show space reclaimed
