@@ -5,6 +5,13 @@ services:
     image: postgres:18
     restart: always
     mem_limit: {{ instance.mem_limits['db'] | default(container_mem_limits['db']) }}
+    cap_drop: [ALL]
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - FOWNER
+      - DAC_OVERRIDE
     env_file:
       - .env.db
     healthcheck:
@@ -15,6 +22,8 @@ services:
       timeout: 10s
     volumes:
       - ./data/postgres:/var/lib/postgresql
+    networks:
+      - backend
 
   protonmail-bridge:
     # image: shenxn/protonmail-bridge  # revert when https://github.com/shenxn/protonmail-bridge-docker/issues/141 is fixed
@@ -28,10 +37,13 @@ services:
     tty: true
     volumes:
       - ./data/protonmail:/root
+    networks:
+      - mail
 
   api:
     image: ghcr.io/michalgm/memoryhole-api:{{ instance.image_tag | default('latest') }}
     init: true
+    cap_drop: [ALL]
     env_file:
       - .env
     restart: unless-stopped
@@ -41,10 +53,17 @@ services:
         condition: service_healthy
     environment:
       - DATABASE_URL=postgresql://$PG_USER:$PG_PASS@db:5432/memoryhole
+    networks:
+      - backend
+      - frontend
+      - mail
 
   web:
     image: ghcr.io/michalgm/memoryhole-web:{{ instance.image_tag | default('latest') }}
     init: true
+    cap_drop: [ALL]
+    cap_add:
+      - CAP_NET_BIND_SERVICE
     ports:
       - "127.0.0.1:{{ instance_credentials[instance.domain].port }}:80"
     restart: unless-stopped
@@ -54,10 +73,11 @@ services:
     depends_on:
       - api
     stop_grace_period: 5s
+    networks:
+      - frontend
 
   console:
     image: ghcr.io/michalgm/memoryhole-api:{{ instance.image_tag | default('latest') }}
-    user: root
     init: true
     tmpfs:
       - /tmp
@@ -68,4 +88,11 @@ services:
       - DATABASE_URL=postgresql://$PG_USER:$PG_PASS@db:5432/memoryhole
     depends_on:
       - db
+    networks:
+      - backend
 
+networks:
+  backend:
+    internal: true
+  frontend:
+  mail:
