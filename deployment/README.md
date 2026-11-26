@@ -69,7 +69,7 @@ Then follow the [Deployment](#2-deployment) section below — skip the inventory
 
 Skip this section if your server already exists.
 
-This creates a new Linode VPS, attaches a Cloud Firewall (SSH, HTTP and HTTPS only), and sets the server's hostname. By default, it will provision a $5/month nanode in the eu-central region called `memoryhole`, with a 2 GB swap disk. To change these, override the `linode_*` settings from `group_vars/all/defaults.yml` in your `main.yml`. The 1 GB nanode is enough for one instance; for more, use a larger plan (`linode_type`).
+This creates a new Linode VPS, attaches a Cloud Firewall (SSH, HTTP and HTTPS only), and sets the server's hostname. By default, it will provision a $5/month nanode in the eu-central region called `memoryhole`, with a 2 GB swap disk. To change these, override the `linode_*` settings from `group_vars/all/defaults.yml` in your `main.yml` (see [configure](#step-1-configure) below). The 1 GB nanode is enough for one instance; for more, use a larger plan (`linode_type`).
 
 You need a Linode API token with read/write access to Linodes and Firewalls, which you can create at https://cloud.linode.com/profile/tokens. Either export it, or leave it unset and the playbook will prompt for it:
 
